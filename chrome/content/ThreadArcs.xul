@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+
+<!--
+/* *******************************************************
+ * ThreadArcs.xul
+ *
+ * (c) 2005 Alexander C. Hubmann
+ *
+ * XUL file to display ThreadArcs extension
+ *
+ * Version: $Id$
+ ********************************************************/
+-->
+
+<overlay id="ThreadArcs"
+  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+    <script src="chrome://threadarcs/content/Container.js" />
+    <script src="chrome://threadarcs/content/Message.js" />
+    <script src="chrome://threadarcs/content/References.js" />
+    <script src="chrome://threadarcs/content/ThreadArcs.js" />
+    <script src="chrome://threadarcs/content/Threader.js" />
+    <script src="chrome://threadarcs/content/Visualisation.js" />
+
+    <hbox id="expandedHeaderView">
+        <hbox id="ThreadArcsBox" height="100" width="200" insertafter="expandedAttachmentBox">
+    </hbox>
+
+    </hbox>
+
+</overlay>

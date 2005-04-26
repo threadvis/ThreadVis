@@ -1,0 +1,37 @@
+<?xml version="1.0"?> 
+<!--
+/* *******************************************************
+ * contents.rdf
+ *
+ * (c) 2005 Alexander C. Hubmann
+ *
+ * RDF file describing chrome part of extension
+ *
+ * Version: $Id$
+ ********************************************************/
+
+-->
+  <RDF:RDF xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+    xmlns:chrome="http://www.mozilla.org/rdf/chrome#"> 
+
+    <RDF:Seq about="urn:mozilla:package:root"> 
+      <RDF:li resource="urn:mozilla:package:threadarcs"/> 
+    </RDF:Seq> 
+
+    <RDF:Description about="urn:mozilla:package:threadarcs" 
+          chrome:displayName="ThreadArcs" 
+          chrome:author="Alexander C. Hubmann" 
+          chrome:name="ThreadArcs"
+          chrome:extension="true"
+          chrome:description="Displays ThreadArcs for Mail Messages."> 
+    </RDF:Description>
+
+    <RDF:Seq about="urn:mozilla:overlays">
+      <RDF:li resource="chrome://messenger/content/msgHdrViewOverlay.xul"/>
+    </RDF:Seq>
+
+    <RDF:Seq about="chrome://messenger/content/msgHdrViewOverlay.xul">
+      <RDF:li>chrome://threadarcs/content/ThreadArcs.xul</RDF:li>
+    </RDF:Seq>
+
+  </RDF:RDF>

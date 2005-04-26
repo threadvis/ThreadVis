@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+
+<!--
+/* *******************************************************
+ * install.rdf
+ *
+ * (c) 2005 Alexander C. Hubmann
+ *
+ * RDF meta-file for Mozilla ThreadArcs extension
+ *
+ * Version: $Id$
+ ********************************************************/
+-->
+
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+
+  <Description about="urn:mozilla:install-manifest">
+      
+    <!-- Target Application - Mozilla -->
+    <em:targetApplication>
+     <Description>
+       <em:id>{3550f703-e582-4d05-9a08-453d09bdfdc6}</em:id>
+       <em:minVersion>1.0</em:minVersion>
+       <em:maxVersion>1.0</em:maxVersion>
+     </Description>
+    </em:targetApplication>
+    
+    <!-- Front End MetaData -->
+    <em:id>{463F6CA5-EE3C-4be1-B7E6-7FEE11953374}</em:id>
+    <em:version>0.4</em:version>
+    <em:name>ThreadArcs</em:name>
+    <em:description>ThreadArcs Extension</em:description>
+    <em:creator>Alexander C. Hubmann</em:creator>
+    <em:homepageURL>http://www.sbox.tugraz.at/~xpert/threadarcs/</em:homepageURL>
+
+    <!-- Packages, Skins and Locales that this extension registers -->
+    <em:file>
+      <Description about="urn:mozilla:extension:file:threadarcs.jar">
+        <em:package>content/</em:package>
+      </Description>
+    </em:file>
+  </Description>
+</RDF>
+
