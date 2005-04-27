@@ -12,18 +12,18 @@
  ********************************************************/
 -->
 
-<overlay id="ThreadArcs"
+<overlay id="ThreadArcsJS"
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-    <script src="chrome://threadarcs/content/Container.js" />
-    <script src="chrome://threadarcs/content/Message.js" />
-    <script src="chrome://threadarcs/content/References.js" />
-    <script src="chrome://threadarcs/content/ThreadArcs.js" />
-    <script src="chrome://threadarcs/content/Threader.js" />
-    <script src="chrome://threadarcs/content/Visualisation.js" />
+    <script src="chrome://threadarcsjs/content/Container.js" />
+    <script src="chrome://threadarcsjs/content/Message.js" />
+    <script src="chrome://threadarcsjs/content/References.js" />
+    <script src="chrome://threadarcsjs/content/ThreadArcs.js" />
+    <script src="chrome://threadarcsjs/content/Threader.js" />
+    <script src="chrome://threadarcsjs/content/Visualisation.js" />
 
     <hbox id="expandedHeaderView">
-        <hbox id="ThreadArcsBox" height="100" width="200" insertafter="expandedAttachmentBox">
+        <hbox id="ThreadArcsJSBox" height="100" width="200" insertafter="expandedAttachmentBox" style="margin-right: 20px;">
     </hbox>
 
     </hbox>

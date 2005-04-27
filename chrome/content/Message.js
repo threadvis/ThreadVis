@@ -184,7 +184,8 @@ function Message_isReply()
 function Message_isSent()
 {
     // fixxme
-    return (this.getFolder() == "sent");
+    // find a better regex
+    return (this.getFolder().search(/.*\/Sent.*/) != -1);
 }
 
 

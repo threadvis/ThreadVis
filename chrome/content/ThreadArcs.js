@@ -89,7 +89,6 @@ function addMessagesFromSubFolders(folder)
     }
 }
 
-
 /**
  * Add all messages in this folder
  */
@@ -166,4 +165,12 @@ function threadArcsCallback(msgKey, folder)
     gDBView.selectMsgByKey(msgKey);
     
     treeBoxObj.ensureRowIsVisible(treeSelection.currentIndex);
+}
+
+
+function ThreadArcs_onMouseClick(event)
+{
+    var container = event.target.container;
+    if (container && ! container.isDummy())
+        threadArcsCallback(container.getMessage().getKey(), container.getMessage().getFolder());
 }

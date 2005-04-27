@@ -10,7 +10,7 @@
 @echo Creating XPI file
 @echo ======================================================================
 
-@c:\Programme\7-Zip\7z a -tzip ThreadArcs.xpi install.rdf chrome\threadarcs.jar
+@c:\Programme\7-Zip\7z a -tzip ThreadArcsJS.xpi install.rdf chrome\threadarcsjs.jar
 
 @echo ======================================================================
 @echo Done creating XPI file

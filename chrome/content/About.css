@@ -1,0 +1,50 @@
+/* *******************************************************
+ * ThreadArcsDialog.css
+ *
+ * (c) 2005 Alexander C. Hubmann
+ *
+ * CSS file to format about dialog
+ *
+ * Version: $Id$
+ ********************************************************/
+
+@import url("chrome://communicator/skin/");
+
+#title
+{
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+#version
+{
+}
+
+#copyright
+{
+}
+
+#homepage
+{
+    color: #0000ff;
+    font-decoration: underline;
+    cursor: pointer;
+}
+
+#mail
+{
+    color: #0000ff;
+    font-decoration: underline;
+    cursor: pointer;
+}
+
+.sendlogdescription
+{
+    max-width: 200px;
+}
+
+.important
+{
+    font-weight: bold;
+    color: #ff0000;
+}

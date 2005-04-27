@@ -24,7 +24,7 @@ var ARC_LEFT_PLACEMENT_ = new Array();
     ARC_LEFT_PLACEMENT_[1] = -4;
 var ARC_RIGHT_PLACEMENT_ = new Array();
     ARC_RIGHT_PLACEMENT_[1] = 4;
-var URL_ = "chrome://threadarcs/content/";
+var URL_ = "chrome://threadarcsjs/content/";
 
 
 /**
@@ -63,7 +63,7 @@ function Visualisation_clearStack()
  */
 function Visualisation_createStack()
 {
-    var box = document.getElementById("ThreadArcsBox");
+    var box = document.getElementById("ThreadArcsJSBox");
     var stack = document.createElementNS(XUL_NAMESPACE_, "stack");
     box.appendChild(stack);
     this.stack_ = stack;
@@ -114,7 +114,7 @@ function Visualisation_drawArc(color, vposition, height, left, right)
 /**
  * Draw a dot
  */
-function Visualisation_drawDot(color, style, left)
+function Visualisation_drawDot(container, color, style, left)
 {
     var div = document.createElementNS(HTML_NAMESPACE_, "div");
     var dot = document.createElementNS(HTML_NAMESPACE_, "img");
@@ -125,6 +125,10 @@ function Visualisation_drawDot(color, style, left)
     dot.style.width = DOTSIZE_ + "px";
     dot.style.height = DOTSIZE_ + "px";
     dot.setAttribute("src", URL_ + "threadarcs_dot_" + color + "_" + style + ".png");
+
+    dot.container = container;
+
+    div.addEventListener("click", ThreadArcs_onMouseClick, true);
 
     div.appendChild(dot);
     this.stack_.appendChild(div);
@@ -158,7 +162,11 @@ function Visualisation_visualise(container)
         if (thiscontainer == container)
             color = "blue";
 
-        this.drawDot(color, "full", x);
+        var style = "full";
+        if (! thiscontainer.isDummy() && thiscontainer.getMessage().isSent())
+            style = "half";
+        
+        this.drawDot(thiscontainer, color, style, x);
         thiscontainer.x_position_ = x;
 
         // draw arc

@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+
+<!--
+/* *******************************************************
+ * ThreadArcsDialog.xul
+ *
+ * (c) 2005 Alexander C. Hubmann
+ *
+ * XUL file to display about dialog
+ *
+ * Version: $Id$
+ ********************************************************/
+-->
+
+<?xml-stylesheet href="About.css" type="text/css"?>
+
+<dialog buttons="accept"
+        id="About"
+        ondialogaccept=""
+        onload=""
+        title="ThreadArcs Extension"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        xmlns:html="http://www.w3.org/1999/xhtml">
+
+    <script src="chrome://threadarcs/content/About.js"/>
+    
+    <description id="title">ThreadArcsJS Extension</description>
+    <description id="version">Version 0.1</description>
+    <description id="copyright">(c) 2004-2005 Alexander C. Hubmann</description>
+    <description id="homepage" onclick="displayHomepage();">www.sbox.tugraz.at/home/x/xpert/threadarcs/</description>
+    <description id="mail" onclick="writeEmail();">xpert@sbox.tugraz.at</description>
+</dialog>
