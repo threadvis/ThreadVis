@@ -59,9 +59,9 @@ function Threader_addMessage(message)
  * Add a new message
  * construct message here
  */
-function Threader_addMessageDetail(subject, author, messageId, messageKey, date, uri, references)
+function Threader_addMessageDetail(subject, author, messageId, messageKey, date, uri, references, issent)
 {
-    this.addMessage(new Message(subject, author, messageId, messageKey, date, uri, references));
+    this.addMessage(new Message(subject, author, messageId, messageKey, date, uri, references, issent));
 }
 
 

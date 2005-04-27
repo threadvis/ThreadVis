@@ -64,7 +64,12 @@ function Visualisation_clearStack()
 function Visualisation_createStack()
 {
     var box = document.getElementById("ThreadArcsJSBox");
-    var stack = document.createElementNS(XUL_NAMESPACE_, "stack");
+    var stack = document.getElementById("ThreadArcsJSStack");
+    if (! stack)
+    {
+        stack = document.createElementNS(XUL_NAMESPACE_, "stack");
+        stack.setAttribute("id", "ThreadArcsJSStack");
+    }
     box.appendChild(stack);
     this.stack_ = stack;
     this.box_ = box;

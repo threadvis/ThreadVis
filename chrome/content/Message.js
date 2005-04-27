@@ -11,7 +11,7 @@
 /**
  * Constructor
  */
-function Message(subject, from, message_id, message_key, date, folder, references)
+function Message(subject, from, message_id, message_key, date, folder, references, issent)
 {
     /**
      * Message date
@@ -31,6 +31,11 @@ function Message(subject, from, message_id, message_key, date, folder, reference
      */
     this.folder_ = folder;
 
+
+    /**
+     * if folder stores sent mails
+     */
+    this.issent_ = issent;
 
     /**
      * Message id
@@ -185,7 +190,8 @@ function Message_isSent()
 {
     // fixxme
     // find a better regex
-    return (this.getFolder().search(/.*\/Sent.*/) != -1);
+    //return (this.getFolder().search(/.*\/Sent.*/) != -1);
+    return this.issent_;
 }
 
 

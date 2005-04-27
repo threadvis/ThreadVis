@@ -23,6 +23,9 @@ window.setTimeout(addThreadArcs, 1000);
 var threader_= null;
 var loaded_ = false;
 
+// store server to react to server switch
+var server_ = null;
+
 // FIXXME: hack
 // add messages when we display first header
 var doLoad = {
@@ -48,6 +51,8 @@ function addMessages()
     // get root folder
     var folder = GetLoadedMsgFolder();
     var root = folder.rootFolder;
+    
+    server_ = folder.server;
 
     addMessagesFromSubFolders(root);
     
@@ -102,12 +107,17 @@ function addMessagesFromFolder(folder)
         header = msg_enumerator.getNext();
         if (header instanceof Components.interfaces.nsIMsgDBHdr)
         {
+            // save current account key
             var date = new Date();
             // PRTime is in microseconds, Javascript time is in milliseconds
             // so divide by 1000 when converting
             date.setTime(header.date / 1000);
             date = date.getDate() + ". " + date.getMonth() + ". " + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-            getThreader().addMessageDetail(header.subject, header.author, header.messageId, header.messageKey, date, header.folder.URI , header.getStringProperty("references"));
+            
+            // see if msg is a sent mail
+            var issent = IsSpecialFolder(header.folder, MSG_FOLDER_FLAG_SENTMAIL, true);
+            
+            getThreader().addMessageDetail(header.subject, header.author, header.messageId, header.messageKey, date, header.folder.URI , header.getStringProperty("references"), issent);
         }
     }
 }
@@ -141,6 +151,15 @@ function setSelectedMessage()
     // get currently loaded message
     var msg_uri = GetLoadedMessage();
     var msg = messenger.messageServiceFromURI(msg_uri).messageURIToMsgHdr(msg_uri);
+    
+    if (server_ != msg.folder.server)
+    {
+        // user just switched account
+        addThreadArcs();
+        loaded_ = false;
+        doLoad.onStartHeaders();
+    }
+    
     // call threader
     getThreader().visualise(msg.messageId);
 }
