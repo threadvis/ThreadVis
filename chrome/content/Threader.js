@@ -182,7 +182,7 @@ function Threader_thread()
     var rootkey = null;
     for (rootkey in this.id_table_)
     {
-        container = this.id_table_[rootkey];
+        var container = this.id_table_[rootkey];
         if (! container.hasParent())
         {
             // root set contains all containers that have no parents
@@ -215,43 +215,43 @@ function Threader_thread()
         }
         // if the container has no message, but children
         // actually we want to keep this dummy to preserve structure
-        /*
-        else if (container.isDummy() && container.hasOneChild())
-        {
-            // add children to root set
-            var child = container.getChild();
+        
+        //else if (container.isDummy() && container.hasOneChild())
+        //{
+        //    // add children to root set
+        //    var child = container.getChild();
+        //
+        //    var lastchild = child.getLast();
+        //    lastchild.setNext(container.getNext());
+        //
+        //    // remove children from container
+        //    container.removeChild();
+        //
+        //    // remove container from root_set_
+        //
+        //    if (container.hasPrevious())
+        //    {
+        //        container.getPrevious().setNext(child);
+        //    }
+        //    else
+        //    {
+        //        root_set_.setChild(child);
+        //    }
+        //
+        //
+        //    if (prev != null)
+        //    {
+        //        prev.setNext(child);
+        //        container = prev;
+        //    }
+        //    else
+        //    {
+        //        root_set_.setChild(child);
+        //        container = prev;
+        //    }
+        //    continue;
+        //}
 
-            var lastchild = child.getLast();
-            lastchild.setNext(container.getNext());
-
-            // remove children from container
-            container.removeChild();
-
-            // remove container from root_set_
-
-            if (container.hasPrevious())
-            {
-                container.getPrevious().setNext(child);
-            }
-            else
-            {
-                root_set_.setChild(child);
-            }
-
-
-            if (prev != null)
-            {
-                prev.setNext(child);
-                container = prev;
-            }
-            else
-            {
-                root_set_.setChild(child);
-                container = prev;
-            }
-            continue;
-        }
-        */
         // recursively prune empty containers
         container.pruneEmptyContainers();
     }
@@ -329,7 +329,7 @@ function Threader_thread()
             {
                 // insert dummy containers for missing messages
                 difference--;
-                new_container = null;
+                var new_container = null;
                 // if container has child, use that
                 if (top.hasChild())
                 {
@@ -376,7 +376,7 @@ function Threader_thread()
             {
                 // insert dummy containers for missing messages
                 difference--;
-                new_container = null;
+                var new_container = null;
                 // if container has child, use that
                 if (top.hasChild())
                 {
@@ -409,9 +409,9 @@ function Threader_thread()
         {
             // remove both from list of siblings
 
-            new_container = new Container();
+            var new_container = new Container();
 
-            tmp = container.getPrevious();;
+            var tmp = container.getPrevious();;
             new_container.addChild(container);
             new_container.addChild(subject_container);
             this.root_set_.addChild(new_container);
@@ -444,6 +444,11 @@ function Threader_visualise(message_id)
     {
         visualisation_.visualise(container);
     }
+    else
+    {
+        visualisation_.createStack();
+    }
+    container = null;
 }
 
 

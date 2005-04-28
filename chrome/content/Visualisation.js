@@ -63,16 +63,36 @@ function Visualisation_clearStack()
  */
 function Visualisation_createStack()
 {
-    var box = document.getElementById("ThreadArcsJSBox");
-    var stack = document.getElementById("ThreadArcsJSStack");
-    if (! stack)
+    this.box_ = document.getElementById("ThreadArcsJSBox");
+    this.stack_ = document.getElementById("ThreadArcsJSStack");
+    
+    if (! this.stack_)
     {
-        stack = document.createElementNS(XUL_NAMESPACE_, "stack");
-        stack.setAttribute("id", "ThreadArcsJSStack");
+        this.stack_ = document.createElementNS(XUL_NAMESPACE_, "stack");
+        this.stack_.setAttribute("id", "ThreadArcsJSStack");
+        this.box_.appendChild(this.stack_);
     }
-    box.appendChild(stack);
-    this.stack_ = stack;
-    this.box_ = box;
+    else
+    {
+        this.clearStack();
+    }
+    
+    
+    var div = document.createElementNS(HTML_NAMESPACE_, "div");
+    var loading = document.createElementNS(HTML_NAMESPACE_, "img");
+
+    loading.style.position = "relative";
+    loading.style.top = "0px";
+    loading.style.left = "0px";
+    loading.style.width = "200px";
+    loading.style.height = "100px";
+    loading.setAttribute("src", URL_ + "threadarcs_loading.gif");
+
+    div.appendChild(loading);
+    this.stack_.appendChild(div);
+    
+    loading = null;
+    div = null;
 }
 
 

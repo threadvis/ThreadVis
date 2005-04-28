@@ -14,33 +14,43 @@ var HTML_NAMESPACE_ =
 var XUL_NAMESPACE_ =
     "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
+// visualisation object
 var visualisation_ = null;
 
-
-// add visualisation at startup
-window.setTimeout(addThreadArcs, 1000);
-
+// threader object
 var threader_= null;
-var loaded_ = false;
 
 // store server to react to server switch
 var server_ = null;
 
-// FIXXME: hack
+// synchronization variables
+var loaded_ = false;
+var loading_ = false;
+var threaded_ = false;
+var threading_ = false;
+var clear_ = false;
+
+
+
+// add visualisation at startup
+setTimeout(addThreadArcs, 1000);
+
+
+
 // add messages when we display first header
+// register this as event handler later
 var doLoad = {
     onStartHeaders: function()
     {
-        if (! loaded_)
-            addMessages();
-        loaded_ = true;
+        initMessages();
+        waitForThreading();
         setSelectedMessage();
     },
     onEndHeaders: function()
     {
     }
 }
-gMessageListeners.push(doLoad);
+
 
 
 /**
@@ -48,16 +58,49 @@ gMessageListeners.push(doLoad);
  */
 function addMessages()
 {
+    loading_ = true;
+    loaded_ = false;
+    
     // get root folder
     var folder = GetLoadedMsgFolder();
     var root = folder.rootFolder;
     
     server_ = folder.server;
-
     addMessagesFromSubFolders(root);
     
-    getThreader().thread();
+    loaded_ = true;
+    loading_ = false;
 }
+
+
+/**
+ * Add all messages in this folder
+ */
+function addMessagesFromFolder(folder)
+{
+    // get messages from current folder
+    var msg_enumerator = folder.getMessages(null);
+    var header = null;
+    while (msg_enumerator.hasMoreElements())
+    {
+        header = msg_enumerator.getNext();
+        if (header instanceof Components.interfaces.nsIMsgDBHdr)
+        {
+            // save current account key
+            var date = new Date();
+            // PRTime is in microseconds, Javascript time is in milliseconds
+            // so divide by 1000 when converting
+            date.setTime(header.date / 1000);
+            date = date.getDate() + ". " + date.getMonth() + ". " + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+            
+            // see if msg is a sent mail
+            var issent = IsSpecialFolder(header.folder, MSG_FOLDER_FLAG_SENTMAIL, true);
+            
+            threader_.addMessageDetail(header.subject, header.author, header.messageId, header.messageKey, date, header.folder.URI , header.getStringProperty("references"), issent);
+        }
+    }
+}
+
 
 /**
  * Add all messages from subfolders
@@ -94,34 +137,6 @@ function addMessagesFromSubFolders(folder)
     }
 }
 
-/**
- * Add all messages in this folder
- */
-function addMessagesFromFolder(folder)
-{
-    // get messages from current folder
-    var msg_enumerator = folder.getMessages(null);
-    var header = null;
-    while (msg_enumerator.hasMoreElements())
-    {
-        header = msg_enumerator.getNext();
-        if (header instanceof Components.interfaces.nsIMsgDBHdr)
-        {
-            // save current account key
-            var date = new Date();
-            // PRTime is in microseconds, Javascript time is in milliseconds
-            // so divide by 1000 when converting
-            date.setTime(header.date / 1000);
-            date = date.getDate() + ". " + date.getMonth() + ". " + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-            
-            // see if msg is a sent mail
-            var issent = IsSpecialFolder(header.folder, MSG_FOLDER_FLAG_SENTMAIL, true);
-            
-            getThreader().addMessageDetail(header.subject, header.author, header.messageId, header.messageKey, date, header.folder.URI , header.getStringProperty("references"), issent);
-        }
-    }
-}
-
 
 /**
  * initialize extension
@@ -130,15 +145,47 @@ function addThreadArcs()
 {
     threader_ = new Threader();
     visualisation_ = new Visualisation();
+    gMessageListeners.push(doLoad);
 }
 
 
 /**
- * Get DOM object of applet
+ * clear visualisation
  */
-function getThreader() {
+function clearVisualisation()
+{
+    if (clear_)
+        return;
+    
+    visualisation_.createStack();
+    clear_ = true;
+}
 
-    return threader_;
+
+/**
+ * thread all messages
+ */
+function doThreading()
+{
+    threading_ = true;
+    threaded_ = false;
+    threader_.thread();
+    threaded_ = true;
+    threading_ = false;
+}
+
+
+/**
+ * add all messages
+ * if not already done
+ */
+function initMessages()
+{
+    if (! loaded_ && ! loading_)
+    {
+        loading_ = true;
+        setTimeout("addMessages()", 100);
+    }
 }
 
 
@@ -148,6 +195,14 @@ function getThreader() {
  */
 function setSelectedMessage()
 {
+    if (! loaded_ || ! threaded_)
+    {
+        setTimeout("setSelectedMessage()", 100);
+        clearVisualisation();
+        return;
+    }
+    clear_ = false;
+    
     // get currently loaded message
     var msg_uri = GetLoadedMessage();
     var msg = messenger.messageServiceFromURI(msg_uri).messageURIToMsgHdr(msg_uri);
@@ -157,11 +212,12 @@ function setSelectedMessage()
         // user just switched account
         addThreadArcs();
         loaded_ = false;
+        threaded_ = false;
         doLoad.onStartHeaders();
     }
     
     // call threader
-    getThreader().visualise(msg.messageId);
+    threader_.visualise(msg.messageId);
 }
 
 
@@ -187,6 +243,28 @@ function threadArcsCallback(msgKey, folder)
 }
 
 
+/**
+ * wait for all messages to be added
+ * then start threading
+ */
+function waitForThreading()
+{
+    if (loaded_ && ! threaded_ && ! threading_)
+    {
+        threading_ = true;
+        setTimeout("doThreading()", 100);
+    }
+    else if (! threaded_ && ! threading_)
+    {
+        setTimeout("waitForThreading()", 100);
+    }
+}
+
+
+/**
+ * mouse click event handler
+ * display message user clicked on
+ */
 function ThreadArcs_onMouseClick(event)
 {
     var container = event.target.container;
