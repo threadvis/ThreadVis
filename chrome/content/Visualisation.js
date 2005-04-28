@@ -240,9 +240,9 @@ function Visualisation_visualise(container)
         if (parent != null && ! parent.isRoot())
         {
             var odd = parent.getDepth() % 2 == 0;
-            var position = "top";
+            var position = "bottom";
             if (odd)
-                position = "bottom";
+                position = "top";
 
             var color = "grey";
             if (thiscontainer == container || parent == container)
