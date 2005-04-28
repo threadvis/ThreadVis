@@ -16,14 +16,11 @@ var XUL_NAMESPACE_ =
     "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
 var DOTSIZE_ = 20;
-var ARC_HEIGHT_ = new Array();
-    ARC_HEIGHT_[1] = 29;
-var ARC_WIDTH_ = new Array();
-    ARC_WIDTH_[1] = 24;
-var ARC_LEFT_PLACEMENT_ = new Array();
-    ARC_LEFT_PLACEMENT_[1] = -4;
-var ARC_RIGHT_PLACEMENT_ = new Array();
-    ARC_RIGHT_PLACEMENT_[1] = 4;
+var ARC_HEIGHT_ = 29;
+var ARC_DIFFERENCE_ = 6;
+var ARC_WIDTH_ = 24;
+var ARC_LEFT_PLACEMENT_ = -4;
+var ARC_RIGHT_PLACEMENT_ = 4;
 var URL_ = "chrome://threadarcsjs/content/";
 
 
@@ -77,7 +74,6 @@ function Visualisation_createStack()
         this.clearStack();
     }
     
-    
     var div = document.createElementNS(HTML_NAMESPACE_, "div");
     var loading = document.createElementNS(HTML_NAMESPACE_, "img");
 
@@ -90,7 +86,7 @@ function Visualisation_createStack()
 
     div.appendChild(loading);
     this.stack_.appendChild(div);
-    
+
     loading = null;
     div = null;
 }
@@ -101,16 +97,26 @@ function Visualisation_createStack()
  */
 function Visualisation_drawArc(color, vposition, height, left, right)
 {
-    var arc_top = (this.box_.height / 2) + (DOTSIZE_ / 2);
+    var arc_top = 0;
+    var fill_top = 0;
     if (vposition == "top")
-        arc_top = arc_top - ARC_HEIGHT_[height] - DOTSIZE_;
+    {
+        arc_top = (this.box_.height / 2) - (DOTSIZE_ / 2) - ARC_HEIGHT_ - (ARC_DIFFERENCE_ * height);
+        fill_top = arc_top + ARC_HEIGHT_;
+    }
+    else
+    {
+        arc_top = (this.box_.height / 2) + (DOTSIZE_ / 2) + (ARC_DIFFERENCE_ * height);
+        fill_top = arc_top - (ARC_DIFFERENCE_ * height);
+    }
 
     var div_left = document.createElementNS(HTML_NAMESPACE_, "div");
     var arc_left = document.createElementNS(HTML_NAMESPACE_, "img");
     arc_left.style.position = "relative";
     arc_left.style.top = arc_top + "px";
-    arc_left.style.left = left + ARC_LEFT_PLACEMENT_[height] + "px";
-    arc_left.setAttribute( "src", URL_ + "threadarcs_arc_" + color + "_" + vposition + "_left_" + height + ".png");
+    arc_left.style.left = left + ARC_LEFT_PLACEMENT_ + "px";
+    arc_left.style.verticalAlign = "top";
+    arc_left.setAttribute( "src", URL_ + "threadarcs_arc_" + color + "_" + vposition + "_left.png");
     div_left.appendChild(arc_left);
     this.stack_.appendChild(div_left);
 
@@ -118,8 +124,11 @@ function Visualisation_drawArc(color, vposition, height, left, right)
     var arc_right = document.createElementNS(HTML_NAMESPACE_, "img");
     arc_right.style.position = "relative";
     arc_right.style.top = arc_top + "px";
-    arc_right.style.left = right - ARC_WIDTH_[height] + ARC_RIGHT_PLACEMENT_[height] + "px";
-    arc_right.setAttribute( "src", URL_ + "threadarcs_arc_" + color + "_" + vposition + "_right_" + height + ".png");
+    arc_right.style.left = right - ARC_WIDTH_ + ARC_RIGHT_PLACEMENT_ + "px";
+    arc_right.style.height = ARC_HEIGHT_ + "px";
+    arc_right.style.width = ARC_WIDTH_ + "px";
+    arc_right.style.verticalAlign = "top";
+    arc_right.setAttribute( "src", URL_ + "threadarcs_arc_" + color + "_" + vposition + "_right.png");
     div_right.appendChild(arc_right);
     this.stack_.appendChild(div_right);
 
@@ -127,12 +136,41 @@ function Visualisation_drawArc(color, vposition, height, left, right)
     var arc_middle = document.createElementNS(HTML_NAMESPACE_, "img");
     arc_middle.style.position = "relative";
     arc_middle.style.top = arc_top + "px";
-    arc_middle.style.left = left + ARC_LEFT_PLACEMENT_[height] + ARC_WIDTH_[height] + "px";
-    arc_middle.style.width = (right - ARC_WIDTH_[height] + ARC_RIGHT_PLACEMENT_[height]) - (left + ARC_LEFT_PLACEMENT_[height] + ARC_WIDTH_[height]) + "px";
-    arc_middle.style.height = ARC_HEIGHT_[height] + "px";
-    arc_middle.setAttribute( "src", URL_ + "threadarcs_arc_" + color + "_" + vposition + "_middle_" + height + ".png");
+    arc_middle.style.left = left + ARC_LEFT_PLACEMENT_ + ARC_WIDTH_ + "px";
+    arc_middle.style.width = (right - ARC_WIDTH_ + ARC_RIGHT_PLACEMENT_) - (left + ARC_LEFT_PLACEMENT_ + ARC_WIDTH_) + "px";
+    arc_middle.style.height = ARC_HEIGHT_ + "px";
+    arc_middle.style.verticalAlign = "top";
+    arc_middle.setAttribute( "src", URL_ + "threadarcs_arc_" + color + "_" + vposition + "_middle.png");
     div_middle.appendChild(arc_middle);
     this.stack_.appendChild(div_middle);
+
+    if (height == 0)
+        return;
+
+    var div_left_middle = document.createElementNS(HTML_NAMESPACE_, "div");
+    var arc_left_middle = document.createElementNS(HTML_NAMESPACE_, "img");
+    arc_left_middle.style.position = "relative";
+    arc_left_middle.style.top = fill_top + "px";
+    arc_left_middle.style.left = left + ARC_LEFT_PLACEMENT_ + "px";
+    arc_left_middle.style.width = ARC_WIDTH_ + "px";
+    arc_left_middle.style.height = ARC_DIFFERENCE_ * height + "px";
+    arc_left_middle.style.verticalAlign = "top";
+    arc_left_middle.setAttribute( "src", URL_ + "threadarcs_arc_" + color + "_left_middle.png");
+    div_left_middle.appendChild(arc_left_middle);
+    this.stack_.appendChild(div_left_middle);
+    
+    var div_right_middle = document.createElementNS(HTML_NAMESPACE_, "div");
+    var arc_right_middle = document.createElementNS(HTML_NAMESPACE_, "img");
+    arc_right_middle.style.position = "relative";
+    arc_right_middle.style.top = fill_top + "px";
+    arc_right_middle.style.left = right - ARC_WIDTH_ + ARC_RIGHT_PLACEMENT_ + "px";
+    arc_right_middle.style.width = ARC_WIDTH_ + "px";
+    arc_right_middle.style.height = ARC_DIFFERENCE_ * height + "px";
+    arc_right_middle.style.verticalAlign = "top";
+    
+    arc_right_middle.setAttribute("src", URL_ + "threadarcs_arc_" + color + "_right_middle.png");
+    div_right_middle.appendChild(arc_right_middle);
+    this.stack_.appendChild(div_right_middle);
 }
 
 
@@ -152,6 +190,9 @@ function Visualisation_drawDot(container, color, style, left)
     dot.setAttribute("src", URL_ + "threadarcs_dot_" + color + "_" + style + ".png");
 
     dot.container = container;
+    
+    dot.setAttribute("tooltiptext", container.getToolTipText());
+    div.setAttribute("tooltiptext", "");
 
     div.addEventListener("click", ThreadArcs_onMouseClick, true);
 
@@ -199,15 +240,17 @@ function Visualisation_visualise(container)
         if (parent != null && ! parent.isRoot())
         {
             var odd = parent.getDepth() % 2 == 0;
-            var position = "bottom";
+            var position = "top";
             if (odd)
-                position = "top";
+                position = "bottom";
 
             var color = "grey";
-
             if (thiscontainer == container || parent == container)
                 color = "blue";
-            this.drawArc(color, position, 1, parent.x_position_, x);
+            
+            var count = parent.getChildPosition(thiscontainer);
+            
+            this.drawArc(color, position, count, parent.x_position_, x);
         }
         x = x + 50;
     }

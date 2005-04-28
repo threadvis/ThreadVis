@@ -64,6 +64,7 @@ function Container(is_root)
     this.findChild = Container_findChild;
     this.getChild = Container_getChild;
     this.getChildCount = Container_getChildCount;
+    this.getChildPosition = Container_getChildPosition;
     this.getChildren = Container_getChildren;
     this.getDate = Container_getDate;
     this.getDepth = Container_getDepth;
@@ -76,6 +77,7 @@ function Container(is_root)
     this.getReplyCount = Container_getReplyCount;
     this.getSimplifiedSubject = Container_getSimplifiedSubject;
     this.getSubject = Container_getSubject;
+    this.getToolTipText = Container_getToolTipText;
     this.getTopContainer = Container_getTopContainer;
     this.hasChild = Container_hasChild;
     this.hasChildren = Container_hasChildren;
@@ -299,6 +301,25 @@ function Container_getChildCount()
 
 
 /**
+ * return at which position child is in child list
+ */
+function Container_getChildPosition(child)
+{
+    var count = 0;
+    var container = 0;
+    for (container = this.getChild();
+         container != null;
+         container = container.getNext())
+    {
+        if (container == child)
+            return count;
+        count++;
+    }
+    return 0;
+}
+
+
+/**
  * Get all children of this container as array
  */
 function Container_getChildren()
@@ -464,6 +485,20 @@ function Container_getSubject()
     {
         return "";
     }
+}
+
+
+/**
+ * Get tooltip text to display
+ */
+function Container_getToolTipText()
+{
+    if (this.isDummy())
+        return null;
+    
+    var msg = this.getMessage();
+    
+    return msg.getFrom() + ": " + msg.getSubject() + ", " + msg.getDate();
 }
 
 
