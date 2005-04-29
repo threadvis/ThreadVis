@@ -23,6 +23,8 @@ var ARC_LEFT_PLACEMENT_ = -4;
 var ARC_RIGHT_PLACEMENT_ = 4;
 var URL_ = "chrome://threadarcsjs/content/";
 
+var RESIZE_ = 0.75;
+
 
 /**
  * Constructor for visualisation class
@@ -77,11 +79,7 @@ function Visualisation_createStack()
     var div = document.createElementNS(HTML_NAMESPACE_, "div");
     var loading = document.createElementNS(HTML_NAMESPACE_, "img");
 
-    loading.style.position = "relative";
-    loading.style.top = "0px";
-    loading.style.left = "0px";
-    loading.style.width = "200px";
-    loading.style.height = "100px";
+    loading.style.marginTop = "20px";
     loading.setAttribute("src", URL_ + "threadarcs_loading.gif");
 
     div.appendChild(loading);
@@ -113,8 +111,10 @@ function Visualisation_drawArc(color, vposition, height, left, right)
     var div_left = document.createElementNS(HTML_NAMESPACE_, "div");
     var arc_left = document.createElementNS(HTML_NAMESPACE_, "img");
     arc_left.style.position = "relative";
-    arc_left.style.top = arc_top + "px";
-    arc_left.style.left = left + ARC_LEFT_PLACEMENT_ + "px";
+    arc_left.style.top = (arc_top * RESIZE_) + "px";
+    arc_left.style.left = ((left + ARC_LEFT_PLACEMENT_) * RESIZE_) + "px";
+    arc_left.style.height = (ARC_HEIGHT_ * RESIZE_)+ "px";
+    arc_left.style.width = (ARC_WIDTH_ * RESIZE_)+ "px";
     arc_left.style.verticalAlign = "top";
     arc_left.setAttribute( "src", URL_ + "threadarcs_arc_" + color + "_" + vposition + "_left.png");
     div_left.appendChild(arc_left);
@@ -123,10 +123,10 @@ function Visualisation_drawArc(color, vposition, height, left, right)
     var div_right = document.createElementNS(HTML_NAMESPACE_, "div");
     var arc_right = document.createElementNS(HTML_NAMESPACE_, "img");
     arc_right.style.position = "relative";
-    arc_right.style.top = arc_top + "px";
-    arc_right.style.left = right - ARC_WIDTH_ + ARC_RIGHT_PLACEMENT_ + "px";
-    arc_right.style.height = ARC_HEIGHT_ + "px";
-    arc_right.style.width = ARC_WIDTH_ + "px";
+    arc_right.style.top = (arc_top * RESIZE_) + "px";
+    arc_right.style.left = ((right - ARC_WIDTH_ + ARC_RIGHT_PLACEMENT_) * RESIZE_) + "px";
+    arc_right.style.height = (ARC_HEIGHT_ * RESIZE_)+ "px";
+    arc_right.style.width = (ARC_WIDTH_ * RESIZE_)+ "px";
     arc_right.style.verticalAlign = "top";
     arc_right.setAttribute( "src", URL_ + "threadarcs_arc_" + color + "_" + vposition + "_right.png");
     div_right.appendChild(arc_right);
@@ -135,10 +135,10 @@ function Visualisation_drawArc(color, vposition, height, left, right)
     var div_middle = document.createElementNS(HTML_NAMESPACE_, "div");
     var arc_middle = document.createElementNS(HTML_NAMESPACE_, "img");
     arc_middle.style.position = "relative";
-    arc_middle.style.top = arc_top + "px";
-    arc_middle.style.left = left + ARC_LEFT_PLACEMENT_ + ARC_WIDTH_ + "px";
-    arc_middle.style.width = (right - ARC_WIDTH_ + ARC_RIGHT_PLACEMENT_) - (left + ARC_LEFT_PLACEMENT_ + ARC_WIDTH_) + "px";
-    arc_middle.style.height = ARC_HEIGHT_ + "px";
+    arc_middle.style.top = (arc_top * RESIZE_)+ "px";
+    arc_middle.style.left = ((left + ARC_LEFT_PLACEMENT_ + ARC_WIDTH_) * RESIZE_) + "px";
+    arc_middle.style.width = (((right - ARC_WIDTH_ + ARC_RIGHT_PLACEMENT_) - (left + ARC_LEFT_PLACEMENT_ + ARC_WIDTH_)) * RESIZE_) + "px";
+    arc_middle.style.height = (ARC_HEIGHT_ * RESIZE_) + "px";
     arc_middle.style.verticalAlign = "top";
     arc_middle.setAttribute( "src", URL_ + "threadarcs_arc_" + color + "_" + vposition + "_middle.png");
     div_middle.appendChild(arc_middle);
@@ -150,10 +150,10 @@ function Visualisation_drawArc(color, vposition, height, left, right)
     var div_left_middle = document.createElementNS(HTML_NAMESPACE_, "div");
     var arc_left_middle = document.createElementNS(HTML_NAMESPACE_, "img");
     arc_left_middle.style.position = "relative";
-    arc_left_middle.style.top = fill_top + "px";
-    arc_left_middle.style.left = left + ARC_LEFT_PLACEMENT_ + "px";
-    arc_left_middle.style.width = ARC_WIDTH_ + "px";
-    arc_left_middle.style.height = ARC_DIFFERENCE_ * height + "px";
+    arc_left_middle.style.top = (fill_top * RESIZE_) + "px";
+    arc_left_middle.style.left = ((left + ARC_LEFT_PLACEMENT_) * RESIZE_) + "px";
+    arc_left_middle.style.width = (ARC_WIDTH_ * RESIZE_) + "px";
+    arc_left_middle.style.height = ((ARC_DIFFERENCE_ * height) * RESIZE_) + "px";
     arc_left_middle.style.verticalAlign = "top";
     arc_left_middle.setAttribute( "src", URL_ + "threadarcs_arc_" + color + "_left_middle.png");
     div_left_middle.appendChild(arc_left_middle);
@@ -162,12 +162,11 @@ function Visualisation_drawArc(color, vposition, height, left, right)
     var div_right_middle = document.createElementNS(HTML_NAMESPACE_, "div");
     var arc_right_middle = document.createElementNS(HTML_NAMESPACE_, "img");
     arc_right_middle.style.position = "relative";
-    arc_right_middle.style.top = fill_top + "px";
-    arc_right_middle.style.left = right - ARC_WIDTH_ + ARC_RIGHT_PLACEMENT_ + "px";
-    arc_right_middle.style.width = ARC_WIDTH_ + "px";
-    arc_right_middle.style.height = ARC_DIFFERENCE_ * height + "px";
+    arc_right_middle.style.top = (fill_top * RESIZE_) + "px";
+    arc_right_middle.style.left = ((right - ARC_WIDTH_ + ARC_RIGHT_PLACEMENT_) * RESIZE_) + "px";
+    arc_right_middle.style.width = (ARC_WIDTH_ * RESIZE_) + "px";
+    arc_right_middle.style.height = ((ARC_DIFFERENCE_ * height) * RESIZE_) + "px";
     arc_right_middle.style.verticalAlign = "top";
-    
     arc_right_middle.setAttribute("src", URL_ + "threadarcs_arc_" + color + "_right_middle.png");
     div_right_middle.appendChild(arc_right_middle);
     this.stack_.appendChild(div_right_middle);
@@ -183,10 +182,10 @@ function Visualisation_drawDot(container, color, style, left)
     var dot = document.createElementNS(HTML_NAMESPACE_, "img");
 
     dot.style.position = "relative";
-    dot.style.top = (this.box_.height / 2)  - (DOTSIZE_ / 2) + "px";
-    dot.style.left = left - (DOTSIZE_ / 2) + "px";
-    dot.style.width = DOTSIZE_ + "px";
-    dot.style.height = DOTSIZE_ + "px";
+    dot.style.top = (((this.box_.height / 2)  - (DOTSIZE_ / 2)) * RESIZE_) + "px";
+    dot.style.left = ((left - (DOTSIZE_ / 2)) * RESIZE_) + "px";
+    dot.style.width = (DOTSIZE_ * RESIZE_) + "px";
+    dot.style.height = (DOTSIZE_ * RESIZE_) + "px";
     dot.setAttribute("src", URL_ + "threadarcs_dot_" + color + "_" + style + ".png");
 
     dot.container = container;

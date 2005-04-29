@@ -177,11 +177,11 @@ function Container_addSibling(sibling)
     if (this.hasNext())
         this.getNext().setPrevious(sibling);
 
+    this.setParentForContainer(sibling, this.getParent());
+    
     sibling.getLast().setNext(this.getNext());
     sibling.setPrevious(this);
     this.setNext(sibling);
-
-    this.setParentForContainer(sibling, this.getParent());
 }
 
 

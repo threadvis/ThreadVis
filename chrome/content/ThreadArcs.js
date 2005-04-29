@@ -167,11 +167,23 @@ function clearVisualisation()
  */
 function doThreading()
 {
-    threading_ = true;
-    threaded_ = false;
-    threader_.thread();
-    threaded_ = true;
-    threading_ = false;
+    if (! threading_ && ! threaded_)
+    {
+        threading_ = true;
+        threaded_ = false;
+        threader_.thread();
+    }
+    if (threading_)
+    {
+        var done = threader_.getDone();
+        if (done)
+        {
+            threaded_ = true;
+            threading_ = false;
+            return;
+        }
+    setTimeout("doThreading()", 100);
+    }
 }
 
 
@@ -210,9 +222,9 @@ function setSelectedMessage()
     if (server_ != msg.folder.server)
     {
         // user just switched account
-        addThreadArcs();
         loaded_ = false;
         threaded_ = false;
+        addThreadArcs();
         doLoad.onStartHeaders();
     }
     
@@ -251,7 +263,6 @@ function waitForThreading()
 {
     if (loaded_ && ! threaded_ && ! threading_)
     {
-        threading_ = true;
         setTimeout("doThreading()", 100);
     }
     else if (! threaded_ && ! threading_)
