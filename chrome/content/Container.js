@@ -811,6 +811,25 @@ function Container_setPrevious(prev)
 
 
 /**
+ * Sort function for sorting javascript array
+ */
+function Container_sortFunction(one, two)
+{
+    if (one.isDummy() && two.isDummy())
+        return 0;
+
+    if (one.isDummy() && !two.isDummy())
+        return -1;
+
+    if (!one.isDummy() && two.isDummy())
+        return 1;
+
+    // fixxme
+    //return getDate().compareTo(object.getDate());
+    return one.getDate().getTime() - two.getDate().getTime();
+}
+
+/**
  * Output string representation of this container
  */
 function Container_toString(prefix)

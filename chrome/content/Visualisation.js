@@ -216,11 +216,13 @@ function Visualisation_visualise(container)
     containers.push(topcontainer);
     containers = containers.concat(topcontainer.getChildren());
 
-    var key = null;
+    // sort containers by date
+    containers.sort(Container_sortFunction);
+
     var x = 20;
-    for (key in containers)
+    for (var counter = 0; counter < containers.length; counter++)
     {
-        var thiscontainer = containers[key];
+        var thiscontainer = containers[counter];
 
         // draw this container
         var color = "grey";
@@ -233,6 +235,7 @@ function Visualisation_visualise(container)
         
         this.drawDot(thiscontainer, color, style, x);
         thiscontainer.x_position_ = x;
+        thiscontainer.y_position = 0;
 
         // draw arc
         var parent = thiscontainer.getParent()
@@ -247,7 +250,8 @@ function Visualisation_visualise(container)
             if (thiscontainer == container || parent == container)
                 color = "blue";
             
-            var count = parent.getChildPosition(thiscontainer);
+            //var count = parent.getChildPosition(thiscontainer);
+            var count = parent.y_position++;
             
             this.drawArc(color, position, count, parent.x_position_, x);
         }

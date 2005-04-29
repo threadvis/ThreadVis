@@ -17,7 +17,16 @@ function Message(subject, from, message_id, message_key, date, folder, reference
      * Message date
      */
     // fixxme parseing
-    this.date_ = date;
+    // DD. MM. YYYY HH:MM:SS
+    var regex = /(\d+).\s*(\d+).\s*(\d+)\s*(\d+):(\d+):(\d+)/;
+    regex.exec(date);
+    var year = RegExp.$3;
+    var month = RegExp.$2 - 1; // javascript month counts from 0
+    var day = RegExp.$1;
+    var hour = RegExp.$4;
+    var minute = RegExp.$5;
+    var second = RegExp.$6;
+    this.date_ = new Date(year, month, day, hour, minute, second);
 
 
     /**
