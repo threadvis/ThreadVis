@@ -91,7 +91,6 @@ function addMessagesFromFolder(folder)
             // PRTime is in microseconds, Javascript time is in milliseconds
             // so divide by 1000 when converting
             date.setTime(header.date / 1000);
-            date = date.getDate() + ". " + date.getMonth() + ". " + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
             
             // see if msg is a sent mail
             var issent = IsSpecialFolder(header.folder, MSG_FOLDER_FLAG_SENTMAIL, true);
@@ -229,7 +228,9 @@ function setSelectedMessage()
     }
     
     // call threader
-    threader_.visualise(msg.messageId);
+    // fixxme delay display
+    // to give UI time to layout
+    setTimeout("threader_.visualise(\"" + msg.messageId + "\")", 100);
 }
 
 

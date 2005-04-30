@@ -23,9 +23,7 @@
     <script src="chrome://threadarcsjs/content/Visualisation.js" />
 
     <hbox id="expandedHeaderView">
-        <hbox id="ThreadArcsJSBox" height="100" width="200" insertafter="expandedAttachmentBox" style="margin-right: 20px;">
-    </hbox>
-
+        <vbox id="ThreadArcsJSBox" minheight="50" minwidth="200" flex="2" align="right" />
     </hbox>
 
 </overlay>

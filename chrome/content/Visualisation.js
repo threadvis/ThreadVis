@@ -21,10 +21,17 @@ var ARC_DIFFERENCE_ = 6;
 var ARC_WIDTH_ = 24;
 var ARC_LEFT_PLACEMENT_ = -4;
 var ARC_RIGHT_PLACEMENT_ = 4;
+var SPACING_ = 50;
 var URL_ = "chrome://threadarcsjs/content/";
 
-var RESIZE_ = 0.75;
-
+// ==============================================================================================
+// ==============================================================================================
+// ==============================================================================================
+// FIXXME
+// all container variables that are set here should be accessed by functions in the container class
+// ==============================================================================================
+// ==============================================================================================
+// ==============================================================================================
 
 /**
  * Constructor for visualisation class
@@ -33,6 +40,8 @@ function Visualisation()
 {
     this.box_ = null;
     this.stack_ = null;
+    // set default resize parameter
+    this.resize_ = 1;
 
     // needed for JavaScript
     // link functions to this object
@@ -40,6 +49,7 @@ function Visualisation()
     this.createStack = Visualisation_createStack;
     this.drawArc = Visualisation_drawArc;
     this.drawDot = Visualisation_drawDot;
+    this.getResize = Visualisation_getResize;
     this.visualise = Visualisation_visualise;
 
     this.createStack();
@@ -99,22 +109,22 @@ function Visualisation_drawArc(color, vposition, height, left, right)
     var fill_top = 0;
     if (vposition == "top")
     {
-        arc_top = (this.box_.height / 2) - (DOTSIZE_ / 2) - ARC_HEIGHT_ - (ARC_DIFFERENCE_ * height);
-        fill_top = arc_top + ARC_HEIGHT_;
+        arc_top = (this.box_.boxObject.height / 2) - (((DOTSIZE_ / 2) + ARC_HEIGHT_ + (ARC_DIFFERENCE_ * height)) * this.resize_);
+        fill_top = arc_top + (ARC_HEIGHT_ * this.resize_);
     }
     else
     {
-        arc_top = (this.box_.height / 2) + (DOTSIZE_ / 2) + (ARC_DIFFERENCE_ * height);
-        fill_top = arc_top - (ARC_DIFFERENCE_ * height);
+        arc_top = (this.box_.boxObject.height / 2) + (((DOTSIZE_ / 2) + (ARC_DIFFERENCE_ * height)) * this.resize_);
+        fill_top = arc_top - (ARC_DIFFERENCE_ * height * this.resize_);
     }
 
     var div_left = document.createElementNS(HTML_NAMESPACE_, "div");
     var arc_left = document.createElementNS(HTML_NAMESPACE_, "img");
     arc_left.style.position = "relative";
-    arc_left.style.top = (arc_top * RESIZE_) + "px";
-    arc_left.style.left = ((left + ARC_LEFT_PLACEMENT_) * RESIZE_) + "px";
-    arc_left.style.height = (ARC_HEIGHT_ * RESIZE_)+ "px";
-    arc_left.style.width = (ARC_WIDTH_ * RESIZE_)+ "px";
+    arc_left.style.top = arc_top + "px";
+    arc_left.style.left = ((left + ARC_LEFT_PLACEMENT_) * this.resize_) + "px";
+    arc_left.style.height = (ARC_HEIGHT_ * this.resize_)+ "px";
+    arc_left.style.width = (ARC_WIDTH_ * this.resize_)+ "px";
     arc_left.style.verticalAlign = "top";
     arc_left.setAttribute( "src", URL_ + "threadarcs_arc_" + color + "_" + vposition + "_left.png");
     div_left.appendChild(arc_left);
@@ -123,10 +133,10 @@ function Visualisation_drawArc(color, vposition, height, left, right)
     var div_right = document.createElementNS(HTML_NAMESPACE_, "div");
     var arc_right = document.createElementNS(HTML_NAMESPACE_, "img");
     arc_right.style.position = "relative";
-    arc_right.style.top = (arc_top * RESIZE_) + "px";
-    arc_right.style.left = ((right - ARC_WIDTH_ + ARC_RIGHT_PLACEMENT_) * RESIZE_) + "px";
-    arc_right.style.height = (ARC_HEIGHT_ * RESIZE_)+ "px";
-    arc_right.style.width = (ARC_WIDTH_ * RESIZE_)+ "px";
+    arc_right.style.top = arc_top + "px";
+    arc_right.style.left = ((right - ARC_WIDTH_ + ARC_RIGHT_PLACEMENT_) * this.resize_) + "px";
+    arc_right.style.height = (ARC_HEIGHT_ * this.resize_)+ "px";
+    arc_right.style.width = (ARC_WIDTH_ * this.resize_)+ "px";
     arc_right.style.verticalAlign = "top";
     arc_right.setAttribute( "src", URL_ + "threadarcs_arc_" + color + "_" + vposition + "_right.png");
     div_right.appendChild(arc_right);
@@ -135,10 +145,10 @@ function Visualisation_drawArc(color, vposition, height, left, right)
     var div_middle = document.createElementNS(HTML_NAMESPACE_, "div");
     var arc_middle = document.createElementNS(HTML_NAMESPACE_, "img");
     arc_middle.style.position = "relative";
-    arc_middle.style.top = (arc_top * RESIZE_)+ "px";
-    arc_middle.style.left = ((left + ARC_LEFT_PLACEMENT_ + ARC_WIDTH_) * RESIZE_) + "px";
-    arc_middle.style.width = (((right - ARC_WIDTH_ + ARC_RIGHT_PLACEMENT_) - (left + ARC_LEFT_PLACEMENT_ + ARC_WIDTH_)) * RESIZE_) + "px";
-    arc_middle.style.height = (ARC_HEIGHT_ * RESIZE_) + "px";
+    arc_middle.style.top = arc_top + "px";
+    arc_middle.style.left = ((left + ARC_LEFT_PLACEMENT_ + ARC_WIDTH_) * this.resize_) + "px";
+    arc_middle.style.width = (((right - ARC_WIDTH_ + ARC_RIGHT_PLACEMENT_) - (left + ARC_LEFT_PLACEMENT_ + ARC_WIDTH_)) * this.resize_) + "px";
+    arc_middle.style.height = (ARC_HEIGHT_ * this.resize_) + "px";
     arc_middle.style.verticalAlign = "top";
     arc_middle.setAttribute( "src", URL_ + "threadarcs_arc_" + color + "_" + vposition + "_middle.png");
     div_middle.appendChild(arc_middle);
@@ -150,10 +160,10 @@ function Visualisation_drawArc(color, vposition, height, left, right)
     var div_left_middle = document.createElementNS(HTML_NAMESPACE_, "div");
     var arc_left_middle = document.createElementNS(HTML_NAMESPACE_, "img");
     arc_left_middle.style.position = "relative";
-    arc_left_middle.style.top = (fill_top * RESIZE_) + "px";
-    arc_left_middle.style.left = ((left + ARC_LEFT_PLACEMENT_) * RESIZE_) + "px";
-    arc_left_middle.style.width = (ARC_WIDTH_ * RESIZE_) + "px";
-    arc_left_middle.style.height = ((ARC_DIFFERENCE_ * height) * RESIZE_) + "px";
+    arc_left_middle.style.top = fill_top + "px";
+    arc_left_middle.style.left = ((left + ARC_LEFT_PLACEMENT_) * this.resize_) + "px";
+    arc_left_middle.style.width = (ARC_WIDTH_ * this.resize_) + "px";
+    arc_left_middle.style.height = ((ARC_DIFFERENCE_ * height) * this.resize_) + "px";
     arc_left_middle.style.verticalAlign = "top";
     arc_left_middle.setAttribute( "src", URL_ + "threadarcs_arc_" + color + "_left_middle.png");
     div_left_middle.appendChild(arc_left_middle);
@@ -162,10 +172,10 @@ function Visualisation_drawArc(color, vposition, height, left, right)
     var div_right_middle = document.createElementNS(HTML_NAMESPACE_, "div");
     var arc_right_middle = document.createElementNS(HTML_NAMESPACE_, "img");
     arc_right_middle.style.position = "relative";
-    arc_right_middle.style.top = (fill_top * RESIZE_) + "px";
-    arc_right_middle.style.left = ((right - ARC_WIDTH_ + ARC_RIGHT_PLACEMENT_) * RESIZE_) + "px";
-    arc_right_middle.style.width = (ARC_WIDTH_ * RESIZE_) + "px";
-    arc_right_middle.style.height = ((ARC_DIFFERENCE_ * height) * RESIZE_) + "px";
+    arc_right_middle.style.top = fill_top + "px";
+    arc_right_middle.style.left = ((right - ARC_WIDTH_ + ARC_RIGHT_PLACEMENT_) * this.resize_) + "px";
+    arc_right_middle.style.width = (ARC_WIDTH_ * this.resize_) + "px";
+    arc_right_middle.style.height = ((ARC_DIFFERENCE_ * height) * this.resize_) + "px";
     arc_right_middle.style.verticalAlign = "top";
     arc_right_middle.setAttribute("src", URL_ + "threadarcs_arc_" + color + "_right_middle.png");
     div_right_middle.appendChild(arc_right_middle);
@@ -182,10 +192,10 @@ function Visualisation_drawDot(container, color, style, left)
     var dot = document.createElementNS(HTML_NAMESPACE_, "img");
 
     dot.style.position = "relative";
-    dot.style.top = (((this.box_.height / 2)  - (DOTSIZE_ / 2)) * RESIZE_) + "px";
-    dot.style.left = ((left - (DOTSIZE_ / 2)) * RESIZE_) + "px";
-    dot.style.width = (DOTSIZE_ * RESIZE_) + "px";
-    dot.style.height = (DOTSIZE_ * RESIZE_) + "px";
+    dot.style.top = (this.box_.boxObject.height / 2) - ((DOTSIZE_ / 2) * this.resize_) + "px";
+    dot.style.left = ((left - (DOTSIZE_ / 2)) * this.resize_) + "px";
+    dot.style.width = (DOTSIZE_ * this.resize_) + "px";
+    dot.style.height = (DOTSIZE_ * this.resize_) + "px";
     dot.setAttribute("src", URL_ + "threadarcs_dot_" + color + "_" + style + ".png");
 
     dot.container = container;
@@ -197,6 +207,34 @@ function Visualisation_drawDot(container, color, style, left)
 
     div.appendChild(dot);
     this.stack_.appendChild(div);
+}
+
+
+/**
+ * Get resize multiplicator
+ * calculate from box width and height
+ * and needed width and height
+ */
+function Visualisation_getResize(xcount, ycount,sizex, sizey)
+{
+    var spaceperarcavailablex = sizex / (xcount - 1);
+    var spaceperarcavailabley = sizey / 2;
+    var spaceperarcneededx = DOTSIZE_ + (2 * ARC_WIDTH_);
+    var spaceperarcneededy = (DOTSIZE_ / 2) + ARC_HEIGHT_ + ycount * ARC_DIFFERENCE_;
+    
+    var resizex = (spaceperarcavailablex / spaceperarcneededx);
+    var resizey = (spaceperarcavailabley / spaceperarcneededy);
+    
+    var resize = 1;
+    if (resizex < resizey)
+        resize = resizex;
+    else
+        resize = resizey;
+    
+    if (resize > 1)
+        resize = 1;
+    
+    return resize;
 }
 
 
@@ -219,7 +257,46 @@ function Visualisation_visualise(container)
     // sort containers by date
     containers.sort(Container_sortFunction);
 
-    var x = 20;
+
+    // pre-calculate size
+    var totalmaxheight = 0;
+    for (var counter = 0; counter < containers.length; counter++)
+    {
+        var thiscontainer = containers[counter];
+        thiscontainer.x_index_ = counter;
+        thiscontainer.current_arc_height_incoming_ = 0;
+        thiscontainer.current_arc_height_outgoing_ = 0;
+        thiscontainer.odd_ = thiscontainer.getDepth() % 2 == 0;
+        var parent = thiscontainer.getParent();
+        if (parent != null && ! parent.isRoot())
+        {
+            //parent.current_arc_height_outgoing_++;
+            //var maxheight = parent.current_arc_height_outgoing_;
+            var maxheight = 0;
+            for (var innercounter = parent.x_index_; innercounter < counter; innercounter++)
+            {
+                var lookatcontainer = containers[innercounter];
+                if (lookatcontainer.odd_ == parent.odd_ && lookatcontainer.current_arc_height_outgoing_ > maxheight)
+                {
+                    maxheight = lookatcontainer.current_arc_height_outgoing_;
+                }
+                if (lookatcontainer.odd_ != parent.odd_ && lookatcontainer.current_arc_height_incoming_ > maxheight)
+                {
+                    maxheight = lookatcontainer.current_arc_height_incoming_;
+                }
+            }
+            maxheight++;
+            parent.current_arc_height_outgoing_ = maxheight;
+            thiscontainer.current_arc_height_incoming_ = maxheight;
+        }
+        if (maxheight > totalmaxheight)
+            totalmaxheight = maxheight;
+    }
+
+    var x = SPACING_ / 2;
+    this.box_.style.paddingRight = x + "px";
+    this.resize_ = this.getResize(containers.length, totalmaxheight, this.box_.boxObject.width, this.box_.boxObject.height);
+
     for (var counter = 0; counter < containers.length; counter++)
     {
         var thiscontainer = containers[counter];
@@ -235,26 +312,41 @@ function Visualisation_visualise(container)
         
         this.drawDot(thiscontainer, color, style, x);
         thiscontainer.x_position_ = x;
-        thiscontainer.y_position = 0;
-
+        thiscontainer.current_arc_height_incoming_ = 0;
+        thiscontainer.current_arc_height_outgoing_ = 0;
+        
         // draw arc
         var parent = thiscontainer.getParent()
         if (parent != null && ! parent.isRoot())
         {
-            var odd = parent.getDepth() % 2 == 0;
             var position = "bottom";
-            if (odd)
+            if (parent.odd_)
                 position = "top";
 
             var color = "grey";
             if (thiscontainer == container || parent == container)
                 color = "blue";
             
-            //var count = parent.getChildPosition(thiscontainer);
-            var count = parent.y_position++;
-            
-            this.drawArc(color, position, count, parent.x_position_, x);
+            //parent.current_arc_height_outgoing_++;
+            //var maxheight = parent.current_arc_height_outgoing_;
+            var maxheight = 0;
+            for (var innercounter = parent.x_index_; innercounter < counter; innercounter++)
+            {
+                var lookatcontainer = containers[innercounter];
+                if (lookatcontainer.odd_ == parent.odd_ && lookatcontainer.current_arc_height_outgoing_ > maxheight)
+                {
+                    maxheight = lookatcontainer.current_arc_height_outgoing_;
+                }
+                if (lookatcontainer.odd_ != parent.odd_ && lookatcontainer.current_arc_height_incoming_ > maxheight)
+                {
+                    maxheight = lookatcontainer.current_arc_height_incoming_;
+                }
+            }
+            maxheight++;
+            parent.current_arc_height_outgoing_ = maxheight;
+            thiscontainer.current_arc_height_incoming_ = maxheight;
+            this.drawArc(color, position, maxheight, parent.x_position_, x);
         }
-        x = x + 50;
+        x = x + SPACING_;
     }
 }

@@ -815,6 +815,14 @@ function Container_setPrevious(prev)
  */
 function Container_sortFunction(one, two)
 {
+    if (one.isDummy() || two.isDummy())
+    {
+        if (one.findChild(two))
+            return -1;
+        if (two.findChild(one))
+            return 1;
+    }
+
     if (one.isDummy() && two.isDummy())
         return 0;
 
@@ -824,8 +832,6 @@ function Container_sortFunction(one, two)
     if (!one.isDummy() && two.isDummy())
         return 1;
 
-    // fixxme
-    //return getDate().compareTo(object.getDate());
     return one.getDate().getTime() - two.getDate().getTime();
 }
 
