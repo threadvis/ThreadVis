@@ -28,7 +28,7 @@
 
     <groupbox align="start">
         <caption label="Logging" />
-        <checkbox id="dologging" label="Enable Logging" prefstring="threadarcsjs.logging.enable" prefdefval="false" tooltiptext="Logging will be enabled/disabled after restarting Thunderbird." />
+        <checkbox id="dologging" label="Enable Logging" prefstring="extensions.threadarcsjs.logging.enabled" prefdefval="false" tooltiptext="Logging will be enabled/disabled after restarting Thunderbird." />
         <separator class="thin" />
         <button id="sendlog" label="Send Logfiles" oncommand="sendLogfiles();" tooltiptext="Creates a new empty email and attaches the logfiles." />
         <separator class="thin" />

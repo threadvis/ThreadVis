@@ -156,7 +156,6 @@ function getPrefattribute(elem)
 function writeEmail()
 {
     composeEmail("xpert@sbox.tugraz.at", "[ThreadArcsJS] <insert subject here>", null)
-    self.close();
 }
 
 
@@ -167,7 +166,6 @@ function sendLogfiles()
 {
     var logfiles = getLogfiles();
     composeEmail("xpert@sbox.tugraz.at", "[ThreadArcsJS] Auto-Email-Logs", null, logfiles);
-    self.close();
 }
 
 
@@ -210,7 +208,8 @@ function composeEmail(to, subject, body, attachments)
 function getLogfiles()
 {
     var logfiles = new Array();
-    var logger = window.opener.opener.LOGGER_;
+    var logger = window.opener.opener ? window.opener.opener.LOGGER_ : window.opener.LOGGER_;
+
     var file = null;
     if (logger)
         file = logger.getFile();
@@ -247,7 +246,7 @@ function addAttachments(composeFields, attachments)
  */
 function resetLogfiles()
 {
-    var logger = window.opener.opener.LOGGER_;
+    var logger = window.opener.opener ? window.opener.opener.LOGGER_ : window.opener.LOGGER_;
     if (logger)
     {
         logger.reset();
