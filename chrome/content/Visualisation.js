@@ -194,7 +194,6 @@ Visualisation.prototype.drawDot = function(container, color, style, left)
     dot.setAttribute("tooltiptext", container.getToolTipText());
     div.setAttribute("tooltiptext", "");
 
-    //div.addEventListener("click", ThreadArcs_onMouseClick, true);
     div.addEventListener("click", this.onMouseClick, true);
 
     div.appendChild(dot);
@@ -234,7 +233,6 @@ Visualisation.prototype.getResize = function(xcount, ycount,sizex, sizey)
  * mouse click event handler
  * display message user clicked on
  */
-//function ThreadArcs_onMouseClick(event)
 Visualisation.prototype.onMouseClick = function(event)
 {
     var container = event.target.container;
@@ -275,8 +273,6 @@ Visualisation.prototype.visualise = function(container)
         var parent = thiscontainer.getParent();
         if (parent != null && ! parent.isRoot())
         {
-            //parent.current_arc_height_outgoing_++;
-            //var maxheight = parent.current_arc_height_outgoing_;
             var maxheight = 0;
             for (var innercounter = parent.x_index_; innercounter < counter; innercounter++)
             {
@@ -315,6 +311,9 @@ Visualisation.prototype.visualise = function(container)
         if (! thiscontainer.isDummy() && thiscontainer.getMessage().isSent())
             style = "half";
         
+        if (thiscontainer.isDummy())
+            style ="dummy";
+        
         this.drawDot(thiscontainer, color, style, x);
         thiscontainer.x_position_ = x;
         thiscontainer.current_arc_height_incoming_ = 0;
@@ -332,8 +331,6 @@ Visualisation.prototype.visualise = function(container)
             if (thiscontainer == container || parent == container)
                 color = "blue";
             
-            //parent.current_arc_height_outgoing_++;
-            //var maxheight = parent.current_arc_height_outgoing_;
             var maxheight = 0;
             for (var innercounter = parent.x_index_; innercounter < counter; innercounter++)
             {
