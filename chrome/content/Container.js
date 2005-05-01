@@ -815,24 +815,28 @@ function Container_setPrevious(prev)
  */
 function Container_sortFunction(one, two)
 {
-    if (one.isDummy() || two.isDummy())
+    // just to be sure, we never want to sort a child
+    // before one of its parents
+    // (could happen if time information in mail is wrong,
+    // e.g. time of mailclient is off)
+    if (one.findChild(two))
     {
-        if (one.findChild(two))
-            return -1;
-        if (two.findChild(one))
-            return 1;
-    }
-
-    if (one.isDummy() && two.isDummy())
-        return 0;
-
-    if (one.isDummy() && !two.isDummy())
         return -1;
-
-    if (!one.isDummy() && two.isDummy())
+    }
+    if (two.findChild(one))
+    {
         return 1;
-
-    return one.getDate().getTime() - two.getDate().getTime();
+    }
+    
+    // sort all others by date
+    // if one of the containers is a dummy, getDate() returns the date
+    // of its first child. this should be enough to ensure the timeline
+    var difference = one.getDate().getTime() - two.getDate().getTime();
+    
+    if (difference < 0)
+        return - 1;
+    else
+        return 1;
 }
 
 /**
