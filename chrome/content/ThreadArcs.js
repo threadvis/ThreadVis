@@ -16,6 +16,7 @@ var XUL_NAMESPACE_ =
 
 var THREADARCS_ = null;
 
+var LOGGER_ = null;
 
 // add visualisation at startup
 setTimeout(createThreadArcs, 1000);
@@ -26,6 +27,9 @@ setTimeout(createThreadArcs, 1000);
  */
 function createThreadArcs()
 {
+    if (LOGGER_ == null)
+        LOGGER_ = new Logger();
+
     if (THREADARCS_ == null)
         THREADARCS_ = new ThreadArcs();
 }
@@ -37,6 +41,7 @@ function createThreadArcs()
  */
 function ThreadArcs()
 {
+    LOGGER_.log("ThreadArcs.js: Creating ThreadArcs object");
     // visualisation object
     this.visualisation_ = new Visualisation();
 
@@ -75,6 +80,7 @@ function ThreadArcs()
  */
 ThreadArcs.prototype.addMessages = function()
 {
+    LOGGER_.log("ThreadArcs.js: Beginning to add messages");
     this.loading_ = true;
     this.loaded_ = false;
     
@@ -87,6 +93,7 @@ ThreadArcs.prototype.addMessages = function()
     
     this.loaded_ = true;
     this.loading_ = false;
+    LOGGER_.log("ThreadArcs.js: Messages added");
 }
 
 
@@ -161,6 +168,7 @@ ThreadArcs.prototype.addMessagesFromSubFolders = function(folder)
  */
 ThreadArcs.prototype.callback = function(msgKey, folder)
 {
+    LOGGER_.log("ThreadArcs.js: User selected message in extension. Display this message.");
     // get folder for message
     SelectFolder(folder);
     
@@ -249,8 +257,11 @@ ThreadArcs.prototype.setSelectedMessage = function()
     var msg_uri = GetLoadedMessage();
     var msg = messenger.messageServiceFromURI(msg_uri).messageURIToMsgHdr(msg_uri);
     
+    LOGGER_.log("ThreadArcs.js: User selected a new message: " + msg.messageId);
+    
     if (this.server_ != msg.folder.server)
     {
+        LOGGER_.log("ThreadArcs.js: This message belongs to another account. Restart extension.");
         // user just switched account
         this.loaded_ = false;
         this.threaded_ = false;
@@ -271,6 +282,12 @@ ThreadArcs.prototype.setSelectedMessage = function()
  */
 ThreadArcs.prototype.visualise = function(container)
 {
+    var msgid = "";
+    if (container.isDummy())
+        msgid = "<DUMMY>";
+    else
+        msgid = container.getMessage().getId();
+    LOGGER_.log("ThreadArcs.js: Visualising message: " + msgid);
     this.visualisation_.visualise(container)
 }
 

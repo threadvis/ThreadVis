@@ -16,6 +16,7 @@
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
     <script src="chrome://threadarcsjs/content/Container.js" />
+    <script src="chrome://threadarcsjs/content/Logger.js" />
     <script src="chrome://threadarcsjs/content/Message.js" />
     <script src="chrome://threadarcsjs/content/References.js" />
     <script src="chrome://threadarcsjs/content/ThreadArcs.js" />
