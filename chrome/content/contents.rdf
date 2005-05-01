@@ -15,15 +15,15 @@
     xmlns:chrome="http://www.mozilla.org/rdf/chrome#"> 
 
     <RDF:Seq about="urn:mozilla:package:root"> 
-      <RDF:li resource="urn:mozilla:package:threadarcs"/> 
+      <RDF:li resource="urn:mozilla:package:threadarcsjs"/> 
     </RDF:Seq> 
 
-    <RDF:Description about="urn:mozilla:package:threadarcs" 
-          chrome:displayName="ThreadArcs" 
+    <RDF:Description about="urn:mozilla:package:threadarcsjs" 
+          chrome:displayName="ThreadArcsJS"
           chrome:author="Alexander C. Hubmann" 
-          chrome:name="ThreadArcs"
+          chrome:name="ThreadArcsJS"
           chrome:extension="true"
-          chrome:description="Displays ThreadArcs for Mail Messages."> 
+          chrome:description="Displays a small graphic visualising the thread (context) of the currently selected email."> 
     </RDF:Description>
 
     <RDF:Seq about="urn:mozilla:overlays">
@@ -31,7 +31,7 @@
     </RDF:Seq>
 
     <RDF:Seq about="chrome://messenger/content/msgHdrViewOverlay.xul">
-      <RDF:li>chrome://threadarcs/content/ThreadArcs.xul</RDF:li>
+      <RDF:li>chrome://threadarcsjs/content/ThreadArcs.xul</RDF:li>
     </RDF:Seq>
 
   </RDF:RDF>
