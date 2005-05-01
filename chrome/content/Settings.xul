@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+
+<!--
+/* *******************************************************
+ * Settings.xul
+ *
+ * (c) 2005 Alexander C. Hubmann
+ *
+ * XUL file to display settings dialog
+ *
+ * Version: $Id$
+ ********************************************************/
+-->
+
+<?xml-stylesheet href="chrome://communicator/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://messenger/skin/prefPanels.css" type="text/css"?>
+
+<dialog xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        style="max-width: 28em;"
+        buttons="accept,cancel"
+        onload="init();"
+        ondialogaccept="savePrefs();"
+        persist="screenX screenY"
+        title="Thread Arcs Settings">
+
+    <script type="application/x-javascript" src="chrome://global/content/nsUserSettings.js" />
+    <script type="application/x-javascript" src="chrome://threadarcsjs/content/Settings.js" />
+
+    <groupbox align="start">
+        <caption label="Logging" />
+        <checkbox id="dologging" label="Enable Logging" prefstring="threadarcsjs.logging.enable" prefdefval="false" tooltiptext="Logging will be enabled/disabled after restarting Thunderbird." />
+        <separator class="thin" />
+        <button id="sendlog" label="Send Logfiles" oncommand="sendLogfiles();" tooltiptext="Creates a new empty email and attaches the logfiles." />
+        <separator class="thin" />
+        <button id="resetlog" label="Reset Logfiles" oncommand="resetLogfiles();" tooltiptext="Resets the logfiles to size 0. Do this after sending the logfiles to save diskspace." />
+    </groupbox>
+
+</dialog>

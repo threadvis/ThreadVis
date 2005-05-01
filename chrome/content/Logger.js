@@ -11,26 +11,55 @@
 var LOGGER_EXTENSION_PATH_ = "extensions";
 var LOGGER_EXTENSION_GUID_ = "{A23E4120-431F-4753-AE53-5D028C42CFDC}";
 var LOGGER_LOGFILENAME_ = "log.txt";
+var LOGGER_PREF_DOLOGGING_ = "threadarcsjs.logging.enable";
 
 
+/**
+ * constructor
+ * read preferences
+ * open file if necessary
+ */
 function Logger()
 {
-    this.file_ = Components.classes["@mozilla.org/file/directory_service;1"].getService(Components.interfaces.nsIProperties).get("ProfD", Components.interfaces.nsIFile);
-    this.file_.append(LOGGER_EXTENSION_PATH_);
-    this.file_.append(LOGGER_EXTENSION_GUID_);
+    var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
+    this.logging_ = prefs.getBoolPref(LOGGER_PREF_DOLOGGING_, false);
     
-    this.ready_ = false;
-    if (this.file_.exists())
+    if (this.logging_)
     {
-        this.file_.append(LOGGER_LOGFILENAME_);
-        this.file_output_stream_ = Components.classes["@mozilla.org/network/file-output-stream;1"].createInstance(Components.interfaces.nsIFileOutputStream);
-        this.file_output_stream_.init(this.file_, 0x2 | 0x8 | 0x10, 0, 0);
-        this.ready_ = true;
+        this.open(false);
     }
-    
+    else
+    {
+        this.ready_ = false;
+    }
 }
 
 
+/**
+ * close the logfile
+ */
+Logger.prototype.close = function()
+{
+    if (this.ready_)
+    {
+        this.ready_ = false;
+        this.file_output_stream_.close();
+    }
+}
+
+
+/**
+ * return the logfile file object
+ */
+Logger.prototype.getFile = function()
+{
+    return this.file_;
+}
+
+
+/**
+ * write a string to the file
+ */
 Logger.prototype.log = function(message)
 {
     if (this.ready_)
@@ -42,11 +71,36 @@ Logger.prototype.log = function(message)
 }
 
 
-Logger.prototype.close = function()
+/**
+ * open the logfile
+ */
+Logger.prototype.open = function(reset)
 {
-    if (this.ready_)
+    this.file_ = Components.classes["@mozilla.org/file/directory_service;1"].getService(Components.interfaces.nsIProperties).get("ProfD", Components.interfaces.nsIFile);
+    this.file_.append(LOGGER_EXTENSION_PATH_);
+    this.file_.append(LOGGER_EXTENSION_GUID_);
+
+    this.ready_ = false;
+    if (this.file_.exists())
     {
-        this.file_output_stream_.close();
+        this.file_.append(LOGGER_LOGFILENAME_);
+        this.file_output_stream_ = Components.classes["@mozilla.org/network/file-output-stream;1"].createInstance(Components.interfaces.nsIFileOutputStream);
+        var options = 0x2 | 0x8 | 0x10;
+        if (reset)
+            options = options | 0x20;
+        this.file_output_stream_.init(this.file_, options, 0, 0);
+        this.ready_ = true;
     }
 }
 
+
+/**
+ * reset the logfile
+ */
+Logger.prototype.reset = function()
+{
+    this.close();
+    this.open(true);
+    if (! this.logging_)
+        this.close();
+}
