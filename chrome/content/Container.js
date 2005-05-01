@@ -54,60 +54,7 @@ function Container(is_root)
     /**
      * save horizontal position of dot
      */
-    this.xposition_ = 0;
-
-
-    // javascript links to methos
-    this.addChild = Container_addChild;
-    this.check = Container_check;
-    this.compareTo = Container_compareTo;
-    this.findChild = Container_findChild;
-    this.getChild = Container_getChild;
-    this.getChildCount = Container_getChildCount;
-    this.getChildPosition = Container_getChildPosition;
-    this.getChildren = Container_getChildren;
-    this.getDate = Container_getDate;
-    this.getDepth = Container_getDepth;
-    this.getDummy = Container_getDummy;
-    this.getLast = Container_getLast;
-    this.getNext = Container_getNext;
-    this.getMessage = Container_getMessage;
-    this.getParent = Container_getParent;
-    this.getPrevious = Container_getPrevious;
-    this.getReplyCount = Container_getReplyCount;
-    this.getSimplifiedSubject = Container_getSimplifiedSubject;
-    this.getSubject = Container_getSubject;
-    this.getToolTipText = Container_getToolTipText;
-    this.getTopContainer = Container_getTopContainer;
-    this.hasChild = Container_hasChild;
-    this.hasChildren = Container_hasChildren;
-    this.hasDummy = Container_hasDummy;
-    this.hasNext = Container_hasNext;
-    this.hasOneChild = Container_hasOneChild;
-    this.hasParent = Container_hasParent;
-    this.hasPrevious = Container_hasPrevious;
-    this.hasSiblings = Container_hasSiblings;
-    this.isDummy = Container_isDummy;
-    this.isReply = Container_isReply;
-    this.isRoot = Container_isRoot;
-    this.mergeChild = Container_mergeChild;
-    this.pruneEmptyContainers = Container_pruneEmptyContainers;
-    this.removeChildren = Container_removeChildren;
-    this.removeChild = Container_removeChild;
-    this.removeNext = Container_removeNext;
-    this.removeParent = Container_removeParent;
-    this.removePrevious = Container_removePrevious;
-    this.setChild = Container_setChild;
-    this.setNext = Container_setNext;
-    this.setMessage = Container_setMessage;
-    this.setParent = Container_setParent;
-    this.setPrevious = Container_setPrevious;
-    this.toString = Container_toString;
-    this.toStringThread = Container_toStringThread;
-    this.addChildren = Container_addChildren;
-    this.addSibling = Container_addSibling;
-    this.setParentForContainer = Container_setParentForContainer;
-}
+    this.xposition_ = 0;}
 
 
 /**
@@ -115,7 +62,7 @@ function Container(is_root)
  * Removes child from old sibling list
  * Inserts child and all its children
  */
-function Container_addChild(child)
+Container.prototype.addChild = function(child)
 {
     /* remove it from old chain
      * child.hasPrevious means that it's not the first in chain,
@@ -150,7 +97,7 @@ function Container_addChild(child)
  * Inserts children into child list
  * Children have to be removed from old position first!
  */
-function Container_addChildren(child)
+Container.prototype.addChildren = function(child)
 {
     // we always want to be passed the first child in list
     if (child.hasPrevious())
@@ -172,7 +119,7 @@ function Container_addChildren(child)
 /**
  * Insert a container into sibling list
  */
-function Container_addSibling(sibling)
+Container.prototype.addSibling = function(sibling)
 {
     if (this.hasNext())
         this.getNext().setPrevious(sibling);
@@ -188,7 +135,7 @@ function Container_addSibling(sibling)
 /**
  * Low level check if tree is valid
  */
-function Container_check()
+Container.prototype.check = function()
 {
     // check if prev-next relationship holds
     if (this.hasPrevious())
@@ -230,31 +177,10 @@ function Container_check()
 
 
 /**
- * needed to sort containers by message date
- * fixxme
- */
-function Container_compareTo(object)
-{
-    if (this.isDummy() && object.isDummy())
-        return 0;
-
-    if (this.isDummy() && !object.isDummy())
-        return -1;
-
-    if (!this.isDummy() && object.isDummy())
-        return 1;
-
-    // fixxme
-    //return getDate().compareTo(object.getDate());
-    return 1;
-}
-
-
-/**
  * See if this container or any of its children
  * contains a specific container
  */
-function Container_findChild(target)
+Container.prototype.findChild = function(target)
 {
     var container = null;
     for (container = this.getChild();
@@ -277,7 +203,7 @@ function Container_findChild(target)
 /**
  * Get first child in child list
  */
-function Container_getChild()
+Container.prototype.getChild = function()
 {
     return this.child_;
 }
@@ -286,7 +212,7 @@ function Container_getChild()
 /**
  * Get child count
  */
-function Container_getChildCount()
+Container.prototype.getChildCount = function()
 {
     var count = 0;
     var container = null;
@@ -303,7 +229,7 @@ function Container_getChildCount()
 /**
  * return at which position child is in child list
  */
-function Container_getChildPosition(child)
+Container.prototype.getChildPosition = function(child)
 {
     var count = 0;
     var container = 0;
@@ -322,7 +248,7 @@ function Container_getChildPosition(child)
 /**
  * Get all children of this container as array
  */
-function Container_getChildren()
+Container.prototype.getChildren = function()
 {
     var containers = new Array();
     var container = null;
@@ -340,7 +266,7 @@ function Container_getChildren()
 /**
  * Get date of message
  */
-function Container_getDate()
+Container.prototype.getDate = function()
 {
     if (! this.isDummy())
         return this.message_.getDate();
@@ -358,7 +284,7 @@ function Container_getDate()
 /**
  * Get depth of message in tree
  */
-function Container_getDepth()
+Container.prototype.getDepth = function()
 {
     if (this.hasParent())
         if (this.getParent().isRoot())
@@ -373,7 +299,7 @@ function Container_getDepth()
 /**
  * Get first dummy child
  */
-function Container_getDummy()
+Container.prototype.getDummy = function()
 {
     var container = null;
     for (container = this.getChild();
@@ -392,7 +318,7 @@ function Container_getDummy()
 /**
  * Get last sibling in list
  */
-function Container_getLast()
+Container.prototype.getLast = function()
 {
     var current = this;
     while (current.hasNext())
@@ -406,7 +332,7 @@ function Container_getLast()
 /**
  * Get next sibling in list
  */
-function Container_getNext()
+Container.prototype.getNext = function()
 {
     return this.next_;
 }
@@ -415,7 +341,7 @@ function Container_getNext()
 /**
  * Get message of this container
  */
-function Container_getMessage()
+Container.prototype.getMessage = function()
 {
     return this.message_;
 }
@@ -424,7 +350,7 @@ function Container_getMessage()
 /**
  * Set parent of this container
  */
-function Container_getParent()
+Container.prototype.getParent = function()
 {
     return this.parent_;
 }
@@ -433,7 +359,7 @@ function Container_getParent()
 /**
  * Get previous sibling in list
  */
-function Container_getPrevious()
+Container.prototype.getPrevious = function()
 {
     return this.previous_;
 }
@@ -442,7 +368,7 @@ function Container_getPrevious()
 /**
  * Get reply count of message of this container
  */
-function Container_getReplyCount()
+Container.prototype.getReplyCount = function()
 {
     return (this.isDummy() ? 0 : this.getMessage().getReplyCount());
 }
@@ -451,7 +377,7 @@ function Container_getReplyCount()
 /**
  * Get simplified subject of this thread
  */
-function Container_getSimplifiedSubject()
+Container.prototype.getSimplifiedSubject = function()
 {
     if (! this.isDummy())
     {
@@ -471,7 +397,7 @@ function Container_getSimplifiedSubject()
 /**
  * Get subject of message of this thread
  */
-function Container_getSubject()
+Container.prototype.getSubject = function()
 {
     if (! this.isDummy())
     {
@@ -491,7 +417,7 @@ function Container_getSubject()
 /**
  * Get tooltip text to display
  */
-function Container_getToolTipText()
+Container.prototype.getToolTipText = function()
 {
     if (this.isDummy())
         return null;
@@ -505,7 +431,7 @@ function Container_getToolTipText()
 /**
  * Get topmost container that is not the root container
  */
-function Container_getTopContainer()
+Container.prototype.getTopContainer = function()
 {
     if (this.hasParent())
     {
@@ -521,7 +447,7 @@ function Container_getTopContainer()
 /**
  * See if this container has at least 1 child
  */
-function Container_hasChild()
+Container.prototype.hasChild = function()
 {
     return (this.getChild() != null);
 }
@@ -530,7 +456,7 @@ function Container_hasChild()
 /**
  * See if this container contains at least 2 children
  */
-function Container_hasChildren()
+Container.prototype.hasChildren = function()
 {
     return (this.hasChild() ? this.getChild().hasSiblings() : false);
 }
@@ -539,7 +465,7 @@ function Container_hasChildren()
 /**
  * See if this container has a dummy child
  */
-function Container_hasDummy()
+Container.prototype.hasDummy = function()
 {
     var container = null;
     for (container = this.getChild();
@@ -558,7 +484,7 @@ function Container_hasDummy()
 /**
  * See if we have a next sibling in list
  */
-function Container_hasNext()
+Container.prototype.hasNext = function()
 {
     return (this.getNext() != null);
 }
@@ -567,7 +493,7 @@ function Container_hasNext()
 /**
  * See if this container has exactly 1 child
  */
-function Container_hasOneChild()
+Container.prototype.hasOneChild = function()
 {
     return (this.hasChild() ? (this.getChild().hasNext() == false) : false);
 }
@@ -576,7 +502,7 @@ function Container_hasOneChild()
 /**
  * See if this container has a parent
  */
-function Container_hasParent()
+Container.prototype.hasParent = function()
 {
     return (this.getParent() != null);
 }
@@ -585,7 +511,7 @@ function Container_hasParent()
 /**
  * See if we have a previous sibling in list
  */
-function Container_hasPrevious()
+Container.prototype.hasPrevious = function()
 {
     return (this.getPrevious() != null);
 }
@@ -594,7 +520,7 @@ function Container_hasPrevious()
 /**
  * See if we have other containers in sibling list
  */
-function Container_hasSiblings()
+Container.prototype.hasSiblings = function()
 {
     return (this.hasNext() || this.hasPrevious());
 }
@@ -603,7 +529,7 @@ function Container_hasSiblings()
 /**
  * See if this container contains a message
  */
-function Container_isDummy()
+Container.prototype.isDummy = function()
 {
     return (this.getMessage() == null);
 }
@@ -612,7 +538,7 @@ function Container_isDummy()
 /**
  * See if this container is a reply
  */
-function Container_isReply()
+Container.prototype.isReply = function()
 {
     return (this.isDummy() ? false : this.getMessage().isReply());
 }
@@ -621,7 +547,7 @@ function Container_isReply()
 /**
  * Return if this container is the topmost container
  */
-function Container_isRoot()
+Container.prototype.isRoot = function()
 {
     return this.is_root_;
 }
@@ -632,7 +558,7 @@ function Container_isRoot()
  * add children as this children
  * set message as this message
  */
-function Container_mergeChild(dummy, child)
+Container.prototype.mergeChild = function(dummy, child)
 {
     dummy.addChildren(child.getChild());
     dummy.setMessage(child.getMessage());
@@ -642,7 +568,7 @@ function Container_mergeChild(dummy, child)
 /**
  * Prune empty containers in this container
  */
-function Container_pruneEmptyContainers()
+Container.prototype.pruneEmptyContainers = function()
 {
     /* 4. Prune empty containers
      * prune if this container is dummy (empty)
@@ -676,7 +602,7 @@ function Container_pruneEmptyContainers()
 /**
  * Unlink all children
  */
-function Container_removeChildren()
+Container.prototype.removeChildren = function()
 {
     this.setChild(null);
 }
@@ -685,7 +611,7 @@ function Container_removeChildren()
 /**
  * Remove a child from the list
  */
-function Container_removeChild(child)
+Container.prototype.removeChild = function(child)
 {
     /* if child is the first in list, we can remove it
      * by setting the next child in list as first
@@ -726,7 +652,7 @@ function Container_removeChild(child)
 /**
  * Unlink next sibling in list
  */
-function Container_removeNext()
+Container.prototype.removeNext = function()
 {
     this.setNext(null);
 }
@@ -735,7 +661,7 @@ function Container_removeNext()
 /**
  * Unlink parent
  */
-function Container_removeParent()
+Container.prototype.removeParent = function()
 {
     this.setParent(null);
 }
@@ -744,7 +670,7 @@ function Container_removeParent()
 /**
  * Unlink previous sibling in list
  */
-function Container_removePrevious()
+Container.prototype.removePrevious = function()
 {
     this.setPrevious(null);
 }
@@ -753,7 +679,7 @@ function Container_removePrevious()
 /**
  * Set first child in list
  */
-function Container_setChild(child)
+Container.prototype.setChild = function(child)
 {
     this.child_ = child;
 }
@@ -762,7 +688,7 @@ function Container_setChild(child)
 /**
  * Set next sibling in list
  */
-function Container_setNext(next)
+Container.prototype.setNext = function(next)
 {
     this.next_ = next;
 }
@@ -771,7 +697,7 @@ function Container_setNext(next)
 /**
  * Set message of this container
  */
-function Container_setMessage(message)
+Container.prototype.setMessage = function(message)
 {
     this.message_ = message;
 }
@@ -780,7 +706,7 @@ function Container_setMessage(message)
 /**
  * Set parent of this container
  */
-function Container_setParent(parent)
+Container.prototype.setParent = function(parent)
 {
     this.parent_ = parent;
 }
@@ -789,7 +715,7 @@ function Container_setParent(parent)
 /**
  * Set parent for all containers in list
  */
-function Container_setParentForContainer(sibling, parent)
+Container.prototype.setParentForContainer = function(sibling, parent)
 {
     var container = null;
     for (container = sibling;
@@ -804,7 +730,7 @@ function Container_setParentForContainer(sibling, parent)
 /**
  * Set previous sibling in list
  */
-function Container_setPrevious(prev)
+Container.prototype.setPrevious = function(prev)
 {
     this.previous_ = prev;
 }
@@ -842,7 +768,7 @@ function Container_sortFunction(one, two)
 /**
  * Output string representation of this container
  */
-function Container_toString(prefix)
+Container.prototype.toString = function(prefix)
 {
     if (prefix == null)
         prefix = "";
@@ -876,7 +802,7 @@ function Container_toString(prefix)
 /**
  * Output string representation of this container
  */
-function Container_toStringThread()
+Container.prototype.toStringThread = function()
 {
     if (this.hasParent())
       if (this.getParent().hasParent())

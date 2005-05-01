@@ -74,28 +74,13 @@ function Message(subject, from, message_id, message_key, date, folder, reference
      * Subject of message
      */
     this.subject_ = subject;
-
-
-    // javascript function hooks
-    this.getDate = Message_getDate;
-    this.getFolder = Message_getFolder;
-    this.getFrom = Message_getFrom;
-    this.getId = Message_getId;
-    this.getKey = Message_getKey;
-    this.getReferences = Message_getReferences;
-    this.getReplyCount = Message_getReplyCount;
-    this.getSimplifiedSubject = Message_getSimplifiedSubject;
-    this.getSubject = Message_getSubject;
-    this.isReply = Message_isReply;
-    this.isSent = Message_isSent;
-    this.toString = Message_toString;
 }
 
 
 /**
  * Get date of message
  */
-function Message_getDate()
+Message.prototype.getDate = function()
 {
     return this.date_;
 }
@@ -104,7 +89,7 @@ function Message_getDate()
 /**
  * Get folder message is in
  */
-function Message_getFolder()
+Message.prototype.getFolder = function()
 {
     return this.folder_;
 }
@@ -113,7 +98,7 @@ function Message_getFolder()
 /**
  * Get sender of message
  */
-function Message_getFrom()
+Message.prototype.getFrom = function()
 {
     return this.from_;
 }
@@ -122,7 +107,7 @@ function Message_getFrom()
 /**
  * Get message id
  */
-function Message_getId()
+Message.prototype.getId = function()
 {
     return this.message_id_;
 }
@@ -131,7 +116,7 @@ function Message_getId()
 /**
  * Get message key
  */
-function Message_getKey()
+Message.prototype.getKey = function()
 {
     return this.message_key_;
 }
@@ -140,7 +125,7 @@ function Message_getKey()
 /**
  * Get references
  */
-function Message_getReferences()
+Message.prototype.getReferences = function()
 {
     return this.references_;
 }
@@ -149,7 +134,7 @@ function Message_getReferences()
 /**
  * Get reply count of this message
  */
-function Message_getReplyCount()
+Message.prototype.getReplyCount = function()
 {
     return this.reply_count_;
 }
@@ -158,7 +143,7 @@ function Message_getReplyCount()
 /**
  * Get simplified subject
  */
-function Message_getSimplifiedSubject()
+Message.prototype.getSimplifiedSubject = function()
 {
     return this.simplified_subject_;
 }
@@ -167,7 +152,7 @@ function Message_getSimplifiedSubject()
 /**
  * Get original subject
  */
-function Message_getSubject()
+Message.prototype.getSubject = function()
 {
     return this.subject_;
 }
@@ -176,7 +161,7 @@ function Message_getSubject()
 /**
  * See if this message is a reply
  */
-function Message_isReply()
+Message.prototype.isReply = function()
 {
     return (this.reply_count_ > 0);
 }
@@ -185,11 +170,8 @@ function Message_isReply()
 /**
  * See if message is sent (i.e. in sent-mail folder)
  */
-function Message_isSent()
+Message.prototype.isSent = function()
 {
-    // fixxme
-    // find a better regex
-    //return (this.getFolder().search(/.*\/Sent.*/) != -1);
     return this.issent_;
 }
 
@@ -241,7 +223,7 @@ private String simplifySubject(String subject)
 /**
  * Return message as string
  */
-function Message_toString()
+Message.prototype.toString = function()
 {
     return "Message: '" + this.getSubject() + "' with simplyfied subject '" + this.getSimplifiedSubject() + "' and id '" + this.getId() + "' and refs '" + this.getReferences() + "' and recount '" + this.getReplyCount() + "'";
 }
@@ -255,7 +237,7 @@ function Message_toString()
 /**
  * Test method
  */
-function Message_test()
+Message.prototype.test = function()
 {
     test1 = new Message("subject1", "Sascha", "23", "23", "1.1.2004 12:00", "INBOX", "");
     alert(test1.toString());

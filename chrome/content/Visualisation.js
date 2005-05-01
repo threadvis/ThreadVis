@@ -43,15 +43,6 @@ function Visualisation()
     // set default resize parameter
     this.resize_ = 1;
 
-    // needed for JavaScript
-    // link functions to this object
-    this.clearStack = Visualisation_clearStack;
-    this.createStack = Visualisation_createStack;
-    this.drawArc = Visualisation_drawArc;
-    this.drawDot = Visualisation_drawDot;
-    this.getResize = Visualisation_getResize;
-    this.visualise = Visualisation_visualise;
-
     this.createStack();
 }
 
@@ -60,7 +51,7 @@ function Visualisation()
  * Clear stack
  * delete all children
  */
-function Visualisation_clearStack()
+Visualisation.prototype.clearStack = function()
 {
     while(this.stack_.firstChild != null)
         this.stack_.removeChild(this.stack_.firstChild);
@@ -70,7 +61,7 @@ function Visualisation_clearStack()
 /**
  * Create stack
  */
-function Visualisation_createStack()
+Visualisation.prototype.createStack = function()
 {
     this.box_ = document.getElementById("ThreadArcsJSBox");
     this.stack_ = document.getElementById("ThreadArcsJSStack");
@@ -103,7 +94,7 @@ function Visualisation_createStack()
 /**
  * Draw arc
  */
-function Visualisation_drawArc(color, vposition, height, left, right)
+Visualisation.prototype.drawArc = function(color, vposition, height, left, right)
 {
     var arc_top = 0;
     var fill_top = 0;
@@ -186,7 +177,7 @@ function Visualisation_drawArc(color, vposition, height, left, right)
 /**
  * Draw a dot
  */
-function Visualisation_drawDot(container, color, style, left)
+Visualisation.prototype.drawDot = function(container, color, style, left)
 {
     var div = document.createElementNS(HTML_NAMESPACE_, "div");
     var dot = document.createElementNS(HTML_NAMESPACE_, "img");
@@ -203,7 +194,8 @@ function Visualisation_drawDot(container, color, style, left)
     dot.setAttribute("tooltiptext", container.getToolTipText());
     div.setAttribute("tooltiptext", "");
 
-    div.addEventListener("click", ThreadArcs_onMouseClick, true);
+    //div.addEventListener("click", ThreadArcs_onMouseClick, true);
+    div.addEventListener("click", this.onMouseClick, true);
 
     div.appendChild(dot);
     this.stack_.appendChild(div);
@@ -215,7 +207,7 @@ function Visualisation_drawDot(container, color, style, left)
  * calculate from box width and height
  * and needed width and height
  */
-function Visualisation_getResize(xcount, ycount,sizex, sizey)
+Visualisation.prototype.getResize = function(xcount, ycount,sizex, sizey)
 {
     var spaceperarcavailablex = sizex / (xcount - 1);
     var spaceperarcavailabley = sizey / 2;
@@ -239,9 +231,22 @@ function Visualisation_getResize(xcount, ycount,sizex, sizey)
 
 
 /**
+ * mouse click event handler
+ * display message user clicked on
+ */
+//function ThreadArcs_onMouseClick(event)
+Visualisation.prototype.onMouseClick = function(event)
+{
+    var container = event.target.container;
+    if (container && ! container.isDummy())
+        THREADARCS_.callback(container.getMessage().getKey(), container.getMessage().getFolder());
+}
+
+
+/**
  * Visualise a new thread
  */
-function Visualisation_visualise(container)
+Visualisation.prototype.visualise = function(container)
 {
     // clear visualisation
     this.clearStack();

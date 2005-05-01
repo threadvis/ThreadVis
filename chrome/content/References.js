@@ -20,10 +20,6 @@ function References(references)
     this.references_ = new Array;
 
     // javascript links to methods
-    this.buildReferences = References_buildReferences;
-    this.getReferences = References_getReferences;
-    this.toString = References_toString;
-
     this.buildReferences(references);
 }
 
@@ -31,7 +27,7 @@ function References(references)
 /**
  * build references array
  */
-function References_buildReferences(references)
+References.prototype.buildReferences = function(references)
 {
     if (references != null && references != "")
     {
@@ -51,7 +47,7 @@ function References_buildReferences(references)
 /**
  * get references array
  */
-function References_getReferences()
+References.prototype.getReferences = function()
 {
     return this.references_;
 }
@@ -60,7 +56,7 @@ function References_getReferences()
 /**
  * Get string representation of object
  */
-function References_toString()
+References.prototype.toString = function()
 {
     //return this.references_;
     var string = "";
