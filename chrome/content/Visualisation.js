@@ -9,9 +9,6 @@
  * Version: $Id$
  ********************************************************/
 
-var HTML_NAMESPACE_ =
-    "http://www.w3.org/1999/xhtml";
-
 var XUL_NAMESPACE_ =
     "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
@@ -77,14 +74,12 @@ Visualisation.prototype.createStack = function()
         this.clearStack();
     }
     
-    var div = document.createElementNS(HTML_NAMESPACE_, "div");
-    var loading = document.createElementNS(HTML_NAMESPACE_, "img");
+    var loading = document.createElementNS(XUL_NAMESPACE_, "image");
 
     loading.style.marginTop = "20px";
     loading.setAttribute("src", URL_ + "threadarcs_loading.gif");
 
-    div.appendChild(loading);
-    this.stack_.appendChild(div);
+    this.stack_.appendChild(loading);
 
     loading = null;
     div = null;
@@ -109,8 +104,7 @@ Visualisation.prototype.drawArc = function(color, vposition, height, left, right
         fill_top = arc_top - (ARC_DIFFERENCE_ * height * this.resize_);
     }
 
-    var div_left = document.createElementNS(HTML_NAMESPACE_, "div");
-    var arc_left = document.createElementNS(HTML_NAMESPACE_, "img");
+    var arc_left = document.createElementNS(XUL_NAMESPACE_, "image");
     arc_left.style.position = "relative";
     arc_left.style.top = arc_top + "px";
     arc_left.style.left = ((left + ARC_LEFT_PLACEMENT_) * this.resize_) + "px";
@@ -118,11 +112,9 @@ Visualisation.prototype.drawArc = function(color, vposition, height, left, right
     arc_left.style.width = (ARC_WIDTH_ * this.resize_)+ "px";
     arc_left.style.verticalAlign = "top";
     arc_left.setAttribute( "src", URL_ + "threadarcs_arc_" + color + "_" + vposition + "_left.png");
-    div_left.appendChild(arc_left);
-    this.stack_.appendChild(div_left);
+    this.stack_.appendChild(arc_left);
 
-    var div_right = document.createElementNS(HTML_NAMESPACE_, "div");
-    var arc_right = document.createElementNS(HTML_NAMESPACE_, "img");
+    var arc_right = document.createElementNS(XUL_NAMESPACE_, "image");
     arc_right.style.position = "relative";
     arc_right.style.top = arc_top + "px";
     arc_right.style.left = ((right - ARC_WIDTH_ + ARC_RIGHT_PLACEMENT_) * this.resize_) + "px";
@@ -130,11 +122,9 @@ Visualisation.prototype.drawArc = function(color, vposition, height, left, right
     arc_right.style.width = (ARC_WIDTH_ * this.resize_)+ "px";
     arc_right.style.verticalAlign = "top";
     arc_right.setAttribute( "src", URL_ + "threadarcs_arc_" + color + "_" + vposition + "_right.png");
-    div_right.appendChild(arc_right);
-    this.stack_.appendChild(div_right);
+    this.stack_.appendChild(arc_right);
 
-    var div_middle = document.createElementNS(HTML_NAMESPACE_, "div");
-    var arc_middle = document.createElementNS(HTML_NAMESPACE_, "img");
+    var arc_middle = document.createElementNS(XUL_NAMESPACE_, "image");
     arc_middle.style.position = "relative";
     arc_middle.style.top = arc_top + "px";
     arc_middle.style.left = ((left + ARC_LEFT_PLACEMENT_ + ARC_WIDTH_) * this.resize_) + "px";
@@ -142,14 +132,12 @@ Visualisation.prototype.drawArc = function(color, vposition, height, left, right
     arc_middle.style.height = (ARC_HEIGHT_ * this.resize_) + "px";
     arc_middle.style.verticalAlign = "top";
     arc_middle.setAttribute( "src", URL_ + "threadarcs_arc_" + color + "_" + vposition + "_middle.png");
-    div_middle.appendChild(arc_middle);
-    this.stack_.appendChild(div_middle);
+    this.stack_.appendChild(arc_middle);
 
     if (height == 0)
         return;
 
-    var div_left_middle = document.createElementNS(HTML_NAMESPACE_, "div");
-    var arc_left_middle = document.createElementNS(HTML_NAMESPACE_, "img");
+    var arc_left_middle = document.createElementNS(XUL_NAMESPACE_, "image");
     arc_left_middle.style.position = "relative";
     arc_left_middle.style.top = fill_top + "px";
     arc_left_middle.style.left = ((left + ARC_LEFT_PLACEMENT_) * this.resize_) + "px";
@@ -157,11 +145,9 @@ Visualisation.prototype.drawArc = function(color, vposition, height, left, right
     arc_left_middle.style.height = ((ARC_DIFFERENCE_ * height) * this.resize_) + "px";
     arc_left_middle.style.verticalAlign = "top";
     arc_left_middle.setAttribute( "src", URL_ + "threadarcs_arc_" + color + "_left_middle.png");
-    div_left_middle.appendChild(arc_left_middle);
-    this.stack_.appendChild(div_left_middle);
+    this.stack_.appendChild(arc_left_middle);
     
-    var div_right_middle = document.createElementNS(HTML_NAMESPACE_, "div");
-    var arc_right_middle = document.createElementNS(HTML_NAMESPACE_, "img");
+    var arc_right_middle = document.createElementNS(XUL_NAMESPACE_, "image");
     arc_right_middle.style.position = "relative";
     arc_right_middle.style.top = fill_top + "px";
     arc_right_middle.style.left = ((right - ARC_WIDTH_ + ARC_RIGHT_PLACEMENT_) * this.resize_) + "px";
@@ -169,8 +155,7 @@ Visualisation.prototype.drawArc = function(color, vposition, height, left, right
     arc_right_middle.style.height = ((ARC_DIFFERENCE_ * height) * this.resize_) + "px";
     arc_right_middle.style.verticalAlign = "top";
     arc_right_middle.setAttribute("src", URL_ + "threadarcs_arc_" + color + "_right_middle.png");
-    div_right_middle.appendChild(arc_right_middle);
-    this.stack_.appendChild(div_right_middle);
+    this.stack_.appendChild(arc_right_middle);
 }
 
 
@@ -179,8 +164,7 @@ Visualisation.prototype.drawArc = function(color, vposition, height, left, right
  */
 Visualisation.prototype.drawDot = function(container, color, style, left)
 {
-    var div = document.createElementNS(HTML_NAMESPACE_, "div");
-    var dot = document.createElementNS(HTML_NAMESPACE_, "img");
+    var dot = document.createElementNS(XUL_NAMESPACE_, "image");
 
     dot.style.position = "relative";
     dot.style.top = (this.box_.boxObject.height / 2) - ((DOTSIZE_ / 2) * this.resize_) + "px";
@@ -190,14 +174,60 @@ Visualisation.prototype.drawDot = function(container, color, style, left)
     dot.setAttribute("src", URL_ + "threadarcs_dot_" + color + "_" + style + ".png");
 
     dot.container = container;
-    
-    dot.setAttribute("tooltiptext", container.getToolTipText());
-    div.setAttribute("tooltiptext", "");
 
-    div.addEventListener("click", this.onMouseClick, true);
+    var tooltip = document.createElementNS(XUL_NAMESPACE_, "tooltip");
+    tooltip.setAttribute("orient", "vertical");
+    tooltip.setAttribute("id", "ThreadArcsJS_" + left);
 
-    div.appendChild(dot);
-    this.stack_.appendChild(div);
+    if (! container.isDummy())
+    {
+        // if container container message, view details
+        var authorlabel = document.createElementNS(XUL_NAMESPACE_, "label");
+        var authortext = document.createElementNS(XUL_NAMESPACE_, "label");
+        var author = document.createElementNS(XUL_NAMESPACE_, "hbox");
+        author.appendChild(authorlabel);
+        author.appendChild(authortext);
+        authorlabel.setAttribute("value", "From:");
+        authorlabel.style.fontWeight = "bold";
+        authortext.setAttribute("value", container.getMessage().getFrom());
+        
+        var datelabel = document.createElementNS(XUL_NAMESPACE_, "label");
+        var datetext = document.createElementNS(XUL_NAMESPACE_, "label");
+        var date = document.createElementNS(XUL_NAMESPACE_, "hbox");
+        date.appendChild(datelabel);
+        date.appendChild(datetext);
+        datelabel.setAttribute("value", "Date:");
+        datelabel.style.fontWeight = "bold";
+        datetext.setAttribute("value", container.getMessage().getDate());
+
+        var subjectlabel = document.createElementNS(XUL_NAMESPACE_, "label");
+        var subjecttext = document.createElementNS(XUL_NAMESPACE_, "label");
+        var subject = document.createElementNS(XUL_NAMESPACE_, "hbox");
+        subject.appendChild(subjectlabel);
+        subject.appendChild(subjecttext);
+        subjectlabel.setAttribute("value", "Subject:");
+        subjectlabel.style.fontWeight = "bold";
+        subjecttext.setAttribute("value", container.getMessage().getSubject());
+
+        tooltip.appendChild(author);
+        tooltip.appendChild(date);
+        tooltip.appendChild(subject);
+    }
+    else
+    {
+        // otherwise we display info about missing message
+        var desc1 = document.createElementNS(XUL_NAMESPACE_, "description");
+        var desc2 = document.createElementNS(XUL_NAMESPACE_, "description");
+        desc1.setAttribute("value", "This is a missing message.");
+        desc2.setAttribute("value", "Either you never received it or it was deleted.");
+        tooltip.appendChild(desc1);
+        tooltip.appendChild(desc2);
+    }
+
+    dot.setAttribute("tooltip", "ThreadArcsJS_" + left);
+    this.stack_.appendChild(dot);
+    this.stack_.appendChild(tooltip);
+    dot.addEventListener("click", this.onMouseClick, true);
 }
 
 

@@ -119,7 +119,7 @@ ThreadArcs.prototype.addMessagesFromFolder = function(folder)
             // see if msg is a sent mail
             var issent = IsSpecialFolder(header.folder, MSG_FOLDER_FLAG_SENTMAIL, true);
             
-            this.threader_.addMessageDetail(header.subject, header.author, header.messageId, header.messageKey, date, header.folder.URI , header.getStringProperty("references"), issent);
+            this.threader_.addMessageDetail(header.mime2DecodedSubject , header.mime2DecodedAuthor , header.messageId, header.messageKey, date, header.folder.URI , header.getStringProperty("references"), issent);
         }
     }
 }
