@@ -287,7 +287,8 @@ ThreadArcs.prototype.visualise = function(container)
         msgid = "<DUMMY>";
     else
         msgid = container.getMessage().getId();
-    LOGGER_.log("ThreadArcs.js: Visualising message: " + msgid);
+    var topcontainer_msgid = container.getTopContainer().isDummy() ? "<DUMMY>" : container.getTopContainer().getMessage().getId();
+    LOGGER_.log("ThreadArcs.js: Visualising message: " + msgid + ". Thread Information: Top Container: " + topcontainer_msgid + ". " + container.getTopContainer().getCountRecursive() + " messages");
     this.visualisation_.visualise(container)
 }
 

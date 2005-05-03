@@ -264,6 +264,23 @@ Container.prototype.getChildren = function()
 
 
 /**
+ * Get recursive container count
+ */
+Container.prototype.getCountRecursive = function()
+{
+    var count = 1;
+    var container = null;
+    for (container = this.getChild();
+         container != null;
+         container = container.getNext())
+    {
+        count += container.getCountRecursive();
+    }
+    return count;
+}
+
+
+/**
  * Get date of message
  */
 Container.prototype.getDate = function()
