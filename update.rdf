@@ -1,4 +1,17 @@
 <?xml version="1.0"?>
+
+<!--
+/* *******************************************************
+ * update.rdf
+ *
+ * (c) 2005 Alexander C. Hubmann
+ *
+ * RDF meta-file to update extension
+ *
+ * Version: $Id$
+ ********************************************************/
+-->
+
 <RDF:RDF xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
          xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 
