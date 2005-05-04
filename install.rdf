@@ -37,12 +37,13 @@
     
     <!-- Front End MetaData -->
     <em:id>{A23E4120-431F-4753-AE53-5D028C42CFDC}</em:id>
-    <em:version>0.1.1</em:version>
+    <em:version>0.1.2</em:version>
     <em:name>Thread Arcs Visualisation</em:name>
     <em:description>Displays a small graphic visualising the thread (context) of the currently selected email.</em:description>
     <em:creator>Alexander C. Hubmann</em:creator>
     <em:homepageURL>http://www.sbox.tugraz.at/home/x/xpert/threadarcs/</em:homepageURL>
     <em:optionsURL>chrome://threadarcsjs/content/Settings.xul</em:optionsURL>
+    <em:updateURL>http://www.sbox.tugraz.at/home/x/xpert/threadarcs/update.rdf</em:updateURL>
 
     <!-- Packages, Skins and Locales that this extension registers -->
     <em:file>
