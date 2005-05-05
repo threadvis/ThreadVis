@@ -26,13 +26,19 @@
     <script type="application/x-javascript" src="chrome://global/content/nsUserSettings.js" />
     <script type="application/x-javascript" src="chrome://threadarcsjs/content/Settings.js" />
 
-    <groupbox align="start">
-        <caption label="Logging" />
-        <checkbox id="dologging" label="Enable Logging" prefstring="extensions.threadarcsjs.logging.enabled" prefdefval="false" tooltiptext="Logging will be enabled/disabled after restarting Thunderbird." />
-        <separator class="thin" />
-        <button id="sendlog" label="Send Logfiles" oncommand="sendLogfiles();" tooltiptext="Creates a new empty email and attaches the logfiles." />
-        <separator class="thin" />
-        <button id="resetlog" label="Reset Logfiles" oncommand="resetLogfiles();" tooltiptext="Resets the logfiles to size 0. Do this after sending the logfiles to save diskspace." />
-    </groupbox>
+    <tabbox>
+        <tabs id="settingstabs">
+            <tab label="Logfiles" selected="true" />
+        </tabs>
+        <tabpanels id="settingstabpanels">
+            <tabpanel id="logfiles" orient="vertical">
+                <checkbox id="dologging" label="Enable Logging" prefstring="extensions.threadarcsjs.logging.enabled" prefdefval="false" tooltiptext="Logging will be enabled/disabled after restarting Thunderbird." />
+                <separator class="thin" />
+                <button id="sendlog" label="Send Logfiles" oncommand="sendLogfiles();" tooltiptext="Creates a new empty email and attaches the logfiles." />
+                <separator class="thin" />
+                <button id="resetlog" label="Reset Logfiles" oncommand="resetLogfiles();" tooltiptext="Resets the logfiles to size 0. Do this after sending the logfiles to save diskspace." />
+            </tabpanel>
+        </tabpanels>
+    </tabbox>
 
 </dialog>
