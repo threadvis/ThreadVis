@@ -10,8 +10,10 @@
 
 var LOGGER_EXTENSION_PATH_ = "extensions";
 var LOGGER_EXTENSION_GUID_ = "{A23E4120-431F-4753-AE53-5D028C42CFDC}";
-var LOGGER_LOGFILENAME_ = "threadarcsjs.log.txt";
+var LOGGER_LOGFILENAME_ = "threadarcsjs.log.xml";
 var LOGGER_PREF_DOLOGGING_ = "extensions.threadarcsjs.logging.enabled";
+var LOGGER_STARTTAG_ = "\n<log>";
+var LOGGER_ENDTAG_ = "\n</log>";
 
 
 /**
@@ -29,7 +31,7 @@ function Logger()
     
     if (this.logging_)
     {
-        this.open(false);
+        this.open();
     }
     else
     {
@@ -46,6 +48,7 @@ Logger.prototype.close = function()
     if (this.ready_)
     {
         this.ready_ = false;
+        this.file_output_stream_.write(LOGGER_ENDTAG_, LOGGER_ENDTAG_.length);
         this.file_output_stream_.close();
     }
 }
@@ -63,12 +66,20 @@ Logger.prototype.getFile = function()
 /**
  * write a string to the file
  */
-Logger.prototype.log = function(message)
+Logger.prototype.log = function(item, infos)
 {
     if (this.ready_)
     {
         var date = new Date();
-        var logtext = "\n" + date + ": " + message;
+        var logtext = "";
+        logtext += '\n<logitem date="' + date + '" item="' + item + '">';
+        for (var key in infos)
+        {
+            logtext += '<info key="' + key + '">';
+            logtext += infos[key];
+            logtext += "</info>";
+        }
+        logtext += "</logitem>";
         this.file_output_stream_.write(logtext, logtext.length);
     }
 }
@@ -77,7 +88,7 @@ Logger.prototype.log = function(message)
 /**
  * open the logfile
  */
-Logger.prototype.open = function(reset)
+Logger.prototype.open = function()
 {
     this.file_ = Components.classes["@mozilla.org/file/directory_service;1"].getService(Components.interfaces.nsIProperties).get("ProfD", Components.interfaces.nsIFile);
     
@@ -95,9 +106,8 @@ Logger.prototype.open = function(reset)
         this.file_.append(LOGGER_LOGFILENAME_);
         this.file_output_stream_ = Components.classes["@mozilla.org/network/file-output-stream;1"].createInstance(Components.interfaces.nsIFileOutputStream);
         var options = 0x2 | 0x8 | 0x10;
-        if (reset)
-            options = options | 0x20;
         this.file_output_stream_.init(this.file_, options, 0, 0);
+        this.file_output_stream_.write(LOGGER_STARTTAG_, LOGGER_STARTTAG_.length);
         this.ready_ = true;
     }
 }
@@ -108,8 +118,12 @@ Logger.prototype.open = function(reset)
  */
 Logger.prototype.reset = function()
 {
-    this.close();
-    this.open(true);
-    if (! this.logging_)
+    if (this.ready_)
         this.close();
+    
+    if (this.file_)
+        this.file_.remove(false);
+    
+    if (this.logging_)
+        this.open();
 }

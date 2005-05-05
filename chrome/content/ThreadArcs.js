@@ -41,7 +41,7 @@ function createThreadArcs()
  */
 function ThreadArcs()
 {
-    LOGGER_.log("ThreadArcs.js: Creating ThreadArcs object");
+    LOGGER_.log("threadarcs", {"action": "startup"});
     // visualisation object
     this.visualisation_ = new Visualisation();
 
@@ -60,18 +60,22 @@ function ThreadArcs()
     
     // add messages when we display first header
     // register this as event handler later
+    var ref = this;
     this.doLoad = {
         onStartHeaders: function()
         {
-            THREADARCS_.initMessages();
-            THREADARCS_.waitForThreading();
-            THREADARCS_.setSelectedMessage();
+            ref.initMessages();
+            ref.waitForThreading();
+            ref.setSelectedMessage();
         },
         onEndHeaders: function()
         {
         }
     }
     gMessageListeners.push(this.doLoad);
+    
+    var ref = this;
+    addEventListener("unload", function() {ref.unloadHandler()}, false);
 }
 
 
@@ -80,7 +84,8 @@ function ThreadArcs()
  */
 ThreadArcs.prototype.addMessages = function()
 {
-    LOGGER_.log("ThreadArcs.js: Beginning to add messages");
+    LOGGER_.log("addmessages", {"action" : "start"});
+    var start_time = new Date();
     this.loading_ = true;
     this.loaded_ = false;
     
@@ -93,7 +98,9 @@ ThreadArcs.prototype.addMessages = function()
     
     this.loaded_ = true;
     this.loading_ = false;
-    LOGGER_.log("ThreadArcs.js: Messages added");
+    var end_time = new Date();
+    var duration = end_time - start_time;
+    LOGGER_.log("addmessages", {"action" : "end", "time" : duration});
 }
 
 
@@ -168,7 +175,7 @@ ThreadArcs.prototype.addMessagesFromSubFolders = function(folder)
  */
 ThreadArcs.prototype.callback = function(msgKey, folder)
 {
-    LOGGER_.log("ThreadArcs.js: User selected message in extension. Display this message.");
+    LOGGER_.log("msgselect", {"from" : "extension", "key" : msgKey});
     // get folder for message
     SelectFolder(folder);
     
@@ -257,11 +264,11 @@ ThreadArcs.prototype.setSelectedMessage = function()
     var msg_uri = GetLoadedMessage();
     var msg = messenger.messageServiceFromURI(msg_uri).messageURIToMsgHdr(msg_uri);
     
-    LOGGER_.log("ThreadArcs.js: User selected a new message: " + msg.messageId);
+    LOGGER_.log("msgselect", {"from" : "user", "key" : msg.messageKey});
     
     if (this.server_ != msg.folder.server)
     {
-        LOGGER_.log("ThreadArcs.js: This message belongs to another account. Restart extension.");
+        LOGGER_.log("msgselect", {"action" : "switch account"});
         // user just switched account
         this.loaded_ = false;
         this.threaded_ = false;
@@ -277,18 +284,21 @@ ThreadArcs.prototype.setSelectedMessage = function()
 }
 
 
+ThreadArcs.prototype.unloadHandler = function()
+{
+    LOGGER_.close();
+}
+
+
 /**
  * clear visualisation
  */
 ThreadArcs.prototype.visualise = function(container)
 {
-    var msgid = "";
-    if (container.isDummy())
-        msgid = "<DUMMY>";
-    else
-        msgid = container.getMessage().getId();
-    var topcontainer_msgid = container.getTopContainer().isDummy() ? "<DUMMY>" : container.getTopContainer().getMessage().getId();
-    LOGGER_.log("ThreadArcs.js: Visualising message: " + msgid + ". Thread Information: Top Container: " + topcontainer_msgid + ". " + container.getTopContainer().getCountRecursive() + " messages");
+    var msgkey = container.isDummy() ? "DUMMY" : container.getMessage().getKey();
+    var topcontainer_msgKey = container.getTopContainer().isDummy() ? "DUMMY" : container.getTopContainer().getMessage().getKey();
+    var msgcount = container.getTopContainer().getCountRecursive();
+    LOGGER_.log("visualise", {"msgkey" : msgkey, "top container" : topcontainer_msgKey, "msgcount" : msgcount});
     this.visualisation_.visualise(container)
 }
 

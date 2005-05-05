@@ -51,6 +51,19 @@ function Threader()
 
     this.doing_5c_ = false;
     this.done_5c_ = false;
+    
+    this.start_ = null;
+    this.end_ = null;
+    this.start_1_ = null;
+    this.end_1_ = null;
+    this.start_2_ = null;
+    this.end_2_ = null;
+    this.start_4_ = null;
+    this.end_4_ = null;
+    this.start_5b_ = null;
+    this.end_5b_ = null;
+    this.start_5c_ = null;
+    this.end_5c_ = null;
 }
 
 
@@ -420,6 +433,7 @@ Threader.prototype.do5c = function()
     if (this.done_5c_)
     {
         this.end_5c_ = (new Date()).getTime();
+        this.end_ = (new Date()).getTime();
         var ref = this;
         setTimeout(function(){ref.logInfo();}, 10);
         return;
@@ -577,7 +591,8 @@ Threader.prototype.do5c1 = function()
 
 Threader.prototype.thread = function()
 {
-    LOGGER_.log("Threader.js: start threading.");
+    this.start_ = (new Date()).getTime();
+    LOGGER_.log("threader", {"action" : "start"});
     // 1. For each message
     this.id_table_ = new Object();
     this.do1();
@@ -672,18 +687,9 @@ Threader.prototype.logInfo = function()
     var time_4 = this.end_4_ - this.start_4_;
     var time_5b = this.end_5b_ - this.start_5b_;
     var time_5c = this.end_5c_ - this.start_5c_;
-    var time_total = time_1 + time_2 + time_4 + time_5b + time_5c;
+    var time_total = this.end_ - this.start_;
     
     var total_messages = this.messages_.length;
-    var logtext = "Threader.js: Threading done.";
-    logtext += "\nTotal messages threaded: " + total_messages;
-    logtext += "\nTiming information:";
-    logtext += "\n1: " + time_1 + "ms";
-    logtext += "\n2: " + time_2 + "ms";
-    logtext += "\n4: " + time_4 + "ms";
-    logtext += "\n5b: " + time_5b + "ms";
-    logtext += "\n5c: " + time_5c + "ms";
-    logtext += "\nTotal: " + time_total + "ms";
-    logtext += "\nThat are " + (time_total / total_messages) + "ms per message";
-    LOGGER_.log(logtext);
+    var per_message = time_total / total_messages;
+    LOGGER_.log("threader", {"action" : "end", "total messages" : total_messages, "timing 1" : time_1, "timing 2" : time_2, "timing 4" : time_4, "timing 5b" : time_5b, "timing 5c" : time_5c, "timing total" : time_total, "per message" : per_message});
 }
