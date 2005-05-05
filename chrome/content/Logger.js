@@ -41,6 +41,15 @@ function Logger()
 
 
 /**
+ * Return if we do logging
+ */
+Logger.prototype.doLogging = function()
+{
+    return this.logging_;
+}
+
+
+/**
  * close the logfile
  */
 Logger.prototype.close = function()
@@ -73,15 +82,29 @@ Logger.prototype.log = function(item, infos)
         var date = new Date();
         var logtext = "";
         logtext += '\n<logitem date="' + date + '" item="' + item + '">';
-        for (var key in infos)
-        {
-            logtext += '<info key="' + key + '">';
-            logtext += infos[key];
-            logtext += "</info>";
-        }
+        logtext += this.decode(infos);
         logtext += "</logitem>";
         this.file_output_stream_.write(logtext, logtext.length);
     }
+}
+
+
+/**
+ * convert an object to xml
+ */
+Logger.prototype.decode = function(object)
+{
+    var logtext = "";
+    for (var key in object)
+    {
+        logtext += '<info key="' + key + '">';
+        if (typeof(object[key]) == "object")
+            logtext += this.decode(object[key]);
+        else
+            logtext += object[key];
+        logtext += "</info>";
+    }
+    return logtext;
 }
 
 

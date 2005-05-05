@@ -101,7 +101,7 @@ Threader.prototype.findContainer = function(message_id)
  */
 Threader.prototype.getRoot = function()
 {
-    return root_set_;
+    return this.root_set_;
 }
 
 
@@ -682,6 +682,9 @@ Threader.prototype.test = function()
 
 Threader.prototype.logInfo = function()
 {
+    if (! LOGGER_.doLogging())
+        return;
+    
     var time_1 = this.end_1_ - this.start_1_;
     var time_2 = this.end_2_ - this.start_2_;
     var time_4 = this.end_4_ - this.start_4_;
@@ -690,6 +693,30 @@ Threader.prototype.logInfo = function()
     var time_total = this.end_ - this.start_;
     
     var total_messages = this.messages_.length;
-    var per_message = time_total / total_messages;
-    LOGGER_.log("threader", {"action" : "end", "total messages" : total_messages, "timing 1" : time_1, "timing 2" : time_2, "timing 4" : time_4, "timing 5b" : time_5b, "timing 5c" : time_5c, "timing total" : time_total, "per message" : per_message});
+    var time_per_message = time_total / total_messages;
+    
+    var num_threads = this.getRoot().getChildCount();
+    var msg_per_thread = total_messages / num_threads;
+    
+    var distribution = this.getThreadDistribution();
+    
+    var timing = {"1" : time_1, "2" : time_2, "4" : time_4, "5b" : time_5b, "5c" : time_5c, "total" : time_total, "per message" : time_per_message};
+    
+    LOGGER_.log("threader", {"action" : "end", "total messages" : total_messages, "total threads" : num_threads, "messages per thread" : msg_per_thread, "distribution" : distribution, "timing" : timing});
+}
+
+
+Threader.prototype.getThreadDistribution = function()
+{
+    var distribution = new Array();
+    var container = null;
+    for (container = this.root_set_.getChild(); container != null; container = container.getNext())
+    {
+        var count = container.getCountRecursive();
+        if (distribution[count])
+            distribution[count]++;
+        else
+            distribution[count] = 1;
+    }
+    return distribution;
 }

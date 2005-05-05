@@ -247,7 +247,7 @@ ThreadArcs.prototype.initMessages = function()
 
 /**
  * Called when a message is selected
- * Call applet with messageid to visualsíse
+ * Call applet with messageid to visualise
  */
 ThreadArcs.prototype.setSelectedMessage = function()
 {
@@ -268,7 +268,7 @@ ThreadArcs.prototype.setSelectedMessage = function()
     
     if (this.server_ != msg.folder.server)
     {
-        LOGGER_.log("msgselect", {"action" : "switch account"});
+        LOGGER_.log("switchaccount", {});
         // user just switched account
         this.loaded_ = false;
         this.threaded_ = false;
