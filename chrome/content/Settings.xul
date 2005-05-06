@@ -29,7 +29,7 @@
     <tabbox>
         <tabs id="settingstabs">
             <tab label="Logfiles" selected="true" />
-            <tab label="Time Scaling" />
+            <tab label="Visualisation" />
         </tabs>
         <tabpanels id="settingstabpanels">
             <tabpanel id="logfiles" orient="vertical">
@@ -39,16 +39,27 @@
                 <separator class="thin" />
                 <button id="resetlog" label="Reset Logfiles" oncommand="resetLogfiles();" tooltiptext="Resets the logfiles to size 0. Do this after sending the logfiles to save diskspace." />
             </tabpanel>
-            <tabpanel id="timescaling" orient="vertical">
-                <checkbox id="dotimescaling" label="Enable Time Scaling" prefstring="extensions.threadarcsjs.timescaling.enabled" prefdefval="false" tooltiptext="Select if you want to enable time scaling." />
-                <separator class="thin" />
-                <description>
-                    If Time Scaling is disabled, the horizontal spacing between two adjacent messages is always constant.
-                </description>
-                <description>
-                    If Time Scaling is enabled, the horizontal spacing between two adjacent messages is
-                    proportional to the time difference between those two messages.
-                </description>
+            <tabpanel id="visualisation" orient="vertical">
+                <groupbox>
+                    <caption label="Time Scaling" />
+                    <checkbox id="dotimescaling" label="Enable Time Scaling" prefstring="extensions.threadarcsjs.timescaling.enabled" prefdefval="false" tooltiptext="Select if you want to enable time scaling." />
+                    <separator class="thin" />
+                    <description>
+                        If Time Scaling is disabled, the horizontal spacing between two adjacent messages is always constant.
+                    </description>
+                    <description>
+                        If Time Scaling is enabled, the horizontal spacing between two adjacent messages is
+                        proportional to the time difference between those two messages.
+                    </description>
+                </groupbox>
+                <groupbox>
+                    <caption label="Visualisation Size" />
+                    <radiogroup id="visualisationsize" prefstring="extensions.threadarcsjs.visualisationsize">
+                        <radio value="8x8,8,8,8,4,-1,1,16" label="small" />
+                        <radio value="12x12,12,12,12,6,-1,1,24" label="medium" />
+                        <radio value="16x16,16,16,16,8,-1,1,32" label="large" />
+                    </radiogroup>
+                </groupbox>
             </tabpanel>
         </tabpanels>
     </tabbox>

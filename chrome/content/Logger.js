@@ -11,7 +11,8 @@
 var LOGGER_EXTENSION_PATH_ = "extensions";
 var LOGGER_EXTENSION_GUID_ = "{A23E4120-431F-4753-AE53-5D028C42CFDC}";
 var LOGGER_LOGFILENAME_ = "threadarcsjs.log.xml";
-var LOGGER_PREF_DOLOGGING_ = "extensions.threadarcsjs.logging.enabled";
+var THREADARCSJS_PREF_BRANCH_ = "extensions.threadarcsjs.";
+var LOGGER_PREF_DOLOGGING_ = "logging.enabled";
 var LOGGER_STARTTAG_ = "\n<log>";
 var LOGGER_ENDTAG_ = "\n</log>";
 
@@ -23,13 +24,11 @@ var LOGGER_ENDTAG_ = "\n</log>";
  */
 function Logger()
 {
-    var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
-    if (prefs.getPrefType(LOGGER_PREF_DOLOGGING_) == prefs.PREF_BOOL)
-        this.logging_ = prefs.getBoolPref(LOGGER_PREF_DOLOGGING_);
-    else
-        this.logging_ = false;
+    this.pref_enablelogging_ = false;
+    this.preferenceReload();
     
-    if (this.logging_)
+    this.ready_ = false;
+    if (this.pref_enablelogging_)
     {
         this.open();
     }
@@ -139,14 +138,24 @@ Logger.prototype.open = function()
 /**
  * reset the logfile
  */
-Logger.prototype.reset = function()
+Logger.prototype.reset = function(delete_file)
 {
     if (this.ready_)
         this.close();
     
-    if (this.file_)
+    if (delete_file && this.file_)
         this.file_.remove(false);
     
-    if (this.logging_)
+    if (this.pref_enablelogging_)
         this.open();
+}
+
+
+Logger.prototype.preferenceReload = function()
+{
+    // check if preference is set to do timescaling
+    var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
+    this.pref_enablelogging_ = false;
+    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_) == prefs.PREF_BOOL)
+        this.pref_enablelogging_ = prefs.getBoolPref(THREADARCSJS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_);
 }

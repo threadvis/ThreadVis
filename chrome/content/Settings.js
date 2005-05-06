@@ -62,7 +62,9 @@ function initPrefs()
                 break;
         }
         if (elt == "radiogroup")
-            document.getElementById(prefid).selectedIndex = prefvalue
+        {
+            document.getElementById(prefid).selectedItem = document.getElementById(prefid).getElementsByAttribute("value", prefvalue).item(0);
+        }
         else
             prefElements[i].setAttribute(prefattribute, prefvalue);
     }
@@ -88,9 +90,7 @@ function savePrefs()
         if (!prefattribute)
             prefattribute = getPrefattribute(elt);
 
-        if (elt == "radiogroup")
-            var prefvalue = document.getElementById(prefid).selectedIndex;
-        else if (elt == "textbox")
+        if (elt == "textbox")
             var prefvalue = document.getElementById(prefid).value;
         else
             var prefvalue = prefElements[i].getAttribute(prefattribute);
@@ -121,11 +121,11 @@ function getPreftype(elem)
 {
     var result = "";
 
-    if (elem == "textbox")
+    if (elem == "textbox" || elem == "radiogroup")
         result = "string";
     else if (elem == "checkbox" || elem == "listitem" || elem == "button")
         result = "bool";
-    else if (elem == "radiogroup" || elem == "menulist")
+    else if (elem == "menulist")
         result = "int";
     return result;
 }
@@ -138,9 +138,7 @@ function getPrefattribute(elem)
 {
     var result = "";
 
-    if (elem == "radiogroup")
-        result = "selectedIndex";
-    else if (elem == "textbox" || elem == "menulist")
+    if (elem == "textbox" || elem == "menulist" || elem == "radiogroup")
         result = "value";
     else if (elem == "checkbox" || elem == "listitem")
         result = "checked";
@@ -249,7 +247,7 @@ function resetLogfiles()
     var logger = window.opener.opener ? window.opener.opener.LOGGER_ : window.opener.LOGGER_;
     if (logger)
     {
-        logger.reset();
+        logger.reset(true);
         alert("Logfiles reset");
     }
     else

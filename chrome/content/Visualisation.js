@@ -12,15 +12,10 @@
 var XUL_NAMESPACE_ =
     "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
-var DOTSIZE_ = 16;
-var ARC_HEIGHT_ = 16;
-var ARC_DIFFERENCE_ = 8;
-var ARC_WIDTH_ = 16;
-var ARC_LEFT_PLACEMENT_ = -1;
-var ARC_RIGHT_PLACEMENT_ = 1;
-var SPACING_ = 32;
 var URL_ = "chrome://threadarcsjs/content/images/";
-var VISUALISATION_PREF_DOTIMESCALING_ = "extensions.threadarcsjs.timescaling.enabled";
+var THREADARCSJS_PREF_BRANCH_ = "extensions.threadarcsjs.";
+var VISUALISATION_PREF_DOTIMESCALING_ = "timescaling.enabled";
+var VISUALISATION_PREF_VISUALISATIONSIZE_ = "visualisationsize";
 
 // ==============================================================================================
 // ==============================================================================================
@@ -40,7 +35,10 @@ function Visualisation()
     this.stack_ = null;
     // set default resize parameter
     this.resize_ = 1;
+    this.pref_timescaling_ = false;
 
+    this.preferenceObserverRegister();
+    this.preferenceReload();
     this.createStack();
 }
 
@@ -97,43 +95,43 @@ Visualisation.prototype.drawArc = function(color, vposition, height, left, right
     height--;
     if (vposition == "top")
     {
-        arc_top = (this.box_.boxObject.height / 2) - (((DOTSIZE_ / 2) + ARC_HEIGHT_ + (ARC_DIFFERENCE_ * height)) * this.resize_);
-        fill_top = arc_top + (ARC_HEIGHT_ * this.resize_);
+        arc_top = (this.box_.boxObject.height / 2) - (((this.dotsize_ / 2) + this.arc_height_ + (this.arc_difference_ * height)) * this.resize_);
+        fill_top = arc_top + (this.arc_height_ * this.resize_);
     }
     else
     {
-        arc_top = (this.box_.boxObject.height / 2) + (((DOTSIZE_ / 2) + (ARC_DIFFERENCE_ * height)) * this.resize_);
-        fill_top = arc_top - (ARC_DIFFERENCE_ * height * this.resize_);
+        arc_top = (this.box_.boxObject.height / 2) + (((this.dotsize_ / 2) + (this.arc_difference_ * height)) * this.resize_);
+        fill_top = arc_top - (this.arc_difference_ * height * this.resize_);
     }
 
     var arc_left = document.createElementNS(XUL_NAMESPACE_, "image");
     arc_left.style.position = "relative";
     arc_left.style.top = arc_top + "px";
-    arc_left.style.left = ((left + ARC_LEFT_PLACEMENT_) * this.resize_) + "px";
-    arc_left.style.height = (ARC_HEIGHT_ * this.resize_)+ "px";
-    arc_left.style.width = (ARC_WIDTH_ * this.resize_)+ "px";
+    arc_left.style.left = ((left + this.arc_left_placement_) * this.resize_) + "px";
+    arc_left.style.height = (this.arc_height_ * this.resize_)+ "px";
+    arc_left.style.width = (this.arc_width_ * this.resize_)+ "px";
     arc_left.style.verticalAlign = "top";
-    arc_left.setAttribute( "src", URL_ + "arc_" + color + "_" + vposition + "_left.png");
+    arc_left.setAttribute( "src", URL_ + this.name_ + "arc_" + color + "_" + vposition + "_left.png");
     this.stack_.appendChild(arc_left);
 
     var arc_right = document.createElementNS(XUL_NAMESPACE_, "image");
     arc_right.style.position = "relative";
     arc_right.style.top = arc_top + "px";
-    arc_right.style.left = ((right - ARC_WIDTH_ + ARC_RIGHT_PLACEMENT_) * this.resize_) + "px";
-    arc_right.style.height = (ARC_HEIGHT_ * this.resize_)+ "px";
-    arc_right.style.width = (ARC_WIDTH_ * this.resize_)+ "px";
+    arc_right.style.left = ((right - this.arc_width_ + this.arc_right_placement_) * this.resize_) + "px";
+    arc_right.style.height = (this.arc_height_ * this.resize_)+ "px";
+    arc_right.style.width = (this.arc_width_ * this.resize_)+ "px";
     arc_right.style.verticalAlign = "top";
-    arc_right.setAttribute( "src", URL_ + "arc_" + color + "_" + vposition + "_right.png");
+    arc_right.setAttribute( "src", URL_ + this.name_ + "arc_" + color + "_" + vposition + "_right.png");
     this.stack_.appendChild(arc_right);
 
     var arc_middle = document.createElementNS(XUL_NAMESPACE_, "image");
     arc_middle.style.position = "relative";
     arc_middle.style.top = arc_top + "px";
-    arc_middle.style.left = ((left + ARC_LEFT_PLACEMENT_ + ARC_WIDTH_) * this.resize_) + "px";
-    arc_middle.style.width = (((right - ARC_WIDTH_ + ARC_RIGHT_PLACEMENT_) - (left + ARC_LEFT_PLACEMENT_ + ARC_WIDTH_)) * this.resize_) + "px";
-    arc_middle.style.height = (ARC_HEIGHT_ * this.resize_) + "px";
+    arc_middle.style.left = ((left + this.arc_left_placement_ + this.arc_width_) * this.resize_) + "px";
+    arc_middle.style.width = (((right - this.arc_width_ + this.arc_right_placement_) - (left + this.arc_left_placement_ + this.arc_width_)) * this.resize_) + "px";
+    arc_middle.style.height = (this.arc_height_ * this.resize_) + "px";
     arc_middle.style.verticalAlign = "top";
-    arc_middle.setAttribute( "src", URL_ + "arc_" + color + "_" + vposition + "_middle.png");
+    arc_middle.setAttribute( "src", URL_ + this.name_ + "arc_" + color + "_" + vposition + "_middle.png");
     this.stack_.appendChild(arc_middle);
 
     if (height == 0)
@@ -142,21 +140,21 @@ Visualisation.prototype.drawArc = function(color, vposition, height, left, right
     var arc_left_middle = document.createElementNS(XUL_NAMESPACE_, "image");
     arc_left_middle.style.position = "relative";
     arc_left_middle.style.top = fill_top + "px";
-    arc_left_middle.style.left = ((left + ARC_LEFT_PLACEMENT_) * this.resize_) + "px";
-    arc_left_middle.style.width = (ARC_WIDTH_ * this.resize_) + "px";
-    arc_left_middle.style.height = ((ARC_DIFFERENCE_ * height) * this.resize_) + "px";
+    arc_left_middle.style.left = ((left + this.arc_left_placement_) * this.resize_) + "px";
+    arc_left_middle.style.width = (this.arc_width_ * this.resize_) + "px";
+    arc_left_middle.style.height = ((this.arc_difference_ * height) * this.resize_) + "px";
     arc_left_middle.style.verticalAlign = "top";
-    arc_left_middle.setAttribute( "src", URL_ + "arc_" + color + "_left_middle.png");
+    arc_left_middle.setAttribute( "src", URL_ + this.name_ + "arc_" + color + "_left_middle.png");
     this.stack_.appendChild(arc_left_middle);
     
     var arc_right_middle = document.createElementNS(XUL_NAMESPACE_, "image");
     arc_right_middle.style.position = "relative";
     arc_right_middle.style.top = fill_top + "px";
-    arc_right_middle.style.left = ((right - ARC_WIDTH_ + ARC_RIGHT_PLACEMENT_) * this.resize_) + "px";
-    arc_right_middle.style.width = (ARC_WIDTH_ * this.resize_) + "px";
-    arc_right_middle.style.height = ((ARC_DIFFERENCE_ * height) * this.resize_) + "px";
+    arc_right_middle.style.left = ((right - this.arc_width_ + this.arc_right_placement_) * this.resize_) + "px";
+    arc_right_middle.style.width = (this.arc_width_ * this.resize_) + "px";
+    arc_right_middle.style.height = ((this.arc_difference_ * height) * this.resize_) + "px";
     arc_right_middle.style.verticalAlign = "top";
-    arc_right_middle.setAttribute("src", URL_ + "arc_" + color + "_right_middle.png");
+    arc_right_middle.setAttribute("src", URL_ + this.name_ + "arc_" + color + "_right_middle.png");
     this.stack_.appendChild(arc_right_middle);
 }
 
@@ -169,11 +167,11 @@ Visualisation.prototype.drawDot = function(container, color, style, left)
     var dot = document.createElementNS(XUL_NAMESPACE_, "image");
 
     dot.style.position = "relative";
-    dot.style.top = (this.box_.boxObject.height / 2) - ((DOTSIZE_ / 2) * this.resize_) + "px";
-    dot.style.left = ((left - (DOTSIZE_ / 2)) * this.resize_) + "px";
-    dot.style.width = (DOTSIZE_ * this.resize_) + "px";
-    dot.style.height = (DOTSIZE_ * this.resize_) + "px";
-    dot.setAttribute("src", URL_ + "dot_" + color + "_" + style + ".png");
+    dot.style.top = (this.box_.boxObject.height / 2) - ((this.dotsize_ / 2) * this.resize_) + "px";
+    dot.style.left = ((left - (this.dotsize_ / 2)) * this.resize_) + "px";
+    dot.style.width = (this.dotsize_ * this.resize_) + "px";
+    dot.style.height = (this.dotsize_ * this.resize_) + "px";
+    dot.setAttribute("src", URL_ + this.name_ + "dot_" + color + "_" + style + ".png");
 
     dot.container = container;
 
@@ -242,8 +240,8 @@ Visualisation.prototype.getResize = function(xcount, ycount,sizex, sizey)
 {
     var spaceperarcavailablex = sizex / (xcount - 1);
     var spaceperarcavailabley = sizey / 2;
-    var spaceperarcneededx = DOTSIZE_ + (2 * ARC_WIDTH_);
-    var spaceperarcneededy = (DOTSIZE_ / 2) + ARC_HEIGHT_ + ycount * ARC_DIFFERENCE_;
+    var spaceperarcneededx = this.dotsize_ + (2 * this.arc_width_);
+    var spaceperarcneededy = (this.dotsize_ / 2) + this.arc_height_ + ycount * this.arc_difference_;
     
     var resizex = (spaceperarcavailablex / spaceperarcneededx);
     var resizey = (spaceperarcavailabley / spaceperarcneededy);
@@ -280,14 +278,8 @@ Visualisation.prototype.onMouseClick = function(event)
  */
 Visualisation.prototype.timeScaling = function(containers, minimaltimedifference, width)
 {
-    // check if preference is set to do timescaling
-    var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
-    var doscaling = false;
-    if (prefs.getPrefType(VISUALISATION_PREF_DOTIMESCALING_) == prefs.PREF_BOOL)
-        doscaling = prefs.getBoolPref(VISUALISATION_PREF_DOTIMESCALING_);
-
     // if we do not want to do timescaling, reset all scaling info to 1
-    if (! doscaling)
+    if (! this.pref_timescaling_)
     {
         for (var counter = 0; counter < containers.length - 1; counter++)
         {
@@ -314,7 +306,7 @@ Visualisation.prototype.timeScaling = function(containers, minimaltimedifference
 
     // max_count_x tells us how many messages we could display if all are laid out
     // with the minimal horizontal spacing
-    var max_count_x = width / (DOTSIZE_ + (2 * ARC_WIDTH_));
+    var max_count_x = width / (this.dotsize_ + (2 * this.arc_width_));
     
     // if the time scaling factor is bigger than what we can display, we have a problem
     // this means, we have to scale the timing factor down
@@ -420,7 +412,7 @@ Visualisation.prototype.visualise = function(container)
     containers = this.timeScaling(containers, minimaltimedifference, width);
 
 
-    var x = SPACING_ / 2;
+    var x = this.spacing_ / 2;
     this.box_.style.paddingRight = x + "px";
     this.resize_ = this.getResize(containers.length, totalmaxheight, this.box_.boxObject.width, this.box_.boxObject.height);
 
@@ -475,7 +467,61 @@ Visualisation.prototype.visualise = function(container)
             thiscontainer.current_arc_height_incoming_ = maxheight;
             this.drawArc(color, position, maxheight, parent.x_position_, x);
         }
-        //x = x + SPACING_;
-        x = x + (thiscontainer.x_scaled_ * SPACING_);
+        x = x + (thiscontainer.x_scaled_ * this.spacing_);
     }
+}
+
+
+/**
+ * Preference changing observer
+ */
+Visualisation.prototype.preferenceObserverRegister =  function()
+{
+    var prefService = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService);
+    this.pref_branch_ = prefService.getBranch(THREADARCSJS_PREF_BRANCH_);
+
+    var pbi = this.pref_branch_.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
+    pbi.addObserver("", this, false);
+}
+
+
+Visualisation.prototype.preferenceObserverUnregister = function()
+{
+    if(!this.branch_)
+        return;
+
+    var pbi = this.pref_branch_.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
+    pbi.removeObserver("", this);
+}
+
+
+Visualisation.prototype.observe = function(subject, topic, data)
+{
+    if(topic != "nsPref:changed")
+        return;
+    // subject is the nsIPrefBranch we're observing
+    this.preferenceReload();
+}
+
+Visualisation.prototype.preferenceReload = function()
+{
+    // check if preference is set to do timescaling
+    var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
+    this.pref_timescaling_ = false;
+    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_DOTIMESCALING_) == prefs.PREF_BOOL)
+        this.pref_timescaling_ = prefs.getBoolPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_DOTIMESCALING_);
+    
+    var todecode = "12x12,12,12,12,6,-1,1,24";
+    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONSIZE_) == prefs.PREF_STRING)
+        todecode = prefs.getCharPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONSIZE_);
+
+    todecode = todecode.split(",");
+    this.name_ = todecode[0] + "/";
+    this.dotsize_ = parseInt(todecode[1]);
+    this.arc_height_ = parseInt(todecode[2]);
+    this.arc_width_ = parseInt(todecode[3]);
+    this.arc_difference_ = parseInt(todecode[4]);
+    this.arc_left_placement_ = parseInt(todecode[5]);
+    this.arc_right_placement_ = parseInt(todecode[6]);
+    this.spacing_ = parseInt(todecode[7]);
 }
