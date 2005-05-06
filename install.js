@@ -13,7 +13,7 @@ var XpiInstaller =
     // --- Editable items begin ---
     extFullName: 'Thread Arcs Visualisation', // The name displayed to the user (don't include the version)
     extShortName: 'threadarcsjs', // The leafname of the JAR file (without the .jar part)
-    extVersion: '0.1.3',
+    extVersion: '0.1.4',
     extAuthor: 'Alexander C. Hubmann',
     extLocaleNames: null, // e.g. ['en-US', 'en-GB']
     extSkinNames: null, // e.g. ['classic', 'modern']

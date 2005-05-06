@@ -12,14 +12,14 @@
 var XUL_NAMESPACE_ =
     "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
-var DOTSIZE_ = 20;
-var ARC_HEIGHT_ = 29;
+var DOTSIZE_ = 16;
+var ARC_HEIGHT_ = 16;
 var ARC_DIFFERENCE_ = 6;
-var ARC_WIDTH_ = 24;
-var ARC_LEFT_PLACEMENT_ = -4;
-var ARC_RIGHT_PLACEMENT_ = 4;
-var SPACING_ = 50;
-var URL_ = "chrome://threadarcsjs/content/";
+var ARC_WIDTH_ = 16;
+var ARC_LEFT_PLACEMENT_ = -1;
+var ARC_RIGHT_PLACEMENT_ = 1;
+var SPACING_ = 32;
+var URL_ = "chrome://threadarcsjs/content/images/";
 
 // ==============================================================================================
 // ==============================================================================================
@@ -77,7 +77,7 @@ Visualisation.prototype.createStack = function()
     var loading = document.createElementNS(XUL_NAMESPACE_, "image");
 
     loading.style.marginTop = "20px";
-    loading.setAttribute("src", URL_ + "threadarcs_loading.gif");
+    loading.setAttribute("src", URL_ + "loading.gif");
 
     this.stack_.appendChild(loading);
 
@@ -93,6 +93,7 @@ Visualisation.prototype.drawArc = function(color, vposition, height, left, right
 {
     var arc_top = 0;
     var fill_top = 0;
+    height--;
     if (vposition == "top")
     {
         arc_top = (this.box_.boxObject.height / 2) - (((DOTSIZE_ / 2) + ARC_HEIGHT_ + (ARC_DIFFERENCE_ * height)) * this.resize_);
@@ -111,7 +112,7 @@ Visualisation.prototype.drawArc = function(color, vposition, height, left, right
     arc_left.style.height = (ARC_HEIGHT_ * this.resize_)+ "px";
     arc_left.style.width = (ARC_WIDTH_ * this.resize_)+ "px";
     arc_left.style.verticalAlign = "top";
-    arc_left.setAttribute( "src", URL_ + "threadarcs_arc_" + color + "_" + vposition + "_left.png");
+    arc_left.setAttribute( "src", URL_ + "arc_" + color + "_" + vposition + "_left.png");
     this.stack_.appendChild(arc_left);
 
     var arc_right = document.createElementNS(XUL_NAMESPACE_, "image");
@@ -121,7 +122,7 @@ Visualisation.prototype.drawArc = function(color, vposition, height, left, right
     arc_right.style.height = (ARC_HEIGHT_ * this.resize_)+ "px";
     arc_right.style.width = (ARC_WIDTH_ * this.resize_)+ "px";
     arc_right.style.verticalAlign = "top";
-    arc_right.setAttribute( "src", URL_ + "threadarcs_arc_" + color + "_" + vposition + "_right.png");
+    arc_right.setAttribute( "src", URL_ + "arc_" + color + "_" + vposition + "_right.png");
     this.stack_.appendChild(arc_right);
 
     var arc_middle = document.createElementNS(XUL_NAMESPACE_, "image");
@@ -131,7 +132,7 @@ Visualisation.prototype.drawArc = function(color, vposition, height, left, right
     arc_middle.style.width = (((right - ARC_WIDTH_ + ARC_RIGHT_PLACEMENT_) - (left + ARC_LEFT_PLACEMENT_ + ARC_WIDTH_)) * this.resize_) + "px";
     arc_middle.style.height = (ARC_HEIGHT_ * this.resize_) + "px";
     arc_middle.style.verticalAlign = "top";
-    arc_middle.setAttribute( "src", URL_ + "threadarcs_arc_" + color + "_" + vposition + "_middle.png");
+    arc_middle.setAttribute( "src", URL_ + "arc_" + color + "_" + vposition + "_middle.png");
     this.stack_.appendChild(arc_middle);
 
     if (height == 0)
@@ -144,7 +145,7 @@ Visualisation.prototype.drawArc = function(color, vposition, height, left, right
     arc_left_middle.style.width = (ARC_WIDTH_ * this.resize_) + "px";
     arc_left_middle.style.height = ((ARC_DIFFERENCE_ * height) * this.resize_) + "px";
     arc_left_middle.style.verticalAlign = "top";
-    arc_left_middle.setAttribute( "src", URL_ + "threadarcs_arc_" + color + "_left_middle.png");
+    arc_left_middle.setAttribute( "src", URL_ + "arc_" + color + "_left_middle.png");
     this.stack_.appendChild(arc_left_middle);
     
     var arc_right_middle = document.createElementNS(XUL_NAMESPACE_, "image");
@@ -154,7 +155,7 @@ Visualisation.prototype.drawArc = function(color, vposition, height, left, right
     arc_right_middle.style.width = (ARC_WIDTH_ * this.resize_) + "px";
     arc_right_middle.style.height = ((ARC_DIFFERENCE_ * height) * this.resize_) + "px";
     arc_right_middle.style.verticalAlign = "top";
-    arc_right_middle.setAttribute("src", URL_ + "threadarcs_arc_" + color + "_right_middle.png");
+    arc_right_middle.setAttribute("src", URL_ + "arc_" + color + "_right_middle.png");
     this.stack_.appendChild(arc_right_middle);
 }
 
@@ -171,7 +172,7 @@ Visualisation.prototype.drawDot = function(container, color, style, left)
     dot.style.left = ((left - (DOTSIZE_ / 2)) * this.resize_) + "px";
     dot.style.width = (DOTSIZE_ * this.resize_) + "px";
     dot.style.height = (DOTSIZE_ * this.resize_) + "px";
-    dot.setAttribute("src", URL_ + "threadarcs_dot_" + color + "_" + style + ".png");
+    dot.setAttribute("src", URL_ + "dot_" + color + "_" + style + ".png");
 
     dot.container = container;
 
