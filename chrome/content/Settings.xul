@@ -29,6 +29,7 @@
     <tabbox>
         <tabs id="settingstabs">
             <tab label="Logfiles" selected="true" />
+            <tab label="Time Scaling" />
         </tabs>
         <tabpanels id="settingstabpanels">
             <tabpanel id="logfiles" orient="vertical">
@@ -37,6 +38,17 @@
                 <button id="sendlog" label="Send Logfiles" oncommand="sendLogfiles();" tooltiptext="Creates a new empty email and attaches the logfiles." />
                 <separator class="thin" />
                 <button id="resetlog" label="Reset Logfiles" oncommand="resetLogfiles();" tooltiptext="Resets the logfiles to size 0. Do this after sending the logfiles to save diskspace." />
+            </tabpanel>
+            <tabpanel id="timescaling" orient="vertical">
+                <checkbox id="dotimescaling" label="Enable Time Scaling" prefstring="extensions.threadarcsjs.timescaling.enabled" prefdefval="false" tooltiptext="Select if you want to enable time scaling." />
+                <separator class="thin" />
+                <description>
+                    If Time Scaling is disabled, the horizontal spacing between two adjacent messages is always constant.
+                </description>
+                <description>
+                    If Time Scaling is enabled, the horizontal spacing between two adjacent messages is
+                    proportional to the time difference between those two messages.
+                </description>
             </tabpanel>
         </tabpanels>
     </tabbox>

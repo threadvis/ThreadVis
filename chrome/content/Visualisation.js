@@ -20,6 +20,7 @@ var ARC_LEFT_PLACEMENT_ = -1;
 var ARC_RIGHT_PLACEMENT_ = 1;
 var SPACING_ = 32;
 var URL_ = "chrome://threadarcsjs/content/images/";
+var VISUALISATION_PREF_DOTIMESCALING_ = "extensions.threadarcsjs.timescaling.enabled";
 
 // ==============================================================================================
 // ==============================================================================================
@@ -273,6 +274,75 @@ Visualisation.prototype.onMouseClick = function(event)
 
 
 /**
+ * If time scaling is enabled, we want to layout the messages so that their
+ * horizontal spacing is proportional to the time difference between those
+ * two messages
+ */
+Visualisation.prototype.timeScaling = function(containers, minimaltimedifference, width)
+{
+    // check if preference is set to do timescaling
+    var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
+    var doscaling = false;
+    if (prefs.getPrefType(VISUALISATION_PREF_DOTIMESCALING_) == prefs.PREF_BOOL)
+        doscaling = prefs.getBoolPref(VISUALISATION_PREF_DOTIMESCALING_);
+
+    // if we do not want to do timescaling, reset all scaling info to 1
+    if (! doscaling)
+    {
+        for (var counter = 0; counter < containers.length - 1; counter++)
+        {
+            var thiscontainer = containers[counter];
+            thiscontainer.x_scaled_ = 1;
+        }
+        return containers;
+    }
+
+    // we want to scale the messages horizontally according to their time difference
+    // therefore we calculate the overall scale factor
+    var total_time_scale = 0;
+    for (var counter = 0; counter < containers.length - 1; counter++)
+    {
+        var thiscontainer = containers[counter];
+        // we norm the scale factor to the minimal time
+        // (this means, the two messages that are the nearest in time have a difference of 1)
+        thiscontainer.x_scaled_ = thiscontainer.timedifference_ / minimaltimedifference;
+        // check if we might encounter a dummy container, see above
+        if (thiscontainer.x_scaled_ < 1)
+            thiscontainer.x_scaled_ = 1;
+        total_time_scale += thiscontainer.x_scaled_;
+    }
+
+    // max_count_x tells us how many messages we could display if all are laid out
+    // with the minimal horizontal spacing
+    var max_count_x = width / (DOTSIZE_ + (2 * ARC_WIDTH_));
+    
+    // if the time scaling factor is bigger than what we can display, we have a problem
+    // this means, we have to scale the timing factor down
+    var scaling = 0.9;
+    while (total_time_scale > max_count_x)
+    {
+        total_time_scale = 0;
+        for (var counter = 0; counter < containers.length - 1; counter++)
+        {
+            var thiscontainer = containers[counter];
+            thiscontainer.x_scaled_ = thiscontainer.x_scaled_ * scaling;
+            if (thiscontainer.x_scaled_ < 1)
+                thiscontainer.x_scaled_ = 1;
+            total_time_scale += thiscontainer.x_scaled_;
+        }
+        // if the total_time_scale == containers.length, we reduced every
+        // horizontal spacing to its minimum and we can't do anything more
+        // this means we have to lay out more messages than we can
+        // this is dealt with later in resizing
+        if (total_time_scale == containers.length - 1)
+            break;
+    }
+    
+    return containers;
+}
+
+
+/**
  * Visualise a new thread
  */
 Visualisation.prototype.visualise = function(container)
@@ -293,17 +363,24 @@ Visualisation.prototype.visualise = function(container)
 
 
     // pre-calculate size
+    // totalmaxheight counts the maximal number of stacked arcs
     var totalmaxheight = 0;
+    // minmaltimedifference stores the minimal time between two messages
+    var minimaltimedifference = Number.MAX_VALUE;
     for (var counter = 0; counter < containers.length; counter++)
     {
         var thiscontainer = containers[counter];
         thiscontainer.x_index_ = counter;
         thiscontainer.current_arc_height_incoming_ = 0;
         thiscontainer.current_arc_height_outgoing_ = 0;
+        // odd_ tells us if we display the arc above or below the messages
         thiscontainer.odd_ = thiscontainer.getDepth() % 2 == 0;
         var parent = thiscontainer.getParent();
         if (parent != null && ! parent.isRoot())
         {
+            // calculate the current maximal arc height between the parent message and this one
+            // since we want to draw an arc between this message and its parent, and we do 
+            // not want any arcs to overlap, we draw this arc higher than the current highest arc
             var maxheight = 0;
             for (var innercounter = parent.x_index_; innercounter < counter; innercounter++)
             {
@@ -321,9 +398,27 @@ Visualisation.prototype.visualise = function(container)
             parent.current_arc_height_outgoing_ = maxheight;
             thiscontainer.current_arc_height_incoming_ = maxheight;
         }
+        // also keep track of the current maximal stacked arc height, so that we can resize
+        // the whole extension
         if (maxheight > totalmaxheight)
             totalmaxheight = maxheight;
+        
+        // also keep track of the time difference between two adjacent messages
+        if (counter < containers.length - 1)
+        {
+            var timedifference = containers[counter + 1].getDate().getTime() - containers[counter].getDate().getTime();
+            // timedifference_ stores the time difference to the _next_ message
+            thiscontainer.timedifference_ = timedifference;
+            // since we could have dummy containers that have the same time as the next message,
+            // skip any time difference of 0
+            if (timedifference < minimaltimedifference && timedifference != 0)
+                minimaltimedifference = timedifference;
+        }
     }
+
+    var width = this.box_.boxObject.width;
+    containers = this.timeScaling(containers, minimaltimedifference, width);
+
 
     var x = SPACING_ / 2;
     this.box_.style.paddingRight = x + "px";
@@ -380,6 +475,7 @@ Visualisation.prototype.visualise = function(container)
             thiscontainer.current_arc_height_incoming_ = maxheight;
             this.drawArc(color, position, maxheight, parent.x_position_, x);
         }
-        x = x + SPACING_;
+        //x = x + SPACING_;
+        x = x + (thiscontainer.x_scaled_ * SPACING_);
     }
 }
