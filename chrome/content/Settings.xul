@@ -30,6 +30,7 @@
         <tabs id="settingstabs">
             <tab label="Logfiles" selected="true" />
             <tab label="Visualisation" />
+            <tab label="About" />
         </tabs>
         <tabpanels id="settingstabpanels">
             <tabpanel id="logfiles" orient="vertical">
@@ -87,6 +88,21 @@
                         <radio value="16x16,16,16,16,8,-1,1,32" label="large" />
                     </radiogroup>
                 </groupbox>
+            </tabpanel>
+            <tabpanel id="about" orient="vertical">
+                <label value="Thread Arcs Visualisation" style="font-size: large; font-weight: bold" />
+                <separator class="thin" />
+                <label value="Version 0.2" style="font-weight: bold; color: rgb(144,144,144);" />
+                <separator class="thin" />
+                <description style="color: rgb(64,64,64);">
+                    Displays a small graphic visualising the thread (context) of the currently selected email.
+                </description>
+                <separator class="thin" />
+                <label style="border-top-style: solid; border-top-color: rgb(192,192,192); border-top-width: 1px; padding-top: 5px;">
+                    (c) 2004-2005 Alexander C. Hubmann
+                </label>
+                <separator class="thin" />
+                <label href="http://www.sbox.tugraz.at/home/x/xpert/threadarcs/" value="http://www.sbox.tugraz.at/home/x/xpert/threadarcs/" onclick="openURL(event.target.getAttribute('href'));" style="text-decoration: underline; color: rgb(0,0,255); cursor: pointer;" />
             </tabpanel>
         </tabpanels>
     </tabbox>

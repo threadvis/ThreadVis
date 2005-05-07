@@ -271,3 +271,15 @@ function toggleLogging()
     else
         debugcheckbox.disabled = true;
 }
+
+
+/**
+ * open a homepage
+ */
+function openURL(url)
+{
+    var uri = Components.classes["@mozilla.org/network/standard-url;1"].createInstance(Components.interfaces.nsIURI);
+    uri.spec = url;
+    var protocolSvc = Components.classes["@mozilla.org/uriloader/external-protocol-service;1"].getService(Components.interfaces.nsIExternalProtocolService);
+    protocolSvc.loadUrl(uri);
+}
