@@ -19,7 +19,7 @@ var THREADARCS_ = null;
 var LOGGER_ = null;
 
 // add visualisation at startup
-setTimeout(createThreadArcs, 1000);
+addEventListener("load", createThreadArcs, false);
 
 
 /**

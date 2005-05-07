@@ -13,7 +13,8 @@ var LOGGER_EXTENSION_GUID_ = "{A23E4120-431F-4753-AE53-5D028C42CFDC}";
 var LOGGER_LOGFILENAME_ = "threadarcsjs.log.xml";
 var THREADARCSJS_PREF_BRANCH_ = "extensions.threadarcsjs.";
 var LOGGER_PREF_DOLOGGING_ = "logging.enabled";
-var LOGGER_STARTTAG_ = "\n<log>";
+var LOGGER_PREF_DOLOGGING_DEBUG_ = "logging.debug";
+var LOGGER_STARTTAG_ = '\n<log extensionversion="0.2">';
 var LOGGER_ENDTAG_ = "\n</log>";
 
 
@@ -89,6 +90,23 @@ Logger.prototype.log = function(item, infos)
 
 
 /**
+ * write a string to the file in debug mode
+ */
+Logger.prototype.logDebug = function(item, infos)
+{
+    if (this.ready_ && this.pref_enablelogging_debug_)
+    {
+        var date = new Date();
+        var logtext = "";
+        logtext += '\n<logitem date="' + date + '" item="' + item + '">';
+        logtext += this.decodeDebug(infos);
+        logtext += "</logitem>";
+        this.file_output_stream_.write(logtext, logtext.length);
+    }
+}
+
+
+/**
  * convert an object to xml
  */
 Logger.prototype.decode = function(object)
@@ -101,6 +119,33 @@ Logger.prototype.decode = function(object)
             logtext += this.decode(object[key]);
         else
             logtext += object[key];
+        logtext += "</info>";
+    }
+    return logtext;
+}
+
+
+/**
+ * convert an object to xml
+ * this method is called in debug mode
+ * so use CDATA blocks to escape
+ */
+Logger.prototype.decodeDebug = function(object)
+{
+    var logtext = "";
+    for (var key in object)
+    {
+        logtext += '<info key="' + key + '">';
+        if (typeof(object[key]) == "object")
+        {
+            logtext += this.decodeDebug(object[key]);
+        }
+        else
+        {
+            logtext += "<![CDATA[";
+            logtext += object[key];
+            logtext += "]]>";
+        }
         logtext += "</info>";
     }
     return logtext;
@@ -158,4 +203,7 @@ Logger.prototype.preferenceReload = function()
     this.pref_enablelogging_ = false;
     if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_) == prefs.PREF_BOOL)
         this.pref_enablelogging_ = prefs.getBoolPref(THREADARCSJS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_);
+    this.pref_enablelogging_debug_ = false;
+    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_DEBUG_) == prefs.PREF_BOOL)
+        this.pref_enablelogging_debug_ = prefs.getBoolPref(THREADARCSJS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_DEBUG_);
 }

@@ -12,7 +12,7 @@
  ********************************************************/
 -->
 
-<?xml-stylesheet href="chrome://communicator/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <?xml-stylesheet href="chrome://messenger/skin/prefPanels.css" type="text/css"?>
 
 <dialog xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
@@ -33,7 +33,35 @@
         </tabs>
         <tabpanels id="settingstabpanels">
             <tabpanel id="logfiles" orient="vertical">
-                <checkbox id="dologging" label="Enable Logging" prefstring="extensions.threadarcsjs.logging.enabled" prefdefval="false" tooltiptext="Logging will be enabled/disabled after restarting Thunderbird." />
+                <groupbox>
+                <caption label="Enable Logging" />
+                <description>
+                    Please note that enabling or disabling logging needs a restart.
+                </description>
+                <checkbox id="dologging" oncommand="toggleLogging();" label="Enable Logging" prefstring="extensions.threadarcsjs.logging.enabled" prefdefval="false" />
+                <label class="indent">
+                    If you enable logging, only statistical information about your inbox, the mail threads you are reading
+                    and the way you are interacting with the extension are logged.
+                </label>
+                <label class="indent">
+                    This information is never automatically sent to anyone. You can share this information by clicking on 
+                    "Send Logfiles" below.
+                </label>
+                <separator class="thin" />
+                <checkbox id="dologgingdebug" label="Include debug information" prefstring="extensions.threadarcsjs.logging.debug" prefdefval="false" />
+                <label class="indent">
+                    If you experience any problems using the extension, enable debug logging to include more information
+                    in the logfiles.
+                 </label>
+                 <label class="indent">
+                    Attention: This information may include personal information such as message-ids, the structure of 
+                    the threads you are viewing, etc.
+                 </label>
+                 <label class="indent">
+                    Also keep in mind that enabling this option will greatly increase the size of the logfiles and reduce the performance
+                    of the extension!
+                </label>
+                </groupbox>
                 <separator class="thin" />
                 <button id="sendlog" label="Send Logfiles" oncommand="sendLogfiles();" tooltiptext="Creates a new empty email and attaches the logfiles." />
                 <separator class="thin" />
@@ -43,14 +71,13 @@
                 <groupbox>
                     <caption label="Time Scaling" />
                     <checkbox id="dotimescaling" label="Enable Time Scaling" prefstring="extensions.threadarcsjs.timescaling.enabled" prefdefval="false" tooltiptext="Select if you want to enable time scaling." />
-                    <separator class="thin" />
-                    <description>
+                    <label class="indent">
                         If Time Scaling is disabled, the horizontal spacing between two adjacent messages is always constant.
-                    </description>
-                    <description>
+                    </label>
+                    <label class="indent">
                         If Time Scaling is enabled, the horizontal spacing between two adjacent messages is
                         proportional to the time difference between those two messages.
-                    </description>
+                    </label>
                 </groupbox>
                 <groupbox>
                     <caption label="Visualisation Size" />

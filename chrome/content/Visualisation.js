@@ -90,6 +90,7 @@ Visualisation.prototype.createStack = function()
  */
 Visualisation.prototype.drawArc = function(color, vposition, height, left, right)
 {
+    LOGGER_.logDebug("visualisation", {"action" : "draw arc", "color" : color, "vposition" : vposition, "height" : height, "left" : left, "right" : right});
     var arc_top = 0;
     var fill_top = 0;
     height--;
@@ -104,57 +105,87 @@ Visualisation.prototype.drawArc = function(color, vposition, height, left, right
         fill_top = arc_top - (this.arc_difference_ * height * this.resize_);
     }
 
+    var style_top = arc_top + "px";
+    var style_left = ((left + this.arc_left_placement_) * this.resize_) + "px";
+    var style_height = (this.arc_height_ * this.resize_)+ "px";
+    var style_width = (this.arc_width_ * this.resize_)+ "px";
+    var style_src = URL_ + this.name_ + "arc_" + color + "_" + vposition + "_left.png";
+    LOGGER_.logDebug("visualisation", {"action" : "draw arc", "position" : "left", "top" : style_top, "left" : style_left, "height" : style_height, "width" : style_width, "src" : style_src});
     var arc_left = document.createElementNS(XUL_NAMESPACE_, "image");
     arc_left.style.position = "relative";
-    arc_left.style.top = arc_top + "px";
-    arc_left.style.left = ((left + this.arc_left_placement_) * this.resize_) + "px";
-    arc_left.style.height = (this.arc_height_ * this.resize_)+ "px";
-    arc_left.style.width = (this.arc_width_ * this.resize_)+ "px";
+    arc_left.style.top = style_top;
+    arc_left.style.left = style_left;
+    arc_left.style.height = style_height;
+    arc_left.style.width = style_width;
     arc_left.style.verticalAlign = "top";
-    arc_left.setAttribute( "src", URL_ + this.name_ + "arc_" + color + "_" + vposition + "_left.png");
+    arc_left.setAttribute("src", style_src);
     this.stack_.appendChild(arc_left);
 
+    var style_top = arc_top + "px";
+    var style_left = ((right - this.arc_width_ + this.arc_right_placement_) * this.resize_) + "px";
+    var style_height = (this.arc_height_ * this.resize_)+ "px";
+    var style_width = (this.arc_width_ * this.resize_)+ "px";
+    var style_src = URL_ + this.name_ + "arc_" + color + "_" + vposition + "_right.png";
+    LOGGER_.logDebug("visualisation", {"action" : "draw arc", "position" : "right", "top" : style_top, "left" : style_left, "height" : style_height, "width" : style_width, "src" : style_src});
     var arc_right = document.createElementNS(XUL_NAMESPACE_, "image");
     arc_right.style.position = "relative";
-    arc_right.style.top = arc_top + "px";
-    arc_right.style.left = ((right - this.arc_width_ + this.arc_right_placement_) * this.resize_) + "px";
-    arc_right.style.height = (this.arc_height_ * this.resize_)+ "px";
-    arc_right.style.width = (this.arc_width_ * this.resize_)+ "px";
+    arc_right.style.top = style_top;
+    arc_right.style.left = style_left;
+    arc_right.style.height = style_height;
+    arc_right.style.width = style_width;
     arc_right.style.verticalAlign = "top";
-    arc_right.setAttribute( "src", URL_ + this.name_ + "arc_" + color + "_" + vposition + "_right.png");
+    arc_right.setAttribute("src", style_src);
     this.stack_.appendChild(arc_right);
 
+    var style_top = arc_top + "px";
+    var style_left = ((left + this.arc_left_placement_ + this.arc_width_) * this.resize_) + "px";
+    var style_height = (this.arc_height_ * this.resize_) + "px";
+    var style_width = (((right - this.arc_width_ + this.arc_right_placement_) - (left + this.arc_left_placement_ + this.arc_width_)) * this.resize_) + "px";
+    var style_src = URL_ + this.name_ + "arc_" + color + "_" + vposition + "_middle.png";
+    LOGGER_.logDebug("visualisation", {"action" : "draw arc", "position" : "middle", "top" : style_top, "left" : style_left, "height" : style_height, "width" : style_width, "src" : style_src});
     var arc_middle = document.createElementNS(XUL_NAMESPACE_, "image");
     arc_middle.style.position = "relative";
-    arc_middle.style.top = arc_top + "px";
-    arc_middle.style.left = ((left + this.arc_left_placement_ + this.arc_width_) * this.resize_) + "px";
-    arc_middle.style.width = (((right - this.arc_width_ + this.arc_right_placement_) - (left + this.arc_left_placement_ + this.arc_width_)) * this.resize_) + "px";
-    arc_middle.style.height = (this.arc_height_ * this.resize_) + "px";
+    arc_middle.style.top = style_top;
+    arc_middle.style.left = style_left;
+    arc_middle.style.width = style_width;
+    arc_middle.style.height = style_height;
     arc_middle.style.verticalAlign = "top";
-    arc_middle.setAttribute( "src", URL_ + this.name_ + "arc_" + color + "_" + vposition + "_middle.png");
+    arc_middle.setAttribute("src", style_src);
     this.stack_.appendChild(arc_middle);
 
     if (height == 0)
         return;
 
+    var style_top = fill_top + "px";
+    var style_left = ((left + this.arc_left_placement_) * this.resize_) + "px";
+    var style_height = ((this.arc_difference_ * height) * this.resize_) + "px";
+    var style_width = (this.arc_width_ * this.resize_) + "px";
+    var style_src = URL_ + this.name_ + "arc_" + color + "_left_middle.png";
+    LOGGER_.logDebug("visualisation", {"action" : "draw arc", "position" : "left-middle", "top" : style_top, "left" : style_left, "height" : style_height, "width" : style_width, "src" : style_src});
     var arc_left_middle = document.createElementNS(XUL_NAMESPACE_, "image");
     arc_left_middle.style.position = "relative";
-    arc_left_middle.style.top = fill_top + "px";
-    arc_left_middle.style.left = ((left + this.arc_left_placement_) * this.resize_) + "px";
-    arc_left_middle.style.width = (this.arc_width_ * this.resize_) + "px";
-    arc_left_middle.style.height = ((this.arc_difference_ * height) * this.resize_) + "px";
+    arc_left_middle.style.top = style_top;
+    arc_left_middle.style.left = style_left;
+    arc_left_middle.style.width = style_width;
+    arc_left_middle.style.height = style_height;
     arc_left_middle.style.verticalAlign = "top";
-    arc_left_middle.setAttribute( "src", URL_ + this.name_ + "arc_" + color + "_left_middle.png");
+    arc_left_middle.setAttribute("src", style_src);
     this.stack_.appendChild(arc_left_middle);
-    
+
+    var style_top = fill_top + "px";
+    var style_left = ((right - this.arc_width_ + this.arc_right_placement_) * this.resize_) + "px";
+    var style_height = ((this.arc_difference_ * height) * this.resize_) + "px";
+    var style_width = (this.arc_width_ * this.resize_) + "px";
+    var style_src = URL_ + this.name_ + "arc_" + color + "_right_middle.png";
+    LOGGER_.logDebug("visualisation", {"action" : "draw arc", "position" : "right-middle", "top" : style_top, "left" : style_left, "height" : style_height, "width" : style_width, "src" : style_src});
     var arc_right_middle = document.createElementNS(XUL_NAMESPACE_, "image");
     arc_right_middle.style.position = "relative";
-    arc_right_middle.style.top = fill_top + "px";
-    arc_right_middle.style.left = ((right - this.arc_width_ + this.arc_right_placement_) * this.resize_) + "px";
-    arc_right_middle.style.width = (this.arc_width_ * this.resize_) + "px";
-    arc_right_middle.style.height = ((this.arc_difference_ * height) * this.resize_) + "px";
+    arc_right_middle.style.top = style_top;
+    arc_right_middle.style.left = style_left;
+    arc_right_middle.style.width = style_width;
+    arc_right_middle.style.height = style_height;
     arc_right_middle.style.verticalAlign = "top";
-    arc_right_middle.setAttribute("src", URL_ + this.name_ + "arc_" + color + "_right_middle.png");
+    arc_right_middle.setAttribute("src", style_src);
     this.stack_.appendChild(arc_right_middle);
 }
 
@@ -164,14 +195,21 @@ Visualisation.prototype.drawArc = function(color, vposition, height, left, right
  */
 Visualisation.prototype.drawDot = function(container, color, style, left)
 {
+    LOGGER_.logDebug("visualisation", {"action" : "draw dot", "container" : container.toString(), "color" : color, "style" : style, "left" : left});
     var dot = document.createElementNS(XUL_NAMESPACE_, "image");
 
+    var style_top = (this.box_.boxObject.height / 2) - ((this.dotsize_ / 2) * this.resize_) + "px";
+    var style_left = ((left - (this.dotsize_ / 2)) * this.resize_) + "px";
+    var style_height = (this.dotsize_ * this.resize_) + "px";
+    var style_width = (this.dotsize_ * this.resize_) + "px";
+    var style_src = URL_ + this.name_ + "dot_" + color + "_" + style + ".png";
+    LOGGER_.logDebug("visualisation", {"action" : "draw dot", "top" : style_top, "left" : style_left, "height" : style_height, "width" : style_width, "src" : style_src});
     dot.style.position = "relative";
-    dot.style.top = (this.box_.boxObject.height / 2) - ((this.dotsize_ / 2) * this.resize_) + "px";
-    dot.style.left = ((left - (this.dotsize_ / 2)) * this.resize_) + "px";
-    dot.style.width = (this.dotsize_ * this.resize_) + "px";
-    dot.style.height = (this.dotsize_ * this.resize_) + "px";
-    dot.setAttribute("src", URL_ + this.name_ + "dot_" + color + "_" + style + ".png");
+    dot.style.top = style_top;
+    dot.style.left = style_left;
+    dot.style.width = style_width;
+    dot.style.height = style_height;
+    dot.setAttribute("src", style_src);
 
     dot.container = container;
 
@@ -238,6 +276,7 @@ Visualisation.prototype.drawDot = function(container, color, style, left)
  */
 Visualisation.prototype.getResize = function(xcount, ycount,sizex, sizey)
 {
+    LOGGER_.logDebug("visualisation", {"action" : "getResize", "xcount" : xcount, "ycount" : ycount, "sizex" : sizex, "sizey" : sizey});
     var spaceperarcavailablex = sizex / (xcount - 1);
     var spaceperarcavailabley = sizey / 2;
     var spaceperarcneededx = this.dotsize_ + (2 * this.arc_width_);
@@ -255,6 +294,7 @@ Visualisation.prototype.getResize = function(xcount, ycount,sizex, sizey)
     if (resize > 1)
         resize = 1;
     
+    LOGGER_.logDebug("visualisation", {"action" : "getResize", "resize" : resize});
     return resize;
 }
 
@@ -278,6 +318,7 @@ Visualisation.prototype.onMouseClick = function(event)
  */
 Visualisation.prototype.timeScaling = function(containers, minimaltimedifference, width)
 {
+    LOGGER_.logDebug("visualisation", {"action" : "timeScaling", "containers" : containers.toString(), "minimaltimedifference" : minimaltimedifference, "width" : width});
     // if we do not want to do timescaling, reset all scaling info to 1
     if (! this.pref_timescaling_)
     {
@@ -308,6 +349,8 @@ Visualisation.prototype.timeScaling = function(containers, minimaltimedifference
     // with the minimal horizontal spacing
     var max_count_x = width / (this.dotsize_ + (2 * this.arc_width_));
     
+    LOGGER_.logDebug("visualisation", {"action" : "timeScaling", "total_time_scale" : total_time_scale, "max_count_x" : max_count_x});
+    
     // if the time scaling factor is bigger than what we can display, we have a problem
     // this means, we have to scale the timing factor down
     var scaling = 0.9;
@@ -330,6 +373,8 @@ Visualisation.prototype.timeScaling = function(containers, minimaltimedifference
             break;
     }
     
+    LOGGER_.logDebug("visualisation", {"action" : "timeScaling", "total_time_scale" : total_time_scale});
+    
     return containers;
 }
 
@@ -339,6 +384,7 @@ Visualisation.prototype.timeScaling = function(containers, minimaltimedifference
  */
 Visualisation.prototype.visualise = function(container)
 {
+    LOGGER_.logDebug("visualisation", {"action" : "visualise", "container" : container.toString()});
     // clear visualisation
     this.clearStack();
 

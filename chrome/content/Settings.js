@@ -18,6 +18,8 @@ function init()
     var dologging = document.getElementById("dologging");
     if (! dologging.checked)
     {
+        var debug = document.getElementById("dologgingdebug");
+        debug.disabled = true;
         var sendlog = document.getElementById("sendlog");
         sendlog.disabled = true;
         var resetlog = document.getElementById("resetlog");
@@ -254,4 +256,18 @@ function resetLogfiles()
     {
         alert("Could not reset logfiles");
     }
+}
+
+
+/**
+ * Enable or disable the debug checkbox
+ */
+function toggleLogging()
+{
+    var logcheckbox = document.getElementById("dologging");
+    var debugcheckbox = document.getElementById("dologgingdebug");
+    if (logcheckbox.checked)
+        debugcheckbox.disabled = false;
+    else
+        debugcheckbox.disabled = true;
 }
