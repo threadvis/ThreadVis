@@ -161,11 +161,11 @@ Logger.prototype.open = function()
     
     this.file_.append(LOGGER_EXTENSION_PATH_);
     if (! this.file_.exists())
-        this.file_.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0644);
+        this.file_.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
 
     this.file_.append(LOGGER_EXTENSION_GUID_);
     if (! this.file_.exists())
-        this.file_.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0644);
+        this.file_.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
 
     this.ready_ = false;
     if (this.file_.exists())
