@@ -11,7 +11,7 @@
  ********************************************************/
 
 -->
-  <RDF:RDF xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+<RDF:RDF xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
     xmlns:chrome="http://www.mozilla.org/rdf/chrome#"> 
 
     <RDF:Seq about="urn:mozilla:package:root"> 
@@ -21,7 +21,7 @@
     <RDF:Description about="urn:mozilla:package:threadarcsjs" 
           chrome:displayName="Thread Arcs Visualisation"
           chrome:author="Alexander C. Hubmann" 
-          chrome:name="ThreadArcsJS"
+          chrome:name="threadarcsjs"
           chrome:extension="true"
           chrome:description="Displays a small graphic visualising the thread (context) of the currently selected email."> 
     </RDF:Description>
@@ -39,4 +39,4 @@
       <RDF:li>chrome://threadarcsjs/content/MozillaMenuOverlay.xul</RDF:li>
     </RDF:Seq>
 
-  </RDF:RDF>
+</RDF:RDF>

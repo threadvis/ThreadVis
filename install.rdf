@@ -50,6 +50,7 @@
     <em:file>
       <Description about="urn:mozilla:extension:file:threadarcsjs.jar">
         <em:package>content/</em:package>
+        <em:locale>locale/en-US/</em:locale>
       </Description>
     </em:file>
   </Description>

@@ -15,7 +15,7 @@ var XpiInstaller =
     extShortName: 'threadarcsjs', // The leafname of the JAR file (without the .jar part)
     extVersion: '0.2',
     extAuthor: 'Alexander C. Hubmann',
-    extLocaleNames: null, // e.g. ['en-US', 'en-GB']
+    extLocaleNames: ["en-US"], // e.g. ['en-US', 'en-GB']
     extSkinNames: null, // e.g. ['classic', 'modern']
     extPostInstallMessage: null, // Set to null for no post-install message
     // --- Editable items end ---
@@ -69,14 +69,14 @@ var XpiInstaller =
         // Register locales
         for (var locale in this.extLocaleNames)
         {
-            var regPath = 'locale/' + this.extLocaleNames[locale] + '//';
+            var regPath = 'locale/' + this.extLocaleNames[locale] + '/';
             Install.registerChrome(Install.LOCALE | installType, jarPath, regPath);
         }
 
         // Register skins
         for (var skin in this.extSkinNames)
         {
-            var regPath = 'skin/' + this.extSkinNames[skin] + '//';
+            var regPath = 'skin/' + this.extSkinNames[skin] + '/';
             Install.registerChrome(Install.SKIN | installType, jarPath, regPath);
         }
 
