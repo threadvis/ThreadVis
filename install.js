@@ -18,6 +18,7 @@ var XpiInstaller =
     extLocaleNames: ["en-US", "de-DE"], // e.g. ['en-US', 'en-GB']
     extSkinNames: null, // e.g. ['classic', 'modern']
     extPostInstallMessage: null, // Set to null for no post-install message
+    extDefaultPrefs: ["ThreadArcsJSDefault.js"],  //e.g. ["default1.js", "default2.js"]
     // --- Editable items end ---
 
     profileInstall: true,
@@ -58,6 +59,15 @@ var XpiInstaller =
 
         // Add JAR file
         Install.addFile(null, 'chrome/' + jarName, installPath, null);
+
+        // Add default preferences
+        var defaultprefdir = Install.getFolder("Program");
+        defaultprefdir = Install.getFolder(defaultprefdir, "defaults");
+        defaultprefdir = Install.getFolder(defaultprefdir, "pref");
+        for (var pref in this.extDefaultPrefs)
+        {
+            Install.addFile(null, "defaults/preferences/" + this.extDefaultPrefs[pref], defaultprefdir, null);
+        }
 
         // Register chrome
         var jarPath = Install.getFolder(installPath, jarName);
