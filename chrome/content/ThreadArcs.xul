@@ -24,6 +24,9 @@
     <script src="chrome://threadarcsjs/content/Visualisation.js" />
 
     <hbox id="expandedHeaderView">
+        <stringbundleset>
+            <stringbundle id="ThreadArcsJSStrings" src="chrome://threadarcsjs/locale/ThreadArcs.properties" />
+        </stringbundleset>
         <vbox id="ThreadArcsJSBox" minheight="50" minwidth="200" flex="2" align="right" />
     </hbox>
 

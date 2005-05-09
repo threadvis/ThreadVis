@@ -33,6 +33,7 @@ function Visualisation()
 {
     this.box_ = null;
     this.stack_ = null;
+    this.strings_ = null;
     // set default resize parameter
     this.resize_ = 1;
     this.pref_timescaling_ = false;
@@ -61,6 +62,7 @@ Visualisation.prototype.createStack = function()
 {
     this.box_ = document.getElementById("ThreadArcsJSBox");
     this.stack_ = document.getElementById("ThreadArcsJSStack");
+    this.strings_ = document.getElementById("ThreadArcsJSStrings");
     
     if (! this.stack_)
     {
@@ -225,7 +227,7 @@ Visualisation.prototype.drawDot = function(container, color, style, left)
         var author = document.createElementNS(XUL_NAMESPACE_, "hbox");
         author.appendChild(authorlabel);
         author.appendChild(authortext);
-        authorlabel.setAttribute("value", "From:");
+        authorlabel.setAttribute("value", this.strings_.getString("tooltip.from"));
         authorlabel.style.fontWeight = "bold";
         authortext.setAttribute("value", container.getMessage().getFrom());
         
@@ -234,7 +236,7 @@ Visualisation.prototype.drawDot = function(container, color, style, left)
         var date = document.createElementNS(XUL_NAMESPACE_, "hbox");
         date.appendChild(datelabel);
         date.appendChild(datetext);
-        datelabel.setAttribute("value", "Date:");
+        datelabel.setAttribute("value", this.strings_.getString("tooltip.date"));
         datelabel.style.fontWeight = "bold";
         datetext.setAttribute("value", container.getMessage().getDate());
 
@@ -243,7 +245,7 @@ Visualisation.prototype.drawDot = function(container, color, style, left)
         var subject = document.createElementNS(XUL_NAMESPACE_, "hbox");
         subject.appendChild(subjectlabel);
         subject.appendChild(subjecttext);
-        subjectlabel.setAttribute("value", "Subject:");
+        subjectlabel.setAttribute("value", this.strings_.getString("tooltip.subject"));
         subjectlabel.style.fontWeight = "bold";
         subjecttext.setAttribute("value", container.getMessage().getSubject());
 
@@ -256,8 +258,8 @@ Visualisation.prototype.drawDot = function(container, color, style, left)
         // otherwise we display info about missing message
         var desc1 = document.createElementNS(XUL_NAMESPACE_, "description");
         var desc2 = document.createElementNS(XUL_NAMESPACE_, "description");
-        desc1.setAttribute("value", "This is a missing message.");
-        desc2.setAttribute("value", "Either you never received it or it was deleted.");
+        desc1.setAttribute("value", this.strings_.getString("tooltip.missingmessage"));
+        desc2.setAttribute("value", this.strings_.getString("tooltip.missingmessagedetail"));
         tooltip.appendChild(desc1);
         tooltip.appendChild(desc2);
     }
