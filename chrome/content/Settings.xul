@@ -22,7 +22,7 @@
         onload="init();"
         ondialogaccept="savePrefs();"
         persist="screenX screenY"
-        title="Thread Arcs Settings">
+        title="&settings.title;">
 
     <script type="application/x-javascript" src="chrome://global/content/nsUserSettings.js" />
     <script type="application/x-javascript" src="chrome://threadarcsjs/content/Settings.js" />
@@ -67,25 +67,56 @@
             <tabpanel id="visualisation" orient="vertical">
                 <groupbox>
                     <caption label="&visualisation.timescaling.caption;" />
-                    <checkbox id="dotimescaling" label="&visualisation.timescaling.checkbox;" prefstring="extensions.threadarcsjs.timescaling.enabled" prefdefval="false" />
-                    <label class="indent">
-                        &visualisation.timescaling.description.disabled;
-                    </label>
-                    <label class="indent">
-                        &visualisation.timescaling.description.enabled;
-                    </label>
+                    <radiogroup id="dotimescaling" prefstring="extensions.threadarcsjs.timescaling.enabled" prefdefval="false" preftype="bool">
+                        <vbox>
+                            <radio value="false" label="&visualisation.timescaling.disable;" />
+                            <hbox class="indent">
+                                <image src="images/timescaling_disabled.png" />
+                            </hbox>
+                            <separator class="thin" />
+                            <label class="indent">
+                                &visualisation.timescaling.description.disabled;
+                            </label>
+                        </vbox>
+                        <separator />
+                        <vbox>
+                            <radio value="true" label="&visualisation.timescaling.enable;" />
+                            <hbox class="indent">
+                                <image src="images/timescaling_enabled.png" />
+                            </hbox>
+                            <separator class="thin" />
+                            <label class="indent">
+                                &visualisation.timescaling.description.enabled;
+                            </label>
+                        </vbox>
+                    </radiogroup>
                 </groupbox>
                 <groupbox>
                     <caption label="&visualisation.size.caption;" />
                     <radiogroup id="visualisationsize" prefstring="extensions.threadarcsjs.visualisationsize">
-                        <radio value="8x8,8,8,8,4,-1,1,16" label="&visualisation.size.small;" />
-                        <radio value="12x12,12,12,12,6,-1,1,24" label="&visualisation.size.medium;" />
-                        <radio value="16x16,16,16,16,8,-1,1,32" label="&visualisation.size.large;" />
+                        <hbox>
+                            <radio value="8x8,8,8,8,4,-1,1,16" label="&visualisation.size.small;" />
+                            <image src="images/size_8.png" />
+                        </hbox>
+                        <separator class="thin" />
+                        <hbox>
+                            <radio value="12x12,12,12,12,6,-1,1,24" label="&visualisation.size.medium;" />
+                            <image src="images/size_12.png" />
+                        </hbox>
+                        <separator class="thin" />
+                        <hbox>
+                            <radio value="16x16,16,16,16,8,-1,1,32" label="&visualisation.size.large;" />
+                            <image src="images/size_16.png" />
+                        </hbox>
                     </radiogroup>
                 </groupbox>
             </tabpanel>
             <tabpanel id="about" orient="vertical">
                 <label value="&extension.name;" id="extension-name" />
+                <separator class="thin" />
+                <hbox>
+                    <image src="images/about.png" />
+                </hbox>
                 <separator class="thin" />
                 <label value="&about.version; &extension.version;" id="about-version" />
                 <separator class="thin" />

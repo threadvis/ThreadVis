@@ -27,7 +27,22 @@ function Logger()
 {
     this.pref_enablelogging_ = false;
     this.preferenceReload();
+    this.strings_ = document.getElementById("ThreadArcsJSStrings");
+
+    this.file_ = Components.classes["@mozilla.org/file/directory_service;1"].getService(Components.interfaces.nsIProperties).get("ProfD", Components.interfaces.nsIFile);
     
+    this.file_.append(LOGGER_EXTENSION_PATH_);
+    if (! this.file_.exists())
+        this.file_.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
+
+    this.file_.append(LOGGER_EXTENSION_GUID_);
+    if (! this.file_.exists())
+        this.file_.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
+
+    this.file_.append(LOGGER_LOGFILENAME_);
+    if (! this.file_.exists())
+        this.file_.create(Components.interfaces.nsIFile.NORMAL_FILE_TYPE, 0644);
+
     this.ready_ = false;
     if (this.pref_enablelogging_)
     {
@@ -157,20 +172,9 @@ Logger.prototype.decodeDebug = function(object)
  */
 Logger.prototype.open = function()
 {
-    this.file_ = Components.classes["@mozilla.org/file/directory_service;1"].getService(Components.interfaces.nsIProperties).get("ProfD", Components.interfaces.nsIFile);
-    
-    this.file_.append(LOGGER_EXTENSION_PATH_);
-    if (! this.file_.exists())
-        this.file_.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
-
-    this.file_.append(LOGGER_EXTENSION_GUID_);
-    if (! this.file_.exists())
-        this.file_.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
-
     this.ready_ = false;
     if (this.file_.exists())
     {
-        this.file_.append(LOGGER_LOGFILENAME_);
         this.file_output_stream_ = Components.classes["@mozilla.org/network/file-output-stream;1"].createInstance(Components.interfaces.nsIFileOutputStream);
         var options = 0x2 | 0x8 | 0x10;
         this.file_output_stream_.init(this.file_, options, 0, 0);
@@ -187,9 +191,18 @@ Logger.prototype.reset = function(delete_file)
 {
     if (this.ready_)
         this.close();
-    
-    if (delete_file && this.file_)
-        this.file_.remove(false);
+
+    try
+    {
+        if (delete_file && this.file_)
+            this.file_.remove(false);
+        alert(this.strings_.getString("logger.deletedfile"));
+    }
+    catch (ex)
+    {
+        alert(this.strings_.getString("logger.couldnotdeletefile"));
+        alert(ex);
+    }
     
     if (this.pref_enablelogging_)
         this.open();

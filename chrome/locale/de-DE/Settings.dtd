@@ -9,6 +9,7 @@
  * Version: $Id$
  ********************************************************/
 -->
+<!ENTITY settings.title                                     "Thread Arcs Visualisation - Einstellungen">
 <!ENTITY logfiles.tab                                       "Log-Dateien">
 <!ENTITY logfiles.caption                                   "Logging aktivieren">
 <!ENTITY logfiles.description.restart                       "Um das Logging zu aktivieren oder zu deaktivieren, m&#xFC;ssen Sie das Programm neu starten.">
@@ -25,7 +26,8 @@
 <!ENTITY logfiles.reset.tooltip                             "Setzt die Log-Dateien auf Gr&#xF6;&#xDF;e 0 zur&#xFC;ck. Sie k&#xF6;nnen dies tun, nachdem Sie die Log-Dateien abgeschickt haben, um Speicherplatz zu sparen.">
 <!ENTITY visualisation.tab                                  "Visualisierung">
 <!ENTITY visualisation.timescaling.caption                  "Time Scaling">
-<!ENTITY visualisation.timescaling.checkbox                 "Time Scaling aktivieren">
+<!ENTITY visualisation.timescaling.enable                   "Time Scaling aktivieren">
+<!ENTITY visualisation.timescaling.disable                  "Time Scaling deaktivieren">
 <!ENTITY visualisation.timescaling.description.disabled     "Wenn Time Scaling deaktiviert ist, ist der horizontale Abstand zwischen benachbarten Nachrichten immer konstant.">
 <!ENTITY visualisation.timescaling.description.enabled      "Wenn Time Scaling aktiviert ist, ist der horizontale Abstand zwischen benachbarten Nachrichten proportional zum zeitlichen Abstand dieser Nachrichten.">
 <!ENTITY visualisation.size.caption                         "Gr&#xF6;&#xDF;e der Visualisierung">

@@ -9,6 +9,7 @@
  * Version: $Id$
  ********************************************************/
 -->
+<!ENTITY settings.title                                     "Thread Arcs Visualisation - Settings">
 <!ENTITY logfiles.tab                                       "Logfiles">
 <!ENTITY logfiles.caption                                   "Enable Logging">
 <!ENTITY logfiles.description.restart                       "Please note that enabling or disabling logging needs a restart.">
@@ -25,7 +26,8 @@
 <!ENTITY logfiles.reset.tooltip                             "Resets the logfiles to size 0. Do this after sending the logfiles to save diskspace.">
 <!ENTITY visualisation.tab                                  "Visualisation">
 <!ENTITY visualisation.timescaling.caption                  "Time Scaling">
-<!ENTITY visualisation.timescaling.checkbox                 "Enable Time Scaling">
+<!ENTITY visualisation.timescaling.enable                   "Enable Time Scaling">
+<!ENTITY visualisation.timescaling.disable                  "Disable Time Scaling">
 <!ENTITY visualisation.timescaling.description.disabled     "If Time Scaling is disabled, the horizontal spacing between two adjacent messages is always constant.">
 <!ENTITY visualisation.timescaling.description.enabled      "If Time Scaling is enabled, the horizontal spacing between two adjacent messages is proportional to the time difference between those two messages.">
 <!ENTITY visualisation.size.caption                         "Visualisation Size">

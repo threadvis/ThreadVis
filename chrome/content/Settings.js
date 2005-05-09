@@ -20,10 +20,6 @@ function init()
     {
         var debug = document.getElementById("dologgingdebug");
         debug.disabled = true;
-        var sendlog = document.getElementById("sendlog");
-        sendlog.disabled = true;
-        var resetlog = document.getElementById("resetlog");
-        resetlog.disabled = true;
     }
 }
 
@@ -98,7 +94,7 @@ function savePrefs()
             var prefvalue = prefElements[i].getAttribute(prefattribute);
 
         if (preftype == "bool")
-        prefvalue = prefvalue == "true" ? true : false;
+            prefvalue = prefvalue == "true" ? true : false;
 
         switch (preftype)
         {
@@ -246,15 +242,15 @@ function addAttachments(composeFields, attachments)
  */
 function resetLogfiles()
 {
+    var parent = window.opener.opener ? window.opener.opener : window.opener;
     var logger = window.opener.opener ? window.opener.opener.LOGGER_ : window.opener.LOGGER_;
     if (logger)
     {
         logger.reset(true);
-        alert("Logfiles reset");
     }
     else
     {
-        alert("Could not reset logfiles");
+        alert(parent.getElementById("ThreadArcsJSStrings").getString("logger.couldnotdeletefile"));
     }
 }
 
