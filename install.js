@@ -15,7 +15,7 @@ var XpiInstaller =
     extShortName: 'threadarcsjs', // The leafname of the JAR file (without the .jar part)
     extVersion: '0.2',
     extAuthor: 'Alexander C. Hubmann',
-    extLocaleNames: ["en-US"], // e.g. ['en-US', 'en-GB']
+    extLocaleNames: ["en-US", "de-DE"], // e.g. ['en-US', 'en-GB']
     extSkinNames: null, // e.g. ['classic', 'modern']
     extPostInstallMessage: null, // Set to null for no post-install message
     // --- Editable items end ---

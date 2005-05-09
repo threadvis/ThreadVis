@@ -1,9 +1,20 @@
+<!--
+/* *******************************************************
+ * Settings.dtd
+ *
+ * (c) 2005 Alexander C. Hubmann
+ *
+ * DTD file containing EN localisation of UI elements
+ *
+ * Version: $Id$
+ ********************************************************/
+-->
 <!ENTITY logfiles.tab                                       "Logfiles">
 <!ENTITY logfiles.caption                                   "Enable Logging">
 <!ENTITY logfiles.description.restart                       "Please note that enabling or disabling logging needs a restart.">
 <!ENTITY logfiles.enable.checkbox                           "Enable Logging">
 <!ENTITY logfiles.enable.description.whatlogged             "If you enable logging, only statistical information about your inbox, the mail threads you are reading and the way you are interacting with the extension are logged.">
-<!ENTITY logfiles.enable.description.sending                "This information is never automatically sent to anyone. You can share this information by clicking on &quot;Send Logfiles&quot; below.">
+<!ENTITY logfiles.enable.description.sending                "This information is never automatically sent to anyone. You can share this information by clicking on &#x22;logfiles.send.button&#x22; below.">
 <!ENTITY logfiles.debug.checkbox                            "Include debug information">
 <!ENTITY logfiles.debug.description.general                 "If you experience any problems using the extension, enable debug logging to include more information in the logfiles.">
 <!ENTITY logfiles.debug.description.personalinfo            "Attention: This information may include personal information such as message-ids, the structure of the threads you are viewing, etc.">

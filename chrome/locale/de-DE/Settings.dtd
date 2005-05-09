@@ -1,0 +1,42 @@
+<!--
+/* *******************************************************
+ * Settings.dtd
+ *
+ * (c) 2005 Alexander C. Hubmann
+ *
+ * DTD file containing DE localisation of UI elements
+ *
+ * Version: $Id$
+ ********************************************************/
+-->
+<!ENTITY logfiles.tab                                       "Log-Dateien">
+<!ENTITY logfiles.caption                                   "Logging aktivieren">
+<!ENTITY logfiles.description.restart                       "Um das Logging zu aktivieren oder zu deaktivieren, m&#xFC;ssen Sie das Programm neu starten.">
+<!ENTITY logfiles.enable.checkbox                           "Logging aktivieren">
+<!ENTITY logfiles.enable.description.whatlogged             "Wenn Sie das Logging aktivieren, werden nur statistische Daten &#xFC;ber Ihre Mailbox, &#xFC;ber die Konversationen die Sie lesen und die Art mit der Sie die Erweiterung verwenden gespeichert.">
+<!ENTITY logfiles.enable.description.sending                "Diese Information wird nie automatisch versendet. Sie k&#xF6;nnen diese Informationen versenden, indem Sie auf den Button &#x22;&logfiles.send.button;&#x22; klicken.">
+<!ENTITY logfiles.debug.checkbox                            "Debug-Informationen inkludieren">
+<!ENTITY logfiles.debug.description.general                 "Wenn Sie auf Probleme mit der Erweiterung sto&#xDF;en, k&#xF6;nnen Sie Debug-Informationen in den Log-Dateien inkludieren, um die Behebung der Probleme zu vereinfachen.">
+<!ENTITY logfiles.debug.description.personalinfo            "Achtung: Diese Informationen k&#xF6;nnen pers&#xF6;nliche Daten wie Message-IDs, die Struktur der Konversationen die Sie f&#xFC;hren und &#xE4;hnliche Informationen beinhalten.">
+<!ENTITY logfiles.debug.description.size                    "Bitte beachten Sie auch, dass durch das Aktivieren dieser Option die Gr&#xF6;&#xDF;e der Log-Dateien extrem anw&#xE4;chst und die Geschwindigkeit der Erweiterung verringert wird.">
+<!ENTITY logfiles.send.button                               "Log-Dateien senden">
+<!ENTITY logfiles.send.tooltip                              "Erstellt eine neue leere E-Mail und f&#xFC;gt die Log-Dateien als Anhang an.">
+<!ENTITY logfiles.reset.button                              "Log-Dateien zur&#xFC;cksetzen">
+<!ENTITY logfiles.reset.tooltip                             "Setzt die Log-Dateien auf Gr&#xF6;&#xDF;e 0 zur&#xFC;ck. Sie k&#xF6;nnen dies tun, nachdem Sie die Log-Dateien abgeschickt haben, um Speicherplatz zu sparen.">
+<!ENTITY visualisation.tab                                  "Visualisierung">
+<!ENTITY visualisation.timescaling.caption                  "Time Scaling">
+<!ENTITY visualisation.timescaling.checkbox                 "Time Scaling aktivieren">
+<!ENTITY visualisation.timescaling.description.disabled     "Wenn Time Scaling deaktiviert ist, ist der horizontale Abstand zwischen benachbarten Nachrichten immer konstant.">
+<!ENTITY visualisation.timescaling.description.enabled      "Wenn Time Scaling aktiviert ist, ist der horizontale Abstand zwischen benachbarten Nachrichten proportional zum zeitlichen Abstand dieser Nachrichten.">
+<!ENTITY visualisation.size.caption                         "Gr&#xF6;&#xDF;e der Visualisierung">
+<!ENTITY visualisation.size.small                           "klein">
+<!ENTITY visualisation.size.medium                          "mittel">
+<!ENTITY visualisation.size.large                           "gro&#xDF;">
+<!ENTITY about.tab                                          "&#xDC;ber die Erweiterung">
+<!ENTITY about.version                                      "Version">
+<!ENTITY extension.description                              "Zeigt eine kleine Grafik, die den Kontext der aktuell angezeigten Nachricht visualisiert.">
+<!ENTITY extension.copyright                                "&#xA9; 2004-2005 Alexander C. Hubmann">
+<!ENTITY extension.homepage                                 "http://www.sbox.tugraz.at/home/x/xpert/threadarcs/">
+<!ENTITY extension.email                                    "xpert@sbox.tugraz.at">
+<!ENTITY extension.name                                     "Thread Arcs Visualisation">
+<!ENTITY extension.version                                  "0.2">
