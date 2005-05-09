@@ -90,7 +90,7 @@ Visualisation.prototype.createStack = function()
 /**
  * Draw arc
  */
-Visualisation.prototype.drawArc = function(color, vposition, height, left, right)
+Visualisation.prototype.drawArc = function(color, vposition, height, left, right, top)
 {
     LOGGER_.logDebug("visualisation", {"action" : "draw arc", "color" : color, "vposition" : vposition, "height" : height, "left" : left, "right" : right});
     var arc_top = 0;
@@ -98,12 +98,12 @@ Visualisation.prototype.drawArc = function(color, vposition, height, left, right
     height--;
     if (vposition == "top")
     {
-        arc_top = (this.box_.boxObject.height / 2) - (((this.dotsize_ / 2) + this.arc_height_ + (this.arc_difference_ * height)) * this.resize_);
+        arc_top = top - (((this.dotsize_ / 2) + this.arc_height_ + (this.arc_difference_ * height)) * this.resize_);
         fill_top = arc_top + (this.arc_height_ * this.resize_);
     }
     else
     {
-        arc_top = (this.box_.boxObject.height / 2) + (((this.dotsize_ / 2) + (this.arc_difference_ * height)) * this.resize_);
+        arc_top = top + (((this.dotsize_ / 2) + (this.arc_difference_ * height)) * this.resize_);
         fill_top = arc_top - (this.arc_difference_ * height * this.resize_);
     }
 
@@ -195,12 +195,12 @@ Visualisation.prototype.drawArc = function(color, vposition, height, left, right
 /**
  * Draw a dot
  */
-Visualisation.prototype.drawDot = function(container, color, style, left)
+Visualisation.prototype.drawDot = function(container, color, style, left, top)
 {
     LOGGER_.logDebug("visualisation", {"action" : "draw dot", "container" : container.toString(), "color" : color, "style" : style, "left" : left});
     var dot = document.createElementNS(XUL_NAMESPACE_, "image");
 
-    var style_top = (this.box_.boxObject.height / 2) - ((this.dotsize_ / 2) * this.resize_) + "px";
+    var style_top = top - ((this.dotsize_ / 2) * this.resize_) + "px";
     var style_left = ((left - (this.dotsize_ / 2)) * this.resize_) + "px";
     var style_height = (this.dotsize_ * this.resize_) + "px";
     var style_width = (this.dotsize_ * this.resize_) + "px";
@@ -211,6 +211,7 @@ Visualisation.prototype.drawDot = function(container, color, style, left)
     dot.style.left = style_left;
     dot.style.width = style_width;
     dot.style.height = style_height;
+    dot.style.verticalAlign = "top";
     dot.setAttribute("src", style_src);
 
     dot.container = container;
@@ -457,12 +458,13 @@ Visualisation.prototype.visualise = function(container)
     }
 
     var width = this.box_.boxObject.width;
+    var height = this.box_.boxObject.height;
     containers = this.timeScaling(containers, minimaltimedifference, width);
 
 
     var x = this.spacing_ / 2;
     this.box_.style.paddingRight = x + "px";
-    this.resize_ = this.getResize(containers.length, totalmaxheight, this.box_.boxObject.width, this.box_.boxObject.height);
+    this.resize_ = this.getResize(containers.length, totalmaxheight, width, height);
 
     for (var counter = 0; counter < containers.length; counter++)
     {
@@ -480,7 +482,7 @@ Visualisation.prototype.visualise = function(container)
         if (thiscontainer.isDummy())
             style ="dummy";
         
-        this.drawDot(thiscontainer, color, style, x);
+        this.drawDot(thiscontainer, color, style, x, (height / 2));
         thiscontainer.x_position_ = x;
         thiscontainer.current_arc_height_incoming_ = 0;
         thiscontainer.current_arc_height_outgoing_ = 0;
@@ -513,7 +515,7 @@ Visualisation.prototype.visualise = function(container)
             maxheight++;
             parent.current_arc_height_outgoing_ = maxheight;
             thiscontainer.current_arc_height_incoming_ = maxheight;
-            this.drawArc(color, position, maxheight, parent.x_position_, x);
+            this.drawArc(color, position, maxheight, parent.x_position_, x, (height / 2));
         }
         x = x + (thiscontainer.x_scaled_ * this.spacing_);
     }
