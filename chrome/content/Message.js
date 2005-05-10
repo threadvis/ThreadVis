@@ -225,7 +225,7 @@ private String simplifySubject(String subject)
  */
 Message.prototype.toString = function()
 {
-    return "Message: '" + this.getSubject() + "' with simplyfied subject '" + this.getSimplifiedSubject() + "' and id '" + this.getId() + "' and refs '" + this.getReferences() + "' and recount '" + this.getReplyCount() + "'";
+    return "Message: Subject: '" + this.getSubject() + "'. From: '" + this.getFrom() +  "'. MsgId: '" + this.getId() + "'. MsgKey: '" + this.getKey() + "'. Date: '" + this.getDate() + "'. Folder: '" + this.getFolder() + "'. Refs: '" + this.getReferences() + "'. Sent: '" + this.isSent() + "'";
 }
 
 
