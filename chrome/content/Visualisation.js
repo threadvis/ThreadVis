@@ -50,6 +50,7 @@ function Visualisation()
  */
 Visualisation.prototype.clearStack = function()
 {
+    LOGGER_.logDebug("Visualisation.clearStack()", {});
     while(this.stack_.firstChild != null)
         this.stack_.removeChild(this.stack_.firstChild);
 }
@@ -60,21 +61,24 @@ Visualisation.prototype.clearStack = function()
  */
 Visualisation.prototype.createStack = function()
 {
+    LOGGER_.logDebug("Visualisation.createStack()", {});
     this.box_ = document.getElementById("ThreadArcsJSBox");
     this.stack_ = document.getElementById("ThreadArcsJSStack");
     this.strings_ = document.getElementById("ThreadArcsJSStrings");
-    
+
     if (! this.stack_)
     {
+        LOGGER_.logDebug("Visualisation.createStack()", {"action" : "create stack"});
         this.stack_ = document.createElementNS(XUL_NAMESPACE_, "stack");
         this.stack_.setAttribute("id", "ThreadArcsJSStack");
         this.box_.appendChild(this.stack_);
     }
     else
     {
+        LOGGER_.logDebug("Visualisation.createStack()", {"action" : "clear stack"});
         this.clearStack();
     }
-    
+
     var loading = document.createElementNS(XUL_NAMESPACE_, "image");
 
     loading.style.marginTop = "20px";
@@ -92,7 +96,7 @@ Visualisation.prototype.createStack = function()
  */
 Visualisation.prototype.drawArc = function(color, vposition, height, left, right, top)
 {
-    LOGGER_.logDebug("visualisation", {"action" : "draw arc", "color" : color, "vposition" : vposition, "height" : height, "left" : left, "right" : right});
+    LOGGER_.logDebug("Visualisation.drawArc()", {"action" : "start", "color" : color, "vposition" : vposition, "height" : height, "left" : left, "right" : right});
     var arc_top = 0;
     var fill_top = 0;
     height--;
@@ -112,7 +116,7 @@ Visualisation.prototype.drawArc = function(color, vposition, height, left, right
     var style_height = (this.arc_height_ * this.resize_)+ "px";
     var style_width = (this.arc_width_ * this.resize_)+ "px";
     var style_src = URL_ + this.name_ + "arc_" + color + "_" + vposition + "_left.png";
-    LOGGER_.logDebug("visualisation", {"action" : "draw arc", "position" : "left", "top" : style_top, "left" : style_left, "height" : style_height, "width" : style_width, "src" : style_src});
+    LOGGER_.logDebug("Visualisation.drawArc()", {"action" : "draw left arc", "top" : style_top, "left" : style_left, "height" : style_height, "width" : style_width, "src" : style_src});
     var arc_left = document.createElementNS(XUL_NAMESPACE_, "image");
     arc_left.style.position = "relative";
     arc_left.style.top = style_top;
@@ -128,7 +132,7 @@ Visualisation.prototype.drawArc = function(color, vposition, height, left, right
     var style_height = (this.arc_height_ * this.resize_)+ "px";
     var style_width = (this.arc_width_ * this.resize_)+ "px";
     var style_src = URL_ + this.name_ + "arc_" + color + "_" + vposition + "_right.png";
-    LOGGER_.logDebug("visualisation", {"action" : "draw arc", "position" : "right", "top" : style_top, "left" : style_left, "height" : style_height, "width" : style_width, "src" : style_src});
+    LOGGER_.logDebug("Visualisation.drawArc()", {"action" : "draw right arc", "top" : style_top, "left" : style_left, "height" : style_height, "width" : style_width, "src" : style_src});
     var arc_right = document.createElementNS(XUL_NAMESPACE_, "image");
     arc_right.style.position = "relative";
     arc_right.style.top = style_top;
@@ -144,7 +148,7 @@ Visualisation.prototype.drawArc = function(color, vposition, height, left, right
     var style_height = (this.arc_height_ * this.resize_) + "px";
     var style_width = (((right - this.arc_width_ + this.arc_right_placement_) - (left + this.arc_left_placement_ + this.arc_width_)) * this.resize_) + "px";
     var style_src = URL_ + this.name_ + "arc_" + color + "_" + vposition + "_middle.png";
-    LOGGER_.logDebug("visualisation", {"action" : "draw arc", "position" : "middle", "top" : style_top, "left" : style_left, "height" : style_height, "width" : style_width, "src" : style_src});
+    LOGGER_.logDebug("Visualisation.drawArc()", {"action" : "draw middle arc", "top" : style_top, "left" : style_left, "height" : style_height, "width" : style_width, "src" : style_src});
     var arc_middle = document.createElementNS(XUL_NAMESPACE_, "image");
     arc_middle.style.position = "relative";
     arc_middle.style.top = style_top;
@@ -163,7 +167,7 @@ Visualisation.prototype.drawArc = function(color, vposition, height, left, right
     var style_height = ((this.arc_difference_ * height) * this.resize_) + "px";
     var style_width = (this.arc_width_ * this.resize_) + "px";
     var style_src = URL_ + this.name_ + "arc_" + color + "_left_middle.png";
-    LOGGER_.logDebug("visualisation", {"action" : "draw arc", "position" : "left-middle", "top" : style_top, "left" : style_left, "height" : style_height, "width" : style_width, "src" : style_src});
+    LOGGER_.logDebug("Visualisation.drawArc()", {"action" : "draw left middle arc", "top" : style_top, "left" : style_left, "height" : style_height, "width" : style_width, "src" : style_src});
     var arc_left_middle = document.createElementNS(XUL_NAMESPACE_, "image");
     arc_left_middle.style.position = "relative";
     arc_left_middle.style.top = style_top;
@@ -179,7 +183,7 @@ Visualisation.prototype.drawArc = function(color, vposition, height, left, right
     var style_height = ((this.arc_difference_ * height) * this.resize_) + "px";
     var style_width = (this.arc_width_ * this.resize_) + "px";
     var style_src = URL_ + this.name_ + "arc_" + color + "_right_middle.png";
-    LOGGER_.logDebug("visualisation", {"action" : "draw arc", "position" : "right-middle", "top" : style_top, "left" : style_left, "height" : style_height, "width" : style_width, "src" : style_src});
+    LOGGER_.logDebug("Visualisation.drawArc()", {"action" : "draw right middle arc", "top" : style_top, "left" : style_left, "height" : style_height, "width" : style_width, "src" : style_src});
     var arc_right_middle = document.createElementNS(XUL_NAMESPACE_, "image");
     arc_right_middle.style.position = "relative";
     arc_right_middle.style.top = style_top;
@@ -197,7 +201,7 @@ Visualisation.prototype.drawArc = function(color, vposition, height, left, right
  */
 Visualisation.prototype.drawDot = function(container, color, style, left, top)
 {
-    LOGGER_.logDebug("visualisation", {"action" : "draw dot", "container" : container.toString(), "color" : color, "style" : style, "left" : left});
+    LOGGER_.logDebug("Visualisation.drawDot()", {"action" : "start", "container" : container.toString(), "color" : color, "style" : style, "left" : left});
     var dot = document.createElementNS(XUL_NAMESPACE_, "image");
 
     var style_top = top - ((this.dotsize_ / 2) * this.resize_) + "px";
@@ -205,7 +209,7 @@ Visualisation.prototype.drawDot = function(container, color, style, left, top)
     var style_height = (this.dotsize_ * this.resize_) + "px";
     var style_width = (this.dotsize_ * this.resize_) + "px";
     var style_src = URL_ + this.name_ + "dot_" + color + "_" + style + ".png";
-    LOGGER_.logDebug("visualisation", {"action" : "draw dot", "top" : style_top, "left" : style_left, "height" : style_height, "width" : style_width, "src" : style_src});
+    LOGGER_.logDebug("Visualisation.drawDot()", {"top" : style_top, "left" : style_left, "height" : style_height, "width" : style_width, "src" : style_src});
     dot.style.position = "relative";
     dot.style.top = style_top;
     dot.style.left = style_left;
@@ -222,6 +226,7 @@ Visualisation.prototype.drawDot = function(container, color, style, left, top)
 
     if (! container.isDummy())
     {
+        LOGGER_.logDebug("Visualisation.drawDot()", {"action" : "create tooltip start"});
         // if container container message, view details
         var authorlabel = document.createElementNS(XUL_NAMESPACE_, "label");
         var authortext = document.createElementNS(XUL_NAMESPACE_, "label");
@@ -253,9 +258,11 @@ Visualisation.prototype.drawDot = function(container, color, style, left, top)
         tooltip.appendChild(author);
         tooltip.appendChild(date);
         tooltip.appendChild(subject);
+        LOGGER_.logDebug("Visualisation.drawDot()", {"action" : "create tooltip end"});
     }
     else
     {
+        LOGGER_.logDebug("Visualisation.drawDot()", {"action" : "create missing tooltip start"});
         // otherwise we display info about missing message
         var desc1 = document.createElementNS(XUL_NAMESPACE_, "description");
         var desc2 = document.createElementNS(XUL_NAMESPACE_, "description");
@@ -263,6 +270,7 @@ Visualisation.prototype.drawDot = function(container, color, style, left, top)
         desc2.setAttribute("value", this.strings_.getString("tooltip.missingmessagedetail"));
         tooltip.appendChild(desc1);
         tooltip.appendChild(desc2);
+        LOGGER_.logDebug("Visualisation.drawDot()", {"action" : "create missing tooltip end"});
     }
 
     dot.setAttribute("tooltip", "ThreadArcsJS_" + left);
@@ -279,7 +287,7 @@ Visualisation.prototype.drawDot = function(container, color, style, left, top)
  */
 Visualisation.prototype.getResize = function(xcount, ycount,sizex, sizey)
 {
-    LOGGER_.logDebug("visualisation", {"action" : "getResize", "xcount" : xcount, "ycount" : ycount, "sizex" : sizex, "sizey" : sizey});
+    LOGGER_.logDebug("Visualisation.getResize()", {"action" : "start", "xcount" : xcount, "ycount" : ycount, "sizex" : sizex, "sizey" : sizey});
     var spaceperarcavailablex = sizex / (xcount - 1);
     var spaceperarcavailabley = sizey / 2;
     var spaceperarcneededx = this.dotsize_ + (2 * this.arc_width_);
@@ -297,7 +305,7 @@ Visualisation.prototype.getResize = function(xcount, ycount,sizex, sizey)
     if (resize > 1)
         resize = 1;
     
-    LOGGER_.logDebug("visualisation", {"action" : "getResize", "resize" : resize});
+    LOGGER_.logDebug("Visualisation.getResize()", {"action" : "end", "resize" : resize});
     return resize;
 }
 
@@ -308,6 +316,7 @@ Visualisation.prototype.getResize = function(xcount, ycount,sizex, sizey)
  */
 Visualisation.prototype.onMouseClick = function(event)
 {
+    LOGGER_.logDebug("Visualisation.onMouseClick()", {});
     var container = event.target.container;
     if (container && ! container.isDummy())
         THREADARCS_.callback(container.getMessage().getKey(), container.getMessage().getFolder());
@@ -321,7 +330,7 @@ Visualisation.prototype.onMouseClick = function(event)
  */
 Visualisation.prototype.timeScaling = function(containers, minimaltimedifference, width)
 {
-    LOGGER_.logDebug("visualisation", {"action" : "timeScaling", "containers" : containers.toString(), "minimaltimedifference" : minimaltimedifference, "width" : width});
+    LOGGER_.logDebug("Visualisation.timeScaling()", {"action" : "start", "containers" : containers.toString(), "minimaltimedifference" : minimaltimedifference, "width" : width});
     // if we do not want to do timescaling, reset all scaling info to 1
     if (! this.pref_timescaling_)
     {
@@ -352,7 +361,7 @@ Visualisation.prototype.timeScaling = function(containers, minimaltimedifference
     // with the minimal horizontal spacing
     var max_count_x = width / (this.dotsize_ + (2 * this.arc_width_));
     
-    LOGGER_.logDebug("visualisation", {"action" : "timeScaling", "total_time_scale" : total_time_scale, "max_count_x" : max_count_x});
+    LOGGER_.logDebug("Visualisation.timeScaling()", {"action" : "first pass done", "total_time_scale" : total_time_scale, "max_count_x" : max_count_x});
     
     // if the time scaling factor is bigger than what we can display, we have a problem
     // this means, we have to scale the timing factor down
@@ -376,7 +385,7 @@ Visualisation.prototype.timeScaling = function(containers, minimaltimedifference
             break;
     }
     
-    LOGGER_.logDebug("visualisation", {"action" : "timeScaling", "total_time_scale" : total_time_scale});
+    LOGGER_.logDebug("Visualisation.timeScaling()", {"action" : "second pass done", "total_time_scale" : total_time_scale});
     
     return containers;
 }
@@ -387,7 +396,7 @@ Visualisation.prototype.timeScaling = function(containers, minimaltimedifference
  */
 Visualisation.prototype.visualise = function(container)
 {
-    LOGGER_.logDebug("visualisation", {"action" : "visualise", "container" : container.toString()});
+    LOGGER_.logDebug("Visualisation.visualise()", {"action" : "start", "container" : container.toString()});
     // clear visualisation
     this.clearStack();
 

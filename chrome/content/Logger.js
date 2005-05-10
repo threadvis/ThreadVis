@@ -60,7 +60,7 @@ function Logger()
  */
 Logger.prototype.doLogging = function()
 {
-    return this.logging_;
+    return this.pref_enablelogging_;
 }
 
 

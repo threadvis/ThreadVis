@@ -109,6 +109,7 @@ ThreadArcs.prototype.addMessages = function()
  */
 ThreadArcs.prototype.addMessagesFromFolder = function(folder)
 {
+    LOGGER_.logDebug("ThreadArcs.addMessagesFromFolder()", {"folder" : folder.URI});
     // get messages from current folder
     var msg_enumerator = folder.getMessages(null);
     var header = null;
@@ -137,6 +138,7 @@ ThreadArcs.prototype.addMessagesFromFolder = function(folder)
  */
 ThreadArcs.prototype.addMessagesFromSubFolders = function(folder)
 {
+    LOGGER_.logDebug("ThreadArcs.addMessagesFromSubFolders()", {"folder" : folder.URI});
     var folder_enumerator = folder.GetSubFolders();
     var current_folder = null;
     while (true)
@@ -154,7 +156,7 @@ ThreadArcs.prototype.addMessagesFromSubFolders = function(folder)
             this.addMessagesFromFolder(current_folder);
         
         if (current_folder.hasSubFolders)
-            this.addMessagesFromSubFolders(current_folder);    
+            this.addMessagesFromSubFolders(current_folder);
         
         try
         {
@@ -196,6 +198,7 @@ ThreadArcs.prototype.callback = function(msgKey, folder)
  */
 ThreadArcs.prototype.clearVisualisation = function()
 {
+    LOGGER_.logDebug("ThreadArcs.clearVisualisation()", {});
     if (this.clear_)
         return;
     
@@ -209,6 +212,7 @@ ThreadArcs.prototype.clearVisualisation = function()
  */
 ThreadArcs.prototype.doThreading = function()
 {
+    LOGGER_.logDebug("ThreadArcs.doThreading()", {});
     if (! this.threading_ && ! this.threaded_)
     {
         this.threading_ = true;
@@ -236,6 +240,7 @@ ThreadArcs.prototype.doThreading = function()
  */
 ThreadArcs.prototype.initMessages = function()
 {
+    LOGGER_.logDebug("ThreadArcs.initMessages()", {});
     if (! this.loaded_ && ! this.loading_)
     {
         this.loading_ = true;
@@ -251,6 +256,7 @@ ThreadArcs.prototype.initMessages = function()
  */
 ThreadArcs.prototype.setSelectedMessage = function()
 {
+    LOGGER_.logDebug("ThreadArcs.setSelectedMessage()", {});
     if (! this.loaded_ || ! this.threaded_)
     {
         var ref = this;
@@ -291,10 +297,11 @@ ThreadArcs.prototype.unloadHandler = function()
 
 
 /**
- * clear visualisation
+ * Visualise a container
  */
 ThreadArcs.prototype.visualise = function(container)
 {
+    LOGGER_.logDebug("ThreadArcs.visualise()", {"container" : container.toString()});
     var msgkey = container.isDummy() ? "DUMMY" : container.getMessage().getKey();
     var topcontainer_msgKey = container.getTopContainer().isDummy() ? "DUMMY" : container.getTopContainer().getMessage().getKey();
     var msgcount = container.getTopContainer().getCountRecursive();
@@ -309,6 +316,7 @@ ThreadArcs.prototype.visualise = function(container)
  */
 ThreadArcs.prototype.waitForThreading = function()
 {
+    LOGGER_.logDebug("ThreadArcs.waitForThreading()", {});
     if (this.loaded_ && ! this.threaded_ && ! this.threading_)
     {
         var ref = this;

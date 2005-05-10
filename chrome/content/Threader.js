@@ -16,6 +16,7 @@
  */
 function Threader()
 {
+    LOGGER_.logDebug("Threader()", {});
     /**
      * Link message ids to container objects
      */
@@ -73,6 +74,7 @@ function Threader()
  */
 Threader.prototype.addMessage = function(message)
 {
+    LOGGER_.logDebug("Threader.addMessage()", {"message" : message.toString()});
     this.messages_.push(message);
 }
 
@@ -92,6 +94,7 @@ Threader.prototype.addMessageDetail = function(subject, author, messageId, messa
  */
 Threader.prototype.findContainer = function(message_id)
 {
+    LOGGER_.logDebug("Threader.findContainer()", {"message_id" : message_id, "return" : this.id_table_[message_id].toString()});
     return this.id_table_[message_id];
 }
 
@@ -101,6 +104,7 @@ Threader.prototype.findContainer = function(message_id)
  */
 Threader.prototype.getRoot = function()
 {
+    LOGGER_.logDebug("Threader.getRoot()", {});
     return this.root_set_;
 }
 
@@ -110,6 +114,7 @@ Threader.prototype.do1 = function()
     if (! this.doing_1_ && ! this.done_1_)
     {
         this.doing_1_ = true;
+        LOGGER_.logDebug("Threader.do1()", {"action" : "start"});
         this.start_1_ = (new Date()).getTime();
         var ref = this;
         setTimeout(function(){ref.do11();}, 10);
@@ -117,6 +122,7 @@ Threader.prototype.do1 = function()
     if (this.done_1_)
     {
         this.end_1_ = (new Date()).getTime();
+        LOGGER_.logDebug("Threader.do1()", {"action" : "end"});
         return;
     }
     var ref = this;
@@ -231,6 +237,7 @@ Threader.prototype.do2 = function()
     if (! this.doing_2_ && ! this.done_2_ && this.done_1_)
     {
         this.doing_2_ = true;
+        LOGGER_.logDebug("Threader.do2()", {"action" : "start"});
         this.start_2_ = (new Date()).getTime();
         var ref = this;
         setTimeout(function(){ref.do21();}, 10);
@@ -238,6 +245,7 @@ Threader.prototype.do2 = function()
     if (this.done_2_)
     {
         this.end_2_ = (new Date()).getTime();
+        LOGGER_.logDebug("Threader.do2()", {"action" : "end"});
         return;
     }
     var ref = this;
@@ -277,6 +285,7 @@ Threader.prototype.do4 = function()
     if (! this.doing_4_ && ! this.done_4_ && this.done_2_)
     {
         this.doing_4_ = true;
+        LOGGER_.logDebug("Threader.do4()", {"action" : "start"});
         this.start_4_ = (new Date()).getTime();
         var ref = this;
         setTimeout(function(){ref.do41();}, 10);
@@ -284,6 +293,7 @@ Threader.prototype.do4 = function()
     if (this.done_4_)
     {
         this.end_4_ = (new Date()).getTime();
+        LOGGER_.logDebug("Threader.do4()", {"action" : "end"});
         return;
     }
     var ref = this;
@@ -368,6 +378,7 @@ Threader.prototype.do5b = function()
     if (! this.doing_5b_ && ! this.done_5b_ && this.done_4_)
     {
         this.doing_5b_ = true;
+        LOGGER_.logDebug("Threader.do5b()", {"action" : "start"});
         this.start_5b_ = (new Date()).getTime();
         var ref = this;
         setTimeout(function(){ref.do5b1();}, 10);
@@ -375,6 +386,7 @@ Threader.prototype.do5b = function()
     if (this.done_5b_)
     {
         this.end_5b_ = (new Date()).getTime();
+        LOGGER_.logDebug("Threader.do5b()", {"action" : "end"});
         return;
     }
     var ref = this;
@@ -426,6 +438,7 @@ Threader.prototype.do5c = function()
     if (! this.doing_5c_ && ! this.done_5c_ && this.done_5b_)
     {
         this.doing_5c_ = true;
+        LOGGER_.logDebug("Threader.do5c()", {"action" : "start"});
         this.start_5c_ = (new Date()).getTime();
         var ref = this;
         setTimeout(function(){ref.do5c1();}, 10);
@@ -434,6 +447,7 @@ Threader.prototype.do5c = function()
     {
         this.end_5c_ = (new Date()).getTime();
         this.end_ = (new Date()).getTime();
+        LOGGER_.logDebug("Threader.do5c()", {"action" : "end"});
         var ref = this;
         setTimeout(function(){ref.logInfo();}, 10);
         return;
@@ -653,6 +667,7 @@ Threader.prototype.toString = function()
  */
 Threader.prototype.visualise = function(message_id)
 {
+    LOGGER_.logDebug("Threader.visualise()", {"message-id" : message_id});
     var container = this.findContainer(message_id);
     if (container != null)
     {
@@ -708,6 +723,7 @@ Threader.prototype.logInfo = function()
 
 Threader.prototype.getThreadDistribution = function()
 {
+    LOGGER_.logDebug("Threader.getThreadDistribution()", {});
     var distribution = new Array();
     var container = null;
     for (container = this.root_set_.getChild(); container != null; container = container.getNext())
