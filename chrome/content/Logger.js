@@ -14,7 +14,7 @@ var LOGGER_LOGFILENAME_ = "threadarcsjs.log.xml";
 var THREADARCSJS_PREF_BRANCH_ = "extensions.threadarcsjs.";
 var LOGGER_PREF_DOLOGGING_ = "logging.enabled";
 var LOGGER_PREF_DOLOGGING_DEBUG_ = "logging.debug";
-var LOGGER_STARTTAG_ = '\n<log extensionversion="0.2.1">';
+var LOGGER_STARTTAG_ = '\n<log extensionversion="0.2.2">';
 var LOGGER_ENDTAG_ = "\n</log>";
 
 

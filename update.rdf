@@ -20,7 +20,7 @@
             <RDF:Seq>
                 <RDF:li>
                     <RDF:Description>
-                        <em:version>0.2.1</em:version>
+                        <em:version>0.2.2</em:version>
                         <em:targetApplication>
                             <Description>
                                 <em:id>{3550f703-e582-4d05-9a08-453d09bdfdc6}</em:id>
@@ -41,7 +41,7 @@
                 </RDF:li>
             </RDF:Seq>
         </em:updates>
-        <em:version>0.2.1</em:version>
+        <em:version>0.2.2</em:version>
         <em:updateLink>http://www.sbox.tugraz.at/home/x/xpert/threadarcs/ThreadArcsJS.xpi</em:updateLink>
     </RDF:Description>
 
