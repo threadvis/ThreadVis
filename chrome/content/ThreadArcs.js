@@ -301,7 +301,7 @@ ThreadArcs.prototype.unloadHandler = function()
  */
 ThreadArcs.prototype.visualise = function(container)
 {
-    LOGGER_.logDebug("ThreadArcs.visualise()", {"container" : container.toString()});
+    LOGGER_.logDebug("ThreadArcs.visualise()", {"container" : container});
     var msgkey = container.isDummy() ? "DUMMY" : container.getMessage().getKey();
     var topcontainer_msgKey = container.getTopContainer().isDummy() ? "DUMMY" : container.getTopContainer().getMessage().getKey();
     var msgcount = container.getTopContainer().getCountRecursive();

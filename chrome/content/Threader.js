@@ -74,7 +74,7 @@ function Threader()
  */
 Threader.prototype.addMessage = function(message)
 {
-    LOGGER_.logDebug("Threader.addMessage()", {"message" : message.toString()});
+    LOGGER_.logDebug("Threader.addMessage()", {"message" : message});
     this.messages_.push(message);
 }
 
@@ -94,7 +94,7 @@ Threader.prototype.addMessageDetail = function(subject, author, messageId, messa
  */
 Threader.prototype.findContainer = function(message_id)
 {
-    LOGGER_.logDebug("Threader.findContainer()", {"message_id" : message_id, "return" : this.id_table_[message_id].toString()});
+    LOGGER_.logDebug("Threader.findContainer()", {"message_id" : message_id, "return" : this.id_table_[message_id]});
     return this.id_table_[message_id];
 }
 
@@ -139,10 +139,12 @@ Threader.prototype.do11 = function()
     this.doing_11_ = true;
     
     var key = null;
+    LOGGER_.logDebug("Threader.do11()", {"action" : "loop over all messages"});
     for (key in this.messages_)
     {
         var message = this.messages_[key];
-
+        LOGGER_.logDebug("Threader.do11()", {"looking at" : message});
+        
         // try to get message container
         var message_container = this.id_table_[message.getId()];
 
@@ -152,6 +154,7 @@ Threader.prototype.do11 = function()
             {
                 // 1.A. id_table contains empty container for this message
                 // store message in this container
+                LOGGER_.logDebug("Threader.do11()", {"action" : "found dummy container with message id"});
                 message_container.setMessage(message);
                 // index container in hashtable
                 this.id_table_[message.getId()] = message_container;
@@ -164,6 +167,7 @@ Threader.prototype.do11 = function()
 
         if (message_container == null)
         {
+            LOGGER_.logDebug("Threader.do11()", {"action" : "no container found, create new one"});
             // no suitable container found, create new one
             message_container = new Container();
             message_container.setMessage(message);
@@ -171,6 +175,7 @@ Threader.prototype.do11 = function()
             this.id_table_[message.getId()] = message_container;
         }
 
+        LOGGER_.logDebug("Threader.do11()", {"action" : "loop over references"});
         // for each element in references field of message
         var parent_reference_container = null;
         var references = message.getReferences().getReferences();
@@ -178,10 +183,12 @@ Threader.prototype.do11 = function()
         {
             var reference_id = references[referencekey];
 
+            LOGGER_.logDebug("Threader.do11()", {"reference" : reference_id});
             // try to find container for referenced message
             var reference_container = this.id_table_[reference_id];
             if (reference_container == null)
             {
+                LOGGER_.logDebug("Threader.do11()", {"action" : "no container found, create new one"});
                 // no container found, create new one
                 reference_container = new Container();
                 // index container
@@ -189,12 +196,13 @@ Threader.prototype.do11 = function()
             }
 
             // 1.B. link reference container together
-
+            LOGGER_.logDebug("Threader.do11()", {"action" : "link references together"});
             if (parent_reference_container != null &&                           // if we have a parent container
                 ! reference_container.hasParent() &&                            // and current container does not have a parent
                 parent_reference_container != reference_container &&            // and we are not looking at the same container
                 ! parent_reference_container.findChild(reference_container))      // see if we are already a child of parent
             {
+                LOGGER_.logDebug("Threader.do11()", {"action" : "add us to parent reference container"});
                 parent_reference_container.addChild(reference_container);
             }
             parent_reference_container = reference_container;
@@ -208,6 +216,7 @@ Threader.prototype.do11 = function()
             (parent_reference_container == message_container ||
             message_container.findChild(parent_reference_container)))
         {
+            LOGGER_.logDebug("Threader.do11()", {"action" : "set parent reference container to null"});
             parent_reference_container = null;
         }
 
@@ -215,6 +224,7 @@ Threader.prototype.do11 = function()
         if (message_container.hasParent() && parent_reference_container != null)
         {
             // remove us from this parent
+            LOGGER_.logDebug("Threader.do11()", {"action" : "remove us from parent"});
             message_container.getParent().removeChild(message_container);
         }
 
@@ -222,6 +232,7 @@ Threader.prototype.do11 = function()
         if (parent_reference_container != null)
         {
             // add us as child
+            LOGGER_.logDebug("Threader.do11()", {"action" : "add us as child to parent reference container"});
             parent_reference_container.addChild(message_container);
         }
     }
@@ -263,6 +274,7 @@ Threader.prototype.do21 = function()
     this.doing_21_ = true;
 
     var rootkey = null;
+    LOGGER_.logDebug("Threader.do21()", {"action" : "find root set"});
     for (rootkey in this.id_table_)
     {
         var container = this.id_table_[rootkey];
@@ -310,13 +322,15 @@ Threader.prototype.do41 = function()
     
     this.doing_41_ = true;
 
+    LOGGER_.logDebug("Threader.do41()", {"action" : "loop over root set"});
     var container = null;
     for (container = this.root_set_.getChild(); container != null; container = container.getNext())
     {
-
+        LOGGER_.logDebug("Threader.do41()", {"container" : container});
         // if container is empty and has no children
         if (container.isDummy() && ! container.hasChild())
         {
+            LOGGER_.logDebug("Threader.do41()", {"action" : "container does not belong to root set"});
             // remove from root_set_
             if (container.hasPrevious())
                 container.getPrevious().setNext(container.getNext());
@@ -403,9 +417,11 @@ Threader.prototype.do5b1 = function()
     
     this.doing_5b1_ = true;
 
+    LOGGER_.logDebug("Threader.do5b1()", {"action" : "loop over root set"});
     var container = null;
     for (container = this.root_set_.getChild(); container != null; container = container.getNext())
     {
+        LOGGER_.logDebug("Threader.do5b1()", {"container" : container});
         // 5.B. find subject of subtree
         var subject = "";
         subject = container.getSimplifiedSubject();
@@ -423,6 +439,7 @@ Threader.prototype.do5b1 = function()
            (subject_container.isDummy() && ! container.isDummy()) ||           // if found one is empty, but this one is not OR
            (subject_container.getReplyCount() > container.getReplyCount()))    // if current is less reply than subject container
         {
+            LOGGER_.logDebug("Threader.do5b1()", {"action" : "putting container in subject table"});
             this.subject_table_[subject] = container;
         }
     }
@@ -465,9 +482,11 @@ Threader.prototype.do5c1 = function()
     
     this.doing_5c1_ = true;
     
+    LOGGER_.logDebug("Threader.do5c1()", {"action" : "loop over root set"});
     var container = null;
     for (container = this.root_set_.getChild(); container != null; container = container.getNext())
     {
+        LOGGER_.logDebug("Threader.do5c1()", {"container" : container});
         // get subject of this container
         var subject = "";
         subject = container.getSimplifiedSubject();
@@ -477,29 +496,34 @@ Threader.prototype.do5c1 = function()
         if (subject_container == null || subject_container == container)
         {
             // if no container found, or found ourselfs
+            LOGGER_.logDebug("Threader.do5c1()", {"action" : "no container in subject table or found ourselves"});
             continue;
         }
         // if both containers are dummies
         if (container.isDummy() && subject_container.isDummy())
         {
             // append children of subject_container to container
+            LOGGER_.logDebug("Threader.do5c1()", {"action" : "both dummies"});
             container.addChild(subject_container.getChild());
         }
         // if container is dummy, subject container no dummy
         else if (container.isDummy() && ! subject_container.isDummy())
         {
             // add non empty container as child of empty container
+            LOGGER_.logDebug("Threader.do5c1()", {"action" : "container dummy, subject_container not"});
             container.addChild(subject_container);
         }
         // if container is no dummy but subject container is dummy
         else if (! container.isDummy() && subject_container.isDummy())
         {
             // add non empty container as child of empty container
+            LOGGER_.logDebug("Threader.do5c1()", {"action" : "container not dummy, subject_container dummy"});
             subject_container.addChild(container);
         }
         // if containers are misordered, change order
         else if (! subject_container.isDummy() && subject_container.getReplyCount() < container.getReplyCount())
         {
+            LOGGER_.logDebug("Threader.do5c1()", {"action" : "misordered 1"});
             // calculate difference between the messages
             var difference = container.getReplyCount() - subject_container.getReplyCount();
             var top = subject_container;
@@ -547,6 +571,7 @@ Threader.prototype.do5c1 = function()
         // misordered again
         else if (! subject_container.isDummy() && subject_container.getReplyCount() > container.getReplyCount())
         {
+            LOGGER_.logDebug("Threader.do5c1()", {"action" : "misordered 2"});
             // calculate difference between the messages
             var difference = subject_container.getReplyCount() - container.getReplyCount();
             var top = container;

@@ -151,16 +151,16 @@ Logger.prototype.decodeDebug = function(object)
     for (var key in object)
     {
         logtext += '<info key="' + key + '">';
-        if (typeof(object[key]) == "object")
-        {
-            logtext += this.decodeDebug(object[key]);
-        }
-        else
-        {
+        //if (typeof(object[key]) == "object")
+        //{
+        //    logtext += this.decodeDebug(object[key]);
+        //}
+        //else
+        //{
             logtext += "<![CDATA[";
             logtext += object[key];
             logtext += "]]>";
-        }
+        //}
         logtext += "</info>";
     }
     return logtext;
