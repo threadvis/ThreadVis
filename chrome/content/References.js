@@ -31,14 +31,15 @@ References.prototype.buildReferences = function(references)
 {
     if (references != null && references != "")
     {
-        var splitted = references.split(" ");
-        var reference = null;
+        var splitted = references.split(/\s/);
         for (key in splitted)
         {
-            reference = splitted[key];
+            var reference = splitted[key];
             reference = reference.replace(/\s/g, "");
             reference = reference.replace(/</, "");
             reference = reference.replace(/>/, "");
+            if (reference == "")
+                continue;
             this.references_.push(reference);
         }
     }
