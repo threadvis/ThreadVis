@@ -36,6 +36,7 @@ References.prototype.buildReferences = function(references)
         for (key in splitted)
         {
             reference = splitted[key];
+            reference = reference.replace(/\s/g, "");
             reference = reference.replace(/</, "");
             reference = reference.replace(/>/, "");
             this.references_.push(reference);
@@ -62,7 +63,7 @@ References.prototype.toString = function()
     var string = "";
     for (referenceskey in this.references_)
     {
-        string += this.references_[referenceskey];
+        string += ", " + this.references_[referenceskey];
     }
     return string;
 }
