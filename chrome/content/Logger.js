@@ -40,8 +40,6 @@ function Logger()
         this.file_.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
 
     this.file_.append(LOGGER_LOGFILENAME_);
-    if (! this.file_.exists())
-        this.file_.create(Components.interfaces.nsIFile.NORMAL_FILE_TYPE, 0644);
 
     this.ready_ = false;
     if (this.pref_enablelogging_)
@@ -173,6 +171,10 @@ Logger.prototype.decodeDebug = function(object)
 Logger.prototype.open = function()
 {
     this.ready_ = false;
+
+    if (! this.file_.exists())
+        this.file_.create(Components.interfaces.nsIFile.NORMAL_FILE_TYPE, 0644);
+
     if (this.file_.exists())
     {
         this.file_output_stream_ = Components.classes["@mozilla.org/network/file-output-stream;1"].createInstance(Components.interfaces.nsIFileOutputStream);
