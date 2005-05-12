@@ -12,11 +12,12 @@
  ********************************************************/
 -->
 
+<!DOCTYPE overlay SYSTEM "chrome://threadarcsjs/locale/MozillaMenuOverlay.dtd">
 <overlay id="MozillaMenuOverlay"
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
     <menupopup id="taskPopup">
-        <menuitem label="Thread Arcs Visualisation..." accesskey="T" id="ThreadArcsMenu" 
+        <menuitem label="&menu.caption;" accesskey="&menu.accesskey;" id="ThreadArcsMenu" 
             oncommand="window.openDialog('chrome://threadarcsjs/content/Settings.xul','Thread Arcs Visualisation Settings','centerscreen, chrome, modal').focus();" />
         <menuseparator />
     </menupopup>

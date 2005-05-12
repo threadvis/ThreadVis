@@ -84,8 +84,12 @@ content\images\8x8\dot_grey_full.png
 content\images\8x8\dot_grey_half.png
 content\images\8x8\dot_grey_dummy.png
 locale\en-US\contents.rdf
+locale\en-US\MozillaMenuOverlay.dtd
 locale\en-US\Settings.dtd
+locale\en-US\ThreadArcs.dtd
 locale\en-US\ThreadArcs.properties
 locale\de-DE\contents.rdf
+locale\de-DE\MozillaMenuOverlay.dtd
 locale\de-DE\Settings.dtd
+locale\de-DE\ThreadArcs.dtd
 locale\de-DE\ThreadArcs.properties

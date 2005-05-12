@@ -275,7 +275,8 @@ Visualisation.prototype.drawDot = function(container, color, style, left, top)
 
     dot.setAttribute("tooltip", "ThreadArcsJS_" + left);
     this.stack_.appendChild(dot);
-    this.stack_.appendChild(tooltip);
+    //this.stack_.appendChild(tooltip);
+    this.box_.appendChild(tooltip);
     dot.addEventListener("click", this.onMouseClick, true);
 }
 

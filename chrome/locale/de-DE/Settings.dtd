@@ -9,7 +9,7 @@
  * Version: $Id$
  ********************************************************/
 -->
-<!ENTITY settings.title                                     "Thread Arcs Visualisation - Einstellungen">
+<!ENTITY settings.title                                     "Thread Arcs Visualisierung - Einstellungen">
 <!ENTITY logfiles.tab                                       "Log-Dateien">
 <!ENTITY logfiles.caption                                   "Logging aktivieren">
 <!ENTITY logfiles.description.restart                       "Um das Logging zu aktivieren oder zu deaktivieren, m&#xFC;ssen Sie das Programm neu starten.">
