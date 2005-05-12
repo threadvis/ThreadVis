@@ -694,25 +694,6 @@ Threader.prototype.toString = function()
 
 
 /**
- * visualise a message
- */
-Threader.prototype.visualise = function(message_id)
-{
-    LOGGER_.logDebug("Threader.visualise()", {"message-id" : message_id});
-    var container = this.findContainer(message_id);
-    if (container != null)
-    {
-        THREADARCS_.visualise(container);
-    }
-    else
-    {
-        THREADARCS_.clearVisualisation();
-    }
-    container = null;
-}
-
-
-/**
  * Test Method
  */
 Threader.prototype.test = function()

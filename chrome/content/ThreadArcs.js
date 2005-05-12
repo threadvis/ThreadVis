@@ -15,8 +15,8 @@ var XUL_NAMESPACE_ =
     "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
 var THREADARCS_ = null;
-
 var LOGGER_ = null;
+var THREADARCS_PARENT_ = null;
 
 // add visualisation at startup
 addEventListener("load", createThreadArcs, false);
@@ -27,13 +27,55 @@ addEventListener("load", createThreadArcs, false);
  */
 function createThreadArcs()
 {
-    if (LOGGER_ == null)
+    // check for any opener and logger in that opener
+    var logger = checkForLogger(window.opener);
+    if (logger)
+        LOGGER_ = logger;
+    else if (LOGGER_ == null)
         LOGGER_ = new Logger();
 
+    THREADARCS_PARENT_ = checkForThreadArcs(window.opener);
     if (THREADARCS_ == null)
         THREADARCS_ = new ThreadArcs();
 }
 
+
+/**
+ * Check all openers for loggers
+ */
+function checkForLogger(win)
+{
+    if (! win)
+        return null;
+
+    if (win.LOGGER_)
+        return win.LOGGER_;
+    if (win.opener)
+        return checkForLogger(win.opener);
+    
+    return null;
+}
+
+
+/**
+ * Check all openers for threadarcs
+ */
+function checkForThreadArcs(win)
+{
+    if (! win)
+        return null;
+
+    if (win.THREADARCS_)
+        return win.THREADARCS_;
+
+    if (win.THREADARCS_PARENT_)
+        return win.THREADARCS_PARENT_;
+
+    if (win.opener)
+        return checkForThreadArcs(win.opener);
+
+    return null;
+}
 
 
 /**
@@ -42,14 +84,6 @@ function createThreadArcs()
 function ThreadArcs()
 {
     LOGGER_.log("threadarcs", {"action": "startup"});
-    // visualisation object
-    this.visualisation_ = new Visualisation();
-
-    // threader object
-    this.threader_= new Threader();
-
-    // store server to react to server switch
-    this.server_ = null;
 
     // synchronization variables
     this.loaded_ = false;
@@ -57,7 +91,24 @@ function ThreadArcs()
     this.threaded_ = false;
     this.threading_ = false;
     this.clear_ = false;
-    
+
+    // store server to react to server switch
+    this.server_ = null;
+
+    // visualisation object
+    this.visualisation_ = new Visualisation();
+
+    // threader object
+    if (THREADARCS_PARENT_)
+    {
+        this.threader_ = THREADARCS_PARENT_.threader_;
+        this.loaded_ = THREADARCS_PARENT_.loaded_;
+        this.threaded_ = THREADARCS_PARENT_.threaded_;
+        this.server_ = THREADARCS_PARENT_.server_;
+    }
+    else
+        this.threader_= new Threader();
+
     // add messages when we display first header
     // register this as event handler later
     var ref = this;
@@ -271,8 +322,7 @@ ThreadArcs.prototype.setSelectedMessage = function()
     var msg = messenger.messageServiceFromURI(msg_uri).messageURIToMsgHdr(msg_uri);
     
     LOGGER_.log("msgselect", {"from" : "user", "key" : msg.messageKey});
-    
-    if (this.server_ != msg.folder.server)
+    if (this.server_.key != msg.folder.server.key)
     {
         LOGGER_.log("switchaccount", {});
         // user just switched account
@@ -286,13 +336,34 @@ ThreadArcs.prototype.setSelectedMessage = function()
     // fixxme delay display
     // to give UI time to layout
     var ref = this;
-    setTimeout(function(){ref.threader_.visualise(msg.messageId);}, 100);
+    setTimeout(function(){ref.visualiseMsgId(msg.messageId);}, 100);
 }
 
 
 ThreadArcs.prototype.unloadHandler = function()
 {
     LOGGER_.close();
+}
+
+
+/**
+ * visualise a message id
+ * find the container
+ * call method visualise(container)
+ */
+ThreadArcs.prototype.visualiseMsgId = function(message_id)
+{
+    LOGGER_.logDebug("ThreadArcs.visualiseMsgId()", {"message-id" : message_id});
+    var container = this.threader_.findContainer(message_id);
+    if (container != null)
+    {
+        this.visualise(container);
+    }
+    else
+    {
+        this.clearVisualisation();
+    }
+    container = null;
 }
 
 
