@@ -8,6 +8,8 @@
  * Version: $Id$
  ********************************************************/
 
+var HEADER_PARSER_ = Components.classes["@mozilla.org/messenger/headerparser;1"].getService(Components.interfaces.nsIMsgHeaderParser);
+
 /**
  * Constructor
  */
@@ -101,6 +103,18 @@ Message.prototype.getFolder = function()
 Message.prototype.getFrom = function()
 {
     return this.from_;
+}
+
+
+/**
+ * Get sender-email of message
+ */
+Message.prototype.getFromEmail = function()
+{
+    // parse email address
+    var email = this.getFrom();
+    email = HEADER_PARSER_.extractHeaderAddressMailboxes(null, email);
+    return email;
 }
 
 
