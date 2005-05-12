@@ -145,6 +145,7 @@ ThreadArcs.prototype.addMessages = function()
     var root = folder.rootFolder;
     
     this.server_ = folder.server;
+    this.account_ = (Components.classes["@mozilla.org/messenger/account-manager;1"].getService(Components.interfaces.nsIMsgAccountManager)).FindAccountForServer(this.server_);
     this.addMessagesFromSubFolders(root);
     
     this.loaded_ = true;
@@ -175,10 +176,12 @@ ThreadArcs.prototype.addMessagesFromFolder = function(folder)
             // so divide by 1000 when converting
             date.setTime(header.date / 1000);
             
-            // see if msg is a sent mail
-            var issent = IsSpecialFolder(header.folder, MSG_FOLDER_FLAG_SENTMAIL, true);
+            var message = new Message(header.mime2DecodedSubject , header.mime2DecodedAuthor , header.messageId, header.messageKey, date, header.folder.URI , header.getStringProperty("references"), false);
             
-            this.threader_.addMessageDetail(header.mime2DecodedSubject , header.mime2DecodedAuthor , header.messageId, header.messageKey, date, header.folder.URI , header.getStringProperty("references"), issent);
+            // see if msg is a sent mail
+            var issent = IsSpecialFolder(header.folder, MSG_FOLDER_FLAG_SENTMAIL, true) || this.account_.defaultIdentity.email == message.getFromEmail();
+            message.setSent(issent);
+            this.threader_.addMessage(message);
         }
     }
 }

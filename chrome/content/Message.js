@@ -235,6 +235,15 @@ private String simplifySubject(String subject)
 
 
 /**
+ * Set if message is sent (i.e. in sent-mail folder)
+ */
+Message.prototype.setSent = function(sent)
+{
+    this.issent_ = sent;
+}
+
+
+/**
  * Return message as string
  */
 Message.prototype.toString = function()
