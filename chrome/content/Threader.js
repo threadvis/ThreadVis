@@ -150,7 +150,13 @@ Threader.prototype.do11 = function()
 
         if (message_container != null)
         {
-            if (message_container.isDummy())
+            // if we found a container for this message id, either it's a dummy
+            // or we have two mails with the same message-id
+            // this should only happen if we sent a mail to a list and got back our sent-mail
+            // in the inbox
+            // in that case we want that our sent-mail takes precedence over the other, since
+            // we want to display it as sent, and we only want to display it once
+            if (message_container.isDummy() || (! message_container.isDummy() && ! message_container.getMessage().isSent()))
             {
                 // 1.A. id_table contains empty container for this message
                 // store message in this container
