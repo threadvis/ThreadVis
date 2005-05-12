@@ -546,7 +546,7 @@ Visualisation.prototype.preferenceObserverRegister =  function()
 
 Visualisation.prototype.preferenceObserverUnregister = function()
 {
-    if(!this.branch_)
+    if(!this.pref_branch_)
         return;
 
     var pbi = this.pref_branch_.QueryInterface(Components.interfaces.nsIPrefBranchInternal);

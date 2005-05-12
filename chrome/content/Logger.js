@@ -25,12 +25,17 @@ var LOGGER_ENDTAG_ = "\n</log>";
  */
 function Logger()
 {
+    // init class variables
     this.pref_enablelogging_ = false;
-    this.preferenceReload();
+    this.pref_enablelogging_debug_ = false;
     this.strings_ = document.getElementById("ThreadArcsJSStrings");
 
+    this.preferenceObserverRegister();
+    this.preferenceReload();
+
+    // try to create file
     this.file_ = Components.classes["@mozilla.org/file/directory_service;1"].getService(Components.interfaces.nsIProperties).get("ProfD", Components.interfaces.nsIFile);
-    
+
     this.file_.append(LOGGER_EXTENSION_PATH_);
     if (! this.file_.exists())
         this.file_.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
@@ -42,6 +47,8 @@ function Logger()
     this.file_.append(LOGGER_LOGFILENAME_);
 
     this.ready_ = false;
+
+    // if logging is enabled, open file
     if (this.pref_enablelogging_)
     {
         this.open();
@@ -67,6 +74,8 @@ Logger.prototype.doLogging = function()
  */
 Logger.prototype.close = function()
 {
+    // if file is open, close it
+    // but write end tag to log first
     if (this.ready_)
     {
         this.ready_ = false;
@@ -149,16 +158,9 @@ Logger.prototype.decodeDebug = function(object)
     for (var key in object)
     {
         logtext += '<info key="' + key + '">';
-        //if (typeof(object[key]) == "object")
-        //{
-        //    logtext += this.decodeDebug(object[key]);
-        //}
-        //else
-        //{
-            logtext += "<![CDATA[";
-            logtext += object[key];
-            logtext += "]]>";
-        //}
+        logtext += "<![CDATA[";
+        logtext += object[key];
+        logtext += "]]>";
         logtext += "</info>";
     }
     return logtext;
@@ -205,7 +207,7 @@ Logger.prototype.reset = function(delete_file)
         alert(this.strings_.getString("logger.couldnotdeletefile"));
         alert(ex);
     }
-    
+
     if (this.pref_enablelogging_)
         this.open();
 }
@@ -213,7 +215,6 @@ Logger.prototype.reset = function(delete_file)
 
 Logger.prototype.preferenceReload = function()
 {
-    // check if preference is set to do timescaling
     var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
     this.pref_enablelogging_ = false;
     if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_) == prefs.PREF_BOOL)
@@ -222,3 +223,52 @@ Logger.prototype.preferenceReload = function()
     if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_DEBUG_) == prefs.PREF_BOOL)
         this.pref_enablelogging_debug_ = prefs.getBoolPref(THREADARCSJS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_DEBUG_);
 }
+
+
+
+/**
+ * Preference changing observer
+ */
+Logger.prototype.preferenceObserverRegister =  function()
+{
+    var prefService = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService);
+    this.pref_branch_ = prefService.getBranch(THREADARCSJS_PREF_BRANCH_);
+
+    var pbi = this.pref_branch_.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
+    pbi.addObserver("", this, false);
+}
+
+
+Logger.prototype.preferenceObserverUnregister = function()
+{
+    if(!this.pref_branch_)
+        return;
+
+    var pbi = this.pref_branch_.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
+    pbi.removeObserver("", this);
+}
+
+
+Logger.prototype.observe = function(subject, topic, data)
+{
+    if(topic != "nsPref:changed")
+        return;
+
+    // reload preferences
+    this.preferenceReload();
+
+    // if logging is enabled, but not ready:
+    // this means it was just enabled, so open logfile
+    if (this.pref_enablelogging_ && ! this.ready_)
+    {
+        this.open();
+    }
+
+    // if logging is disabled, but ready
+    // this means it was just disabled, so close logfile
+    if (!this.pref_enablelogging_ && this.ready_)
+    {
+        this.close();
+    }
+}
+
