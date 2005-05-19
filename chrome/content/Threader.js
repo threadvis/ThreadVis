@@ -1,4 +1,4 @@
-/* *******************************************************
+/** ****************************************************************************
  * Threader.js
  *
  * (c) 2005 Alexander C. Hubmann
@@ -8,12 +8,13 @@
  * Re-write from Java
  *
  * $Id$
- ********************************************************/
+ ******************************************************************************/
 
 
-/**
+
+/** ****************************************************************************
  * Constructor
- */
+ ******************************************************************************/
 function Threader()
 {
     LOGGER_.logDebug("Threader()", {});
@@ -35,73 +36,103 @@ function Threader()
     this.root_set_ = new Container(true);
 
 
-    this.done_1_ = false;
-    this.doing_1_ = false;
-    this.doing_11_ = false;
+    /**
+     * instance variables for methods
+     */
+    this.put_messages_in_container_done_ = false;
+    this.put_messages_in_container_top_doing_ = false;
+    this.put_messages_in_container_doing_ = false;
+    this.put_messages_in_container_increment_ = 100;
+    this.put_messages_in_container_counter_ = 0;
 
-    this.doing_2_ = false;
-    this.done_2_ = false;
-    this.doing_21_ = false;
+    this.find_rootset_top_doing_ = false;
+    this.find_rootset_done_ = false;
+    this.find_rootset_doing_ = false;
 
-    this.doing_4_ = false;
-    this.done_4_ = false;
+    this.prune_empty_containers_done_ = false;
+    this.prune_empty_containers_top_doing_ = false;
+    this.prune_empty_containers_doing_ = false;
 
     this.subject_table_ = null;
-    this.doing_5b_ = false;
-    this.done_5b_ = false;
 
-    this.doing_5c_ = false;
-    this.done_5c_ = false;
-    
+    this.put_containers_in_subject_table_done_ = false;
+    this.put_containers_in_subject_table_top_doing_ = false;
+    this.put_containers_in_subject_table_doing_ = false;
+
+    this.group_by_subject_done_ = false;
+    this.group_by_subject_top_doing_ = false;
+    this.group_by_subject_doing_ = false;
+
     this.start_ = null;
     this.end_ = null;
-    this.start_1_ = null;
-    this.end_1_ = null;
-    this.start_2_ = null;
-    this.end_2_ = null;
-    this.start_4_ = null;
-    this.end_4_ = null;
-    this.start_5b_ = null;
-    this.end_5b_ = null;
-    this.start_5c_ = null;
-    this.end_5c_ = null;
+    this.put_messages_in_container_start_ = null;
+    this.put_messages_in_container_end_ = null;
+    this.find_rootset_start_ = null;
+    this.find_rootset_end_ = null;
+    this.prune_empty_containers_start_ = null;
+    this.prune_empty_containers_end_ = null;
+    this.put_containers_in_subject_table_start_ = null;
+    this.put_containers_in_subject_table_end_ = null;
+    this.group_by_subject_start_ = null;
+    this.group_by_subject_end_ = null;
 }
 
 
-/**
+
+/** ****************************************************************************
  * Add a new message
  * @param message The new Message to add
- */
+ ******************************************************************************/
 Threader.prototype.addMessage = function(message)
 {
-    LOGGER_.logDebug("Threader.addMessage()", {"message" : message});
+    LOGGER_.logDebug("Threader.addMessage()",
+                        {"message" : message});
     this.messages_.push(message);
 }
 
 
-/**
+
+/** ****************************************************************************
  * Add a new message
  * construct message here
- */
-Threader.prototype.addMessageDetail = function(subject, author, messageId, messageKey, date, uri, references, issent)
+ ******************************************************************************/
+Threader.prototype.addMessageDetail = function(subject,
+                                               author,
+                                               messageId,
+                                               messageKey,
+                                               date,
+                                               uri,
+                                               references,
+                                               issent)
 {
-    this.addMessage(new Message(subject, author, messageId, messageKey, date, uri, references, issent));
+    this.addMessage(new Message(subject,
+                                author,
+                                messageId,
+                                messageKey,
+                                date,
+                                uri,
+                                references,
+                                issent));
 }
 
 
-/**
+
+/** ****************************************************************************
  * Find a message
- */
+ ******************************************************************************/
 Threader.prototype.findContainer = function(message_id)
 {
-    LOGGER_.logDebug("Threader.findContainer()", {"message_id" : message_id, "return" : this.id_table_[message_id]});
+    LOGGER_.logDebug("Threader.findContainer()",
+                        {"message_id" : message_id,
+                         "return" : this.id_table_[message_id]});
     return this.id_table_[message_id];
 }
 
 
-/**
+
+/** ****************************************************************************
  * Get root container
- */
+ ******************************************************************************/
 Threader.prototype.getRoot = function()
 {
     LOGGER_.logDebug("Threader.getRoot()", {});
@@ -109,178 +140,252 @@ Threader.prototype.getRoot = function()
 }
 
 
-Threader.prototype.do1 = function()
+
+/** ***************************************************************************
+ * top method to add all messages to a container
+ ******************************************************************************/
+Threader.prototype.topPutMessagesInContainer = function()
 {
-    if (! this.doing_1_ && ! this.done_1_)
+    if (! this.put_messages_in_container_top_doing_ &&
+        ! this.put_messages_in_container_done_)
     {
-        this.doing_1_ = true;
-        LOGGER_.logDebug("Threader.do1()", {"action" : "start"});
-        this.start_1_ = (new Date()).getTime();
+        this.put_messages_in_container_top_doing_ = true;
+        this.put_messages_in_container_counter_ = 0;
+        LOGGER_.logDebug("Threader.topPutMessagesInContainer()",
+                            {"action" : "start"});
+        this.put_messages_in_container_start_ = (new Date()).getTime();
         var ref = this;
-        setTimeout(function(){ref.do11();}, 10);
+        setTimeout(function(){ref.putMessagesInContainer();}, 10);
     }
-    if (this.done_1_)
+    if (this.put_messages_in_container_done_)
     {
-        this.end_1_ = (new Date()).getTime();
-        LOGGER_.logDebug("Threader.do1()", {"action" : "end"});
+        this.put_messages_in_container_end_ = (new Date()).getTime();
+        LOGGER_.logDebug("Threader.topPutMessagesInContainer()",
+                            {"action" : "end"});
         return;
     }
     var ref = this;
-    setTimeout(function(){ref.do1();}, 10);
+    setTimeout(function(){ref.topPutMessagesInContainer();}, 10);
 }
 
-Threader.prototype.do11 = function()
+
+
+/** ****************************************************************************
+ * put all messages in a container
+ * loop over all messages
+ * use setTimeout to give mozilla time
+ ******************************************************************************/
+Threader.prototype.putMessagesInContainer = function()
 {
-    if (this.doing_11_)
+    if (this.put_messages_in_container_doing_ &&
+        ! this.put_messages_in_container_done_)
     {
+        var ref = this;
+        setTimeout(function() { ref.putMessagesInContainer(); }, 10);
         return;
     }
-    
-    this.doing_11_ = true;
-    
-    var key = null;
-    LOGGER_.logDebug("Threader.do11()", {"action" : "loop over all messages"});
-    for (key in this.messages_)
+
+    this.put_messages_in_container_doing_ = true;
+
+    var counter = this.put_messages_in_container_counter_;
+    var maxcounter = counter + this.put_messages_in_container_increment_;
+
+    LOGGER_.logDebug("Threader.putMessagesInContainer()",
+                        {"action" : "loop over all messages",
+                         "startcounter" : counter,
+                         "endcounter" : maxcounter,
+                         "messages.length" : this.messages_.length});
+
+    for (counter;
+         counter < this.messages_.length && counter < maxcounter;
+         counter++)
     {
-        var message = this.messages_[key];
-        LOGGER_.logDebug("Threader.do11()", {"looking at" : message});
-        
-        // try to get message container
-        var message_container = this.id_table_[message.getId()];
+        var message = this.messages_[counter];
+        this.putMessageInContainer(message);
+    }
+    this.put_messages_in_container_counter_ = counter;
 
-        if (message_container != null)
-        {
-            // if we found a container for this message id, either it's a dummy
-            // or we have two mails with the same message-id
-            // this should only happen if we sent a mail to a list and got back our sent-mail
-            // in the inbox
-            // in that case we want that our sent-mail takes precedence over the other, since
-            // we want to display it as sent, and we only want to display it once
-            if (message_container.isDummy() || (! message_container.isDummy() && ! message_container.getMessage().isSent()))
-            {
-                // 1.A. id_table contains empty container for this message
-                // store message in this container
-                LOGGER_.logDebug("Threader.do11()", {"action" : "found dummy container with message id"});
-                message_container.setMessage(message);
-                // index container in hashtable
-                this.id_table_[message.getId()] = message_container;
-            }
-            else
-            {
-                message_container = null;
-            }
-        }
+    if (this.put_messages_in_container_counter_ == this.messages_.length)
+    {
+        this.put_messages_in_container_done_ = true;
+    }
+    else
+    {
+        var ref = this;
+        setTimeout(function() { ref.putMessagesInContainer(); }, 10);
+    }
+    this.put_messages_in_container_doing_ = false;
+}
 
-        if (message_container == null)
+
+
+/** ****************************************************************************
+ * put this message in a container
+ ******************************************************************************/
+Threader.prototype.putMessageInContainer = function(message)
+{
+    LOGGER_.logDebug("Threader.putMessageInContainer()",
+                        {"looking at" : message});
+
+    // try to get message container
+    var message_container = this.id_table_[message.getId()];
+
+    if (message_container != null)
+    {
+        // if we found a container for this message id, either it's a dummy
+        // or we have two mails with the same message-id
+        // this should only happen if we sent a mail to a list and got back
+        // our sent-mail in the inbox
+        // in that case we want that our sent-mail takes precedence over
+        // the other, since we want to display it as sent, and we only want
+        // to display it once
+        if (message_container.isDummy() ||
+           (! message_container.isDummy() &&
+            ! message_container.getMessage().isSent()))
         {
-            LOGGER_.logDebug("Threader.do11()", {"action" : "no container found, create new one"});
-            // no suitable container found, create new one
-            message_container = new Container();
+            // 1.A. id_table contains empty container for this message
+            // store message in this container
+            LOGGER_.logDebug("Threader.putMessageInContainer()",
+                                {"action" : "found dummy container with message id"});
             message_container.setMessage(message);
             // index container in hashtable
             this.id_table_[message.getId()] = message_container;
         }
-
-        LOGGER_.logDebug("Threader.do11()", {"action" : "loop over references"});
-        // for each element in references field of message
-        var parent_reference_container = null;
-        var references = message.getReferences().getReferences();
-        for (referencekey in references)
+        else
         {
-            var reference_id = references[referencekey];
-
-            LOGGER_.logDebug("Threader.do11()", {"reference" : reference_id});
-            // try to find container for referenced message
-            var reference_container = this.id_table_[reference_id];
-            if (reference_container == null)
-            {
-                LOGGER_.logDebug("Threader.do11()", {"action" : "no container found, create new one"});
-                // no container found, create new one
-                reference_container = new Container();
-                // index container
-                this.id_table_[reference_id] = reference_container;
-            }
-
-            // 1.B. link reference container together
-            LOGGER_.logDebug("Threader.do11()", {"action" : "link references together"});
-            if (parent_reference_container != null &&                           // if we have a parent container
-                ! reference_container.hasParent() &&                            // and current container does not have a parent
-                parent_reference_container != reference_container &&            // and we are not looking at the same container
-                ! parent_reference_container.findChild(reference_container))      // see if we are already a child of parent
-            {
-                LOGGER_.logDebug("Threader.do11()", {"action" : "add us to parent reference container"});
-                parent_reference_container.addChild(reference_container);
-            }
-            parent_reference_container = reference_container;
-        }
-
-        // set parent of current message to last element in references
-
-        // if we have a suitable parent container, and the parent container is the current container
-        // or the parent container is a child of the current container, discard it as parent
-        if (parent_reference_container != null &&
-            (parent_reference_container == message_container ||
-            message_container.findChild(parent_reference_container)))
-        {
-            LOGGER_.logDebug("Threader.do11()", {"action" : "set parent reference container to null"});
-            parent_reference_container = null;
-        }
-
-        // if current message already has a parent
-        if (message_container.hasParent() && parent_reference_container != null)
-        {
-            // remove us from this parent
-            LOGGER_.logDebug("Threader.do11()", {"action" : "remove us from parent"});
-            message_container.getParent().removeChild(message_container);
-        }
-
-        // if we have a suitable parent
-        if (parent_reference_container != null)
-        {
-            // add us as child
-            LOGGER_.logDebug("Threader.do11()", {"action" : "add us as child to parent reference container"});
-            parent_reference_container.addChild(message_container);
+            message_container = null;
         }
     }
-    
-    this.done_11_ = true;
-    this.doing_11_ = false;
-    this.done_1_ = true;
+
+    if (message_container == null)
+    {
+        LOGGER_.logDebug("Threader.putMessageInContainer()",
+                            {"action" : "no container found, create new one"});
+        // no suitable container found, create new one
+        message_container = new Container();
+        message_container.setMessage(message);
+        // index container in hashtable
+        this.id_table_[message.getId()] = message_container;
+    }
+
+    LOGGER_.logDebug("Threader.putMessageInContainer()",
+                        {"action" : "loop over references"});
+    // for each element in references field of message
+    var parent_reference_container = null;
+    var references = message.getReferences().getReferences();
+    for (referencekey in references)
+    {
+        var reference_id = references[referencekey];
+
+        LOGGER_.logDebug("Threader.putMessageInContainer()",
+                            {"reference" : reference_id});
+        // try to find container for referenced message
+        var reference_container = this.id_table_[reference_id];
+        if (reference_container == null)
+        {
+            LOGGER_.logDebug("Threader.putMessageInContainer()",
+                                {"action" : "no container found, create new one"});
+            // no container found, create new one
+            reference_container = new Container();
+            // index container
+            this.id_table_[reference_id] = reference_container;
+        }
+
+        // 1.B. link reference container together
+        LOGGER_.logDebug("Threader.putMessageInContainer()",
+                            {"action" : "link references together"});
+        if (parent_reference_container != null &&                           // if we have a parent container
+            ! reference_container.hasParent() &&                            // and current container does not have a parent
+            parent_reference_container != reference_container &&            // and we are not looking at the same container
+            ! parent_reference_container.findChild(reference_container))    // see if we are already a child of parent
+        {
+            LOGGER_.logDebug("Threader.putMessageInContainer()",
+                                {"action" : "add us to parent reference container"});
+            parent_reference_container.addChild(reference_container);
+        }
+        parent_reference_container = reference_container;
+    }
+
+    // set parent of current message to last element in references
+
+    // if we have a suitable parent container, and the parent container is the current container
+    // or the parent container is a child of the current container, discard it as parent
+    if (parent_reference_container != null &&
+        (parent_reference_container == message_container ||
+        message_container.findChild(parent_reference_container)))
+    {
+        LOGGER_.logDebug("Threader.putMessageInContainer()",
+                            {"action" : "set parent reference container to null"});
+        parent_reference_container = null;
+    }
+
+    // if current message already has a parent
+    if (message_container.hasParent() &&
+        parent_reference_container != null)
+    {
+        // remove us from this parent
+        LOGGER_.logDebug("Threader.do11()",
+                            {"action" : "remove us from parent"});
+        message_container.getParent().removeChild(message_container);
+    }
+
+    // if we have a suitable parent
+    if (parent_reference_container != null)
+    {
+        // add us as child
+        LOGGER_.logDebug("Threader.putMessageInContainer()",
+                            {"action" : "add us as child to parent reference container"});
+        parent_reference_container.addChild(message_container);
+    }
 }
 
 
-Threader.prototype.do2 = function()
+
+/** ****************************************************************************
+ * Top method to find the root set
+ ******************************************************************************/
+Threader.prototype.topFindRootSet = function()
 {
-    if (! this.doing_2_ && ! this.done_2_ && this.done_1_)
+    if (! this.find_rootset_top_doing_ &&
+        ! this.find_rootset_done_ &&
+        this.put_messages_in_container_done_)
     {
-        this.doing_2_ = true;
-        LOGGER_.logDebug("Threader.do2()", {"action" : "start"});
-        this.start_2_ = (new Date()).getTime();
+        this.find_rootset_top_doing_ = true;
+        LOGGER_.logDebug("Threader.topFindRootSet()",
+                            {"action" : "start"});
+        this.find_rootset_start_ = (new Date()).getTime();
         var ref = this;
-        setTimeout(function(){ref.do21();}, 10);
+        setTimeout(function(){ref.findRootSet();}, 10);
     }
-    if (this.done_2_)
+    if (this.find_rootset_done_)
     {
-        this.end_2_ = (new Date()).getTime();
-        LOGGER_.logDebug("Threader.do2()", {"action" : "end"});
+        this.find_rootset_end_ = (new Date()).getTime();
+        LOGGER_.logDebug("Threader.topFindRootSet()",
+                            {"action" : "end"});
         return;
     }
     var ref = this;
-    setTimeout(function(){ref.do2();}, 10);
+    setTimeout(function(){ref.topFindRootSet();}, 10);
 }
 
 
-Threader.prototype.do21 = function()
+
+/** ****************************************************************************
+ * Find the root set
+ * These are all containers which have no parent
+ ******************************************************************************/
+Threader.prototype.findRootSet = function()
 {
-    if (this.doing_21_)
+    if (this.find_rootset_doing_)
     {
         return;
     }
-    
-    this.doing_21_ = true;
+
+    this.find_rootset_doing_ = true;
 
     var rootkey = null;
-    LOGGER_.logDebug("Threader.do21()", {"action" : "find root set"});
+    LOGGER_.logDebug("Threader.findRootSet()",
+                        {"action" : "find root set"});
     for (rootkey in this.id_table_)
     {
         var container = this.id_table_[rootkey];
@@ -292,62 +397,80 @@ Threader.prototype.do21 = function()
         }
     }
 
-    this.done_21_ = true;
-    this.doing_21_ = false;
-    this.done_2_ = true;
+    this.find_rootset_doing_ = false;
+    this.find_rootset_done_ = true;
 }
 
 
-Threader.prototype.do4 = function()
+
+/** ****************************************************************************
+ * Top method to prune all empty containers
+ ******************************************************************************/
+Threader.prototype.topPruneEmptyContainers = function()
 {
-    if (! this.doing_4_ && ! this.done_4_ && this.done_2_)
+    if (! this.prune_empty_containers_doing_ &&
+        ! this.prune_empty_containers_top_done_ &&
+        this.find_rootset_done_)
     {
-        this.doing_4_ = true;
-        LOGGER_.logDebug("Threader.do4()", {"action" : "start"});
-        this.start_4_ = (new Date()).getTime();
+        this.prune_empty_containers_top_doing_ = true;
+        LOGGER_.logDebug("Threader.topPruneEmptyContainers()",
+                            {"action" : "start"});
+        this.prune_empty_containers_start_ = (new Date()).getTime();
         var ref = this;
-        setTimeout(function(){ref.do41();}, 10);
+        setTimeout(function(){ref.pruneEmptyContainers();}, 10);
     }
-    if (this.done_4_)
+    if (this.prune_empty_containers_done_)
     {
-        this.end_4_ = (new Date()).getTime();
-        LOGGER_.logDebug("Threader.do4()", {"action" : "end"});
+        this.prune_empty_containers_end_ = (new Date()).getTime();
+        LOGGER_.logDebug("Threader.topPruneEmptyContainers()",
+                            {"action" : "end"});
         return;
     }
     var ref = this;
-    setTimeout(function(){ref.do4();}, 10);
+    setTimeout(function(){ref.topPruneEmptyContainers();}, 10);
 }
 
 
-Threader.prototype.do41 = function()
+
+/** ****************************************************************************
+ * Prune all empty containers
+ * do recursive pruneing on all containers
+ ******************************************************************************/
+Threader.prototype.pruneEmptyContainers = function()
 {
-    if (this.doing_41_)
+    if (this.prune_empty_containers_doing_)
     {
         return;
     }
-    
-    this.doing_41_ = true;
 
-    LOGGER_.logDebug("Threader.do41()", {"action" : "loop over root set"});
+    this.prune_empty_containers_doing_ = true;
+
+    LOGGER_.logDebug("Threader.pruneEmptyContainers()",
+                        {"action" : "loop over root set"});
     var container = null;
-    for (container = this.root_set_.getChild(); container != null; container = container.getNext())
+    for (container = this.root_set_.getChild();
+         container != null;
+         container = container.getNext())
     {
-        LOGGER_.logDebug("Threader.do41()", {"container" : container});
+        LOGGER_.logDebug("Threader.pruneEmptyContainers()",
+                            {"container" : container});
         // if container is empty and has no children
-        if (container.isDummy() && ! container.hasChild())
+        if (container.isDummy() &&
+            ! container.hasChild())
         {
-            LOGGER_.logDebug("Threader.do41()", {"action" : "container does not belong to root set"});
+            LOGGER_.logDebug("Threader.pruneEmptyContainers()",
+                                {"action" : "container does not belong to root set"});
             // remove from root_set_
             if (container.hasPrevious())
                 container.getPrevious().setNext(container.getNext());
             else
                 container.getParent().setChild(container.getNext());
-        
+
             continue;
         }
         // if the container has no message, but children
         // actually we want to keep this dummy to preserve structure
-    
+
         //else if (container.isDummy() && container.hasOneChild())
         //{
         //    // add children to root set
@@ -387,47 +510,65 @@ Threader.prototype.do41 = function()
         // recursively prune empty containers
         container.pruneEmptyContainers();
     }
-    this.done_41_ = true;
-    this.doing_41_ = false;
-    this.done_4_ = true;
+
+    this.prune_empty_containers_doing_ = false;
+    this.prune_empty_containers_done_ = true;
 }
 
 
-Threader.prototype.do5b = function()
+
+/** ****************************************************************************
+ * Top method to put all containers in the subject table
+ ******************************************************************************/
+Threader.prototype.topPutContainersInSubjectTable = function()
 {
-    if (! this.doing_5b_ && ! this.done_5b_ && this.done_4_)
+    if (! this.put_containers_in_subject_table_top_doing_ &&
+        ! this.put_containers_in_subject_table_done_ &&
+        this.prune_empty_containers_done_)
     {
-        this.doing_5b_ = true;
-        LOGGER_.logDebug("Threader.do5b()", {"action" : "start"});
-        this.start_5b_ = (new Date()).getTime();
+        this.put_containers_in_subject_table_top_doing_ = true;
+        LOGGER_.logDebug("Threader.topPutContainersInSubjectTable()",
+                            {"action" : "start"});
+        this.put_containers_in_subject_table_start_ = (new Date()).getTime();
         var ref = this;
-        setTimeout(function(){ref.do5b1();}, 10);
+        setTimeout(function(){ref.putContainersInSubjectTable();}, 10);
     }
-    if (this.done_5b_)
+    if (this.put_containers_in_subject_table_done_)
     {
-        this.end_5b_ = (new Date()).getTime();
-        LOGGER_.logDebug("Threader.do5b()", {"action" : "end"});
+        this.put_containers_in_subject_table_end_ = (new Date()).getTime();
+        LOGGER_.logDebug("Threader.topPutContainersInSubjectTable()",
+                            {"action" : "end"});
         return;
     }
     var ref = this;
-    setTimeout(function(){ref.do5b();}, 10);
+    setTimeout(function(){ref.topPutContainersInSubjectTable();}, 10);
 }
 
 
-Threader.prototype.do5b1 = function()
+
+/** ****************************************************************************
+ * Put all containers in subject table
+ * always put topmost container in subject table
+ * (i.e. container which is "least" reply
+ ******************************************************************************/
+Threader.prototype.putContainersInSubjectTable = function()
 {
-    if (this.doing_5b1_)
+    if (this.put_containers_in_subject_table_doing_)
     {
         return;
     }
-    
-    this.doing_5b1_ = true;
 
-    LOGGER_.logDebug("Threader.do5b1()", {"action" : "loop over root set"});
+    this.put_containers_in_subject_table_doing_ = true;
+
+    LOGGER_.logDebug("Threader.putContainersInSubjectTable()",
+                        {"action" : "loop over root set"});
     var container = null;
-    for (container = this.root_set_.getChild(); container != null; container = container.getNext())
+    for (container = this.root_set_.getChild();
+         container != null;
+         container = container.getNext())
     {
-        LOGGER_.logDebug("Threader.do5b1()", {"container" : container});
+        LOGGER_.logDebug("Threader.putContainersInSubjectTable()",
+                            {"container" : container});
         // 5.B. find subject of subtree
         var subject = "";
         subject = container.getSimplifiedSubject();
@@ -441,95 +582,122 @@ Threader.prototype.do5b1 = function()
         // try to find existing container with same subject
         var subject_container = this.subject_table_[subject];
 
-        if (subject_container == null ||                                        // if we have to container with this subject OR
+        if (subject_container == null ||                                       // if we have to container with this subject OR
            (subject_container.isDummy() && ! container.isDummy()) ||           // if found one is empty, but this one is not OR
            (subject_container.getReplyCount() > container.getReplyCount()))    // if current is less reply than subject container
         {
-            LOGGER_.logDebug("Threader.do5b1()", {"action" : "putting container in subject table"});
+            LOGGER_.logDebug("Threader.putContainersInSubjectTable()",
+                                {"action" : "putting container in subject table"});
             this.subject_table_[subject] = container;
         }
     }
 
-    this.done_5b1_ = true;
-    this.doing_5b1_ = false;
-    this.done_5b_ = true;
+    this.put_containers_in_subject_table_doing_ = false;
+    this.put_containers_in_subject_table_done_ = true;
 }
 
 
-Threader.prototype.do5c = function()
+
+/** ****************************************************************************
+ * Top method to group containers by subject
+ ******************************************************************************/
+Threader.prototype.topGroupBySubject = function()
 {
-    if (! this.doing_5c_ && ! this.done_5c_ && this.done_5b_)
+    if (! this.group_by_subject_top_doing_ &&
+        ! this.group_by_subject_done_ &&
+        this.put_containers_in_subject_table_done_)
     {
-        this.doing_5c_ = true;
-        LOGGER_.logDebug("Threader.do5c()", {"action" : "start"});
-        this.start_5c_ = (new Date()).getTime();
+        this.group_by_subject_top_doing_ = true;
+        LOGGER_.logDebug("Threader.topGroupBySubject()",
+                            {"action" : "start"});
+        this.group_by_subject_top_start_ = (new Date()).getTime();
         var ref = this;
-        setTimeout(function(){ref.do5c1();}, 10);
+        setTimeout(function(){ref.groupBySubject();}, 10);
     }
-    if (this.done_5c_)
+    if (this.group_by_subject_done_)
     {
-        this.end_5c_ = (new Date()).getTime();
+        this.group_by_subject_end_ = (new Date()).getTime();
         this.end_ = (new Date()).getTime();
-        LOGGER_.logDebug("Threader.do5c()", {"action" : "end"});
+        LOGGER_.logDebug("Threader.topGroupBySubject()",
+                            {"action" : "end"});
         var ref = this;
         setTimeout(function(){ref.logInfo();}, 10);
         return;
     }
     var ref = this;
-    setTimeout(function(){ref.do5c();}, 10);
+    setTimeout(function(){ref.topGroupBySubject();}, 10);
 }
 
-Threader.prototype.do5c1 = function()
+
+
+/** ****************************************************************************
+ * Group all containers by subject
+ ******************************************************************************/
+Threader.prototype.groupBySubject = function()
 {
-    if (this.doing_5c1_)
+    if (this.group_by_subject_doing_)
     {
         return;
     }
-    
-    this.doing_5c1_ = true;
-    
-    LOGGER_.logDebug("Threader.do5c1()", {"action" : "loop over root set"});
+
+    this.group_by_subject_doing_ = true;
+
+    LOGGER_.logDebug("Threader.groupBySubject()",
+                        {"action" : "loop over root set"});
     var container = null;
-    for (container = this.root_set_.getChild(); container != null; container = container.getNext())
+    for (container = this.root_set_.getChild();
+         container != null;
+         container = container.getNext())
     {
-        LOGGER_.logDebug("Threader.do5c1()", {"container" : container});
+        LOGGER_.logDebug("Threader.groupBySubject()",
+                            {"container" : container});
         // get subject of this container
         var subject = "";
         subject = container.getSimplifiedSubject();
 
         // get container for this subject in subject_table
         var subject_container = this.subject_table_[subject];
-        if (subject_container == null || subject_container == container)
+        if (subject_container == null ||
+            subject_container == container)
         {
             // if no container found, or found ourselfs
-            LOGGER_.logDebug("Threader.do5c1()", {"action" : "no container in subject table or found ourselves"});
+            LOGGER_.logDebug("Threader.groupBySubject()",
+                                {"action" : "no container in subject table or found ourselves"});
             continue;
         }
         // if both containers are dummies
-        if (container.isDummy() && subject_container.isDummy())
+        if (container.isDummy() &&
+            subject_container.isDummy())
         {
             // append children of subject_container to container
-            LOGGER_.logDebug("Threader.do5c1()", {"action" : "both dummies"});
+            LOGGER_.logDebug("Threader.groupBySubject()",
+                                {"action" : "both dummies"});
             container.addChild(subject_container.getChild());
         }
         // if container is dummy, subject container no dummy
-        else if (container.isDummy() && ! subject_container.isDummy())
+        else if (container.isDummy() &&
+                 ! subject_container.isDummy())
         {
             // add non empty container as child of empty container
-            LOGGER_.logDebug("Threader.do5c1()", {"action" : "container dummy, subject_container not"});
+            LOGGER_.logDebug("Threader.groupBySubject()",
+                                {"action" : "container dummy, subject_container not"});
             container.addChild(subject_container);
         }
         // if container is no dummy but subject container is dummy
-        else if (! container.isDummy() && subject_container.isDummy())
+        else if (! container.isDummy() &&
+                 subject_container.isDummy())
         {
             // add non empty container as child of empty container
-            LOGGER_.logDebug("Threader.do5c1()", {"action" : "container not dummy, subject_container dummy"});
+            LOGGER_.logDebug("Threader.groupBySubject()",
+                                {"action" : "container not dummy, subject_container dummy"});
             subject_container.addChild(container);
         }
         // if containers are misordered, change order
-        else if (! subject_container.isDummy() && subject_container.getReplyCount() < container.getReplyCount())
+        else if (! subject_container.isDummy() &&
+                 subject_container.getReplyCount() < container.getReplyCount())
         {
-            LOGGER_.logDebug("Threader.do5c1()", {"action" : "misordered 1"});
+            LOGGER_.logDebug("Threader.groupBySubject()",
+                                {"action" : "misordered 1"});
             // calculate difference between the messages
             var difference = container.getReplyCount() - subject_container.getReplyCount();
             var top = subject_container;
@@ -575,9 +743,10 @@ Threader.prototype.do5c1 = function()
             }
         }
         // misordered again
-        else if (! subject_container.isDummy() && subject_container.getReplyCount() > container.getReplyCount())
+        else if (! subject_container.isDummy() &&
+                 subject_container.getReplyCount() > container.getReplyCount())
         {
-            LOGGER_.logDebug("Threader.do5c1()", {"action" : "misordered 2"});
+            LOGGER_.logDebug("Threader.groupBySubject()", {"action" : "misordered 2"});
             // calculate difference between the messages
             var difference = subject_container.getReplyCount() - container.getReplyCount();
             var top = container;
@@ -627,24 +796,28 @@ Threader.prototype.do5c1 = function()
             container = tmp;
         }
     }
-    this.done_5c1_ = true;
-    this.doing_5c1_ = false;
-    this.done_5c_ = true;
+
+    this.group_by_subject_doing_ = false;
+    this.group_by_subject_done_ = true;
     this.done_threading_ = true;
 }
 
 
+
+/** ****************************************************************************
+ * Thread all messages
+ ******************************************************************************/
 Threader.prototype.thread = function()
 {
     this.start_ = (new Date()).getTime();
     LOGGER_.log("threader", {"action" : "start"});
     // 1. For each message
     this.id_table_ = new Object();
-    this.do1();
+    this.topPutMessagesInContainer();
 
     // 2. Find the root set
     // walk over all elements in id_table
-    this.do2();
+    this.topFindRootSet();
 
     // 3. Discard id_table
     // do not discard id_table_, we might need it to find individual messages
@@ -653,38 +826,37 @@ Threader.prototype.thread = function()
     // 4. Prune empty containers
     // recursively walk all containers under root set
     // for each container
-    this.do4();
+    this.topPruneEmptyContainers();
 
     // 5. Group root set by subject
     // 5.A. create new hashtable for all subjects
-    //var subject_table = new Object();
     this.subject_table_ = new Object();
 
-    // 5.B. iterate over all containers in root set
-    this.do5b();
+    // 5.B. put all containers in subject table
+    this.topPutContainersInSubjectTable();
 
-    // 5.C. iterator over root set
-    this.do5c();
+    // 5.C. group all containers by subject
+    this.topGroupBySubject();
 
     // 6. that's it
     //root_set_.check();
 }
-// =============================================================================
-// / HALF SETTIMEOUT IMPLEMENTATION
-// =============================================================================
 
 
 
-
+/** ****************************************************************************
+ * return true if threading is done
+ ******************************************************************************/
 Threader.prototype.getDone = function()
 {
-    return this.done_5c_;
+    return this.done_threading_;
 }
 
 
-/**
+
+/** ****************************************************************************
  * Output root set as string
- */
+ ******************************************************************************/
 Threader.prototype.toString = function()
 {
     var string = "\n-----\n";
@@ -693,52 +865,92 @@ Threader.prototype.toString = function()
 }
 
 
-/**
+
+/** ****************************************************************************
  * Test Method
- */
+ ******************************************************************************/
 Threader.prototype.test = function()
 {
     threader = new Threader();
-    threader.addMessage(new Message("Subject 1", "From 1 <from1@inter.net>", "1@inter.net", "0", "9. 7. 2004 17:33:56", "Inbox", ""));
-    threader.addMessage(new Message("Subject 2", "From 2 <from2@inter.net>", "2@inter.net", "0", "9. 7. 2004 17:33:56", "Inbox", "1@inter.net"));
+    threader.addMessage(new Message("Subject 1",
+                                    "From 1 <from1@inter.net>",
+                                    "1@inter.net",
+                                    "0",
+                                    "9. 7. 2004 17:33:56",
+                                    "Inbox",
+                                    ""));
+    threader.addMessage(new Message("Subject 2",
+                                    "From 2 <from2@inter.net>",
+                                    "2@inter.net",
+                                    "0",
+                                    "9. 7. 2004 17:33:56",
+                                    "Inbox",
+                                    "1@inter.net"));
 
     threader.thread();
     alert(threader.toString());
 }
 
 
+/** ****************************************************************************
+ * Log info about threading
+ ******************************************************************************/
 Threader.prototype.logInfo = function()
 {
     if (! LOGGER_.doLogging())
         return;
-    
-    var time_1 = this.end_1_ - this.start_1_;
-    var time_2 = this.end_2_ - this.start_2_;
-    var time_4 = this.end_4_ - this.start_4_;
-    var time_5b = this.end_5b_ - this.start_5b_;
-    var time_5c = this.end_5c_ - this.start_5c_;
-    var time_total = this.end_ - this.start_;
-    
+
+    var time_put_messages_in_container = this.put_messages_in_container_end_ -
+                                         this.put_messages_in_container_start_;
+    var time_find_rootset = this.find_rootset_end_ -
+                            this.find_rootset_start_;
+    var time_prune_empty_containers = this.prune_empty_containers_end_ -
+                                      this.prune_empty_containers_start_;
+    var time_put_containers_in_subject_table = this.put_containers_in_subject_table_end_ -
+                                               this.put_containers_in_subject_table_start_;
+    var time_group_by_subject = this.group_by_subject_end_ -
+                                this.group_by_subject_start_;
+    var time_total = this.end_ -
+                     this.start_;
+
     var total_messages = this.messages_.length;
     var time_per_message = time_total / total_messages;
-    
+
     var num_threads = this.getRoot().getChildCount();
     var msg_per_thread = total_messages / num_threads;
-    
+
     var distribution = this.getThreadDistribution();
-    
-    var timing = {"1" : time_1, "2" : time_2, "4" : time_4, "5b" : time_5b, "5c" : time_5c, "total" : time_total, "per message" : time_per_message};
-    
-    LOGGER_.log("threader", {"action" : "end", "total messages" : total_messages, "total threads" : num_threads, "messages per thread" : msg_per_thread, "distribution" : distribution, "timing" : timing});
+
+    var timing = {"put messages in container" : time_put_messages_in_container,
+                  "find root set" : time_find_rootset,
+                  "prune empty containers" : time_prune_empty_containers,
+                  "put containers in subject table" : time_put_containers_in_subject_table,
+                  "group by subject" : time_group_by_subject,
+                  "total" : time_total,
+                  "per message" : time_per_message};
+
+    LOGGER_.log("threader",
+                    {"action" : "end",
+                     "total messages" : total_messages,
+                     "total threads" : num_threads, 
+                     "messages per thread" : msg_per_thread,
+                     "distribution" : distribution,
+                     "timing" : timing});
 }
 
 
+
+/** ****************************************************************************
+ * get statistical info about message distribution
+ ******************************************************************************/
 Threader.prototype.getThreadDistribution = function()
 {
     LOGGER_.logDebug("Threader.getThreadDistribution()", {});
     var distribution = new Array();
     var container = null;
-    for (container = this.root_set_.getChild(); container != null; container = container.getNext())
+    for (container = this.root_set_.getChild();
+         container != null;
+         container = container.getNext())
     {
         var count = container.getCountRecursive();
         if (distribution[count])

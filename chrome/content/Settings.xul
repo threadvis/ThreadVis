@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <!--
-/* *******************************************************
+/** ****************************************************************************
  * Settings.xul
  *
  * (c) 2005 Alexander C. Hubmann
@@ -9,7 +9,7 @@
  * XUL file to display settings dialog
  *
  * Version: $Id$
- ********************************************************/
+ ******************************************************************************/
 -->
 
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
@@ -24,52 +24,83 @@
         persist="screenX screenY"
         title="&settings.title;">
 
-    <script type="application/x-javascript" src="chrome://global/content/nsUserSettings.js" />
-    <script type="application/x-javascript" src="chrome://threadarcsjs/content/Settings.js" />
+    <script type="application/x-javascript"
+            src="chrome://global/content/nsUserSettings.js" />
+    <script type="application/x-javascript"
+            src="chrome://threadarcsjs/content/Settings.js" />
 
     <tabbox>
         <tabs id="settingstabs">
-            <tab label="&logfiles.tab;" selected="true" />
+            <tab label="&logfiles.tab;"
+                 selected="true" />
             <tab label="&visualisation.tab;" />
             <tab label="&about.tab;" />
         </tabs>
+
         <tabpanels id="settingstabpanels">
+
             <tabpanel id="logfiles" orient="vertical">
+
                 <groupbox>
-                <caption label="&logfiles.caption;" />
-                <description>
-                    &logfiles.description.restart;
-                </description>
-                <checkbox id="dologging" oncommand="toggleLogging();" label="&logfiles.enable.checkbox;" prefstring="extensions.threadarcsjs.logging.enabled" prefdefval="false" />
-                <label class="indent">
-                    &logfiles.enable.description.whatlogged;
-                </label>
-                <label class="indent">
-                    &logfiles.enable.description.sending;
-                </label>
-                <separator class="thin" />
-                <checkbox id="dologgingdebug" label="&logfiles.debug.checkbox;" prefstring="extensions.threadarcsjs.logging.debug" prefdefval="false" />
-                <label class="indent">
-                    &logfiles.debug.description.general;
-                 </label>
-                 <label class="indent">
-                    &logfiles.debug.description.personalinfo;
-                 </label>
-                 <label class="indent">
-                    &logfiles.debug.description.size;
-                </label>
+                    <caption label="&logfiles.caption;" />
+                    <description>
+                        &logfiles.description.restart;
+                    </description>
+                    <checkbox id="dologging"
+                              oncommand="toggleLogging();"
+                              label="&logfiles.enable.checkbox;"
+                              prefstring="extensions.threadarcsjs.logging.enabled"
+                              prefdefval="false"
+                              preftype="bool"/>
+                    <label class="indent">
+                        &logfiles.enable.description.whatlogged;
+                    </label>
+                    <label class="indent">
+                        &logfiles.enable.description.sending;
+                    </label>
+                    <separator class="thin" />
+                    <checkbox id="dologgingdebug"
+                              label="&logfiles.debug.checkbox;"
+                              prefstring="extensions.threadarcsjs.logging.debug"
+                              prefdefval="false"
+                              preftype="bool"/>
+                    <label class="indent">
+                        &logfiles.debug.description.general;
+                     </label>
+                     <label class="indent">
+                        &logfiles.debug.description.personalinfo;
+                     </label>
+                     <label class="indent">
+                        &logfiles.debug.description.size;
+                    </label>
                 </groupbox>
+
                 <separator class="thin" />
-                <button id="sendlog" label="&logfiles.send.button;" oncommand="sendLogfiles();" tooltiptext="&logfiles.send.tooltip;" />
+                <button id="sendlog"
+                        label="&logfiles.send.button;"
+                        oncommand="sendLogfiles();"
+                        tooltiptext="&logfiles.send.tooltip;" />
                 <separator class="thin" />
-                <button id="resetlog" label="&logfiles.reset.button;" oncommand="resetLogfiles();" tooltiptext="&logfiles.reset.tooltip;" />
+                <button id="resetlog"
+                        label="&logfiles.reset.button;"
+                        oncommand="resetLogfiles();"
+                        tooltiptext="&logfiles.reset.tooltip;" />
+
             </tabpanel>
+
             <tabpanel id="visualisation" orient="vertical">
+
                 <groupbox>
+
                     <caption label="&visualisation.timescaling.caption;" />
-                    <radiogroup id="dotimescaling" prefstring="extensions.threadarcsjs.timescaling.enabled" prefdefvalue="false" preftype="bool">
+
+                    <radiogroup id="dotimescaling"
+                                prefstring="extensions.threadarcsjs.timescaling.enabled"
+                                prefdefvalue="false"
+                                preftype="bool">
                         <vbox>
-                            <radio value="false" label="&visualisation.timescaling.disable;" />
+                            <radio value="false"
+                                   label="&visualisation.timescaling.disable;" />
                             <hbox class="indent">
                                 <image src="images/timescaling_disabled.png" />
                             </hbox>
@@ -90,35 +121,50 @@
                             </label>
                         </vbox>
                     </radiogroup>
+
                 </groupbox>
+
                 <groupbox>
                     <caption label="&visualisation.size.caption;" />
-                    <radiogroup id="visualisationsize" prefstring="extensions.threadarcsjs.visualisationsize" prefdefvalue="12x12,12,12,12,6,-1,1,24">
+
+                    <radiogroup id="visualisationsize"
+                                prefstring="extensions.threadarcsjs.visualisationsize"
+                                prefdefvalue="12x12,12,12,12,6,-1,1,24"
+                                preftype="string">
                         <hbox>
-                            <radio value="8x8,8,8,8,4,-1,1,16" label="&visualisation.size.small;" />
+                            <radio value="8x8,8,8,24,4,1,16"
+                                   label="&visualisation.size.small;" />
                             <image src="images/size_8.png" />
                         </hbox>
                         <separator class="thin" />
                         <hbox>
-                            <radio value="12x12,12,12,12,6,-1,1,24" label="&visualisation.size.medium;" />
+                            <radio value="12x12,12,12,32,6,2,24"
+                                   label="&visualisation.size.medium;" />
                             <image src="images/size_12.png" />
                         </hbox>
                         <separator class="thin" />
                         <hbox>
-                            <radio value="16x16,16,16,16,8,-1,1,32" label="&visualisation.size.large;" />
+                            <radio value="16x16,16,16,40,8,3,32"
+                                   label="&visualisation.size.large;" />
                             <image src="images/size_16.png" />
                         </hbox>
                     </radiogroup>
+
                 </groupbox>
+
             </tabpanel>
+
             <tabpanel id="about" orient="vertical">
-                <label value="&extension.name;" id="extension-name" />
+
+                <label value="&extension.name;"
+                       id="extension-name" />
                 <separator class="thin" />
                 <hbox>
                     <image src="images/about.png" />
                 </hbox>
                 <separator class="thin" />
-                <label value="&about.version; &extension.version;" id="about-version" />
+                <label value="&about.version; &extension.version;"
+                       id="about-version" />
                 <separator class="thin" />
                 <description id="about-description">
                     &extension.description;
@@ -128,11 +174,19 @@
                     &extension.copyright;
                 </label>
                 <separator class="thin" />
-                <label value="&extension.email;" onclick="writeEmail();" id="about-email" />
+                <label value="&extension.email;"
+                       onclick="writeEmail();"
+                       id="about-email" />
                 <separator class="thin" />
-                <label href="&extension.homepage;" value="&extension.homepage;" onclick="openURL(event.target.getAttribute('href'));" id="about-homepage"/>
+                <label href="&extension.homepage;"
+                       value="&extension.homepage;"
+                       onclick="openURL(event.target.getAttribute('href'));"
+                       id="about-homepage" />
+
             </tabpanel>
+
         </tabpanels>
+
     </tabbox>
 
 </dialog>

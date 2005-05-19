@@ -1,4 +1,4 @@
-/* *******************************************************
+/** ****************************************************************************
  * Message.js
  *
  * (c) 2005 Alexander C. Hubmann
@@ -6,14 +6,26 @@
  * Wrap email message
  * Re-write from Java
  * Version: $Id$
- ********************************************************/
+ ******************************************************************************/
 
-var HEADER_PARSER_ = Components.classes["@mozilla.org/messenger/headerparser;1"].getService(Components.interfaces.nsIMsgHeaderParser);
 
-/**
+
+var HEADER_PARSER_ = Components.classes["@mozilla.org/messenger/headerparser;1"]
+                     .getService(Components.interfaces.nsIMsgHeaderParser);
+
+
+
+/** ****************************************************************************
  * Constructor
- */
-function Message(subject, from, message_id, message_key, date, folder, references, issent)
+ ******************************************************************************/
+function Message(subject,
+                 from,
+                 message_id,
+                 message_key,
+                 date,
+                 folder,
+                 references,
+                 issent)
 {
     /**
      * Message date
@@ -79,36 +91,40 @@ function Message(subject, from, message_id, message_key, date, folder, reference
 }
 
 
-/**
+
+/** ****************************************************************************
  * Get date of message
- */
+ ******************************************************************************/
 Message.prototype.getDate = function()
 {
     return this.date_;
 }
 
 
-/**
+
+/** ****************************************************************************
  * Get folder message is in
- */
+ ******************************************************************************/
 Message.prototype.getFolder = function()
 {
     return this.folder_;
 }
 
 
-/**
+
+/** ****************************************************************************
  * Get sender of message
- */
+ ******************************************************************************/
 Message.prototype.getFrom = function()
 {
     return this.from_;
 }
 
 
-/**
+
+/** ****************************************************************************
  * Get sender-email of message
- */
+ ******************************************************************************/
 Message.prototype.getFromEmail = function()
 {
     // parse email address
@@ -118,83 +134,92 @@ Message.prototype.getFromEmail = function()
 }
 
 
-/**
+
+/** ****************************************************************************
  * Get message id
- */
+ ******************************************************************************/
 Message.prototype.getId = function()
 {
     return this.message_id_;
 }
 
 
-/**
+
+/** ****************************************************************************
  * Get message key
- */
+ ******************************************************************************/
 Message.prototype.getKey = function()
 {
     return this.message_key_;
 }
 
 
-/**
+
+/** ****************************************************************************
  * Get references
- */
+ ******************************************************************************/
 Message.prototype.getReferences = function()
 {
     return this.references_;
 }
 
 
-/**
+
+/** ****************************************************************************
  * Get reply count of this message
- */
+ ******************************************************************************/
 Message.prototype.getReplyCount = function()
 {
     return this.reply_count_;
 }
 
 
-/**
+
+/** ****************************************************************************
  * Get simplified subject
- */
+ ******************************************************************************/
 Message.prototype.getSimplifiedSubject = function()
 {
     return this.simplified_subject_;
 }
 
 
-/**
+
+/** ****************************************************************************
  * Get original subject
- */
+ ******************************************************************************/
 Message.prototype.getSubject = function()
 {
     return this.subject_;
 }
 
 
-/**
+
+/** ****************************************************************************
  * See if this message is a reply
- */
+ ******************************************************************************/
 Message.prototype.isReply = function()
 {
     return (this.reply_count_ > 0);
 }
 
 
-/**
+
+/** ****************************************************************************
  * See if message is sent (i.e. in sent-mail folder)
- */
+ ******************************************************************************/
 Message.prototype.isSent = function()
 {
     return this.issent_;
 }
 
 
-/**
+
+/** ****************************************************************************
  * Get simplyfied subject of message
  * Strip all Re:
  * fixxme
- */
+ ******************************************************************************/
 /*
 private String simplifySubject(String subject)
 {
@@ -234,46 +259,81 @@ private String simplifySubject(String subject)
 */
 
 
-/**
+
+/** ****************************************************************************
  * Set if message is sent (i.e. in sent-mail folder)
- */
+ ******************************************************************************/
 Message.prototype.setSent = function(sent)
 {
     this.issent_ = sent;
 }
 
 
-/**
+
+/** ****************************************************************************
  * Return message as string
- */
+ ******************************************************************************/
 Message.prototype.toString = function()
 {
-    return "Message: Subject: '" + this.getSubject() + "'. From: '" + this.getFrom() +  "'. MsgId: '" + this.getId() + "'. MsgKey: '" + this.getKey() + "'. Date: '" + this.getDate() + "'. Folder: '" + this.getFolder() + "'. Refs: '" + this.getReferences() + "'. Sent: '" + this.isSent() + "'";
+    return "Message: Subject: '" + this.getSubject() +
+                 "'. From: '" + this.getFrom() +
+                 "'. MsgId: '" + this.getId() +
+                 "'. MsgKey: '" + this.getKey() +
+                 "'. Date: '" + this.getDate() +
+                 "'. Folder: '" + this.getFolder() +
+                 "'. Refs: '" + this.getReferences() +
+                 "'. Sent: '" + this.isSent() + "'";
 }
 
 
 
-// ********************************************************
-
-
-
-/**
+/** ****************************************************************************
  * Test method
- */
+ ******************************************************************************/
 Message.prototype.test = function()
 {
-    test1 = new Message("subject1", "Sascha", "23", "23", "1.1.2004 12:00", "INBOX", "");
+    test1 = new Message("subject1",
+                        "Sascha",
+                        "23",
+                        "23",
+                        "1.1.2004 12:00",
+                        "INBOX",
+                        "");
     alert(test1.toString());
 
-    test2 = new Message("RE:subject1", "Iris", "24", "24", "1.1.2004 12:00", "INBOX", "23");
+    test2 = new Message("RE:subject1",
+                        "Iris",
+                        "24",
+                        "24",
+                        "1.1.2004 12:00",
+                        "INBOX",
+                        "23");
     alert(test2.toString());
 
-    test3 = new Message("RE[2]:subject1", "Christian", "25", "25", "1.1.2004 12:00", "INBOX", "23");
+    test3 = new Message("RE[2]:subject1",
+                        "Christian",
+                        "25",
+                        "25",
+                        "1.1.2004 12:00",
+                        "INBOX",
+                        "23");
     alert(test3.toString());
 
-    test4 = new Message("subject1 RE:", "Iris", "26", "26", "1.1.2004 12:00", "INBOX", "23");
+    test4 = new Message("subject1 RE:",
+                        "Iris",
+                        "26",
+                        "26",
+                        "1.1.2004 12:00",
+                        "INBOX",
+                        "23");
     alert(test4.toString());
 
-    test5 = new Message("Re:RE[2]:subject1 RE:", "Sascha", "27", "27", "1.1.2004 12:00", "INBOX", "24");
+    test5 = new Message("Re:RE[2]:subject1 RE:",
+                        "Sascha",
+                        "27",
+                        "27",
+                        "1.1.2004 12:00",
+                        "INBOX",
+                        "24");
     alert(test5.toString());
 }

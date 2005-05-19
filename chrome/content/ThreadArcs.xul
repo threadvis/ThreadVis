@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <!--
-/* *******************************************************
+/** ****************************************************************************
  * ThreadArcs.xul
  *
  * (c) 2005 Alexander C. Hubmann
@@ -9,12 +9,14 @@
  * XUL file to display ThreadArcs extension
  *
  * Version: $Id$
- ********************************************************/
+ ******************************************************************************/
 -->
+
+
 
 <!DOCTYPE overlay SYSTEM "chrome://threadarcsjs/locale/ThreadArcs.dtd">
 <overlay id="ThreadArcsJS"
-  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
     <script src="chrome://threadarcsjs/content/Container.js" />
     <script src="chrome://threadarcsjs/content/Logger.js" />
@@ -26,14 +28,21 @@
 
     <hbox id="expandedHeaderView">
         <stringbundleset>
-            <stringbundle id="ThreadArcsJSStrings" src="chrome://threadarcsjs/locale/ThreadArcs.properties" />
+            <stringbundle id="ThreadArcsJSStrings" 
+                          src="chrome://threadarcsjs/locale/ThreadArcs.properties" />
         </stringbundleset>
         <popupset>
             <popup id="ThreadArcsJSPopUp">
-                <menuitem label="&popup.caption;" oncommand="window.openDialog('chrome://threadarcsjs/content/Settings.xul','','centerscreen, chrome, modal').focus();" />
+                <menuitem label="&popup.caption;" 
+                          oncommand="window.openDialog('chrome://threadarcsjs/content/Settings.xul','','centerscreen, chrome, modal').focus();" />
             </popup>
         </popupset>
-        <vbox id="ThreadArcsJSBox" minheight="50" minwidth="200" flex="2" align="right" context="ThreadArcsJSPopUp" />
+        <vbox id="ThreadArcsJSBox" 
+              minheight="50" 
+              minwidth="200" 
+              flex="2" 
+              align="right" 
+              context="ThreadArcsJSPopUp" />
     </hbox>
 
 </overlay>

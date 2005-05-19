@@ -1,4 +1,4 @@
-/* *******************************************************
+/** ****************************************************************************
  * Settings.js
  *
  * (c) 2005 Alexander C. Hubmann
@@ -6,12 +6,13 @@
  * JavaScript file for settings dialog
  *
  * Version: $Id$
- ********************************************************/
+ ******************************************************************************/
 
 
-/**
+
+/** ****************************************************************************
  * init
- */
+ ******************************************************************************/
 function init()
 {
     initPrefs();
@@ -24,9 +25,10 @@ function init()
 }
 
 
-/**
+
+/** ****************************************************************************
  * Init preferences (read in)
- */
+ ******************************************************************************/
 function initPrefs()
 {
     var prefElements = document.getElementsByAttribute("prefstring", "*");
@@ -61,7 +63,8 @@ function initPrefs()
         }
         if (elt == "radiogroup")
         {
-            document.getElementById(prefid).selectedItem = document.getElementById(prefid).getElementsByAttribute("value", prefvalue).item(0);
+            document.getElementById(prefid).selectedItem =
+                document.getElementById(prefid).getElementsByAttribute("value", prefvalue).item(0);
         }
         else
             prefElements[i].setAttribute(prefattribute, prefvalue);
@@ -69,13 +72,14 @@ function initPrefs()
 }
 
 
-/**
+
+/** ****************************************************************************
  * save preferences
- */
+ ******************************************************************************/
 function savePrefs()
 {
     var prefElements = document.getElementsByAttribute("prefstring", "*");
-    for (var i=0; i<prefElements.length; i++ )  
+    for (var i=0; i<prefElements.length; i++ )
     {
         var prefstring    = prefElements[i].getAttribute("prefstring");
         var prefid        = prefElements[i].getAttribute("id");
@@ -112,9 +116,10 @@ function savePrefs()
 }
 
 
-/**
+
+/** ****************************************************************************
  * get preference type
- */
+ ******************************************************************************/
 function getPreftype(elem)
 {
     var result = "";
@@ -129,16 +134,20 @@ function getPreftype(elem)
 }
 
 
-/**
+
+/** ****************************************************************************
  * get preference attribute
- */
+ ******************************************************************************/
 function getPrefattribute(elem)
 {
     var result = "";
 
-    if (elem == "textbox" || elem == "menulist" || elem == "radiogroup")
+    if (elem == "textbox" ||
+        elem == "menulist" ||
+        elem == "radiogroup")
         result = "value";
-    else if (elem == "checkbox" || elem == "listitem")
+    else if (elem == "checkbox" ||
+             elem == "listitem")
         result = "checked";
     else if (elem == "button")
         result = "disabled";
@@ -146,41 +155,56 @@ function getPrefattribute(elem)
 }
 
 
-/**
+
+/** ****************************************************************************
  * write an email to the author
- */
+ ******************************************************************************/
 function writeEmail()
 {
-    composeEmail("xpert@sbox.tugraz.at", "[ThreadArcsJS] <insert subject here>", null)
+    composeEmail("xpert@sbox.tugraz.at",
+                 "[ThreadArcsJS] <insert subject here>", null)
 }
 
 
-/**
+
+/** ****************************************************************************
  * send the logfiles to the author
- */
+ ******************************************************************************/
 function sendLogfiles()
 {
     var logfiles = getLogfiles();
-    composeEmail("xpert@sbox.tugraz.at", "[ThreadArcsJS] Auto-Email-Logs", null, logfiles);
+    composeEmail("xpert@sbox.tugraz.at",
+                 "[ThreadArcsJS] Auto-Email-Logs",
+                 null,
+                 logfiles);
 }
 
 
-/**
+
+/** ****************************************************************************
  * compose an email
- */
-function composeEmail(to, subject, body, attachments)
+ ******************************************************************************/
+function composeEmail(to,
+                      subject,
+                      body,
+                      attachments)
 {
     var msgComposeType = Components.interfaces.nsIMsgCompType;
     var msgComposFormat = Components.interfaces.nsIMsgCompFormat;
-    var msgComposeService = Components.classes["@mozilla.org/messengercompose;1"].getService();
-    msgComposeService = msgComposeService.QueryInterface(Components.interfaces.nsIMsgComposeService);
-    
-    var params = Components.classes["@mozilla.org/messengercompose/composeparams;1"].createInstance(Components.interfaces.nsIMsgComposeParams);
+    var msgComposeService = Components.classes["@mozilla.org/messengercompose;1"]
+                            .getService();
+    msgComposeService = msgComposeService
+                        .QueryInterface(Components.interfaces.nsIMsgComposeService);
+
+    var params = Components.classes["@mozilla.org/messengercompose/composeparams;1"]
+                 .createInstance(Components.interfaces.nsIMsgComposeParams);
+
     if (params)
     {
         params.type = msgComposeType.New;
         params.format = msgComposFormat.Default;
-        var composeFields = Components.classes["@mozilla.org/messengercompose/composefields;1"].createInstance(Components.interfaces.nsIMsgCompFields);
+        var composeFields = Components.classes["@mozilla.org/messengercompose/composefields;1"]
+                            .createInstance(Components.interfaces.nsIMsgCompFields);
         if (composeFields)
         {
             if (to)
@@ -198,13 +222,16 @@ function composeEmail(to, subject, body, attachments)
 }
 
 
-/**
+
+/** ****************************************************************************
  * return file objects for all logfiles
- */
+ ******************************************************************************/
 function getLogfiles()
 {
     var logfiles = new Array();
-    var logger = window.opener.opener ? window.opener.opener.LOGGER_ : window.opener.LOGGER_;
+    var logger = window.opener.opener ?
+                 window.opener.opener.LOGGER_ :
+                 window.opener.LOGGER_;
 
     var file = null;
     if (logger)
@@ -215,35 +242,44 @@ function getLogfiles()
         if (file.exists())
             logfiles.push(file);
     }
-    
+
     return logfiles;
 }
 
 
-/**
+
+/** ****************************************************************************
  * add attachments from file objects
- */
+ ******************************************************************************/
 function addAttachments(composeFields, attachments)
 {
     for (key in attachments)
     {
         var file = attachments[key];
-        var attachment = Components.classes["@mozilla.org/messengercompose/attachment;1"].createInstance(Components.interfaces.nsIMsgAttachment);
-        var ios = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService);
-        var fileHandler = ios.getProtocolHandler("file").QueryInterface(Components.interfaces.nsIFileProtocolHandler);
+        var attachment = Components.classes["@mozilla.org/messengercompose/attachment;1"]
+                         .createInstance(Components.interfaces.nsIMsgAttachment);
+        var ios = Components.classes["@mozilla.org/network/io-service;1"]
+                  .getService(Components.interfaces.nsIIOService);
+        var fileHandler = ios.getProtocolHandler("file")
+                          .QueryInterface(Components.interfaces.nsIFileProtocolHandler);
         attachment.url = fileHandler.getURLSpecFromFile(file);
         composeFields.addAttachment(attachment);
     }
 }
 
 
-/**
+
+/** ****************************************************************************
  * reset the logfiles
- */
+ ******************************************************************************/
 function resetLogfiles()
 {
-    var parent = window.opener.opener ? window.opener.opener : window.opener;
-    var logger = window.opener.opener ? window.opener.opener.LOGGER_ : window.opener.LOGGER_;
+    var parent = window.opener.opener ?
+                 window.opener.opener :
+                 window.opener;
+    var logger = window.opener.opener ?
+                 window.opener.opener.LOGGER_ :
+                 window.opener.LOGGER_;
     if (logger)
     {
         logger.reset(true);
@@ -255,9 +291,10 @@ function resetLogfiles()
 }
 
 
-/**
+
+/** ****************************************************************************
  * Enable or disable the debug checkbox
- */
+ ******************************************************************************/
 function toggleLogging()
 {
     var logcheckbox = document.getElementById("dologging");
@@ -269,13 +306,16 @@ function toggleLogging()
 }
 
 
-/**
+
+/** ****************************************************************************
  * open a homepage
- */
+ ******************************************************************************/
 function openURL(url)
 {
-    var uri = Components.classes["@mozilla.org/network/standard-url;1"].createInstance(Components.interfaces.nsIURI);
+    var uri = Components.classes["@mozilla.org/network/standard-url;1"]
+              .createInstance(Components.interfaces.nsIURI);
     uri.spec = url;
-    var protocolSvc = Components.classes["@mozilla.org/uriloader/external-protocol-service;1"].getService(Components.interfaces.nsIExternalProtocolService);
+    var protocolSvc = Components.classes["@mozilla.org/uriloader/external-protocol-service;1"]
+                      .getService(Components.interfaces.nsIExternalProtocolService);
     protocolSvc.loadUrl(uri);
 }

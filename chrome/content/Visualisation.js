@@ -1,4 +1,4 @@
-/* *******************************************************
+/** ****************************************************************************
  * Visualisation.js
  *
  * (c) 2005 Alexander C. Hubmann
@@ -7,7 +7,9 @@
  * Re-implementation from Java
  *
  * Version: $Id$
- ********************************************************/
+ ******************************************************************************/
+
+
 
 var XUL_NAMESPACE_ =
     "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
@@ -17,18 +19,25 @@ var THREADARCSJS_PREF_BRANCH_ = "extensions.threadarcsjs.";
 var VISUALISATION_PREF_DOTIMESCALING_ = "timescaling.enabled";
 var VISUALISATION_PREF_VISUALISATIONSIZE_ = "visualisationsize";
 
-// ==============================================================================================
-// ==============================================================================================
-// ==============================================================================================
-// FIXXME
-// all container variables that are set here should be accessed by functions in the container class
-// ==============================================================================================
-// ==============================================================================================
-// ==============================================================================================
+var ALPHA_ = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
 
-/**
+
+
+// =============================================================================
+// =============================================================================
+// =============================================================================
+// FIXXME
+// all container variables that are set here should be accessed by functions
+// in the container class
+// =============================================================================
+// =============================================================================
+// =============================================================================
+
+
+
+/** ****************************************************************************
  * Constructor for visualisation class
- */
+ ******************************************************************************/
 function Visualisation()
 {
     this.box_ = null;
@@ -44,10 +53,11 @@ function Visualisation()
 }
 
 
-/**
+
+/** ****************************************************************************
  * Clear stack
  * delete all children
- */
+ ******************************************************************************/
 Visualisation.prototype.clearStack = function()
 {
     LOGGER_.logDebug("Visualisation.clearStack()", {});
@@ -56,9 +66,10 @@ Visualisation.prototype.clearStack = function()
 }
 
 
-/**
+
+/** ****************************************************************************
  * Create stack
- */
+ ******************************************************************************/
 Visualisation.prototype.createStack = function()
 {
     LOGGER_.logDebug("Visualisation.createStack()", {});
@@ -91,133 +102,128 @@ Visualisation.prototype.createStack = function()
 }
 
 
-/**
+
+/** ****************************************************************************
  * Draw arc
- */
-Visualisation.prototype.drawArc = function(color, vposition, height, left, right, top)
+ ******************************************************************************/
+Visualisation.prototype.drawArc = function(color,
+                                           vposition,
+                                           height,
+                                           left,
+                                           right,
+                                           top)
 {
-    LOGGER_.logDebug("Visualisation.drawArc()", {"action" : "start", "color" : color, "vposition" : vposition, "height" : height, "left" : left, "right" : right});
+    LOGGER_.logDebug("Visualisation.drawArc()", {"action" : "start",
+                                                 "color" : color,
+                                                 "vposition" : vposition,
+                                                 "height" : height,
+                                                 "left" : left,
+                                                 "right" : right});
     var arc_top = 0;
     var fill_top = 0;
-    height--;
+    if (vposition == "top")
+        arc_top = top - (((this.dotsize_ / 2) + this.arc_min_height_ + 
+                  (this.arc_difference_ * height)) * this.resize_);
+    else
+        arc_top = top + ((this.dotsize_ / 2) * this.resize_);
+
+    var style_top = (arc_top) + "px";
+    var style_left = ((left - (this.arc_width_ / 2)) * this.resize_) + "px";
+    var style_height = ((this.arc_min_height_ + this.arc_difference_ * height) * 
+                       this.resize_) + "px";
+    var style_width = ((right - left + this.arc_width_) * this.resize_)+ "px";
+    var style_background = color;
+    LOGGER_.logDebug("Visualisation.drawArc()",
+                        {"action" : "draw arc",
+                         "top" : style_top,
+                         "left" : style_left,
+                         "height" : style_height,
+                         "width" : style_width,
+                         "background" : style_background});
+
+    var arc = document.createElementNS(XUL_NAMESPACE_, "box");
+    arc.style.position = "relative";
+    arc.style.top = style_top;
+    arc.style.left = style_left;
+    arc.style.height = style_height;
+    arc.style.width = style_width;
+    arc.style.verticalAlign = "top";
     if (vposition == "top")
     {
-        arc_top = top - (((this.dotsize_ / 2) + this.arc_height_ + (this.arc_difference_ * height)) * this.resize_);
-        fill_top = arc_top + (this.arc_height_ * this.resize_);
+        arc.style.MozBorderRadiusTopleft = this.arc_radius_ + "px";
+        arc.style.MozBorderRadiusTopright = this.arc_radius_ + "px"
+        arc.style.borderTop = (this.arc_width_ * this.resize_) + 
+                              "px solid " + style_background;
+        arc.style.borderLeft = (this.arc_width_ * this.resize_) + 
+                               "px solid " + style_background;
+        arc.style.borderRight = (this.arc_width_ * this.resize_) + 
+                                "px solid " + style_background;
     }
     else
     {
-        arc_top = top + (((this.dotsize_ / 2) + (this.arc_difference_ * height)) * this.resize_);
-        fill_top = arc_top - (this.arc_difference_ * height * this.resize_);
+        arc.style.MozBorderRadiusBottomleft = this.arc_radius_ + "px";
+        arc.style.MozBorderRadiusBottomright = this.arc_radius_ + "px";
+        arc.style.borderBottom = (this.arc_width_ * this.resize_) + 
+                                 "px solid " + style_background;
+        arc.style.borderLeft = (this.arc_width_ * this.resize_) + 
+                               "px solid " + style_background;
+        arc.style.borderRight = (this.arc_width_ * this.resize_) + 
+                                "px solid " + style_background;
     }
-
-    var style_top = arc_top + "px";
-    var style_left = ((left + this.arc_left_placement_) * this.resize_) + "px";
-    var style_height = (this.arc_height_ * this.resize_)+ "px";
-    var style_width = (this.arc_width_ * this.resize_)+ "px";
-    var style_src = URL_ + this.name_ + "arc_" + color + "_" + vposition + "_left.png";
-    LOGGER_.logDebug("Visualisation.drawArc()", {"action" : "draw left arc", "top" : style_top, "left" : style_left, "height" : style_height, "width" : style_width, "src" : style_src});
-    var arc_left = document.createElementNS(XUL_NAMESPACE_, "image");
-    arc_left.style.position = "relative";
-    arc_left.style.top = style_top;
-    arc_left.style.left = style_left;
-    arc_left.style.height = style_height;
-    arc_left.style.width = style_width;
-    arc_left.style.verticalAlign = "top";
-    arc_left.setAttribute("src", style_src);
-    this.stack_.appendChild(arc_left);
-
-    var style_top = arc_top + "px";
-    var style_left = ((right - this.arc_width_ + this.arc_right_placement_) * this.resize_) + "px";
-    var style_height = (this.arc_height_ * this.resize_)+ "px";
-    var style_width = (this.arc_width_ * this.resize_)+ "px";
-    var style_src = URL_ + this.name_ + "arc_" + color + "_" + vposition + "_right.png";
-    LOGGER_.logDebug("Visualisation.drawArc()", {"action" : "draw right arc", "top" : style_top, "left" : style_left, "height" : style_height, "width" : style_width, "src" : style_src});
-    var arc_right = document.createElementNS(XUL_NAMESPACE_, "image");
-    arc_right.style.position = "relative";
-    arc_right.style.top = style_top;
-    arc_right.style.left = style_left;
-    arc_right.style.height = style_height;
-    arc_right.style.width = style_width;
-    arc_right.style.verticalAlign = "top";
-    arc_right.setAttribute("src", style_src);
-    this.stack_.appendChild(arc_right);
-
-    var style_top = arc_top + "px";
-    var style_left = ((left + this.arc_left_placement_ + this.arc_width_) * this.resize_) + "px";
-    var style_height = (this.arc_height_ * this.resize_) + "px";
-    var style_width = (((right - this.arc_width_ + this.arc_right_placement_) - (left + this.arc_left_placement_ + this.arc_width_)) * this.resize_) + "px";
-    var style_src = URL_ + this.name_ + "arc_" + color + "_" + vposition + "_middle.png";
-    LOGGER_.logDebug("Visualisation.drawArc()", {"action" : "draw middle arc", "top" : style_top, "left" : style_left, "height" : style_height, "width" : style_width, "src" : style_src});
-    var arc_middle = document.createElementNS(XUL_NAMESPACE_, "image");
-    arc_middle.style.position = "relative";
-    arc_middle.style.top = style_top;
-    arc_middle.style.left = style_left;
-    arc_middle.style.width = style_width;
-    arc_middle.style.height = style_height;
-    arc_middle.style.verticalAlign = "top";
-    arc_middle.setAttribute("src", style_src);
-    this.stack_.appendChild(arc_middle);
-
-    if (height == 0)
-        return;
-
-    var style_top = fill_top + "px";
-    var style_left = ((left + this.arc_left_placement_) * this.resize_) + "px";
-    var style_height = ((this.arc_difference_ * height) * this.resize_) + "px";
-    var style_width = (this.arc_width_ * this.resize_) + "px";
-    var style_src = URL_ + this.name_ + "arc_" + color + "_left_middle.png";
-    LOGGER_.logDebug("Visualisation.drawArc()", {"action" : "draw left middle arc", "top" : style_top, "left" : style_left, "height" : style_height, "width" : style_width, "src" : style_src});
-    var arc_left_middle = document.createElementNS(XUL_NAMESPACE_, "image");
-    arc_left_middle.style.position = "relative";
-    arc_left_middle.style.top = style_top;
-    arc_left_middle.style.left = style_left;
-    arc_left_middle.style.width = style_width;
-    arc_left_middle.style.height = style_height;
-    arc_left_middle.style.verticalAlign = "top";
-    arc_left_middle.setAttribute("src", style_src);
-    this.stack_.appendChild(arc_left_middle);
-
-    var style_top = fill_top + "px";
-    var style_left = ((right - this.arc_width_ + this.arc_right_placement_) * this.resize_) + "px";
-    var style_height = ((this.arc_difference_ * height) * this.resize_) + "px";
-    var style_width = (this.arc_width_ * this.resize_) + "px";
-    var style_src = URL_ + this.name_ + "arc_" + color + "_right_middle.png";
-    LOGGER_.logDebug("Visualisation.drawArc()", {"action" : "draw right middle arc", "top" : style_top, "left" : style_left, "height" : style_height, "width" : style_width, "src" : style_src});
-    var arc_right_middle = document.createElementNS(XUL_NAMESPACE_, "image");
-    arc_right_middle.style.position = "relative";
-    arc_right_middle.style.top = style_top;
-    arc_right_middle.style.left = style_left;
-    arc_right_middle.style.width = style_width;
-    arc_right_middle.style.height = style_height;
-    arc_right_middle.style.verticalAlign = "top";
-    arc_right_middle.setAttribute("src", style_src);
-    this.stack_.appendChild(arc_right_middle);
+    this.stack_.appendChild(arc);
 }
 
 
-/**
- * Draw a dot
- */
-Visualisation.prototype.drawDot = function(container, color, style, left, top)
-{
-    LOGGER_.logDebug("Visualisation.drawDot()", {"action" : "start", "container" : container.toString(), "color" : color, "style" : style, "left" : left});
-    var dot = document.createElementNS(XUL_NAMESPACE_, "image");
 
-    var style_top = top - ((this.dotsize_ / 2) * this.resize_) + "px";
+/** ****************************************************************************
+ * Draw a dot
+ ******************************************************************************/
+Visualisation.prototype.drawDot = function(container,
+                                           color,
+                                           style,
+                                           left,
+                                           top)
+{
+    LOGGER_.logDebug("Visualisation.drawDot()",
+                        {"action" : "start",
+                         "container" : container.toString(),
+                         "color" : color,
+                         "style" : style,
+                         "left" : left,
+                         "top" : top});
+
+    var dot = document.createElementNS(XUL_NAMESPACE_, "box");
+
+    var style_top = (top - ((this.dotsize_ / 2) * this.resize_)) + "px";
     var style_left = ((left - (this.dotsize_ / 2)) * this.resize_) + "px";
     var style_height = (this.dotsize_ * this.resize_) + "px";
     var style_width = (this.dotsize_ * this.resize_) + "px";
-    var style_src = URL_ + this.name_ + "dot_" + color + "_" + style + ".png";
-    LOGGER_.logDebug("Visualisation.drawDot()", {"top" : style_top, "left" : style_left, "height" : style_height, "width" : style_width, "src" : style_src});
+    var style_background = "";
+    var style_border = "";
+    if (style != "half")
+        var style_background = color;
+    else
+        var style_border = (this.dotsize_ / 4 * this.resize_) + 
+                           "px solid " + color;
+
+    LOGGER_.logDebug("Visualisation.drawDot()",
+                        {"top" : style_top,
+                         "left" : style_left,
+                         "height" : style_height,
+                         "width" : style_width,
+                         "background" : style_background,
+                         "border" : style_border});
+
     dot.style.position = "relative";
     dot.style.top = style_top;
     dot.style.left = style_left;
     dot.style.width = style_width;
     dot.style.height = style_height;
     dot.style.verticalAlign = "top";
-    dot.setAttribute("src", style_src);
-
+    dot.style.background = style_background;
+    dot.style.border = style_border;
+    if (style != "dummy")
+        dot.style.MozBorderRadius = style_width;
     dot.container = container;
 
     var tooltip = document.createElementNS(XUL_NAMESPACE_, "tooltip");
@@ -226,112 +232,210 @@ Visualisation.prototype.drawDot = function(container, color, style, left, top)
 
     if (! container.isDummy())
     {
-        LOGGER_.logDebug("Visualisation.drawDot()", {"action" : "create tooltip start"});
+        LOGGER_.logDebug("Visualisation.drawDot()",
+                            {"action" : "create tooltip start"});
+
         // if container container message, view details
         var authorlabel = document.createElementNS(XUL_NAMESPACE_, "label");
         var authortext = document.createElementNS(XUL_NAMESPACE_, "label");
         var author = document.createElementNS(XUL_NAMESPACE_, "hbox");
         author.appendChild(authorlabel);
         author.appendChild(authortext);
-        authorlabel.setAttribute("value", this.strings_.getString("tooltip.from"));
+        authorlabel.setAttribute("value",
+                                 this.strings_.getString("tooltip.from"));
         authorlabel.style.fontWeight = "bold";
-        authortext.setAttribute("value", container.getMessage().getFrom());
-        
+        authortext.setAttribute("value",
+                                container.getMessage().getFrom());
+
         var datelabel = document.createElementNS(XUL_NAMESPACE_, "label");
         var datetext = document.createElementNS(XUL_NAMESPACE_, "label");
         var date = document.createElementNS(XUL_NAMESPACE_, "hbox");
         date.appendChild(datelabel);
         date.appendChild(datetext);
-        datelabel.setAttribute("value", this.strings_.getString("tooltip.date"));
+        datelabel.setAttribute("value",
+                               this.strings_.getString("tooltip.date"));
         datelabel.style.fontWeight = "bold";
-        datetext.setAttribute("value", container.getMessage().getDate());
+        datetext.setAttribute("value",
+                              container.getMessage().getDate());
 
         var subjectlabel = document.createElementNS(XUL_NAMESPACE_, "label");
         var subjecttext = document.createElementNS(XUL_NAMESPACE_, "label");
         var subject = document.createElementNS(XUL_NAMESPACE_, "hbox");
         subject.appendChild(subjectlabel);
         subject.appendChild(subjecttext);
-        subjectlabel.setAttribute("value", this.strings_.getString("tooltip.subject"));
+        subjectlabel.setAttribute("value",
+                                  this.strings_.getString("tooltip.subject"));
         subjectlabel.style.fontWeight = "bold";
-        subjecttext.setAttribute("value", container.getMessage().getSubject());
+        subjecttext.setAttribute("value",
+                                 container.getMessage().getSubject());
 
         tooltip.appendChild(author);
         tooltip.appendChild(date);
         tooltip.appendChild(subject);
-        LOGGER_.logDebug("Visualisation.drawDot()", {"action" : "create tooltip end"});
+        LOGGER_.logDebug("Visualisation.drawDot()",
+                            {"action" : "create tooltip end"});
     }
     else
     {
-        LOGGER_.logDebug("Visualisation.drawDot()", {"action" : "create missing tooltip start"});
+        LOGGER_.logDebug("Visualisation.drawDot()",
+                            {"action" : "create missing tooltip start"});
+
         // otherwise we display info about missing message
         var desc1 = document.createElementNS(XUL_NAMESPACE_, "description");
         var desc2 = document.createElementNS(XUL_NAMESPACE_, "description");
-        desc1.setAttribute("value", this.strings_.getString("tooltip.missingmessage"));
-        desc2.setAttribute("value", this.strings_.getString("tooltip.missingmessagedetail"));
+        desc1.setAttribute("value",
+                           this.strings_.getString("tooltip.missingmessage"));
+        desc2.setAttribute("value",
+                           this.strings_.getString("tooltip.missingmessagedetail"));
         tooltip.appendChild(desc1);
         tooltip.appendChild(desc2);
-        LOGGER_.logDebug("Visualisation.drawDot()", {"action" : "create missing tooltip end"});
+        LOGGER_.logDebug("Visualisation.drawDot()",
+                            {"action" : "create missing tooltip end"});
     }
 
     dot.setAttribute("tooltip", "ThreadArcsJS_" + left);
     this.stack_.appendChild(dot);
-    //this.stack_.appendChild(tooltip);
-    this.box_.appendChild(tooltip);
+    this.stack_.appendChild(tooltip);
     dot.addEventListener("click", this.onMouseClick, true);
 }
 
 
-/**
+
+/** ****************************************************************************
+ * Get a new color for the arc
+ ******************************************************************************/
+Visualisation.prototype.getNewColor = function(saturation)
+{
+    this.lastcolor_ = (this.lastcolor_ + 1.3) % 6;
+    rgb = this.convertHSVtoRGB(this.lastcolor_, saturation, 0.7);
+
+    return "#" + this.DECtoHEX(Math.floor(rgb.r * 255)) + 
+                 this.DECtoHEX(Math.floor(rgb.g * 255)) + 
+                 this.DECtoHEX(Math.floor(rgb.b * 255));
+}
+
+
+
+/** ****************************************************************************
+ * Convert a HSV color to a RGB color
+ *******************************************************************************/
+Visualisation.prototype.convertHSVtoRGB = function(hue,
+                                                   saturation,
+                                                   value)
+{
+    // hue in [0..6]
+    // saturation, value in [0..1]
+    var i = Math.floor(hue);
+    var f = hue - i;
+    if (! i % 2 == 1)
+        f = 1 - f;
+    var m = value * (1 - saturation);
+    var n = value * (1 - saturation * f);
+    switch(i)
+    {
+        case 6:
+        case 0:
+            return {"r" : value, "g" : n, "b" : m};
+        case 1:
+            return {"r" : n, "g" : value, "b" : m};
+        case 2:
+            return {"r" : m, "g" : value, "b" : n};
+        case 3:
+            return {"r" : m, "g" : n, "b" : value};
+        case 4:
+            return {"r" : n, "g" : m, "b" : value};
+        case 5:
+            return {"r" : value, "g" : m, "b" : n};
+    }
+}
+
+
+
+/** ****************************************************************************
+ * Get hexadecimal representation of a decimal number
+ ******************************************************************************/
+Visualisation.prototype.DECtoHEX = function(dec)
+{
+    var n_ = Math.floor(dec / 16)
+    var _n = dec - n_*16;
+    return ALPHA_[n_] + ALPHA_[_n];
+}
+
+
+
+/** ****************************************************************************
  * Get resize multiplicator
  * calculate from box width and height
  * and needed width and height
- */
-Visualisation.prototype.getResize = function(xcount, ycount,sizex, sizey)
+ *******************************************************************************/
+Visualisation.prototype.getResize = function(xcount,
+                                             ycount,
+                                             sizex,
+                                             sizey)
 {
-    LOGGER_.logDebug("Visualisation.getResize()", {"action" : "start", "xcount" : xcount, "ycount" : ycount, "sizex" : sizex, "sizey" : sizey});
+    LOGGER_.logDebug("Visualisation.getResize()",
+                        {"action" : "start",
+                         "xcount" : xcount,
+                         "ycount" : ycount,
+                         "sizex" : sizex,
+                         "sizey" : sizey});
+
     var spaceperarcavailablex = sizex / (xcount - 1);
     var spaceperarcavailabley = sizey / 2;
-    var spaceperarcneededx = this.dotsize_ + (2 * this.arc_width_);
-    var spaceperarcneededy = (this.dotsize_ / 2) + this.arc_height_ + ycount * this.arc_difference_;
-    
+    var spaceperarcneededx = this.spacing_;
+    var spaceperarcneededy = (this.dotsize_ / 2) + this.arc_min_height_ + 
+                             (ycount + 1) * this.arc_difference_;
+
     var resizex = (spaceperarcavailablex / spaceperarcneededx);
     var resizey = (spaceperarcavailabley / spaceperarcneededy);
-    
+
     var resize = 1;
     if (resizex < resizey)
         resize = resizex;
     else
         resize = resizey;
-    
+
     if (resize > 1)
         resize = 1;
-    
-    LOGGER_.logDebug("Visualisation.getResize()", {"action" : "end", "resize" : resize});
+
+    LOGGER_.logDebug("Visualisation.getResize()",
+                        {"action" : "end",
+                        "resize" : resize});
     return resize;
 }
 
 
-/**
+
+/** ****************************************************************************
  * mouse click event handler
  * display message user clicked on
- */
+ ******************************************************************************/
 Visualisation.prototype.onMouseClick = function(event)
 {
     LOGGER_.logDebug("Visualisation.onMouseClick()", {});
     var container = event.target.container;
     if (container && ! container.isDummy())
-        THREADARCS_.callback(container.getMessage().getKey(), container.getMessage().getFolder());
+        THREADARCS_.callback(container.getMessage().getKey(), 
+                             container.getMessage().getFolder());
 }
 
 
-/**
- * If time scaling is enabled, we want to layout the messages so that their
- * horizontal spacing is proportional to the time difference between those
- * two messages
- */
-Visualisation.prototype.timeScaling = function(containers, minimaltimedifference, width)
+
+/** ****************************************************************************
+ * If time scaling is enabled, we want to layout the messages so that their 
+ * horizontal spacing is proportional to the time difference between 
+ * those two messages
+ ******************************************************************************/
+Visualisation.prototype.timeScaling = function(containers,
+                                               minimaltimedifference,
+                                               width)
 {
-    LOGGER_.logDebug("Visualisation.timeScaling()", {"action" : "start", "containers" : containers.toString(), "minimaltimedifference" : minimaltimedifference, "width" : width});
+    LOGGER_.logDebug("Visualisation.timeScaling()",
+                        {"action" : "start",
+                         "containers" : containers.toString(),
+                         "minimaltimedifference" : minimaltimedifference,
+                         "width" : width});
+
     // if we do not want to do timescaling, reset all scaling info to 1
     if (! this.pref_timescaling_)
     {
@@ -343,14 +447,16 @@ Visualisation.prototype.timeScaling = function(containers, minimaltimedifference
         return containers;
     }
 
-    // we want to scale the messages horizontally according to their time difference
+    // we want to scale the messages horizontally according to their 
+    // time difference
     // therefore we calculate the overall scale factor
     var total_time_scale = 0;
     for (var counter = 0; counter < containers.length - 1; counter++)
     {
         var thiscontainer = containers[counter];
         // we norm the scale factor to the minimal time
-        // (this means, the two messages that are the nearest in time have a difference of 1)
+        // (this means, the two messages that are the nearest in time 
+        // have a difference of 1)
         thiscontainer.x_scaled_ = thiscontainer.timedifference_ / minimaltimedifference;
         // check if we might encounter a dummy container, see above
         if (thiscontainer.x_scaled_ < 1)
@@ -358,13 +464,17 @@ Visualisation.prototype.timeScaling = function(containers, minimaltimedifference
         total_time_scale += thiscontainer.x_scaled_;
     }
 
-    // max_count_x tells us how many messages we could display if all are laid out
-    // with the minimal horizontal spacing
-    var max_count_x = width / (this.dotsize_ + (2 * this.arc_width_));
-    
-    LOGGER_.logDebug("Visualisation.timeScaling()", {"action" : "first pass done", "total_time_scale" : total_time_scale, "max_count_x" : max_count_x});
-    
-    // if the time scaling factor is bigger than what we can display, we have a problem
+    // max_count_x tells us how many messages we could display if all are 
+    // laid out with the minimal horizontal spacing
+    var max_count_x = width / this.spacing_;
+
+    LOGGER_.logDebug("Visualisation.timeScaling()", 
+                        {"action" : "first pass done",
+                         "total_time_scale" : total_time_scale,
+                         "max_count_x" : max_count_x});
+
+    // if the time scaling factor is bigger than what we can display, we have 
+    // a problem
     // this means, we have to scale the timing factor down
     var scaling = 0.9;
     while (total_time_scale > max_count_x)
@@ -385,19 +495,25 @@ Visualisation.prototype.timeScaling = function(containers, minimaltimedifference
         if (total_time_scale == containers.length - 1)
             break;
     }
-    
-    LOGGER_.logDebug("Visualisation.timeScaling()", {"action" : "second pass done", "total_time_scale" : total_time_scale});
-    
+
+    LOGGER_.logDebug("Visualisation.timeScaling()",
+                        {"action" : "second pass done", 
+                         "total_time_scale" : total_time_scale});
+
     return containers;
 }
 
 
-/**
+
+/** ****************************************************************************
  * Visualise a new thread
- */
+ ******************************************************************************/
 Visualisation.prototype.visualise = function(container)
 {
-    LOGGER_.logDebug("Visualisation.visualise()", {"action" : "start", "container" : container.toString()});
+    LOGGER_.logDebug("Visualisation.visualise()",
+                        {"action" : "start",
+                         "container" : container.toString()});
+
     // clear visualisation
     this.clearStack();
 
@@ -429,18 +545,23 @@ Visualisation.prototype.visualise = function(container)
         var parent = thiscontainer.getParent();
         if (parent != null && ! parent.isRoot())
         {
-            // calculate the current maximal arc height between the parent message and this one
-            // since we want to draw an arc between this message and its parent, and we do 
-            // not want any arcs to overlap, we draw this arc higher than the current highest arc
+            // calculate the current maximal arc height between the parent 
+            // message and this one since we want to draw an arc between this 
+            // message and its parent, and we do not want any arcs to overlap, 
+            // we draw this arc higher than the current highest arc
             var maxheight = 0;
-            for (var innercounter = parent.x_index_; innercounter < counter; innercounter++)
+            for (var innercounter = parent.x_index_;
+                 innercounter < counter;
+                 innercounter++)
             {
                 var lookatcontainer = containers[innercounter];
-                if (lookatcontainer.odd_ == parent.odd_ && lookatcontainer.current_arc_height_outgoing_ > maxheight)
+                if (lookatcontainer.odd_ == parent.odd_ && 
+                    lookatcontainer.current_arc_height_outgoing_ > maxheight)
                 {
                     maxheight = lookatcontainer.current_arc_height_outgoing_;
                 }
-                if (lookatcontainer.odd_ != parent.odd_ && lookatcontainer.current_arc_height_incoming_ > maxheight)
+                if (lookatcontainer.odd_ != parent.odd_ &&
+                    lookatcontainer.current_arc_height_incoming_ > maxheight)
                 {
                     maxheight = lookatcontainer.current_arc_height_incoming_;
                 }
@@ -453,50 +574,75 @@ Visualisation.prototype.visualise = function(container)
         // the whole extension
         if (maxheight > totalmaxheight)
             totalmaxheight = maxheight;
-        
+
         // also keep track of the time difference between two adjacent messages
         if (counter < containers.length - 1)
         {
-            var timedifference = containers[counter + 1].getDate().getTime() - containers[counter].getDate().getTime();
+            var timedifference = containers[counter + 1].getDate().getTime() - 
+                                 containers[counter].getDate().getTime();
             // timedifference_ stores the time difference to the _next_ message
             thiscontainer.timedifference_ = timedifference;
-            // since we could have dummy containers that have the same time as the next message,
-            // skip any time difference of 0
-            if (timedifference < minimaltimedifference && timedifference != 0)
+            // since we could have dummy containers that have the same time as 
+            // the next message, skip any time difference of 0
+            if (timedifference < minimaltimedifference &&
+                timedifference != 0)
                 minimaltimedifference = timedifference;
         }
     }
 
     var width = this.box_.boxObject.width;
     var height = this.box_.boxObject.height;
-    containers = this.timeScaling(containers, minimaltimedifference, width);
+    containers = this.timeScaling(containers,
+                                  minimaltimedifference,
+                                  width);
 
 
     var x = this.spacing_ / 2;
     this.box_.style.paddingRight = x + "px";
-    this.resize_ = this.getResize(containers.length, totalmaxheight, width, height);
+    this.resize_ = this.getResize(containers.length,
+                                  totalmaxheight,
+                                  width,
+                                  height);
 
-    for (var counter = 0; counter < containers.length; counter++)
+    // pre-calculate colors for different authors
+    var authors = new Object();
+    this.lastcolor_ = 0;
+
+    for (var counter = 0;
+         counter < containers.length;
+         counter++)
     {
         var thiscontainer = containers[counter];
 
-        // draw this container
-        var color = "grey";
-        if (thiscontainer == container)
-            color = "blue";
+        var color = "#75756D";
+        if (! thiscontainer.isDummy())
+        {
+            if (authors[thiscontainer.getMessage().getFromEmail()] != null)
+            {
+                color = authors[thiscontainer.getMessage().getFromEmail()];
+            }
+            else
+            {
+                if (thiscontainer == container)
+                    color = this.getNewColor(1);
+                else
+                    color = this.getNewColor(0.5);
+                authors[thiscontainer.getMessage().getFromEmail()] = color;
+            }
+        }
 
         var style = "full";
-        if (! thiscontainer.isDummy() && thiscontainer.getMessage().isSent())
+        if (! thiscontainer.isDummy() &&
+            thiscontainer.getMessage().isSent())
             style = "half";
-        
+
         if (thiscontainer.isDummy())
             style ="dummy";
-        
+
         this.drawDot(thiscontainer, color, style, x, (height / 2));
         thiscontainer.x_position_ = x;
         thiscontainer.current_arc_height_incoming_ = 0;
         thiscontainer.current_arc_height_outgoing_ = 0;
-        
         // draw arc
         var parent = thiscontainer.getParent()
         if (parent != null && ! parent.isRoot())
@@ -505,19 +651,19 @@ Visualisation.prototype.visualise = function(container)
             if (parent.odd_)
                 position = "top";
 
-            var color = "grey";
-            if (thiscontainer == container || parent == container)
-                color = "blue";
-            
             var maxheight = 0;
-            for (var innercounter = parent.x_index_; innercounter < counter; innercounter++)
+            for (var innercounter = parent.x_index_;
+                 innercounter < counter;
+                 innercounter++)
             {
                 var lookatcontainer = containers[innercounter];
-                if (lookatcontainer.odd_ == parent.odd_ && lookatcontainer.current_arc_height_outgoing_ > maxheight)
+                if (lookatcontainer.odd_ == parent.odd_ && 
+                    lookatcontainer.current_arc_height_outgoing_ > maxheight)
                 {
                     maxheight = lookatcontainer.current_arc_height_outgoing_;
                 }
-                if (lookatcontainer.odd_ != parent.odd_ && lookatcontainer.current_arc_height_incoming_ > maxheight)
+                if (lookatcontainer.odd_ != parent.odd_ &&
+                    lookatcontainer.current_arc_height_incoming_ > maxheight)
                 {
                     maxheight = lookatcontainer.current_arc_height_incoming_;
                 }
@@ -525,19 +671,26 @@ Visualisation.prototype.visualise = function(container)
             maxheight++;
             parent.current_arc_height_outgoing_ = maxheight;
             thiscontainer.current_arc_height_incoming_ = maxheight;
-            this.drawArc(color, position, maxheight, parent.x_position_, x, (height / 2));
+            this.drawArc(color,
+                         position,
+                         maxheight,
+                         parent.x_position_,
+                         x,
+                         (height / 2));
         }
         x = x + (thiscontainer.x_scaled_ * this.spacing_);
     }
 }
 
 
-/**
+
+/** ****************************************************************************
  * Preference changing observer
- */
+ ******************************************************************************/
 Visualisation.prototype.preferenceObserverRegister =  function()
 {
-    var prefService = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService);
+    var prefService = Components.classes["@mozilla.org/preferences-service;1"]
+                      .getService(Components.interfaces.nsIPrefService);
     this.pref_branch_ = prefService.getBranch(THREADARCSJS_PREF_BRANCH_);
 
     var pbi = this.pref_branch_.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
@@ -545,6 +698,10 @@ Visualisation.prototype.preferenceObserverRegister =  function()
 }
 
 
+
+/** ****************************************************************************
+ * unregister observer
+ ******************************************************************************/
 Visualisation.prototype.preferenceObserverUnregister = function()
 {
     if(!this.pref_branch_)
@@ -555,6 +712,10 @@ Visualisation.prototype.preferenceObserverUnregister = function()
 }
 
 
+
+/** ****************************************************************************
+ * observe preferences change
+ ******************************************************************************/
 Visualisation.prototype.observe = function(subject, topic, data)
 {
     if(topic != "nsPref:changed")
@@ -563,25 +724,30 @@ Visualisation.prototype.observe = function(subject, topic, data)
     this.preferenceReload();
 }
 
+
+
+/** ****************************************************************************
+ * reload all preferences
+ ******************************************************************************/
 Visualisation.prototype.preferenceReload = function()
 {
     // check if preference is set to do timescaling
-    var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
+    var prefs = Components.classes["@mozilla.org/preferences-service;1"]
+                .getService(Components.interfaces.nsIPrefBranch);
     this.pref_timescaling_ = false;
     if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_DOTIMESCALING_) == prefs.PREF_BOOL)
         this.pref_timescaling_ = prefs.getBoolPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_DOTIMESCALING_);
-    
-    var todecode = "12x12,12,12,12,6,-1,1,24";
+
+    var todecode = "12x12,12,12,32,6,2,24";
     if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONSIZE_) == prefs.PREF_STRING)
         todecode = prefs.getCharPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONSIZE_);
 
     todecode = todecode.split(",");
     this.name_ = todecode[0] + "/";
     this.dotsize_ = parseInt(todecode[1]);
-    this.arc_height_ = parseInt(todecode[2]);
-    this.arc_width_ = parseInt(todecode[3]);
+    this.arc_min_height_ = parseInt(todecode[2]);
+    this.arc_radius_ = parseInt(todecode[3]);
     this.arc_difference_ = parseInt(todecode[4]);
-    this.arc_left_placement_ = parseInt(todecode[5]);
-    this.arc_right_placement_ = parseInt(todecode[6]);
-    this.spacing_ = parseInt(todecode[7]);
+    this.arc_width_ = parseInt(todecode[5]);
+    this.spacing_ = parseInt(todecode[6]);
 }
