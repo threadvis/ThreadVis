@@ -106,7 +106,7 @@ Visualisation.prototype.createStack = function()
 /** ****************************************************************************
  * Draw arc
  ******************************************************************************/
-Visualisation.prototype.drawArc = function(color,
+Visualisation.prototype.drawArc = function(colour,
                                            vposition,
                                            height,
                                            left,
@@ -114,7 +114,7 @@ Visualisation.prototype.drawArc = function(color,
                                            top)
 {
     LOGGER_.logDebug("Visualisation.drawArc()", {"action" : "start",
-                                                 "color" : color,
+                                                 "colour" : colour,
                                                  "vposition" : vposition,
                                                  "height" : height,
                                                  "left" : left,
@@ -132,7 +132,7 @@ Visualisation.prototype.drawArc = function(color,
     var style_height = ((this.arc_min_height_ + this.arc_difference_ * height) * 
                        this.resize_) + "px";
     var style_width = ((right - left + this.arc_width_) * this.resize_)+ "px";
-    var style_background = color;
+    var style_background = colour;
     LOGGER_.logDebug("Visualisation.drawArc()",
                         {"action" : "draw arc",
                          "top" : style_top,
@@ -179,7 +179,7 @@ Visualisation.prototype.drawArc = function(color,
  * Draw a dot
  ******************************************************************************/
 Visualisation.prototype.drawDot = function(container,
-                                           color,
+                                           colour,
                                            style,
                                            left,
                                            top)
@@ -187,7 +187,7 @@ Visualisation.prototype.drawDot = function(container,
     LOGGER_.logDebug("Visualisation.drawDot()",
                         {"action" : "start",
                          "container" : container.toString(),
-                         "color" : color,
+                         "colour" : colour,
                          "style" : style,
                          "left" : left,
                          "top" : top});
@@ -201,10 +201,10 @@ Visualisation.prototype.drawDot = function(container,
     var style_background = "";
     var style_border = "";
     if (style != "half")
-        var style_background = color;
+        var style_background = colour;
     else
         var style_border = (this.dotsize_ / 4 * this.resize_) + 
-                           "px solid " + color;
+                           "px solid " + colour;
 
     LOGGER_.logDebug("Visualisation.drawDot()",
                         {"top" : style_top,
@@ -302,12 +302,11 @@ Visualisation.prototype.drawDot = function(container,
 
 
 /** ****************************************************************************
- * Get a new color for the arc
+ * Get a colour for the arc
  ******************************************************************************/
-Visualisation.prototype.getNewColor = function(saturation)
+Visualisation.prototype.getColour = function(hue, saturation)
 {
-    this.lastcolor_ = (this.lastcolor_ + 1.3) % 6;
-    rgb = this.convertHSVtoRGB(this.lastcolor_, saturation, 0.7);
+    rgb = this.convertHSVtoRGB(hue, saturation, 0.7);
 
     return "#" + this.DECtoHEX(Math.floor(rgb.r * 255)) + 
                  this.DECtoHEX(Math.floor(rgb.g * 255)) + 
@@ -317,7 +316,18 @@ Visualisation.prototype.getNewColor = function(saturation)
 
 
 /** ****************************************************************************
- * Convert a HSV color to a RGB color
+ * Get a new colour for the arc
+ ******************************************************************************/
+Visualisation.prototype.getNewColour = function()
+{
+    this.lastcolour_ = (this.lastcolour_ + 1.3) % 6;
+    return this.lastcolour_
+}
+
+
+
+/** ****************************************************************************
+ * Convert a HSV colour to a RGB colour
  *******************************************************************************/
 Visualisation.prototype.convertHSVtoRGB = function(hue,
                                                    saturation,
@@ -604,9 +614,9 @@ Visualisation.prototype.visualise = function(container)
                                   width,
                                   height);
 
-    // pre-calculate colors for different authors
+    // pre-calculate colours for different authors
     var authors = new Object();
-    this.lastcolor_ = 0;
+    this.lastcolour_ = 0;
 
     for (var counter = 0;
          counter < containers.length;
@@ -614,21 +624,22 @@ Visualisation.prototype.visualise = function(container)
     {
         var thiscontainer = containers[counter];
 
-        var color = "#75756D";
+        var colour = "#75756D";
         if (! thiscontainer.isDummy())
         {
             if (authors[thiscontainer.getMessage().getFromEmail()] != null)
             {
-                color = authors[thiscontainer.getMessage().getFromEmail()];
+                colour = authors[thiscontainer.getMessage().getFromEmail()];
             }
             else
             {
-                if (thiscontainer == container)
-                    color = this.getNewColor(1);
-                else
-                    color = this.getNewColor(0.5);
-                authors[thiscontainer.getMessage().getFromEmail()] = color;
+                colour = this.getNewColour();
+                authors[thiscontainer.getMessage().getFromEmail()] = colour;
             }
+            if (thiscontainer == container)
+                colour = this.getColour(colour, 1);
+            else
+                colour = this.getColour(colour, 0.5);
         }
 
         var style = "full";
@@ -639,7 +650,7 @@ Visualisation.prototype.visualise = function(container)
         if (thiscontainer.isDummy())
             style ="dummy";
 
-        this.drawDot(thiscontainer, color, style, x, (height / 2));
+        this.drawDot(thiscontainer, colour, style, x, (height / 2));
         thiscontainer.x_position_ = x;
         thiscontainer.current_arc_height_incoming_ = 0;
         thiscontainer.current_arc_height_outgoing_ = 0;
@@ -671,7 +682,7 @@ Visualisation.prototype.visualise = function(container)
             maxheight++;
             parent.current_arc_height_outgoing_ = maxheight;
             thiscontainer.current_arc_height_incoming_ = maxheight;
-            this.drawArc(color,
+            this.drawArc(colour,
                          position,
                          maxheight,
                          parent.x_position_,
