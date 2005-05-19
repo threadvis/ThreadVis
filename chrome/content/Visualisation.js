@@ -182,7 +182,8 @@ Visualisation.prototype.drawDot = function(container,
                                            colour,
                                            style,
                                            left,
-                                           top)
+                                           top,
+                                           selected)
 {
     LOGGER_.logDebug("Visualisation.drawDot()",
                         {"action" : "start",
@@ -201,10 +202,14 @@ Visualisation.prototype.drawDot = function(container,
     var style_background = "";
     var style_border = "";
     if (style != "half")
-        var style_background = colour;
+    {
+        style_background = colour;
+    }
     else
-        var style_border = (this.dotsize_ / 4 * this.resize_) + 
+    {
+        style_border = (this.dotsize_ / 4 * this.resize_) + 
                            "px solid " + colour;
+    }
 
     LOGGER_.logDebug("Visualisation.drawDot()",
                         {"top" : style_top,
@@ -225,6 +230,41 @@ Visualisation.prototype.drawDot = function(container,
     if (style != "dummy")
         dot.style.MozBorderRadius = style_width;
     dot.container = container;
+
+
+    if (selected)
+    {
+        var circle = document.createElementNS(XUL_NAMESPACE_, "box");
+
+        var style_top = (top - ((this.dotsize_ * 4/6) * this.resize_)) + "px";
+        var style_left = ((left - (this.dotsize_ * 4/6)) * this.resize_) + "px";
+        var style_height = (this.dotsize_ * 8/6 * this.resize_) + "px";
+        var style_width = (this.dotsize_ * 8/6 * this.resize_) + "px";
+        var style_background = "";
+        var style_border = "";
+        style_border = (this.dotsize_ / 6 * this.resize_) + 
+                           "px solid black";
+
+        LOGGER_.logDebug("Visualisation.drawDot()",
+                            {"action" : "draw selection circle",
+                             "top" : style_top,
+                             "left" : style_left,
+                             "height" : style_height,
+                             "width" : style_width,
+                             "background" : style_background,
+                             "border" : style_border});
+
+        circle.style.position = "relative";
+        circle.style.top = style_top;
+        circle.style.left = style_left;
+        circle.style.width = style_width;
+        circle.style.height = style_height;
+        circle.style.verticalAlign = "top";
+        circle.style.border = style_border;
+        circle.style.MozBorderRadius = style_width;
+        circle.container = container;
+    }
+
 
     var tooltip = document.createElementNS(XUL_NAMESPACE_, "tooltip");
     tooltip.setAttribute("orient", "vertical");
@@ -295,6 +335,11 @@ Visualisation.prototype.drawDot = function(container,
 
     dot.setAttribute("tooltip", "ThreadArcsJS_" + left);
     this.stack_.appendChild(dot);
+    if (circle)
+    {
+        circle.setAttribute("tooltip", "ThreadArcsJS_" + left);
+        this.stack_.appendChild(circle);
+    }
     this.stack_.appendChild(tooltip);
     dot.addEventListener("click", this.onMouseClick, true);
 }
@@ -624,6 +669,8 @@ Visualisation.prototype.visualise = function(container)
     {
         var thiscontainer = containers[counter];
 
+        var selected = thiscontainer == container;
+
         var colour = "#75756D";
         if (! thiscontainer.isDummy())
         {
@@ -636,7 +683,7 @@ Visualisation.prototype.visualise = function(container)
                 colour = this.getNewColour();
                 authors[thiscontainer.getMessage().getFromEmail()] = colour;
             }
-            if (thiscontainer == container)
+            if (selected)
                 colour = this.getColour(colour, 1);
             else
                 colour = this.getColour(colour, 0.5);
@@ -650,7 +697,7 @@ Visualisation.prototype.visualise = function(container)
         if (thiscontainer.isDummy())
             style ="dummy";
 
-        this.drawDot(thiscontainer, colour, style, x, (height / 2));
+        this.drawDot(thiscontainer, colour, style, x, (height / 2), selected);
         thiscontainer.x_position_ = x;
         thiscontainer.current_arc_height_incoming_ = 0;
         thiscontainer.current_arc_height_outgoing_ = 0;
