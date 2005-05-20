@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<!--
+/** ****************************************************************************
+ * SettingsDialog.xul
+ *
+ * (c) 2005 Alexander C. Hubmann
+ *
+ * XUL file to display settings dialog
+ *
+ * Version: $Id$
+ ******************************************************************************/
+-->
+
+<dialog xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        onload="window.opener.opener.openOptionsDialog('threadarcsjs', 'chrome://threadarcsjs/content/Settings.xul','threadarcsjs'); window.close();">
+</dialog>

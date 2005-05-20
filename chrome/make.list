@@ -2,11 +2,12 @@ content\Container.js
 content\contents.rdf
 content\Logger.js
 content\Message.js
-content\MozillaMenuOverlay.xul
+content\Preferences.xul
 content\References.js
 content\Settings.css
 content\Settings.js
 content\Settings.xul
+content\SettingsDialog.xul
 content\ThreadArcs.js
 content\ThreadArcs.xul
 content\Threader.js
@@ -20,12 +21,10 @@ content\images\size_16.png
 content\images\timescaling_disabled.png
 content\images\timescaling_enabled.png
 locale\en-US\contents.rdf
-locale\en-US\MozillaMenuOverlay.dtd
 locale\en-US\Settings.dtd
 locale\en-US\ThreadArcs.dtd
 locale\en-US\ThreadArcs.properties
 locale\de-DE\contents.rdf
-locale\de-DE\MozillaMenuOverlay.dtd
 locale\de-DE\Settings.dtd
 locale\de-DE\ThreadArcs.dtd
 locale\de-DE\ThreadArcs.properties

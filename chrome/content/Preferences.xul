@@ -1,0 +1,44 @@
+<?xml version="1.0"?> 
+
+<!--
+/** ****************************************************************************
+ * Preferences.xul
+ *
+ * (c) 2005 Alexander C. Hubmann
+ *
+ * XUL overlay for settings dialog
+ *
+ * Version: $Id$
+ ******************************************************************************/
+-->
+
+<!DOCTYPE overlay SYSTEM "chrome://threadarcsjs/locale/Settings.dtd">
+<overlay id="ThreadArcsJSPreferences"
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+    <!-- This is for Mozilla -->
+    <treechildren id="panelChildren">
+        <treeitem id="threadarcsjs"
+                  container="false">
+            <treerow>
+                <treecell id="multizillaPrefCell"
+                          class="treecell-indent"
+                          label="&settings.title;"
+                          url="chrome://threadarcsjs/content/Settings.xul" />
+            </treerow>
+        </treeitem>
+    </treechildren>
+
+    <!-- This is for Thunderbird -->
+    <vbox id="prefsCategories">
+        <button id="threadarcsjs"
+                orient="vertical"
+                class="buttonBoxButton"
+                type="radio"
+                label="&settings.title;"
+                group="categories"
+                url="chrome://threadarcsjs/content/Settings.xul"
+                style="list-style-image: url(chrome://threadarcsjs/content/images/icon.png);" />
+    </vbox>
+
+</overlay>

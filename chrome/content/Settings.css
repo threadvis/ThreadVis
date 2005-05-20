@@ -1,6 +1,11 @@
-dialog
+tabpanel
 {
-    max-width: 28em;
+    overflow: auto;
+}
+
+tab
+{
+    padding: 0.5em;
 }
 
 #extension-name

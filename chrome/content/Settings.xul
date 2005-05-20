@@ -12,35 +12,121 @@
  ******************************************************************************/
 -->
 
-<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
-<?xml-stylesheet href="chrome://messenger/skin/prefPanels.css" type="text/css"?>
+<?xml-stylesheet href="chrome://communicator/skin/pref/pref.css" type="text/css"?>
+<?xml-stylesheet href="chrome://communicator/skin/" type="text/css"?>
 <?xml-stylesheet href="Settings.css" type="text/css"?>
 
-<!DOCTYPE dialog SYSTEM "chrome://threadarcsjs/locale/Settings.dtd">
-<dialog xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        buttons="accept,cancel"
-        onload="init();"
-        ondialogaccept="savePrefs();"
-        persist="screenX screenY"
-        title="&settings.title;">
+<!DOCTYPE page SYSTEM "chrome://threadarcsjs/locale/Settings.dtd">
+<page xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+      headertitle="&settings.title;"
+      onload="parent.initPanel('chrome://threadarcsjs/content/Settings.xul'); init();">
 
-    <script type="application/x-javascript"
-            src="chrome://global/content/nsUserSettings.js" />
     <script type="application/x-javascript"
             src="chrome://threadarcsjs/content/Settings.js" />
 
-    <tabbox>
+    <script type="application/x-javascript">
+        <![CDATA[
+        var _elementIDs = ["dotimescaling", "visualisationsize", "dologging", "dologgingdebug"];
+        ]]>
+    </script>
+
+    <tabbox flex="1">
         <tabs id="settingstabs">
-            <tab label="&logfiles.tab;"
-                 selected="true" />
-            <tab label="&visualisation.tab;" />
             <tab label="&about.tab;" />
+            <tab label="&visualisation.tab;" />
+            <tab label="&logfiles.tab;" />
         </tabs>
 
-        <tabpanels id="settingstabpanels">
+        <tabpanels id="settingstabpanels" flex="1">
 
-            <tabpanel id="logfiles" orient="vertical">
+            <tabpanel id="about" orient="vertical" flex="1">
+                <label value="&extension.name;"
+                       id="extension-name" />
+                <separator class="thin" />
+                <hbox>
+                    <image src="images/about.png" />
+                </hbox>
+                <separator class="thin" />
+                <label value="&about.version; &extension.version;"
+                       id="about-version" />
+                <separator class="thin" />
+                <description id="about-description">
+                    &extension.description;
+                </description>
+                <separator class="thin" />
+                <label id="about-copyright">
+                    &extension.copyright;
+                </label>
+                <separator class="thin" />
+                <label value="&extension.email;"
+                       onclick="writeEmail();"
+                       id="about-email" />
+                <separator class="thin" />
+                <label href="&extension.homepage;"
+                       value="&extension.homepage;"
+                       onclick="openURL(event.target.getAttribute('href'));"
+                       id="about-homepage" />
+            </tabpanel>
 
+            <tabpanel id="visualisation" orient="vertical" flex="1">
+                <groupbox>
+                    <caption label="&visualisation.timescaling.caption;" />
+                    <radiogroup id="dotimescaling"
+                                prefstring="extensions.threadarcsjs.timescaling.enabled"
+                                prefdefvalue="false"
+                                preftype="bool">
+                        <vbox>
+                            <radio value="false"
+                                   label="&visualisation.timescaling.disable;" />
+                            <hbox class="indent">
+                                <image src="images/timescaling_disabled.png" />
+                            </hbox>
+                            <separator class="thin" />
+                            <label class="indent">
+                                &visualisation.timescaling.description.disabled;
+                            </label>
+                        </vbox>
+                        <separator />
+                        <vbox>
+                            <radio value="true" label="&visualisation.timescaling.enable;" />
+                            <hbox class="indent">
+                                <image src="images/timescaling_enabled.png" />
+                            </hbox>
+                            <separator class="thin" />
+                            <label class="indent">
+                                &visualisation.timescaling.description.enabled;
+                            </label>
+                        </vbox>
+                    </radiogroup>
+                </groupbox>
+                <groupbox>
+                    <caption label="&visualisation.size.caption;" />
+                    <radiogroup id="visualisationsize"
+                                prefstring="extensions.threadarcsjs.visualisationsize"
+                                prefdefvalue="12x12,12,12,12,6,-1,1,24"
+                                preftype="string">
+                        <hbox>
+                            <radio value="8x8,8,8,24,4,1,16"
+                                   label="&visualisation.size.small;" />
+                            <image src="images/size_8.png" />
+                        </hbox>
+                        <separator class="thin" />
+                        <hbox>
+                            <radio value="12x12,12,12,32,6,2,24"
+                                   label="&visualisation.size.medium;" />
+                            <image src="images/size_12.png" />
+                        </hbox>
+                        <separator class="thin" />
+                        <hbox>
+                            <radio value="16x16,16,16,40,8,3,32"
+                                   label="&visualisation.size.large;" />
+                            <image src="images/size_16.png" />
+                        </hbox>
+                    </radiogroup>
+                </groupbox>
+            </tabpanel>
+
+            <tabpanel id="logfiles" orient="vertical" flex="1">
                 <groupbox>
                     <caption label="&logfiles.caption;" />
                     <description>
@@ -74,7 +160,6 @@
                         &logfiles.debug.description.size;
                     </label>
                 </groupbox>
-
                 <separator class="thin" />
                 <button id="sendlog"
                         label="&logfiles.send.button;"
@@ -85,108 +170,11 @@
                         label="&logfiles.reset.button;"
                         oncommand="resetLogfiles();"
                         tooltiptext="&logfiles.reset.tooltip;" />
-
             </tabpanel>
 
-            <tabpanel id="visualisation" orient="vertical">
-
-                <groupbox>
-
-                    <caption label="&visualisation.timescaling.caption;" />
-
-                    <radiogroup id="dotimescaling"
-                                prefstring="extensions.threadarcsjs.timescaling.enabled"
-                                prefdefvalue="false"
-                                preftype="bool">
-                        <vbox>
-                            <radio value="false"
-                                   label="&visualisation.timescaling.disable;" />
-                            <hbox class="indent">
-                                <image src="images/timescaling_disabled.png" />
-                            </hbox>
-                            <separator class="thin" />
-                            <label class="indent">
-                                &visualisation.timescaling.description.disabled;
-                            </label>
-                        </vbox>
-                        <separator />
-                        <vbox>
-                            <radio value="true" label="&visualisation.timescaling.enable;" />
-                            <hbox class="indent">
-                                <image src="images/timescaling_enabled.png" />
-                            </hbox>
-                            <separator class="thin" />
-                            <label class="indent">
-                                &visualisation.timescaling.description.enabled;
-                            </label>
-                        </vbox>
-                    </radiogroup>
-
-                </groupbox>
-
-                <groupbox>
-                    <caption label="&visualisation.size.caption;" />
-
-                    <radiogroup id="visualisationsize"
-                                prefstring="extensions.threadarcsjs.visualisationsize"
-                                prefdefvalue="12x12,12,12,12,6,-1,1,24"
-                                preftype="string">
-                        <hbox>
-                            <radio value="8x8,8,8,24,4,1,16"
-                                   label="&visualisation.size.small;" />
-                            <image src="images/size_8.png" />
-                        </hbox>
-                        <separator class="thin" />
-                        <hbox>
-                            <radio value="12x12,12,12,32,6,2,24"
-                                   label="&visualisation.size.medium;" />
-                            <image src="images/size_12.png" />
-                        </hbox>
-                        <separator class="thin" />
-                        <hbox>
-                            <radio value="16x16,16,16,40,8,3,32"
-                                   label="&visualisation.size.large;" />
-                            <image src="images/size_16.png" />
-                        </hbox>
-                    </radiogroup>
-
-                </groupbox>
-
-            </tabpanel>
-
-            <tabpanel id="about" orient="vertical">
-
-                <label value="&extension.name;"
-                       id="extension-name" />
-                <separator class="thin" />
-                <hbox>
-                    <image src="images/about.png" />
-                </hbox>
-                <separator class="thin" />
-                <label value="&about.version; &extension.version;"
-                       id="about-version" />
-                <separator class="thin" />
-                <description id="about-description">
-                    &extension.description;
-                </description>
-                <separator class="thin" />
-                <label id="about-copyright">
-                    &extension.copyright;
-                </label>
-                <separator class="thin" />
-                <label value="&extension.email;"
-                       onclick="writeEmail();"
-                       id="about-email" />
-                <separator class="thin" />
-                <label href="&extension.homepage;"
-                       value="&extension.homepage;"
-                       onclick="openURL(event.target.getAttribute('href'));"
-                       id="about-homepage" />
-
-            </tabpanel>
 
         </tabpanels>
 
     </tabbox>
 
-</dialog>
+</page>

@@ -9,7 +9,7 @@
  * Version: $Id$
  ********************************************************/
 -->
-<!ENTITY settings.title                                     "Thread Arcs Visualisation - Settings">
+<!ENTITY settings.title                                     "Thread Arcs Visualisation">
 <!ENTITY logfiles.tab                                       "Logfiles">
 <!ENTITY logfiles.caption                                   "Enable Logging">
 <!ENTITY logfiles.description.restart                       "Please note that enabling or disabling logging needs a restart.">

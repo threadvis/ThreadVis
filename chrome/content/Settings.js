@@ -15,143 +15,12 @@
  ******************************************************************************/
 function init()
 {
-    initPrefs();
     var dologging = document.getElementById("dologging");
     if (! dologging.checked)
     {
         var debug = document.getElementById("dologgingdebug");
         debug.disabled = true;
     }
-}
-
-
-
-/** ****************************************************************************
- * Init preferences (read in)
- ******************************************************************************/
-function initPrefs()
-{
-    var prefElements = document.getElementsByAttribute("prefstring", "*");
-    for (var i=0; i<prefElements.length; i++ )
-    {
-        var prefstring    = prefElements[i].getAttribute("prefstring");
-        var prefid        = prefElements[i].getAttribute("id");
-        var preftype      = prefElements[i].getAttribute("preftype");
-        var prefdefval    = prefElements[i].getAttribute("prefdefval");
-        var prefattribute = prefElements[i].getAttribute("prefattribute");
-        var elt           = prefElements[i].localName;
-
-        if (!preftype)
-            preftype = getPreftype(elt);
-        if (preftype == "int")
-            prefdefval = parseInt(prefdefval, 10);
-        if (!prefattribute)
-            prefattribute = getPrefattribute(elt);
-
-        var prefvalue;
-        switch (preftype)
-        {
-            case "bool":
-                prefvalue = nsPreferences.getBoolPref(prefstring, prefdefval);
-                break;
-            case "int":
-                prefvalue = nsPreferences.getIntPref(prefstring, prefdefval);
-                break;
-            default:
-                prefvalue = nsPreferences.copyUnicharPref(prefstring, prefdefval);
-                break;
-        }
-        if (elt == "radiogroup")
-        {
-            document.getElementById(prefid).selectedItem =
-                document.getElementById(prefid).getElementsByAttribute("value", prefvalue).item(0);
-        }
-        else
-            prefElements[i].setAttribute(prefattribute, prefvalue);
-    }
-}
-
-
-
-/** ****************************************************************************
- * save preferences
- ******************************************************************************/
-function savePrefs()
-{
-    var prefElements = document.getElementsByAttribute("prefstring", "*");
-    for (var i=0; i<prefElements.length; i++ )
-    {
-        var prefstring    = prefElements[i].getAttribute("prefstring");
-        var prefid        = prefElements[i].getAttribute("id");
-        var preftype      = prefElements[i].getAttribute("preftype");
-        var prefattribute = prefElements[i].getAttribute("prefattribute");
-        var elt           = prefElements[i].localName;
-
-        if (!preftype)
-            preftype = getPreftype(elt);
-        if (!prefattribute)
-            prefattribute = getPrefattribute(elt);
-
-        if (elt == "textbox")
-            var prefvalue = document.getElementById(prefid).value;
-        else
-            var prefvalue = prefElements[i].getAttribute(prefattribute);
-
-        if (preftype == "bool")
-            prefvalue = prefvalue == "true" ? true : false;
-
-        switch (preftype)
-        {
-            case "bool":
-                nsPreferences.setBoolPref(prefstring, prefvalue);
-                break;
-            case "int":
-                nsPreferences.setIntPref(prefstring, prefvalue);
-                break;
-            default:
-                nsPreferences.setUnicharPref(prefstring, prefvalue);
-                break;
-        }
-    }
-}
-
-
-
-/** ****************************************************************************
- * get preference type
- ******************************************************************************/
-function getPreftype(elem)
-{
-    var result = "";
-
-    if (elem == "textbox" || elem == "radiogroup")
-        result = "string";
-    else if (elem == "checkbox" || elem == "listitem" || elem == "button")
-        result = "bool";
-    else if (elem == "menulist")
-        result = "int";
-    return result;
-}
-
-
-
-/** ****************************************************************************
- * get preference attribute
- ******************************************************************************/
-function getPrefattribute(elem)
-{
-    var result = "";
-
-    if (elem == "textbox" ||
-        elem == "menulist" ||
-        elem == "radiogroup")
-        result = "value";
-    else if (elem == "checkbox" ||
-             elem == "listitem")
-        result = "checked";
-    else if (elem == "button")
-        result = "disabled";
-    return result;
 }
 
 
@@ -229,9 +98,7 @@ function composeEmail(to,
 function getLogfiles()
 {
     var logfiles = new Array();
-    var logger = window.opener.opener ?
-                 window.opener.opener.LOGGER_ :
-                 window.opener.LOGGER_;
+    var logger = getLogger();
 
     var file = null;
     if (logger)
@@ -274,12 +141,8 @@ function addAttachments(composeFields, attachments)
  ******************************************************************************/
 function resetLogfiles()
 {
-    var parent = window.opener.opener ?
-                 window.opener.opener :
-                 window.opener;
-    var logger = window.opener.opener ?
-                 window.opener.opener.LOGGER_ :
-                 window.opener.LOGGER_;
+    var logger = getLogger();
+
     if (logger)
     {
         logger.reset(true);
@@ -318,4 +181,32 @@ function openURL(url)
     var protocolSvc = Components.classes["@mozilla.org/uriloader/external-protocol-service;1"]
                       .getService(Components.interfaces.nsIExternalProtocolService);
     protocolSvc.loadUrl(uri);
+}
+
+
+
+/** ****************************************************************************
+ * get the logger object
+ ******************************************************************************/
+function getLogger(object)
+{
+    // if no object given, assume this window
+    if (! object)
+        object = window;
+
+    // check for logger object
+    if (object.LOGGER_)
+        return object.LOGGER_;
+
+    // go to top parent window
+    if (object.parent && object != object.parent)
+        return getLogger(object.parent);
+
+    // go to window opener, until logger found
+    if (object.opener && object != object.opener)
+        return getLogger(object.opener);
+
+    // we have no logger, no parent and no opener
+    // this shouldn't happen
+    return null;
 }

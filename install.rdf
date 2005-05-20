@@ -42,7 +42,7 @@
     <em:description>Displays a small graphic visualising the thread (context) of the currently selected email.</em:description>
     <em:creator>Alexander C. Hubmann</em:creator>
     <em:homepageURL>http://www.sbox.tugraz.at/home/x/xpert/threadarcs/</em:homepageURL>
-    <em:optionsURL>chrome://threadarcsjs/content/Settings.xul</em:optionsURL>
+    <em:optionsURL>chrome://threadarcsjs/content/SettingsDialog.xul</em:optionsURL>
     <em:updateURL>http://www.sbox.tugraz.at/home/x/xpert/threadarcs/update.rdf</em:updateURL>
     <em:iconURL>chrome://threadarcsjs/content/images/icon.png</em:iconURL>
 
