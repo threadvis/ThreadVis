@@ -10,6 +10,7 @@
  ********************************************************/
 -->
 <!ENTITY settings.title                                     "Thread Arcs Visualisation">
+<!ENTITY extension.enabled                                  "Enable extension">
 <!ENTITY logfiles.tab                                       "Logfiles">
 <!ENTITY logfiles.caption                                   "Enable Logging">
 <!ENTITY logfiles.enable.checkbox                           "Enable Logging">

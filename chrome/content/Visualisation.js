@@ -49,7 +49,6 @@ function Visualisation()
 
     this.preferenceObserverRegister();
     this.preferenceReload();
-    this.createStack();
 }
 
 
@@ -89,7 +88,7 @@ Visualisation.prototype.createStack = function()
         LOGGER_.logDebug("Visualisation.createStack()", {"action" : "clear stack"});
         this.clearStack();
     }
-
+/*
     var loading = document.createElementNS(XUL_NAMESPACE_, "image");
 
     loading.style.marginTop = "20px";
@@ -99,6 +98,7 @@ Visualisation.prototype.createStack = function()
 
     loading = null;
     div = null;
+    */
 }
 
 
@@ -570,6 +570,7 @@ Visualisation.prototype.visualise = function(container)
                          "container" : container.toString()});
 
     // clear visualisation
+    this.createStack();
     this.clearStack();
 
     // get topmost container

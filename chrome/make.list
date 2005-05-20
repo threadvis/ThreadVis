@@ -3,6 +3,7 @@ content\contents.rdf
 content\Logger.js
 content\Message.js
 content\Preferences.xul
+content\PreferenceObserver.js
 content\References.js
 content\Settings.css
 content\Settings.js

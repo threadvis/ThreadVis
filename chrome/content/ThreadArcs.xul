@@ -21,6 +21,7 @@
     <script src="chrome://threadarcsjs/content/Container.js" />
     <script src="chrome://threadarcsjs/content/Logger.js" />
     <script src="chrome://threadarcsjs/content/Message.js" />
+    <script src="chrome://threadarcsjs/content/PreferenceObserver.js" />
     <script src="chrome://threadarcsjs/content/References.js" />
     <script src="chrome://threadarcsjs/content/ThreadArcs.js" />
     <script src="chrome://threadarcsjs/content/Threader.js" />

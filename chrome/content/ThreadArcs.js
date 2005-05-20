@@ -16,7 +16,9 @@ var XUL_NAMESPACE_ =
 
 var THREADARCS_ = null;
 var LOGGER_ = null;
+var PREFERENCE_OBSERVER_ = null;
 var THREADARCS_PARENT_ = null;
+var THREADARCS_ENABLED_ = false;
 
 // add visualisation at startup
 addEventListener("load", createThreadArcs, false);
@@ -28,14 +30,36 @@ addEventListener("load", createThreadArcs, false);
  ******************************************************************************/
 function createThreadArcs()
 {
+    // create preference observer
+    var preference_observer = checkForPreferenceObserver(window);
+    if (preference_observer)
+    {
+        PREFERENCE_OBSERVER_ = preference_observer;
+    }
+    else
+    {
+        PREFERENCE_OBSERVER_ = new PreferenceObserver();
+        PREFERENCE_OBSERVER_.registerCallback("enabled", preferenceEnabledChanged);
+    }
+
+    THREADARCS_ENABLED_ = PREFERENCE_OBSERVER_.getPreference("enabled");
+
+    if (! THREADARCS_ENABLED_)
+    {
+        deleteBox();
+        return;
+    }
+
+    createBox();
+
     // check for any opener and logger in that opener
-    var logger = checkForLogger(window.opener);
+    var logger = checkForLogger(window);
     if (logger)
         LOGGER_ = logger;
-    else if (LOGGER_ == null)
+    else
         LOGGER_ = new Logger();
 
-    THREADARCS_PARENT_ = checkForThreadArcs(window.opener);
+    THREADARCS_PARENT_ = checkForThreadArcs(window);
     if (THREADARCS_ == null)
         THREADARCS_ = new ThreadArcs();
 }
@@ -83,6 +107,24 @@ function checkForThreadArcs(win)
 
 
 /** ****************************************************************************
+ * Check all openers for preference observer
+ ******************************************************************************/
+function checkForPreferenceObserver(win)
+{
+    if (! win)
+        return null;
+
+    if (win.PREFERENCE_OBSERVER_)
+        return win.PREFERENCE_OBSERVER_;
+    if (win.opener)
+        return checkForPreferenceObserver(win.opener);
+
+    return null;
+}
+
+
+
+/** ****************************************************************************
  * constructor
  ******************************************************************************/
 function ThreadArcs()
@@ -102,6 +144,7 @@ function ThreadArcs()
 
     // visualisation object
     this.visualisation_ = new Visualisation();
+    this.clearVisualisation();
 
     // threader object
     if (THREADARCS_PARENT_)
@@ -147,6 +190,9 @@ function ThreadArcs()
  ******************************************************************************/
 ThreadArcs.prototype.addMessages = function()
 {
+    if (! THREADARCS_ENABLED_)
+        return;
+
     LOGGER_.log("addmessages", {"action" : "start"});
     this.add_messages_start_time = new Date();
     this.loading_ = true;
@@ -176,6 +222,9 @@ ThreadArcs.prototype.addMessages = function()
  ******************************************************************************/
 ThreadArcs.prototype.waitForAddMessages = function()
 {
+    if (! THREADARCS_ENABLED_)
+        return;
+
     if (this.add_messages_done_)
     {
         this.loaded_ = true;
@@ -225,6 +274,9 @@ ThreadArcs.prototype.waitForAddMessages = function()
  ******************************************************************************/
 ThreadArcs.prototype.addMessage = function(header)
 {
+    if (! THREADARCS_ENABLED_)
+        return;
+
     LOGGER_.logDebug("ThreadArcs.addMessage()", {});
     var date = new Date();
     // PRTime is in microseconds, Javascript time is in milliseconds
@@ -257,6 +309,9 @@ ThreadArcs.prototype.addMessage = function(header)
  ******************************************************************************/
 ThreadArcs.prototype.addMessagesFromFolder = function(folder)
 {
+    if (! THREADARCS_ENABLED_)
+        return;
+
     if (this.add_messages_from_folder_done_)
     {
         LOGGER_.logDebug("ThreadArcs.addMessagesFromFolder()",
@@ -286,6 +341,9 @@ ThreadArcs.prototype.addMessagesFromFolder = function(folder)
  ******************************************************************************/
 ThreadArcs.prototype.addMessagesFromFolderEnumerator = function(enumerator)
 {
+    if (! THREADARCS_ENABLED_)
+        return;
+
     LOGGER_.logDebug("ThreadArcs.addMessagesFromFolderEnumerator()", {"action" : "start"});
     var header = null;
     while (enumerator.hasMoreElements())
@@ -319,6 +377,9 @@ ThreadArcs.prototype.addMessagesFromFolderEnumerator = function(enumerator)
  ******************************************************************************/
 ThreadArcs.prototype.getAllFolders = function(folder)
 {
+    if (! THREADARCS_ENABLED_)
+        return;
+
     LOGGER_.logDebug("ThreadArcs.getAllFolders()",
                         {"folder" : folder.URI});
     var folder_enumerator = folder.GetSubFolders();
@@ -361,6 +422,9 @@ ThreadArcs.prototype.getAllFolders = function(folder)
 ThreadArcs.prototype.callback = function(msgKey,
                                          folder)
 {
+    if (! THREADARCS_ENABLED_)
+        return;
+
     LOGGER_.log("msgselect",
                     {"from" : "extension",
                      "key" : msgKey});
@@ -387,6 +451,13 @@ ThreadArcs.prototype.callback = function(msgKey,
 ThreadArcs.prototype.clearVisualisation = function()
 {
     LOGGER_.logDebug("ThreadArcs.clearVisualisation()", {});
+
+    if (! THREADARCS_ENABLED_)
+    {
+        this.visualisation_.clearStack();
+        return;
+    }
+
     if (this.clear_)
         return;
 
@@ -401,6 +472,9 @@ ThreadArcs.prototype.clearVisualisation = function()
  ******************************************************************************/
 ThreadArcs.prototype.doThreading = function()
 {
+    if (! THREADARCS_ENABLED_)
+        return;
+
     LOGGER_.logDebug("ThreadArcs.doThreading()", {});
     if (! this.threading_ && ! this.threaded_)
     {
@@ -430,6 +504,9 @@ ThreadArcs.prototype.doThreading = function()
  ******************************************************************************/
 ThreadArcs.prototype.initMessages = function()
 {
+    if (! THREADARCS_ENABLED_)
+        return;
+
     LOGGER_.logDebug("ThreadArcs.initMessages()", {});
     if (! this.loaded_ && ! this.loading_)
     {
@@ -447,6 +524,9 @@ ThreadArcs.prototype.initMessages = function()
  ******************************************************************************/
 ThreadArcs.prototype.setSelectedMessage = function()
 {
+    if (! THREADARCS_ENABLED_)
+        return;
+
     LOGGER_.logDebug("ThreadArcs.setSelectedMessage()", {});
     if (! this.loaded_ || ! this.threaded_)
     {
@@ -502,10 +582,14 @@ ThreadArcs.prototype.unloadHandler = function()
  ******************************************************************************/
 ThreadArcs.prototype.visualiseMsgId = function(message_id)
 {
+    if (! THREADARCS_ENABLED_)
+        return;
+
     LOGGER_.logDebug("ThreadArcs.visualiseMsgId()",
                         {"message-id" : message_id});
 
     var container = this.threader_.findContainer(message_id);
+
     if (container != null)
     {
         this.visualise(container);
@@ -524,6 +608,9 @@ ThreadArcs.prototype.visualiseMsgId = function(message_id)
  ******************************************************************************/
 ThreadArcs.prototype.visualise = function(container)
 {
+    if (! THREADARCS_ENABLED_)
+        return;
+
     LOGGER_.logDebug("ThreadArcs.visualise()",
                         {"container" : container});
 
@@ -551,6 +638,9 @@ ThreadArcs.prototype.visualise = function(container)
  ******************************************************************************/
 ThreadArcs.prototype.waitForThreading = function()
 {
+    if (! THREADARCS_ENABLED_)
+        return;
+
     LOGGER_.logDebug("ThreadArcs.waitForThreading()", {});
 
     if (this.loaded_ &&
@@ -566,4 +656,52 @@ ThreadArcs.prototype.waitForThreading = function()
         var ref = this;
         setTimeout(function(){ref.waitForThreading();}, 100);
     }
+}
+
+
+
+/** ****************************************************************************
+ * "enabled" preference changed
+ ******************************************************************************/
+function preferenceEnabledChanged(value)
+{
+    THREADARCS_ENABLED_ = value;
+    createThreadArcs();
+}
+
+
+
+/** ****************************************************************************
+ * create thread arcs xul box
+ ******************************************************************************/
+function createBox()
+{
+    if (document.getElementById("ThreadArcsJSBox"))
+        return;
+
+    var box = document.createElementNS(XUL_NAMESPACE_, "vbox");
+    box.setAttribute("id", "ThreadArcsJSBox");
+    box.setAttribute("minheight", 50);
+    box.setAttribute("minwidth", 200);
+    box.setAttribute("flex", 2);
+    box.setAttribute("align", "right");
+    box.setAttribute("context", "ThreadArcsJSPopUp");
+    
+    var headerbox = document.getElementById("expandedHeaderView");
+    headerbox.appendChild(box);
+}
+
+
+
+/** ****************************************************************************
+ * delete thread arcs xul box
+ ******************************************************************************/
+function deleteBox()
+{
+    var box = document.getElementById("ThreadArcsJSBox");
+    if (! box)
+        return;
+
+    var headerbox = document.getElementById("expandedHeaderView");
+    headerbox.removeChild(box);
 }
