@@ -129,9 +129,6 @@
             <tabpanel id="logfiles" orient="vertical" flex="1">
                 <groupbox>
                     <caption label="&logfiles.caption;" />
-                    <description>
-                        &logfiles.description.restart;
-                    </description>
                     <checkbox id="dologging"
                               oncommand="toggleLogging();"
                               label="&logfiles.enable.checkbox;"

@@ -12,9 +12,8 @@
 <!ENTITY settings.title                                     "Thread Arcs Visualisierung">
 <!ENTITY logfiles.tab                                       "Log-Dateien">
 <!ENTITY logfiles.caption                                   "Logging aktivieren">
-<!ENTITY logfiles.description.restart                       "Um das Logging zu aktivieren oder zu deaktivieren, m&#xFC;ssen Sie das Programm neu starten.">
 <!ENTITY logfiles.enable.checkbox                           "Logging aktivieren">
-<!ENTITY logfiles.enable.description.whatlogged             "Wenn Sie das Logging aktivieren, werden nur statistische Daten &#xFC;ber Ihre Mailbox, &#xFC;ber die Konversationen die Sie lesen und die Art mit der Sie die Erweiterung verwenden gespeichert.">
+<!ENTITY logfiles.enable.description.whatlogged             "Wenn Sie das Logging aktivieren, werden nur statistische Daten &#xFC;ber Ihre Mailbox, &#xFC;ber die Konversationen die Sie lesen und die Art mit der Sie die Erweiterung verwenden, gespeichert.">
 <!ENTITY logfiles.enable.description.sending                "Diese Information wird nie automatisch versendet. Sie k&#xF6;nnen diese Informationen versenden, indem Sie auf den Button &#x22;&logfiles.send.button;&#x22; klicken.">
 <!ENTITY logfiles.debug.checkbox                            "Debug-Informationen inkludieren">
 <!ENTITY logfiles.debug.description.general                 "Wenn Sie auf Probleme mit der Erweiterung sto&#xDF;en, k&#xF6;nnen Sie Debug-Informationen in den Log-Dateien inkludieren, um die Behebung der Probleme zu vereinfachen.">
