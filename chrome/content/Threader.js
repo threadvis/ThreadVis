@@ -53,7 +53,7 @@ function Threader()
     this.prune_empty_containers_top_doing_ = false;
     this.prune_empty_containers_doing_ = false;
 
-    this.subject_table_ = null;
+    this.subject_table_ = new Object();
 
     this.put_containers_in_subject_table_done_ = false;
     this.put_containers_in_subject_table_top_doing_ = false;
@@ -75,6 +75,8 @@ function Threader()
     this.put_containers_in_subject_table_end_ = null;
     this.group_by_subject_start_ = null;
     this.group_by_subject_end_ = null;
+
+    this.total_messages_ = 0;
 }
 
 
@@ -160,6 +162,7 @@ Threader.prototype.topPutMessagesInContainer = function()
     if (this.put_messages_in_container_done_)
     {
         this.put_messages_in_container_end_ = (new Date()).getTime();
+        this.put_messages_in_container_top_doing_ = false;
         LOGGER_.logDebug("Threader.topPutMessagesInContainer()",
                             {"action" : "end"});
         return;
@@ -187,8 +190,10 @@ Threader.prototype.putMessagesInContainer = function()
 
     this.put_messages_in_container_doing_ = true;
 
-    var counter = this.put_messages_in_container_counter_;
-    var maxcounter = counter + this.put_messages_in_container_increment_;
+    //var counter = this.put_messages_in_container_counter_;
+    //var maxcounter = counter + this.put_messages_in_container_increment_;
+    var counter = 0;
+    var maxcounter = this.put_messages_in_container_increment_;
 
     LOGGER_.logDebug("Threader.putMessagesInContainer()",
                         {"action" : "loop over all messages",
@@ -196,16 +201,24 @@ Threader.prototype.putMessagesInContainer = function()
                          "endcounter" : maxcounter,
                          "messages.length" : this.messages_.length});
 
+    //for (counter;
+    //     counter < this.messages_.length && counter < maxcounter;
+    //     counter++)
     for (counter;
-         counter < this.messages_.length && counter < maxcounter;
+         counter < maxcounter;
          counter++)
     {
-        var message = this.messages_[counter];
+        //var message = this.messages_[counter];
+        var message = this.messages_.pop();
+        if (! message)
+            break;
+        this.total_messages_++;
         this.putMessageInContainer(message);
     }
-    this.put_messages_in_container_counter_ = counter;
+    //this.put_messages_in_container_counter_ = counter;
 
-    if (this.put_messages_in_container_counter_ == this.messages_.length)
+    //if (this.put_messages_in_container_counter_ == this.messages_.length)
+    if (this.messages_.length == 0)
     {
         this.put_messages_in_container_done_ = true;
     }
@@ -232,6 +245,10 @@ Threader.prototype.putMessageInContainer = function(message)
 
     if (message_container != null)
     {
+        LOGGER_.logDebug("Threader.putMessageInContainer()",
+                            {"action" : "found dummy container with message id",
+                             "dummy" : message_container.isDummy(),
+                             "sent" : message_container.isDummy() ? "false" : message_container.getMessage().isSent()});
         // if we found a container for this message id, either it's a dummy
         // or we have two mails with the same message-id
         // this should only happen if we sent a mail to a list and got back
@@ -245,11 +262,17 @@ Threader.prototype.putMessageInContainer = function(message)
         {
             // 1.A. id_table contains empty container for this message
             // store message in this container
-            LOGGER_.logDebug("Threader.putMessageInContainer()",
-                                {"action" : "found dummy container with message id"});
             message_container.setMessage(message);
             // index container in hashtable
             this.id_table_[message.getId()] = message_container;
+        }
+        else if (! message_container.isDummy() && message_container.getMessage().isSent())
+        {
+            // the message in message_container is a sent message,
+            // the new message is not the sent one
+            // in this case we simply ignore the new message, since
+            // the sent message takes precedence
+            return;
         }
         else
         {
@@ -324,7 +347,7 @@ Threader.prototype.putMessageInContainer = function(message)
         parent_reference_container != null)
     {
         // remove us from this parent
-        LOGGER_.logDebug("Threader.do11()",
+        LOGGER_.logDebug("Threader.putMessageInContainer()",
                             {"action" : "remove us from parent"});
         message_container.getParent().removeChild(message_container);
     }
@@ -360,6 +383,7 @@ Threader.prototype.topFindRootSet = function()
     if (this.find_rootset_done_)
     {
         this.find_rootset_end_ = (new Date()).getTime();
+        this.find_rootset_top_doing_ = false;
         LOGGER_.logDebug("Threader.topFindRootSet()",
                             {"action" : "end"});
         return;
@@ -422,6 +446,7 @@ Threader.prototype.topPruneEmptyContainers = function()
     if (this.prune_empty_containers_done_)
     {
         this.prune_empty_containers_end_ = (new Date()).getTime();
+        this.prune_empty_containers_doing_ = false;
         LOGGER_.logDebug("Threader.topPruneEmptyContainers()",
                             {"action" : "end"});
         return;
@@ -536,6 +561,7 @@ Threader.prototype.topPutContainersInSubjectTable = function()
     if (this.put_containers_in_subject_table_done_)
     {
         this.put_containers_in_subject_table_end_ = (new Date()).getTime();
+        this.put_containers_in_subject_table_top_doing_ = false;
         LOGGER_.logDebug("Threader.topPutContainersInSubjectTable()",
                             {"action" : "end"});
         return;
@@ -618,6 +644,7 @@ Threader.prototype.topGroupBySubject = function()
     {
         this.group_by_subject_end_ = (new Date()).getTime();
         this.end_ = (new Date()).getTime();
+        this.group_by_subject_top_doing_ = false;
         LOGGER_.logDebug("Threader.topGroupBySubject()",
                             {"action" : "end"});
         var ref = this;
@@ -809,10 +836,17 @@ Threader.prototype.groupBySubject = function()
  ******************************************************************************/
 Threader.prototype.thread = function()
 {
+    this.done_threading_ = false;
+    this.put_messages_in_container_done_ = false;
+    this.find_rootset_done_ = false;
+    this.prune_empty_containers_done_ = false;
+    this.put_containers_in_subject_table_done_ = false;
+    this.group_by_subject_done_ = false;
+    
     this.start_ = (new Date()).getTime();
     LOGGER_.log("threader", {"action" : "start"});
     // 1. For each message
-    this.id_table_ = new Object();
+    //this.id_table_ = new Object();
     this.topPutMessagesInContainer();
 
     // 2. Find the root set
@@ -830,7 +864,7 @@ Threader.prototype.thread = function()
 
     // 5. Group root set by subject
     // 5.A. create new hashtable for all subjects
-    this.subject_table_ = new Object();
+    //this.subject_table_ = new Object();
 
     // 5.B. put all containers in subject table
     this.topPutContainersInSubjectTable();
@@ -913,7 +947,8 @@ Threader.prototype.logInfo = function()
     var time_total = this.end_ -
                      this.start_;
 
-    var total_messages = this.messages_.length;
+    //var total_messages = this.messages_.length;
+    var total_messages = this.total_messages_;
     var time_per_message = time_total / total_messages;
 
     var num_threads = this.getRoot().getChildCount();

@@ -11,7 +11,6 @@
  * Version: $Id$
  ******************************************************************************/
 -->
-
 <dialog xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         onload="window.opener.opener.openOptionsDialog('threadarcsjs', 'chrome://threadarcsjs/content/Settings.xul','threadarcsjs'); window.close();">
 </dialog>

@@ -67,6 +67,11 @@ function Container(is_root)
  ******************************************************************************/
 Container.prototype.addChild = function(child)
 {
+    // check if child is already our child
+    // if so, do nothing
+    if (child.getParent == this)
+        return;
+    
     /* remove it from old chain
      * child.hasPrevious means that it's not the first in chain,
      * so take it out of old chain by juggling the pointers

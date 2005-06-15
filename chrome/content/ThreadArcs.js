@@ -177,7 +177,38 @@ function ThreadArcs()
     }
     gMessageListeners.push(this.doLoad);
 
-    var ref = this;
+    // add folder listener, so that we can add newly received
+    // messages
+    this.folderListener =
+    {
+        OnItemAdded: function(parentItem, item, view)
+        {
+            // this is called
+            // POP:  - when new msgs arrive
+            //       - when moving messages from one folder to another
+            // IMAP: - only when new msgs arrive
+            //       - NOT when moving messages!!
+            ref.onItemAdded(parentItem, item, view);
+        },
+
+        OnItemRemoved: function(parentItem, item, view)
+        {
+            // removed item from folder
+            //ref.onItemRemoved(parentItem, item, view);
+        },
+
+        OnItemPropertyChanged: function(item, property, oldValue, newValue) {},
+        OnItemIntPropertyChanged: function(item, property, oldValue, newValue) {},
+        OnItemBoolPropertyChanged: function(item, property, oldValue, newValue) {},
+        OnItemUnicharPropertyChanged: function(item, property, oldValue, newValue) {},
+        OnItemPropertyFlagChanged: function(item, property, oldFlag, newFlag) {},
+        OnItemEvent: function(folder, event) {}
+    }
+    if (! this.gMailSession)
+        this.gMailSession = Components.classes["@mozilla.org/messenger/services/session;1"].getService(Components.interfaces.nsIMsgMailSession);
+    var notifyFlags = Components.interfaces.nsIFolderListener.all;
+    this.gMailSession.AddFolderListener(this.folderListener, notifyFlags);
+
     addEventListener("unload",
                      function() {ref.unloadHandler()},
                      false);
@@ -704,4 +735,49 @@ function deleteBox()
 
     var headerbox = document.getElementById("expandedHeaderView");
     headerbox.removeChild(box);
+}
+
+
+
+/** ****************************************************************************
+ * called when new messages arrive
+ * either from server or moved from one folder to the other (only POP!!)
+ ******************************************************************************/
+ThreadArcs.prototype.onItemAdded = function(parentItem, item, view)
+{
+    var start = new Date();
+    LOGGER_.log("addadditionalmessages", {"action" : "start"});
+    // added new message to folder
+    if (item instanceof Components.interfaces.nsIMsgDBHdr)
+    {
+        this.addMessage(item);
+        this.threader_.thread();
+    }
+    var end = new Date();
+    var duration = end - start;
+    LOGGER_.log("addadditionalmessages", {"action" : "end", "time" : duration});
+}
+
+
+
+/** ****************************************************************************
+ * called when messages are deleted
+ * not called at the moment
+ ******************************************************************************/
+ThreadArcs.prototype.onItemRemoved = function(parentItem, item, view)
+{
+    var start = new Date();
+    LOGGER_.log("deletemessage", {"action" : "start"});
+    // added new message to folder
+    if (item instanceof Components.interfaces.nsIMsgDBHdr)
+    {
+        var container = this.threader_.findContainer(item.messageId);
+        if (container)
+        {
+            container.setMessage(null);
+        }
+    }
+    var end = new Date();
+    var duration = end - start;
+    LOGGER_.log("deletemessage", {"action" : "end", "time" : duration});
 }

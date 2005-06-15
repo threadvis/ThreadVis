@@ -15,12 +15,8 @@
  ******************************************************************************/
 function init()
 {
-    var dologging = document.getElementById("dologging");
-    if (! dologging.checked)
-    {
-        var debug = document.getElementById("dologgingdebug");
-        debug.disabled = true;
-    }
+    toggleLogging();
+    toggleHighlight();
 }
 
 
@@ -166,6 +162,21 @@ function toggleLogging()
         debugcheckbox.disabled = false;
     else
         debugcheckbox.disabled = true;
+}
+
+
+
+/** ****************************************************************************
+ * Enable or disable the highlight checkbox
+ ******************************************************************************/
+function toggleHighlight()
+{
+    var colourradio = document.getElementById("visualisationcolourauthor");
+    var highlightcheckbox = document.getElementById("visualisationhighlight");
+    if (colourradio.selected)
+        highlightcheckbox.disabled = false;
+    else
+        highlightcheckbox.disabled = true;
 }
 
 

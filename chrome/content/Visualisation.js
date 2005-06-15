@@ -17,9 +17,14 @@ var XUL_NAMESPACE_ =
 var URL_ = "chrome://threadarcsjs/content/images/";
 var THREADARCSJS_PREF_BRANCH_ = "extensions.threadarcsjs.";
 var VISUALISATION_PREF_DOTIMESCALING_ = "timescaling.enabled";
-var VISUALISATION_PREF_VISUALISATIONSIZE_ = "visualisationsize";
+var VISUALISATION_PREF_VISUALISATIONSIZE_ = "visualisation.size";
+var VISUALISATION_PREF_VISUALISATIONCOLOUR_ = "visualisation.colour";
+var VISUALISATION_PREF_VISUALISATIONHIGHLIGHT_ = "visualisation.highlight";
 
 var ALPHA_ = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
+
+var COLOUR_DUMMY_ = "#75756D";
+var COLOUR_SINGLE_ = "blue";
 
 
 
@@ -46,6 +51,8 @@ function Visualisation()
     // set default resize parameter
     this.resize_ = 1;
     this.pref_timescaling_ = false;
+    this.pref_colour = "single";
+    this.pref_highlight_ = false;
 
     this.preferenceObserverRegister();
     this.preferenceReload();
@@ -113,64 +120,20 @@ Visualisation.prototype.drawArc = function(colour,
                                            right,
                                            top)
 {
-    LOGGER_.logDebug("Visualisation.drawArc()", {"action" : "start",
-                                                 "colour" : colour,
-                                                 "vposition" : vposition,
-                                                 "height" : height,
-                                                 "left" : left,
-                                                 "right" : right});
-    var arc_top = 0;
-    var fill_top = 0;
-    if (vposition == "top")
-        arc_top = top - (((this.dotsize_ / 2) + this.arc_min_height_ + 
-                  (this.arc_difference_ * height)) * this.resize_);
-    else
-        arc_top = top + ((this.dotsize_ / 2) * this.resize_);
-
-    var style_top = (arc_top) + "px";
-    var style_left = ((left - (this.arc_width_ / 2)) * this.resize_) + "px";
-    var style_height = ((this.arc_min_height_ + this.arc_difference_ * height) * 
-                       this.resize_) + "px";
-    var style_width = ((right - left + this.arc_width_) * this.resize_)+ "px";
-    var style_background = colour;
-    LOGGER_.logDebug("Visualisation.drawArc()",
-                        {"action" : "draw arc",
-                         "top" : style_top,
-                         "left" : style_left,
-                         "height" : style_height,
-                         "width" : style_width,
-                         "background" : style_background});
-
-    var arc = document.createElementNS(XUL_NAMESPACE_, "box");
-    arc.style.position = "relative";
-    arc.style.top = style_top;
-    arc.style.left = style_left;
-    arc.style.height = style_height;
-    arc.style.width = style_width;
-    arc.style.verticalAlign = "top";
-    if (vposition == "top")
-    {
-        arc.style.MozBorderRadiusTopleft = this.arc_radius_ + "px";
-        arc.style.MozBorderRadiusTopright = this.arc_radius_ + "px"
-        arc.style.borderTop = (this.arc_width_ * this.resize_) + 
-                              "px solid " + style_background;
-        arc.style.borderLeft = (this.arc_width_ * this.resize_) + 
-                               "px solid " + style_background;
-        arc.style.borderRight = (this.arc_width_ * this.resize_) + 
-                                "px solid " + style_background;
-    }
-    else
-    {
-        arc.style.MozBorderRadiusBottomleft = this.arc_radius_ + "px";
-        arc.style.MozBorderRadiusBottomright = this.arc_radius_ + "px";
-        arc.style.borderBottom = (this.arc_width_ * this.resize_) + 
-                                 "px solid " + style_background;
-        arc.style.borderLeft = (this.arc_width_ * this.resize_) + 
-                               "px solid " + style_background;
-        arc.style.borderRight = (this.arc_width_ * this.resize_) + 
-                                "px solid " + style_background;
-    }
-    this.stack_.appendChild(arc);
+    var arc = new ArcVisualisation(this.stack_,
+                                   this.dotsize_,
+                                   this.resize_,
+                                   this.arc_min_height_,
+                                   this.arc_difference_,
+                                   this.arc_radius_,
+                                   this.arc_width_,
+                                   colour,
+                                   vposition,
+                                   height,
+                                   left,
+                                   right,
+                                   top);
+    return arc;
 }
 
 
@@ -180,168 +143,24 @@ Visualisation.prototype.drawArc = function(colour,
  ******************************************************************************/
 Visualisation.prototype.drawDot = function(container,
                                            colour,
-                                           style,
                                            left,
                                            top,
-                                           selected)
+                                           selected,
+                                           circle,
+                                           flash)
 {
-    LOGGER_.logDebug("Visualisation.drawDot()",
-                        {"action" : "start",
-                         "container" : container.toString(),
-                         "colour" : colour,
-                         "style" : style,
-                         "left" : left,
-                         "top" : top});
-
-    var dot = document.createElementNS(XUL_NAMESPACE_, "box");
-
-    var style_top = (top - ((this.dotsize_ / 2) * this.resize_)) + "px";
-    var style_left = ((left - (this.dotsize_ / 2)) * this.resize_) + "px";
-    var style_height = (this.dotsize_ * this.resize_) + "px";
-    var style_width = (this.dotsize_ * this.resize_) + "px";
-    var style_background = "";
-    var style_border = "";
-    if (style != "half")
-    {
-        style_background = colour;
-    }
-    else
-    {
-        style_border = (this.dotsize_ / 4 * this.resize_) + 
-                           "px solid " + colour;
-    }
-
-    LOGGER_.logDebug("Visualisation.drawDot()",
-                        {"top" : style_top,
-                         "left" : style_left,
-                         "height" : style_height,
-                         "width" : style_width,
-                         "background" : style_background,
-                         "border" : style_border});
-
-    dot.style.position = "relative";
-    dot.style.top = style_top;
-    dot.style.left = style_left;
-    dot.style.width = style_width;
-    dot.style.height = style_height;
-    dot.style.verticalAlign = "top";
-    dot.style.background = style_background;
-    dot.style.border = style_border;
-    if (style != "dummy")
-        dot.style.MozBorderRadius = style_width;
-    dot.container = container;
-
-
-    if (selected)
-    {
-        var circle = document.createElementNS(XUL_NAMESPACE_, "box");
-
-        var style_top = (top - ((this.dotsize_ * 4/6) * this.resize_)) + "px";
-        var style_left = ((left - (this.dotsize_ * 4/6)) * this.resize_) + "px";
-        var style_height = (this.dotsize_ * 8/6 * this.resize_) + "px";
-        var style_width = (this.dotsize_ * 8/6 * this.resize_) + "px";
-        var style_background = "";
-        var style_border = "";
-        style_border = (this.dotsize_ / 6 * this.resize_) + 
-                           "px solid black";
-
-        LOGGER_.logDebug("Visualisation.drawDot()",
-                            {"action" : "draw selection circle",
-                             "top" : style_top,
-                             "left" : style_left,
-                             "height" : style_height,
-                             "width" : style_width,
-                             "background" : style_background,
-                             "border" : style_border});
-
-        circle.style.position = "relative";
-        circle.style.top = style_top;
-        circle.style.left = style_left;
-        circle.style.width = style_width;
-        circle.style.height = style_height;
-        circle.style.verticalAlign = "top";
-        circle.style.border = style_border;
-        circle.style.MozBorderRadius = style_width;
-        circle.container = container;
-    }
-
-
-    var tooltip = document.createElementNS(XUL_NAMESPACE_, "tooltip");
-    tooltip.setAttribute("orient", "vertical");
-    tooltip.setAttribute("id", "ThreadArcsJS_" + left);
-
-    if (! container.isDummy())
-    {
-        LOGGER_.logDebug("Visualisation.drawDot()",
-                            {"action" : "create tooltip start"});
-
-        // if container container message, view details
-        var authorlabel = document.createElementNS(XUL_NAMESPACE_, "label");
-        var authortext = document.createElementNS(XUL_NAMESPACE_, "label");
-        var author = document.createElementNS(XUL_NAMESPACE_, "hbox");
-        author.appendChild(authorlabel);
-        author.appendChild(authortext);
-        authorlabel.setAttribute("value",
-                                 this.strings_.getString("tooltip.from"));
-        authorlabel.style.fontWeight = "bold";
-        authortext.setAttribute("value",
-                                container.getMessage().getFrom());
-
-        var datelabel = document.createElementNS(XUL_NAMESPACE_, "label");
-        var datetext = document.createElementNS(XUL_NAMESPACE_, "label");
-        var date = document.createElementNS(XUL_NAMESPACE_, "hbox");
-        date.appendChild(datelabel);
-        date.appendChild(datetext);
-        datelabel.setAttribute("value",
-                               this.strings_.getString("tooltip.date"));
-        datelabel.style.fontWeight = "bold";
-        datetext.setAttribute("value",
-                              container.getMessage().getDate());
-
-        var subjectlabel = document.createElementNS(XUL_NAMESPACE_, "label");
-        var subjecttext = document.createElementNS(XUL_NAMESPACE_, "label");
-        var subject = document.createElementNS(XUL_NAMESPACE_, "hbox");
-        subject.appendChild(subjectlabel);
-        subject.appendChild(subjecttext);
-        subjectlabel.setAttribute("value",
-                                  this.strings_.getString("tooltip.subject"));
-        subjectlabel.style.fontWeight = "bold";
-        subjecttext.setAttribute("value",
-                                 container.getMessage().getSubject());
-
-        tooltip.appendChild(author);
-        tooltip.appendChild(date);
-        tooltip.appendChild(subject);
-        LOGGER_.logDebug("Visualisation.drawDot()",
-                            {"action" : "create tooltip end"});
-    }
-    else
-    {
-        LOGGER_.logDebug("Visualisation.drawDot()",
-                            {"action" : "create missing tooltip start"});
-
-        // otherwise we display info about missing message
-        var desc1 = document.createElementNS(XUL_NAMESPACE_, "description");
-        var desc2 = document.createElementNS(XUL_NAMESPACE_, "description");
-        desc1.setAttribute("value",
-                           this.strings_.getString("tooltip.missingmessage"));
-        desc2.setAttribute("value",
-                           this.strings_.getString("tooltip.missingmessagedetail"));
-        tooltip.appendChild(desc1);
-        tooltip.appendChild(desc2);
-        LOGGER_.logDebug("Visualisation.drawDot()",
-                            {"action" : "create missing tooltip end"});
-    }
-
-    dot.setAttribute("tooltip", "ThreadArcsJS_" + left);
-    this.stack_.appendChild(dot);
-    if (circle)
-    {
-        circle.setAttribute("tooltip", "ThreadArcsJS_" + left);
-        this.stack_.appendChild(circle);
-    }
-    this.stack_.appendChild(tooltip);
-    dot.addEventListener("click", this.onMouseClick, true);
+    var msg = new ContainerVisualisation(this.stack_,
+                                         this.strings_,
+                                         container,
+                                         colour,
+                                         left,
+                                         top,
+                                         selected,
+                                         this.dotsize_,
+                                         this.resize_,
+                                         circle,
+                                         flash);
+    return msg;
 }
 
 
@@ -349,9 +168,14 @@ Visualisation.prototype.drawDot = function(container,
 /** ****************************************************************************
  * Get a colour for the arc
  ******************************************************************************/
-Visualisation.prototype.getColour = function(hue, saturation)
+Visualisation.prototype.getColour = function(hue, saturation, value)
 {
-    rgb = this.convertHSVtoRGB(hue, saturation, 0.7);
+    if (! value)
+        value = 1.0;
+    if (! saturation)
+        saturation = 1.0;
+
+    rgb = this.convertHSVtoRGB(hue, saturation, value);
 
     return "#" + this.DECtoHEX(Math.floor(rgb.r * 255)) + 
                  this.DECtoHEX(Math.floor(rgb.g * 255)) + 
@@ -586,66 +410,15 @@ Visualisation.prototype.visualise = function(container)
 
 
     // pre-calculate size
+    var presize = this.calculateSize(containers);
+    containers = presize.containers;
     // totalmaxheight counts the maximal number of stacked arcs
-    var totalmaxheight = 0;
+    var totalmaxheight = presize.totalmaxheight;
     // minmaltimedifference stores the minimal time between two messages
-    var minimaltimedifference = Number.MAX_VALUE;
-    for (var counter = 0; counter < containers.length; counter++)
-    {
-        var thiscontainer = containers[counter];
-        thiscontainer.x_index_ = counter;
-        thiscontainer.current_arc_height_incoming_ = 0;
-        thiscontainer.current_arc_height_outgoing_ = 0;
-        // odd_ tells us if we display the arc above or below the messages
-        thiscontainer.odd_ = thiscontainer.getDepth() % 2 == 0;
-        var parent = thiscontainer.getParent();
-        if (parent != null && ! parent.isRoot())
-        {
-            // calculate the current maximal arc height between the parent 
-            // message and this one since we want to draw an arc between this 
-            // message and its parent, and we do not want any arcs to overlap, 
-            // we draw this arc higher than the current highest arc
-            var maxheight = 0;
-            for (var innercounter = parent.x_index_;
-                 innercounter < counter;
-                 innercounter++)
-            {
-                var lookatcontainer = containers[innercounter];
-                if (lookatcontainer.odd_ == parent.odd_ && 
-                    lookatcontainer.current_arc_height_outgoing_ > maxheight)
-                {
-                    maxheight = lookatcontainer.current_arc_height_outgoing_;
-                }
-                if (lookatcontainer.odd_ != parent.odd_ &&
-                    lookatcontainer.current_arc_height_incoming_ > maxheight)
-                {
-                    maxheight = lookatcontainer.current_arc_height_incoming_;
-                }
-            }
-            maxheight++;
-            parent.current_arc_height_outgoing_ = maxheight;
-            thiscontainer.current_arc_height_incoming_ = maxheight;
-        }
-        // also keep track of the current maximal stacked arc height, so that we can resize
-        // the whole extension
-        if (maxheight > totalmaxheight)
-            totalmaxheight = maxheight;
+    var minimaltimedifference = presize.minimaltimedifference;
+    
 
-        // also keep track of the time difference between two adjacent messages
-        if (counter < containers.length - 1)
-        {
-            var timedifference = containers[counter + 1].getDate().getTime() - 
-                                 containers[counter].getDate().getTime();
-            // timedifference_ stores the time difference to the _next_ message
-            thiscontainer.timedifference_ = timedifference;
-            // since we could have dummy containers that have the same time as 
-            // the next message, skip any time difference of 0
-            if (timedifference < minimaltimedifference &&
-                timedifference != 0)
-                minimaltimedifference = timedifference;
-        }
-    }
-
+    // do time scaling
     var width = this.box_.boxObject.width;
     var height = this.box_.boxObject.height;
     containers = this.timeScaling(containers,
@@ -653,6 +426,7 @@ Visualisation.prototype.visualise = function(container)
                                   width);
 
 
+    // do final resizing
     var x = this.spacing_ / 2;
     this.box_.style.paddingRight = x + "px";
     this.resize_ = this.getResize(containers.length,
@@ -660,9 +434,10 @@ Visualisation.prototype.visualise = function(container)
                                   width,
                                   height);
 
+
     // pre-calculate colours for different authors
     var authors = new Object();
-    this.lastcolour_ = 0;
+    this.lastcolour_ = 2;
 
     for (var counter = 0;
          counter < containers.length;
@@ -672,36 +447,54 @@ Visualisation.prototype.visualise = function(container)
 
         var selected = thiscontainer == container;
 
-        var colour = "#75756D";
+        var colour = COLOUR_DUMMY_;
         if (! thiscontainer.isDummy())
         {
-            if (authors[thiscontainer.getMessage().getFromEmail()] != null)
+            if (this.pref_colour_ == "single")
             {
-                colour = authors[thiscontainer.getMessage().getFromEmail()];
+                if (selected)
+                    colour = COLOUR_SINGLE_;
+                else
+                    colour = COLOUR_DUMMY_;
             }
             else
             {
-                colour = this.getNewColour();
-                authors[thiscontainer.getMessage().getFromEmail()] = colour;
+                if (authors[thiscontainer.getMessage().getFromEmail()] != null)
+                {
+                    colour = authors[thiscontainer.getMessage().getFromEmail()];
+                }
+                else
+                {
+                    colour = this.getNewColour();
+                    authors[thiscontainer.getMessage().getFromEmail()] = colour;
+                }
+                if (selected)
+                    colour = this.getColour(colour, 1, 0.8);
+                else
+                    colour = this.getColour(colour, 0.8, 0.8);
             }
-            if (selected)
-                colour = this.getColour(colour, 1);
-            else
-                colour = this.getColour(colour, 0.5);
         }
 
-        var style = "full";
-        if (! thiscontainer.isDummy() &&
-            thiscontainer.getMessage().isSent())
-            style = "half";
+        // only display black circle to highlight selected message
+        // if we are using more than one colour
+        var circle = this.pref_colour_ == "single" ? false : true;
 
-        if (thiscontainer.isDummy())
-            style ="dummy";
+        // at the moment, always flash
+        // note: dot only flashes if circle == true
+        var flash = true;
 
-        this.drawDot(thiscontainer, colour, style, x, (height / 2), selected);
+        this.drawDot(thiscontainer,
+                     colour,
+                     x,
+                     (height / 2),
+                     selected,
+                     circle,
+                     flash);
+
         thiscontainer.x_position_ = x;
         thiscontainer.current_arc_height_incoming_ = 0;
         thiscontainer.current_arc_height_outgoing_ = 0;
+
         // draw arc
         var parent = thiscontainer.getParent()
         if (parent != null && ! parent.isRoot())
@@ -730,6 +523,12 @@ Visualisation.prototype.visualise = function(container)
             maxheight++;
             parent.current_arc_height_outgoing_ = maxheight;
             thiscontainer.current_arc_height_incoming_ = maxheight;
+
+            // if we are using a single colour, display all arcs from
+            // a selected message in this colour
+            if (this.pref_colour_ == "single")
+                colour = parent == container || selected ? COLOUR_SINGLE_ : COLOUR_DUMMY_;
+
             this.drawArc(colour,
                          position,
                          maxheight,
@@ -738,6 +537,52 @@ Visualisation.prototype.visualise = function(container)
                          (height / 2));
         }
         x = x + (thiscontainer.x_scaled_ * this.spacing_);
+    }
+
+    this.colourAuthors(authors);
+}
+
+
+
+/** ****************************************************************************
+ * Underline authors in header view
+ ******************************************************************************/
+Visualisation.prototype.colourAuthors = function(authors)
+{
+    // colour links
+    var emailfields = new Array();
+
+    // from, reply-to, ... (single value fields)
+    var singlefields = document.getElementById("expandedHeaderView").getElementsByTagName("mail-emailheaderfield");
+    for (var i = 0; i < singlefields.length; i++)
+    {
+        if (singlefields[i].emailAddressNode.attributes["emailAddress"])
+            emailfields.push(singlefields[i].emailAddressNode);
+    }
+
+
+    // to, cc, bcc, ... (multi value fields)
+    var multifields = document.getElementById("expandedHeaderView").getElementsByTagName("mail-multi-emailHeaderField");
+    for (var i = 0; i < multifields.length; i++)
+    {
+        var multifield = multifields[i].emailAddresses.childNodes;
+        for (var j = 0; j < multifield.length; j++)
+        {
+            if (multifield[j].attributes["emailAddress"])
+            emailfields.push(multifield[j]);
+        }
+    }
+
+
+    var emailfield = emailfields.pop();
+    while (emailfield)
+    {
+        var colour = authors[emailfield.attributes["emailAddress"].value];
+        if (colour && this.pref_highlight_)
+            emailfield.style.borderBottom = "2px solid " + this.getColour(colour, 1.0, 1.0);
+        else
+            emailfield.style.borderBottom = "";
+        emailfield = emailfields.pop();
     }
 }
 
@@ -793,9 +638,18 @@ Visualisation.prototype.preferenceReload = function()
     // check if preference is set to do timescaling
     var prefs = Components.classes["@mozilla.org/preferences-service;1"]
                 .getService(Components.interfaces.nsIPrefBranch);
+
     this.pref_timescaling_ = false;
     if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_DOTIMESCALING_) == prefs.PREF_BOOL)
         this.pref_timescaling_ = prefs.getBoolPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_DOTIMESCALING_);
+
+    this.pref_colour_ = "single";
+    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONCOLOUR_) == prefs.PREF_STRING)
+        this.pref_colour_ = prefs.getCharPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONCOLOUR_);
+
+    this.pref_highlight_ = false;
+    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONHIGHLIGHT_) == prefs.PREF_BOOL)
+        this.pref_highlight_ = prefs.getBoolPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONHIGHLIGHT_);
 
     var todecode = "12x12,12,12,32,6,2,24";
     if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONSIZE_) == prefs.PREF_STRING)
@@ -809,4 +663,80 @@ Visualisation.prototype.preferenceReload = function()
     this.arc_difference_ = parseInt(todecode[4]);
     this.arc_width_ = parseInt(todecode[5]);
     this.spacing_ = parseInt(todecode[6]);
+}
+
+
+
+/** ****************************************************************************
+ * Calculate size
+ ******************************************************************************/
+Visualisation.prototype.calculateSize = function(containers)
+{
+    // totalmaxheight counts the maximal number of stacked arcs
+    var totalmaxheight = 0;
+
+    // minmaltimedifference stores the minimal time between two messages
+    var minimaltimedifference = Number.MAX_VALUE;
+
+    for (var counter = 0; counter < containers.length; counter++)
+    {
+        var thiscontainer = containers[counter];
+        thiscontainer.x_index_ = counter;
+        thiscontainer.current_arc_height_incoming_ = 0;
+        thiscontainer.current_arc_height_outgoing_ = 0;
+
+        // odd_ tells us if we display the arc above or below the messages
+        thiscontainer.odd_ = thiscontainer.getDepth() % 2 == 0;
+
+        var parent = thiscontainer.getParent();
+        if (parent != null && ! parent.isRoot())
+        {
+            // calculate the current maximal arc height between the parent 
+            // message and this one since we want to draw an arc between this 
+            // message and its parent, and we do not want any arcs to overlap, 
+            // we draw this arc higher than the current highest arc
+            var maxheight = 0;
+            for (var innercounter = parent.x_index_;
+                 innercounter < counter;
+                 innercounter++)
+            {
+                var lookatcontainer = containers[innercounter];
+                if (lookatcontainer.odd_ == parent.odd_ && 
+                    lookatcontainer.current_arc_height_outgoing_ > maxheight)
+                {
+                    maxheight = lookatcontainer.current_arc_height_outgoing_;
+                }
+                if (lookatcontainer.odd_ != parent.odd_ &&
+                    lookatcontainer.current_arc_height_incoming_ > maxheight)
+                {
+                    maxheight = lookatcontainer.current_arc_height_incoming_;
+                }
+            }
+            maxheight++;
+            parent.current_arc_height_outgoing_ = maxheight;
+            thiscontainer.current_arc_height_incoming_ = maxheight;
+        }
+        // also keep track of the current maximal stacked arc height, so that we can resize
+        // the whole extension
+        if (maxheight > totalmaxheight)
+            totalmaxheight = maxheight;
+
+        // also keep track of the time difference between two adjacent messages
+        if (counter < containers.length - 1)
+        {
+            var timedifference = containers[counter + 1].getDate().getTime() - 
+                                 containers[counter].getDate().getTime();
+            // timedifference_ stores the time difference to the _next_ message
+            thiscontainer.timedifference_ = timedifference;
+            // since we could have dummy containers that have the same time as 
+            // the next message, skip any time difference of 0
+            if (timedifference < minimaltimedifference &&
+                timedifference != 0)
+                minimaltimedifference = timedifference;
+        }
+    }
+
+    return {"containers" : containers,
+            "totalmaxheight" : totalmaxheight,
+            "minimaltimedifference" : minimaltimedifference};
 }

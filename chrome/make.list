@@ -1,4 +1,6 @@
+content\ArcVisualisation.js
 content\Container.js
+content\ContainerVisualisation.js
 content\contents.rdf
 content\Logger.js
 content\Message.js

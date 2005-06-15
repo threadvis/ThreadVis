@@ -34,6 +34,12 @@
 <!ENTITY visualisation.size.small                           "small">
 <!ENTITY visualisation.size.medium                          "medium">
 <!ENTITY visualisation.size.large                           "large">
+<!ENTITY visualisation.colour.caption                       "Colours">
+<!ENTITY visualisation.colour.single.caption                "Single colour">
+<!ENTITY visualisation.colour.single.description            "Only use a single colour in the visualisation. The selected message is displayed in blue, other messages are displayed in grey.">
+<!ENTITY visualisation.colour.author.caption                "Multiple colours">
+<!ENTITY visualisation.colour.author.description            "Use different colours for different authors.">
+<!ENTITY visualisation.colour.highlight                     "Underline authors in header display with their colours.">
 <!ENTITY about.tab                                          "About">
 <!ENTITY about.version                                      "Version">
 <!ENTITY extension.description                              "Displays a small graphic visualising the thread (context) of the currently selected email.">

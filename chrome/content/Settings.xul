@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
-
 <!--
 /** ****************************************************************************
  * Settings.xul
@@ -11,7 +10,6 @@
  * Version: $Id$
  ******************************************************************************/
 -->
-
 <?xml-stylesheet href="chrome://communicator/skin/pref/pref.css" type="text/css"?>
 <?xml-stylesheet href="chrome://communicator/skin/" type="text/css"?>
 <?xml-stylesheet href="Settings.css" type="text/css"?>
@@ -20,14 +18,19 @@
 <page xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
       headertitle="&settings.title;"
       onload="parent.initPanel('chrome://threadarcsjs/content/Settings.xul'); init();">
-
+      
     <script type="application/x-javascript"
             src="chrome://threadarcsjs/content/Settings.js" />
-
     <script type="application/x-javascript">
-        <![CDATA[
-        var _elementIDs = ["enablethreadarcs", "dotimescaling", "visualisationsize", "dologging", "dologgingdebug"];
-        ]]>
+    <![CDATA[
+    var _elementIDs = ["enablethreadarcs",
+                       "dotimescaling",
+                       "visualisationsize",
+                       "visualisationcolour",
+                       "visualisationhighlight",
+                       "dologging",
+                       "dologgingdebug"];
+    ]]>
     </script>
 
     <tabbox flex="1">
@@ -76,61 +79,103 @@
             </tabpanel>
 
             <tabpanel id="visualisation" orient="vertical" flex="1">
-                <groupbox>
-                    <caption label="&visualisation.timescaling.caption;" />
-                    <radiogroup id="dotimescaling"
-                                prefstring="extensions.threadarcsjs.timescaling.enabled"
-                                prefdefvalue="false"
-                                preftype="bool">
-                        <vbox>
-                            <radio value="false"
-                                   label="&visualisation.timescaling.disable;" />
-                            <hbox class="indent">
-                                <image src="images/timescaling_disabled.png" />
+                <expander id="timescaling"
+                          label="&visualisation.timescaling.caption;"
+                          open="true"
+                          persist="open"
+                          clearhidden="true">
+                    <groupbox>
+                        <radiogroup id="dotimescaling"
+                                    prefstring="extensions.threadarcsjs.timescaling.enabled"
+                                    prefdefvalue="false"
+                                    preftype="bool">
+                            <vbox>
+                                <radio value="false"
+                                       label="&visualisation.timescaling.disable;" />
+                                <hbox class="indent">
+                                    <image src="images/timescaling_disabled.png" />
+                                </hbox>
+                                <separator class="thin" />
+                                <label class="indent">
+                                    &visualisation.timescaling.description.disabled;
+                                </label>
+                            </vbox>
+                            <separator />
+                            <vbox>
+                                <radio value="true" label="&visualisation.timescaling.enable;" />
+                                <hbox class="indent">
+                                    <image src="images/timescaling_enabled.png" />
+                                </hbox>
+                                <separator class="thin" />
+                                <label class="indent">
+                                    &visualisation.timescaling.description.enabled;
+                                </label>
+                            </vbox>
+                        </radiogroup>
+                    </groupbox>
+                </expander>
+
+                <expander id="size"
+                          label="&visualisation.size.caption;"
+                          open="true"
+                          persist="open"
+                          clearhidden="true">
+                    <groupbox>
+                        <radiogroup id="visualisationsize"
+                                    prefstring="extensions.threadarcsjs.visualisation.size"
+                                    prefdefvalue="12x12,12,12,12,6,-1,1,24"
+                                    preftype="string">
+                            <hbox>
+                                <radio value="8x8,8,8,24,4,1,16"
+                                       label="&visualisation.size.small;" />
+                                <image src="images/size_8.png" />
                             </hbox>
                             <separator class="thin" />
-                            <label class="indent">
-                                &visualisation.timescaling.description.disabled;
-                            </label>
-                        </vbox>
-                        <separator />
-                        <vbox>
-                            <radio value="true" label="&visualisation.timescaling.enable;" />
-                            <hbox class="indent">
-                                <image src="images/timescaling_enabled.png" />
+                            <hbox>
+                                <radio value="12x12,12,12,32,6,2,24"
+                                       label="&visualisation.size.medium;" />
+                                <image src="images/size_12.png" />
                             </hbox>
                             <separator class="thin" />
+                            <hbox>
+                                <radio value="16x16,16,16,40,8,3,32"
+                                       label="&visualisation.size.large;" />
+                                <image src="images/size_16.png" />
+                            </hbox>
+                        </radiogroup>
+                    </groupbox>
+                </expander>
+
+                <expander id="colour"
+                          label="&visualisation.colour.caption;"
+                          open="true"
+                          persist="open"
+                          clearhidden="true">
+                    <groupbox>
+                        <radiogroup id="visualisationcolour"
+                                    prefstring="extensions.threadarcsjs.visualisation.colour"
+                                    prefdefvalue="author"
+                                    preftype="string"
+                                    oncommand="toggleHighlight();">
+                            <radio value="single"
+                                   label="&visualisation.colour.single.caption;" />
                             <label class="indent">
-                                &visualisation.timescaling.description.enabled;
+                                &visualisation.colour.single.description;
                             </label>
-                        </vbox>
-                    </radiogroup>
-                </groupbox>
-                <groupbox>
-                    <caption label="&visualisation.size.caption;" />
-                    <radiogroup id="visualisationsize"
-                                prefstring="extensions.threadarcsjs.visualisationsize"
-                                prefdefvalue="12x12,12,12,12,6,-1,1,24"
-                                preftype="string">
-                        <hbox>
-                            <radio value="8x8,8,8,24,4,1,16"
-                                   label="&visualisation.size.small;" />
-                            <image src="images/size_8.png" />
-                        </hbox>
-                        <separator class="thin" />
-                        <hbox>
-                            <radio value="12x12,12,12,32,6,2,24"
-                                   label="&visualisation.size.medium;" />
-                            <image src="images/size_12.png" />
-                        </hbox>
-                        <separator class="thin" />
-                        <hbox>
-                            <radio value="16x16,16,16,40,8,3,32"
-                                   label="&visualisation.size.large;" />
-                            <image src="images/size_16.png" />
-                        </hbox>
-                    </radiogroup>
-                </groupbox>
+                            <radio value="author"
+                                   label="&visualisation.colour.author.caption;"
+                                   id="visualisationcolourauthor" />
+                            <label class="indent">
+                                &visualisation.colour.author.description;
+                            </label>
+                        </radiogroup>
+                        <checkbox id="visualisationhighlight"
+                                  label="&visualisation.colour.highlight;"
+                                  prefstring="extensions.threadarcsjs.visualisation.highlight"
+                                  prefdefvalue="true"
+                                  preftype="bool" />
+                    </groupbox>
+                </expander>
             </tabpanel>
 
             <tabpanel id="logfiles" orient="vertical" flex="1">
@@ -175,7 +220,6 @@
                         oncommand="resetLogfiles();"
                         tooltiptext="&logfiles.reset.tooltip;" />
             </tabpanel>
-
 
         </tabpanels>
 
