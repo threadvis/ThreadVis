@@ -211,32 +211,6 @@ ContainerVisualisation.prototype.createToolTip = function()
         tooltip.appendChild(date);
         tooltip.appendChild(subject);
 
-
-        var folderlabel = document.createElementNS(XUL_NAMESPACE_, "label");
-        var foldertext = document.createElementNS(XUL_NAMESPACE_, "label");
-        var folder = document.createElementNS(XUL_NAMESPACE_, "hbox");
-        folder.appendChild(folderlabel);
-        folder.appendChild(foldertext);
-        folderlabel.setAttribute("value",
-                                  "Folder:");
-        folderlabel.style.fontWeight = "bold";
-        foldertext.setAttribute("value",
-                                 this.container_.getMessage().getFolder());
-        tooltip.appendChild(folder);
-
-        var msgidlabel = document.createElementNS(XUL_NAMESPACE_, "label");
-        var msgidtext = document.createElementNS(XUL_NAMESPACE_, "label");
-        var msgid = document.createElementNS(XUL_NAMESPACE_, "hbox");
-        msgid.appendChild(msgidlabel);
-        msgid.appendChild(msgidtext);
-        msgidlabel.setAttribute("value",
-                                  "MsgId:");
-        msgidlabel.style.fontWeight = "bold";
-        msgidtext.setAttribute("value",
-                                 this.container_.getMessage().getId());
-        tooltip.appendChild(msgid);
-
-
         LOGGER_.logDebug("Visualisation.drawDot()",
                             {"action" : "create tooltip end"});
     }
