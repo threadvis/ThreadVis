@@ -37,7 +37,7 @@
         <popupset>
             <popup id="ThreadArcsJSPopUp">
                 <menuitem label="&popup.caption;" 
-                          oncommand="window.openOptionsDialog('threadarcsjs', 'chrome://threadarcsjs/content/Settings.xul','threadarcsjs');" />
+                          oncommand="goPreferences('threadarcsjs', 'chrome://threadarcsjs/content/Settings.xul','threadarcsjs');" />
             </popup>
         </popupset>
         <vbox id="ThreadArcsJSBox" 
