@@ -2,6 +2,8 @@ content\ArcVisualisation.js
 content\Container.js
 content\ContainerVisualisation.js
 content\contents.rdf
+content\Expander.css
+content\Expander.xml
 content\Logger.js
 content\Message.js
 content\Preferences.xul
@@ -23,6 +25,8 @@ content\images\size_12.png
 content\images\size_16.png
 content\images\timescaling_disabled.png
 content\images\timescaling_enabled.png
+content\images\twisty-closed.png
+content\images\twisty-open.png
 locale\en-US\contents.rdf
 locale\en-US\Settings.dtd
 locale\en-US\ThreadArcs.dtd

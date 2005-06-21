@@ -1,3 +1,13 @@
+/** ****************************************************************************
+ * Settings.css
+ *
+ * (c) 2005 Alexander C. Hubmann
+ *
+ * CSS file to layout preferences dialog
+ *
+ * Version: $Id$
+ ******************************************************************************/
+
 tabpanel
 {
     overflow: auto;

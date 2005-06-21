@@ -12,15 +12,19 @@
 -->
 <?xml-stylesheet href="chrome://communicator/skin/pref/pref.css" type="text/css"?>
 <?xml-stylesheet href="chrome://communicator/skin/" type="text/css"?>
-<?xml-stylesheet href="Settings.css" type="text/css"?>
+<?xml-stylesheet href="chrome://threadarcsjs/content/Settings.css" type="text/css"?>
+<?xml-stylesheet href="chrome://threadarcsjs/content/Expander.css" type="text/css"?>
 
 <!DOCTYPE page SYSTEM "chrome://threadarcsjs/locale/Settings.dtd">
 <page xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
       headertitle="&settings.title;"
-      onload="parent.initPanel('chrome://threadarcsjs/content/Settings.xul'); init();">
-      
+      onload="parent.initPanel('chrome://threadarcsjs/content/Settings.xul'); init();"
+      defaultStyling="true"
+      extraStyling="true">
+
     <script type="application/x-javascript"
             src="chrome://threadarcsjs/content/Settings.js" />
+
     <script type="application/x-javascript">
     <![CDATA[
     var _elementIDs = ["enablethreadarcs",
@@ -32,6 +36,7 @@
                        "dologgingdebug"];
     ]]>
     </script>
+
 
     <tabbox flex="1">
         <tabs id="settingstabs">
@@ -71,20 +76,22 @@
                        id="about-homepage" />
 
                 <separator />
-                <checkbox id="enablethreadarcs"
-                          label="&extension.enabled;"
-                          prefstring="extensions.threadarcsjs.enabled"
-                          prefdefval="true"
-                          preftype="bool" />
+                <groupbox>
+                    <checkbox id="enablethreadarcs"
+                              label="&extension.enabled;"
+                              prefstring="extensions.threadarcsjs.enabled"
+                              prefdefval="true"
+                              preftype="bool" />
+                </groupbox>
             </tabpanel>
 
             <tabpanel id="visualisation" orient="vertical" flex="1">
-                <expander id="timescaling"
-                          label="&visualisation.timescaling.caption;"
-                          open="true"
-                          persist="open"
-                          clearhidden="true">
-                    <groupbox>
+                <groupbox>
+                    <expander id="timescaling"
+                              label="&visualisation.timescaling.caption;"
+                              open="true"
+                              persist="open"
+                              clearhidden="true">
                         <radiogroup id="dotimescaling"
                                     prefstring="extensions.threadarcsjs.timescaling.enabled"
                                     prefdefvalue="false"
@@ -112,15 +119,15 @@
                                 </label>
                             </vbox>
                         </radiogroup>
-                    </groupbox>
-                </expander>
+                    </expander>
+                </groupbox>
 
-                <expander id="size"
-                          label="&visualisation.size.caption;"
-                          open="true"
-                          persist="open"
-                          clearhidden="true">
-                    <groupbox>
+                <groupbox>
+                    <expander id="size"
+                              label="&visualisation.size.caption;"
+                              open="true"
+                              persist="open"
+                              clearhidden="true">
                         <radiogroup id="visualisationsize"
                                     prefstring="extensions.threadarcsjs.visualisation.size"
                                     prefdefvalue="12x12,12,12,12,6,-1,1,24"
@@ -143,15 +150,15 @@
                                 <image src="images/size_16.png" />
                             </hbox>
                         </radiogroup>
-                    </groupbox>
-                </expander>
+                    </expander>
+                </groupbox>
 
-                <expander id="colour"
-                          label="&visualisation.colour.caption;"
-                          open="true"
-                          persist="open"
-                          clearhidden="true">
-                    <groupbox>
+                <groupbox>
+                    <expander id="colour"
+                              label="&visualisation.colour.caption;"
+                              open="true"
+                              persist="open"
+                              clearhidden="true">
                         <radiogroup id="visualisationcolour"
                                     prefstring="extensions.threadarcsjs.visualisation.colour"
                                     prefdefvalue="author"
@@ -174,8 +181,8 @@
                                   prefstring="extensions.threadarcsjs.visualisation.highlight"
                                   prefdefvalue="true"
                                   preftype="bool" />
-                    </groupbox>
-                </expander>
+                    </expander>
+                </groupbox>
             </tabpanel>
 
             <tabpanel id="logfiles" orient="vertical" flex="1">
