@@ -564,6 +564,9 @@ Threader.prototype.topPutContainersInSubjectTable = function()
         this.put_containers_in_subject_table_top_doing_ = false;
         LOGGER_.logDebug("Threader.topPutContainersInSubjectTable()",
                             {"action" : "end"});
+        this.done_threading_ = true;
+        var ref = this;
+        setTimeout(function(){ref.logInfo();}, 10);
         return;
     }
     var ref = this;
@@ -620,7 +623,6 @@ Threader.prototype.putContainersInSubjectTable = function()
 
     this.put_containers_in_subject_table_doing_ = false;
     this.put_containers_in_subject_table_done_ = true;
-    this.done_threading_ = true;
 }
 
 
