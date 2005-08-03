@@ -620,6 +620,7 @@ Threader.prototype.putContainersInSubjectTable = function()
 
     this.put_containers_in_subject_table_doing_ = false;
     this.put_containers_in_subject_table_done_ = true;
+    this.done_threading_ = true;
 }
 
 
@@ -870,7 +871,7 @@ Threader.prototype.thread = function()
     this.topPutContainersInSubjectTable();
 
     // 5.C. group all containers by subject
-    this.topGroupBySubject();
+    //this.topGroupBySubject();
 
     // 6. that's it
     //root_set_.check();
