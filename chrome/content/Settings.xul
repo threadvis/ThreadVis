@@ -88,7 +88,6 @@
 
             <tabpanel id="visualisation" orient="vertical" flex="1">
             
-            
                 <groupbox>
                     <expander id="enableaccount"
                               label="&visualisation.enabledaccounts.caption;"
@@ -105,10 +104,10 @@
                         </label>
                         <separator />
                         <vbox id="enableaccounts"
-                              style="overflow: auto;" />
+                              style="overflow: auto;" 
+                              class="indent" />
                     </expander>
                </groupbox>
-            
             
                 <groupbox>
                     <expander id="timescaling"
