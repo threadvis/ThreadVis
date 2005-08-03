@@ -561,6 +561,7 @@ Threader.prototype.topPutContainersInSubjectTable = function()
     if (this.put_containers_in_subject_table_done_)
     {
         this.put_containers_in_subject_table_end_ = (new Date()).getTime();
+        this.end_ = (new Date()).getTime();
         this.put_containers_in_subject_table_top_doing_ = false;
         LOGGER_.logDebug("Threader.topPutContainersInSubjectTable()",
                             {"action" : "end"});
