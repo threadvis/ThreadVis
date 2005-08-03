@@ -10,6 +10,14 @@
 
 
 
+var XUL_NAMESPACE_ =
+    "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
+
+var THREADARCSJS_PREF_BRANCH_ = "extensions.threadarcsjs.";
+var THREADARCSJS_PREF_ENABLEDACCOUNTS_ = "enabledaccounts";
+
+
+
 /** ****************************************************************************
  * init
  ******************************************************************************/
@@ -17,6 +25,7 @@ function init()
 {
     toggleLogging();
     toggleHighlight();
+    buildAccountList();
 }
 
 
@@ -220,4 +229,62 @@ function getLogger(object)
     // we have no logger, no parent and no opener
     // this shouldn't happen
     return null;
+}
+
+
+
+/** ****************************************************************************
+ * Build the account list
+ * get all accounts, display checkbox for each
+ ******************************************************************************/
+function buildAccountList()
+{
+    var account_box = document.getElementById("enableaccounts");
+    var pref = document.getElementById("hidden_enableaccounts").value;
+    
+    var account_manager = Components.classes["@mozilla.org/messenger/account-manager;1"]
+                         .getService(Components.interfaces.nsIMsgAccountManager);
+    
+    var accounts = account_manager.accounts;
+    for (var i = 0; i < accounts.Count(); i++) 
+    {
+        var account = accounts.QueryElementAt(i, Components.interfaces.nsIMsgAccount);
+        var checkbox = document.createElementNS(XUL_NAMESPACE_, "checkbox");
+        checkbox.setAttribute("label", account.incomingServer.prettyName);
+        checkbox.setAttribute("oncommand", "buildAccountPreference();");
+        checkbox.setAttribute("accountkey", account.key);
+        var regexp = new RegExp(account.key);
+        if (pref == "*" || pref.match(regexp))
+            checkbox.setAttribute("checked", true);
+        account_box.appendChild(checkbox);
+    }
+}
+
+
+
+/** ****************************************************************************
+ * Create a string preference of all selected accounts
+ ******************************************************************************/
+function buildAccountPreference()
+{
+    var account_box = document.getElementById("enableaccounts");
+    var pref = document.getElementById("hidden_enableaccounts");
+    
+    var prefstring = "";
+    var count = 0;
+    
+    var checkboxes = account_box.getElementsByTagName("checkbox");
+    
+    for (var i = 0; i < checkboxes.length; i++)
+    {
+        var checkbox = checkboxes.item(i);
+        if (checkbox.checked)
+        {
+            prefstring += " " + checkbox.getAttribute("accountkey");
+            count++;
+        }
+    }
+    if (count == checkboxes.length)
+        prefstring = "*";
+    pref.value = prefstring;
 }

@@ -9,6 +9,7 @@
  ********************************************************/
 
 pref("extensions.threadarcsjs.enabled", true);
+pref("extensions.threadarcsjs.enabledaccounts", "*");
 pref("extensions.threadarcsjs.logging.debug", false);
 pref("extensions.threadarcsjs.logging.enabled", false);
 pref("extensions.threadarcsjs.timescaling.enabled", false);

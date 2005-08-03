@@ -28,6 +28,7 @@
     <script type="application/x-javascript">
     <![CDATA[
     var _elementIDs = ["enablethreadarcs",
+                       "hidden_enableaccounts",
                        "dotimescaling",
                        "visualisationsize",
                        "visualisationcolour",
@@ -86,6 +87,29 @@
             </tabpanel>
 
             <tabpanel id="visualisation" orient="vertical" flex="1">
+            
+            
+                <groupbox>
+                    <expander id="enableaccount"
+                              label="&visualisation.enabledaccounts.caption;"
+                              open="true"
+                              persist="open"
+                              clearhidden="true">
+                        <textbox id="hidden_enableaccounts"
+                               prefstring="extensions.threadarcsjs.enabledaccounts"
+                               prefdefval="*"
+                               preftype="string"
+                               hidden="true" />
+                        <label class="indent">
+                            &visualisation.enabledaccounts.description;
+                        </label>
+                        <separator />
+                        <vbox id="enableaccounts"
+                              style="overflow: auto;" />
+                    </expander>
+               </groupbox>
+            
+            
                 <groupbox>
                     <expander id="timescaling"
                               label="&visualisation.timescaling.caption;"
@@ -94,7 +118,7 @@
                               clearhidden="true">
                         <radiogroup id="dotimescaling"
                                     prefstring="extensions.threadarcsjs.timescaling.enabled"
-                                    prefdefvalue="false"
+                                    prefdefval="false"
                                     preftype="bool">
                             <vbox>
                                 <radio value="false"
@@ -130,7 +154,7 @@
                               clearhidden="true">
                         <radiogroup id="visualisationsize"
                                     prefstring="extensions.threadarcsjs.visualisation.size"
-                                    prefdefvalue="12x12,12,12,12,6,-1,1,24"
+                                    prefdefval="12x12,12,12,12,6,-1,1,24"
                                     preftype="string">
                             <hbox>
                                 <radio value="8x8,8,8,24,4,1,16"
@@ -161,7 +185,7 @@
                               clearhidden="true">
                         <radiogroup id="visualisationcolour"
                                     prefstring="extensions.threadarcsjs.visualisation.colour"
-                                    prefdefvalue="author"
+                                    prefdefval="author"
                                     preftype="string"
                                     oncommand="toggleHighlight();">
                             <radio value="single"
@@ -179,7 +203,7 @@
                         <checkbox id="visualisationhighlight"
                                   label="&visualisation.colour.highlight;"
                                   prefstring="extensions.threadarcsjs.visualisation.highlight"
-                                  prefdefvalue="true"
+                                  prefdefval="true"
                                   preftype="bool" />
                     </expander>
                 </groupbox>

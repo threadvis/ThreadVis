@@ -19,6 +19,7 @@ var LOGGER_ = null;
 var PREFERENCE_OBSERVER_ = null;
 var THREADARCS_PARENT_ = null;
 var THREADARCS_ENABLED_ = false;
+var THREADARCS_ENABLEDACCOUNTS_ = "*";
 
 // add visualisation at startup
 addEventListener("load", createThreadArcs, false);
@@ -40,9 +41,11 @@ function createThreadArcs()
     {
         PREFERENCE_OBSERVER_ = new PreferenceObserver();
         PREFERENCE_OBSERVER_.registerCallback("enabled", preferenceEnabledChanged);
+        PREFERENCE_OBSERVER_.registerCallback("enabledaccounts", preferenceEnabledAccountsChanged);
     }
 
     THREADARCS_ENABLED_ = PREFERENCE_OBSERVER_.getPreference("enabled");
+    THREADARCS_ENABLEDACCOUNTS_ = PREFERENCE_OBSERVER_.getPreference("enabledaccounts");
 
     if (! THREADARCS_ENABLED_)
     {
@@ -223,6 +226,8 @@ ThreadArcs.prototype.addMessages = function()
 {
     if (! THREADARCS_ENABLED_)
         return;
+    if (! this.checkEnabledAccount())
+        return;
 
     LOGGER_.log("addmessages", {"action" : "start"});
     this.add_messages_start_time = new Date();
@@ -254,6 +259,9 @@ ThreadArcs.prototype.addMessages = function()
 ThreadArcs.prototype.waitForAddMessages = function()
 {
     if (! THREADARCS_ENABLED_)
+        return;
+    
+    if (! this.checkEnabledAccount())
         return;
 
     if (this.add_messages_done_)
@@ -307,6 +315,9 @@ ThreadArcs.prototype.addMessage = function(header)
 {
     if (! THREADARCS_ENABLED_)
         return;
+    if (! this.checkEnabledAccount())
+        return
+
 
     LOGGER_.logDebug("ThreadArcs.addMessage()", {});
     var date = new Date();
@@ -342,6 +353,9 @@ ThreadArcs.prototype.addMessagesFromFolder = function(folder)
 {
     if (! THREADARCS_ENABLED_)
         return;
+    if (! this.checkEnabledAccount())
+        return
+
 
     if (this.add_messages_from_folder_done_)
     {
@@ -374,6 +388,9 @@ ThreadArcs.prototype.addMessagesFromFolderEnumerator = function(enumerator)
 {
     if (! THREADARCS_ENABLED_)
         return;
+    if (! this.checkEnabledAccount())
+        return
+
 
     LOGGER_.logDebug("ThreadArcs.addMessagesFromFolderEnumerator()", {"action" : "start"});
     var header = null;
@@ -410,6 +427,9 @@ ThreadArcs.prototype.getAllFolders = function(folder)
 {
     if (! THREADARCS_ENABLED_)
         return;
+    if (! this.checkEnabledAccount())
+        return
+
 
     LOGGER_.logDebug("ThreadArcs.getAllFolders()",
                         {"folder" : folder.URI});
@@ -455,6 +475,9 @@ ThreadArcs.prototype.callback = function(msgKey,
 {
     if (! THREADARCS_ENABLED_)
         return;
+    if (! this.checkEnabledAccount())
+        return
+
 
     LOGGER_.log("msgselect",
                     {"from" : "extension",
@@ -477,15 +500,40 @@ ThreadArcs.prototype.callback = function(msgKey,
 
 
 /** ****************************************************************************
+ * Check if current account is enabled in extension
+ ******************************************************************************/
+ThreadArcs.prototype.checkEnabledAccount = function()
+{
+    var folder = GetLoadedMsgFolder();
+
+    if (! folder)
+        return false;
+
+    var server = folder.server;
+    var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
+                   .getService(Components.interfaces.nsIMsgAccountManager))
+                   .FindAccountForServer(server);
+
+    var regexp = new RegExp(account.key);
+    
+    if (THREADARCS_ENABLEDACCOUNTS_ == "*" || 
+        THREADARCS_ENABLEDACCOUNTS_.match(regexp))
+        return true;
+    else
+        return false;
+}
+
+
+
+/** ****************************************************************************
  * clear visualisation
  ******************************************************************************/
 ThreadArcs.prototype.clearVisualisation = function()
 {
-    LOGGER_.logDebug("ThreadArcs.clearVisualisation()", {});
+    LOGGER_.logDebug("ThreadArcs.clearVisualisation()", {"clear" : this.clear_});
 
-    if (! THREADARCS_ENABLED_)
+    if (! THREADARCS_ENABLED_ )
     {
-        this.visualisation_.clearStack();
         return;
     }
 
@@ -505,6 +553,9 @@ ThreadArcs.prototype.doThreading = function()
 {
     if (! THREADARCS_ENABLED_)
         return;
+    if (! this.checkEnabledAccount())
+        return
+
 
     LOGGER_.logDebug("ThreadArcs.doThreading()", {});
     if (! this.threading_ && ! this.threaded_)
@@ -537,6 +588,9 @@ ThreadArcs.prototype.initMessages = function()
 {
     if (! THREADARCS_ENABLED_)
         return;
+    if (! this.checkEnabledAccount())
+        return
+
 
     LOGGER_.logDebug("ThreadArcs.initMessages()", {});
     if (! this.loaded_ && ! this.loading_)
@@ -557,6 +611,12 @@ ThreadArcs.prototype.setSelectedMessage = function()
 {
     if (! THREADARCS_ENABLED_)
         return;
+    if (! this.checkEnabledAccount())
+    {
+        this.clearVisualisation();
+        return;
+    }
+
 
     LOGGER_.logDebug("ThreadArcs.setSelectedMessage()", {});
     if (! this.loaded_ || ! this.threaded_)
@@ -615,6 +675,9 @@ ThreadArcs.prototype.visualiseMsgId = function(message_id)
 {
     if (! THREADARCS_ENABLED_)
         return;
+    if (! this.checkEnabledAccount())
+        return
+
 
     LOGGER_.logDebug("ThreadArcs.visualiseMsgId()",
                         {"message-id" : message_id});
@@ -641,6 +704,9 @@ ThreadArcs.prototype.visualise = function(container)
 {
     if (! THREADARCS_ENABLED_)
         return;
+    if (! this.checkEnabledAccount())
+        return
+
 
     LOGGER_.logDebug("ThreadArcs.visualise()",
                         {"container" : container});
@@ -671,6 +737,9 @@ ThreadArcs.prototype.waitForThreading = function()
 {
     if (! THREADARCS_ENABLED_)
         return;
+    if (! this.checkEnabledAccount())
+        return
+
 
     LOGGER_.logDebug("ThreadArcs.waitForThreading()", {});
 
@@ -698,6 +767,18 @@ function preferenceEnabledChanged(value)
 {
     THREADARCS_ENABLED_ = value;
     createThreadArcs();
+}
+
+
+
+/** ****************************************************************************
+ * "enabledaccounts" preference changed
+ ******************************************************************************/
+function preferenceEnabledAccountsChanged(value)
+{
+    THREADARCS_ENABLEDACCOUNTS_ = value;
+    createThreadArcs();
+    THREADARCS_.doLoad.onStartHeaders();
 }
 
 
