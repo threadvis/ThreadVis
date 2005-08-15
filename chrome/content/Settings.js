@@ -26,6 +26,7 @@ function init()
     toggleLogging();
     toggleHighlight();
     buildAccountList();
+    buildAccountPreference();
 }
 
 
@@ -234,13 +235,97 @@ function getLogger(object)
 
 
 /** ****************************************************************************
+ * get all subfolders starting from "folder" as array
+ ******************************************************************************/
+function getAllFolders(folder)
+{
+    var folder_enumerator = folder.GetSubFolders();
+    var current_folder = null;
+    var folders = new Array();
+    
+    while (true)
+    {
+        try
+        {
+            current_folder = folder_enumerator.currentItem();
+        }
+        catch (Exception)
+        {
+            break;
+        }
+
+        if (current_folder instanceof Components.interfaces.nsIMsgFolder)
+        {
+            folders.push(current_folder);
+        }
+
+        if (current_folder.hasSubFolders)
+        {
+            folders.push(this.getAllFolders(current_folder));
+        }
+
+        try
+        {
+            folder_enumerator.next();
+        }
+        catch (Exception)
+        {
+            break;
+        }
+    }
+    
+    return folders;
+}
+
+
+
+/** ****************************************************************************
+ * create checkbox elements for all folders
+ ******************************************************************************/
+function buildFolderCheckboxes(box, folders, account, indent)
+{
+    var pref = document.getElementById("hidden_disabledfolders").value;
+    
+    for (var i = 0; i < folders.length; i++)
+    {
+        var folder = folders[i];
+        
+        if (folder instanceof Array)
+        {
+            buildFolderCheckboxes(box, folder, account, ++indent);
+            return;
+        }
+        
+        var checkbox = document.createElementNS(XUL_NAMESPACE_, "checkbox");
+        checkbox.setAttribute("label", folder.name);
+        checkbox.setAttribute("oncommand", "buildFolderPreference();");
+        checkbox.setAttribute("folderuri", folder.URI);
+        checkbox.setAttribute("checkboxtype", "folder");
+        checkbox.setAttribute("accountkey", account);
+        checkbox.style.paddingLeft = indent + "em";
+        var regexp = new RegExp(folder.URI + " ");
+        if (pref != "" && pref.match(regexp))
+        {
+            checkbox.setAttribute("checked", false);
+        }
+        else
+        {
+            checkbox.setAttribute("checked", true);
+        }
+        box.appendChild(checkbox);
+    }
+}
+
+
+
+/** ****************************************************************************
  * Build the account list
  * get all accounts, display checkbox for each
  ******************************************************************************/
 function buildAccountList()
 {
     var account_box = document.getElementById("enableaccounts");
-    var pref = document.getElementById("hidden_enableaccounts").value;
+    var pref = document.getElementById("hidden_disabledaccounts").value;
     
     var account_manager = Components.classes["@mozilla.org/messenger/account-manager;1"]
                          .getService(Components.interfaces.nsIMsgAccountManager);
@@ -249,14 +334,31 @@ function buildAccountList()
     for (var i = 0; i < accounts.Count(); i++) 
     {
         var account = accounts.QueryElementAt(i, Components.interfaces.nsIMsgAccount);
+        
+        // get folders
+        var root_folder = account.incomingServer.rootFolder;
+        var folders = getAllFolders(root_folder);
+        
         var checkbox = document.createElementNS(XUL_NAMESPACE_, "checkbox");
         checkbox.setAttribute("label", account.incomingServer.prettyName);
         checkbox.setAttribute("oncommand", "buildAccountPreference();");
         checkbox.setAttribute("accountkey", account.key);
+        checkbox.setAttribute("checkboxtype", "account");
         var regexp = new RegExp(account.key);
-        if (pref == "*" || pref.match(regexp))
+        if (pref != "" && pref.match(regexp))
+        {
+            checkbox.setAttribute("checked", false);
+        }
+        else
+        {
             checkbox.setAttribute("checked", true);
+        }
         account_box.appendChild(checkbox);
+        buildFolderCheckboxes(account_box, folders, account.key, 1);
+        
+        var separator = document.createElementNS(XUL_NAMESPACE_, "separator");
+        separator.setAttribute("class", "groove");
+        account_box.appendChild(separator);
     }
 }
 
@@ -268,23 +370,62 @@ function buildAccountList()
 function buildAccountPreference()
 {
     var account_box = document.getElementById("enableaccounts");
-    var pref = document.getElementById("hidden_enableaccounts");
+    var pref = document.getElementById("hidden_disabledaccounts");
     
     var prefstring = "";
-    var count = 0;
     
-    var checkboxes = account_box.getElementsByTagName("checkbox");
+    var checkboxes = account_box.getElementsByAttribute("checkboxtype", "account");
     
     for (var i = 0; i < checkboxes.length; i++)
     {
         var checkbox = checkboxes.item(i);
-        if (checkbox.checked)
+        if (! checkbox.checked)
         {
             prefstring += " " + checkbox.getAttribute("accountkey");
-            count++;
+        }
+        
+        var folder_checkboxes = account_box.getElementsByAttribute("checkboxtype", "folder");
+        for (var j = 0; j < folder_checkboxes.length; j++)
+        {
+            var folder_checkbox = folder_checkboxes.item(j);
+            if (folder_checkbox.getAttribute("accountkey") == checkbox.getAttribute("accountkey"))
+            {
+                if (checkbox.checked)
+                {
+                    folder_checkbox.disabled = false;
+                }
+                else
+                {
+                    folder_checkbox.disabled = true;
+                }
+            }
+        }
+        
+    }
+    pref.value = prefstring;
+}
+
+
+
+/** ****************************************************************************
+ * Create a string preference of all selected folders
+ ******************************************************************************/
+function buildFolderPreference()
+{
+    var account_box = document.getElementById("enableaccounts");
+    var pref = document.getElementById("hidden_disabledfolders");
+    
+    var prefstring = "";
+    
+    var checkboxes = account_box.getElementsByAttribute("checkboxtype", "folder");
+    
+    for (var i = 0; i < checkboxes.length; i++)
+    {
+        var checkbox = checkboxes.item(i);
+        if (! checkbox.checked)
+        {
+            prefstring += checkbox.getAttribute("folderuri") + " ";
         }
     }
-    if (count == checkboxes.length)
-        prefstring = "*";
     pref.value = prefstring;
 }

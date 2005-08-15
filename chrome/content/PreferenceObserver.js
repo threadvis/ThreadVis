@@ -12,7 +12,8 @@
 
 var THREADARCSJS_PREF_BRANCH_ = "extensions.threadarcsjs.";
 var THREADARCSJS_PREF_ENABLED_ = "enabled";
-var THREADARCSJS_PREF_ENABLEDACCOUNTS_ = "enabledaccounts";
+var THREADARCSJS_PREF_DISABLEDACCOUNTS_ = "disabledaccounts";
+var THREADARCSJS_PREF_DISABLEDFOLDERS_ = "disabledfolders";
 
 
 
@@ -44,9 +45,14 @@ PreferenceObserver.prototype.preferenceReload = function()
     this.preferences_["enabled"] = false;
     if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + THREADARCSJS_PREF_ENABLED_) == prefs.PREF_BOOL)
         this.preferences_["enabled"] = prefs.getBoolPref(THREADARCSJS_PREF_BRANCH_ + THREADARCSJS_PREF_ENABLED_);
-    this.preferences_["enabledaccounts"] = "*";
-    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + THREADARCSJS_PREF_ENABLEDACCOUNTS_) == prefs.PREF_STRING)
-        this.preferences_["enabledaccounts"] = prefs.getCharPref(THREADARCSJS_PREF_BRANCH_ + THREADARCSJS_PREF_ENABLEDACCOUNTS_);
+
+    this.preferences_["disabledaccounts"] = "";
+    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + THREADARCSJS_PREF_DISABLEDACCOUNTS_) == prefs.PREF_STRING)
+        this.preferences_["disabledaccounts"] = prefs.getCharPref(THREADARCSJS_PREF_BRANCH_ + THREADARCSJS_PREF_DISABLEDACCOUNTS_);
+
+    this.preferences_["disabledfolders"] = "";
+    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + THREADARCSJS_PREF_DISABLEDFOLDERS_) == prefs.PREF_STRING)
+        this.preferences_["disabledfolders"] = prefs.getCharPref(THREADARCSJS_PREF_BRANCH_ + THREADARCSJS_PREF_DISABLEDFOLDERS_);
 }
 
 

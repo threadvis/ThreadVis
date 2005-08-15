@@ -28,7 +28,8 @@
     <script type="application/x-javascript">
     <![CDATA[
     var _elementIDs = ["enablethreadarcs",
-                       "hidden_enableaccounts",
+                       "hidden_disabledaccounts",
+                       "hidden_disabledfolders",
                        "dotimescaling",
                        "visualisationsize",
                        "visualisationcolour",
@@ -94,8 +95,8 @@
                               open="true"
                               persist="open"
                               clearhidden="true">
-                        <textbox id="hidden_enableaccounts"
-                               prefstring="extensions.threadarcsjs.enabledaccounts"
+                        <textbox id="hidden_disabledaccounts"
+                               prefstring="extensions.threadarcsjs.disabledaccounts"
                                prefdefval="*"
                                preftype="string"
                                hidden="true" />
@@ -106,6 +107,11 @@
                         <vbox id="enableaccounts"
                               style="overflow: auto;" 
                               class="indent" />
+                        <textbox id="hidden_disabledfolders"
+                                 prefstring="extensions.threadarcsjs.disabledfolders"
+                                 prefdefval=""
+                                 preftype="string" 
+                                 hidden="true" />
                     </expander>
                </groupbox>
             
