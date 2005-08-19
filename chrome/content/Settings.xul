@@ -88,33 +88,6 @@
             </tabpanel>
 
             <tabpanel id="visualisation" orient="vertical" flex="1">
-            
-                <groupbox>
-                    <expander id="enableaccount"
-                              label="&visualisation.enabledaccounts.caption;"
-                              open="true"
-                              persist="open"
-                              clearhidden="true">
-                        <textbox id="hidden_disabledaccounts"
-                               prefstring="extensions.threadarcsjs.disabledaccounts"
-                               prefdefval="*"
-                               preftype="string"
-                               hidden="true" />
-                        <label class="indent">
-                            &visualisation.enabledaccounts.description;
-                        </label>
-                        <separator />
-                        <vbox id="enableaccounts"
-                              style="overflow: auto;" 
-                              class="indent" />
-                        <textbox id="hidden_disabledfolders"
-                                 prefstring="extensions.threadarcsjs.disabledfolders"
-                                 prefdefval=""
-                                 preftype="string" 
-                                 hidden="true" />
-                    </expander>
-               </groupbox>
-            
                 <groupbox>
                     <expander id="timescaling"
                               label="&visualisation.timescaling.caption;"
@@ -212,6 +185,32 @@
                                   preftype="bool" />
                     </expander>
                 </groupbox>
+
+                <groupbox>
+                    <expander id="enableaccount"
+                              label="&visualisation.enabledaccounts.caption;"
+                              open="true"
+                              persist="open"
+                              clearhidden="true">
+                        <textbox id="hidden_disabledaccounts"
+                               prefstring="extensions.threadarcsjs.disabledaccounts"
+                               prefdefval="*"
+                               preftype="string"
+                               hidden="true" />
+                        <label class="indent">
+                            &visualisation.enabledaccounts.description;
+                        </label>
+                        <separator />
+                        <vbox id="enableaccounts"
+                              style="overflow: auto;" 
+                              class="indent" />
+                        <textbox id="hidden_disabledfolders"
+                                 prefstring="extensions.threadarcsjs.disabledfolders"
+                                 prefdefval=""
+                                 preftype="string" 
+                                 hidden="true" />
+                    </expander>
+               </groupbox>
             </tabpanel>
 
             <tabpanel id="logfiles" orient="vertical" flex="1">

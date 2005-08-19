@@ -540,6 +540,12 @@ Visualisation.prototype.visualise = function(container)
     }
 
     this.colourAuthors(authors);
+    
+    var popupbox = document.createElementNS(XUL_NAMESPACE_, "box");
+    popupbox.style.width = "100%";
+    popupbox.style.height = "100%";
+    popupbox.setAttribute("context", "ThreadArcsJSPopUp");
+    this.stack_.appendChild(popupbox);
 }
 
 
