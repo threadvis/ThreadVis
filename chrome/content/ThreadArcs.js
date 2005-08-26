@@ -381,7 +381,6 @@ ThreadArcs.prototype.addMessagesFromFolder = function(folder)
     this.add_messages_from_folder_doing_ = true;
     var ref = this;
     setTimeout(function(){ref.addMessagesFromFolderEnumerator(msg_enumerator);}, 10);
-    //setTimeout(function(){ref.addMessagesFromFolder(folder);}, 10);
 }
 
 

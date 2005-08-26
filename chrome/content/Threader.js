@@ -190,8 +190,6 @@ Threader.prototype.putMessagesInContainer = function()
 
     this.put_messages_in_container_doing_ = true;
 
-    //var counter = this.put_messages_in_container_counter_;
-    //var maxcounter = counter + this.put_messages_in_container_increment_;
     var counter = 0;
     var maxcounter = this.put_messages_in_container_increment_;
 
@@ -201,23 +199,17 @@ Threader.prototype.putMessagesInContainer = function()
                          "endcounter" : maxcounter,
                          "messages.length" : this.messages_.length});
 
-    //for (counter;
-    //     counter < this.messages_.length && counter < maxcounter;
-    //     counter++)
     for (counter;
          counter < maxcounter;
          counter++)
     {
-        //var message = this.messages_[counter];
         var message = this.messages_.pop();
         if (! message)
             break;
         this.total_messages_++;
         this.putMessageInContainer(message);
     }
-    //this.put_messages_in_container_counter_ = counter;
 
-    //if (this.put_messages_in_container_counter_ == this.messages_.length)
     if (this.messages_.length == 0)
     {
         this.put_messages_in_container_done_ = true;

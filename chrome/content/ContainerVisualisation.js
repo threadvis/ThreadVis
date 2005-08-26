@@ -28,7 +28,8 @@ function ContainerVisualisation(stack,
                                 dotsize,
                                 resize,
                                 circle,
-                                flash)
+                                flash,
+                                spacing)
 {
     this.stack_ = stack;
     this.strings_ = strings;
@@ -42,6 +43,7 @@ function ContainerVisualisation(stack,
     this.draw_circle_ = circle;
     this.flashcount_ = 3;
     this.flash_ = flash;
+    this.spacing_ = spacing;
 
     this.style_ = "full";
     if (! this.container_.isDummy() &&
@@ -59,107 +61,25 @@ function ContainerVisualisation(stack,
                          "left" : this.left_,
                          "top" : this.top_});
 
-
     this.drawDot();
-}
-
-
-
-ContainerVisualisation.prototype.drawDot = function()
-{
-    this.dot_ = document.createElementNS(XUL_NAMESPACE_, "box");
-
-    var style_top = (this.top_ - ((this.dotsize_ / 2) * this.resize_)) + "px";
-    var style_left = ((this.left_ - (this.dotsize_ / 2)) * this.resize_) + "px";
-    var style_height = (this.dotsize_ * this.resize_) + "px";
-    var style_width = (this.dotsize_ * this.resize_) + "px";
-    var style_background = "";
-    var style_border = "";
-    if (this.style_ != "half")
-        style_background = this.colour_;
-    else
-        style_border = (this.dotsize_ / 4 * this.resize_) + 
-                           "px solid " + this.colour_;
-
-    LOGGER_.logDebug("Visualisation.drawDot()",
-                        {"top" : style_top,
-                         "left" : style_left,
-                         "height" : style_height,
-                         "width" : style_width,
-                         "background" : style_background,
-                         "border" : style_border});
-
-    this.dot_.style.position = "relative";
-    this.dot_.style.top = style_top;
-    this.dot_.style.left = style_left;
-    this.dot_.style.width = style_width;
-    this.dot_.style.height = style_height;
-    this.dot_.style.verticalAlign = "top";
-    this.dot_.style.background = style_background;
-    this.dot_.style.border = style_border;
-    if (this.style_ != "dummy")
-        this.dot_.style.MozBorderRadius = style_width;
-    this.dot_.container = this.container_;
-
 
     if (this.selected_ && this.draw_circle_)
     {
         this.drawCircle("black");
-
-        // flash a few times
-        if (this.flash_)
-            this.flash();
     }
 
+    this.drawClick();
 
     this.createToolTip();
-
-    this.dot_.addEventListener("click", this.onMouseClick, true);
+    
+    if (this.selected_ && this.draw_circle_ && this.flash_)
+        this.flash();
 }
 
 
 
 /** ****************************************************************************
- *
- ******************************************************************************/
-ContainerVisualisation.prototype.drawCircle = function(colour)
-{
-    if (! this.circle_)
-        this.circle_ = document.createElementNS(XUL_NAMESPACE_, "box");
-
-    var style_top = (this.top_ - ((this.dotsize_ * 4/6) * this.resize_)) + "px";
-    var style_left = ((this.left_ - (this.dotsize_ * 4/6)) * this.resize_) + "px";
-    var style_height = (this.dotsize_ * 8/6 * this.resize_) + "px";
-    var style_width = (this.dotsize_ * 8/6 * this.resize_) + "px";
-    var style_background = "";
-    var style_border = "";
-    style_border = (this.dotsize_ / 6 * this.resize_) + 
-                       "px solid " + colour;
-
-    LOGGER_.logDebug("Visualisation.drawDot()",
-                        {"action" : "draw selection circle",
-                         "top" : style_top,
-                         "left" : style_left,
-                         "height" : style_height,
-                         "width" : style_width,
-                         "background" : style_background,
-                         "border" : style_border});
-
-    this.circle_.style.position = "relative";
-    this.circle_.style.top = style_top;
-    this.circle_.style.left = style_left;
-    this.circle_.style.width = style_width;
-    this.circle_.style.height = style_height;
-    this.circle_.style.verticalAlign = "top";
-    this.circle_.style.border = style_border;
-    this.circle_.style.MozBorderRadius = style_width;
-    this.circle_.container = this.container_;
-}
-
-
-
-/** ****************************************************************************
- *
+ * Create tooltip for container containing information about container
  ******************************************************************************/
 ContainerVisualisation.prototype.createToolTip = function()
 {
@@ -231,15 +151,167 @@ ContainerVisualisation.prototype.createToolTip = function()
         LOGGER_.logDebug("Visualisation.drawDot()",
                             {"action" : "create missing tooltip end"});
     }
-
-    this.dot_.setAttribute("tooltip", "ThreadArcsJS_" + this.left_);
-    this.stack_.appendChild(this.dot_);
-    if (this.circle_)
-    {
-        this.circle_.setAttribute("tooltip", "ThreadArcsJS_" + this.left_);
-        this.stack_.appendChild(this.circle_);
-    }
+    
     this.stack_.appendChild(tooltip);
+}
+
+
+
+/** ****************************************************************************
+ * Draw circle around container if container is slected
+ ******************************************************************************/
+ContainerVisualisation.prototype.drawCircle = function(colour)
+{
+    if (! this.circle_)
+        this.circle_ = document.createElementNS(XUL_NAMESPACE_, "box");
+
+    var style_top = (this.top_ - ((this.dotsize_ * 4/6) * this.resize_)) + "px";
+    var style_left = ((this.left_ - (this.dotsize_ * 4/6)) * this.resize_) + "px";
+    var style_height = (this.dotsize_ * 8/6 * this.resize_) + "px";
+    var style_width = (this.dotsize_ * 8/6 * this.resize_) + "px";
+    var style_background = "";
+    var style_border = "";
+    style_border = (this.dotsize_ / 6 * this.resize_) + 
+                       "px solid " + colour;
+
+    LOGGER_.logDebug("Visualisation.drawDot()",
+                        {"action" : "draw selection circle",
+                         "top" : style_top,
+                         "left" : style_left,
+                         "height" : style_height,
+                         "width" : style_width,
+                         "background" : style_background,
+                         "border" : style_border});
+
+    this.circle_.style.position = "relative";
+    this.circle_.style.top = style_top;
+    this.circle_.style.left = style_left;
+    this.circle_.style.width = style_width;
+    this.circle_.style.height = style_height;
+    this.circle_.style.verticalAlign = "top";
+    this.circle_.style.border = style_border;
+    this.circle_.style.MozBorderRadius = style_width;
+    
+    this.stack_.appendChild(this.circle_);
+}
+
+
+
+/** ****************************************************************************
+ * Draw container around dot to catch click events and show tooltip
+ ******************************************************************************/
+ContainerVisualisation.prototype.drawClick = function()
+{
+    this.click_ = document.createElementNS(XUL_NAMESPACE_, "box");
+
+    var style_top = (this.top_ - ((this.spacing_ / 2) * this.resize_)) + "px";
+    var style_left = ((this.left_ - this.spacing_ / 2) * this.resize_) + "px";
+    var style_height = (this.spacing_ * this.resize_) + "px";
+    var style_width = (this.spacing_ * this.resize_) + "px";
+    var style_background = "";
+    var style_border = "";
+
+    LOGGER_.logDebug("Visualisation.drawClick()",
+                        {"top" : style_top,
+                         "left" : style_left,
+                         "height" : style_height,
+                         "width" : style_width,
+                         "background" : style_background,
+                         "border" : style_border});
+
+    this.click_.style.position = "relative";
+    this.click_.style.top = style_top;
+    this.click_.style.left = style_left;
+    this.click_.style.width = style_width;
+    this.click_.style.height = style_height;
+    this.click_.style.verticalAlign = "top";
+    this.click_.container = this.container_;
+    this.click_.setAttribute("tooltip", "ThreadArcsJS_" + this.left_);
+
+    this.stack_.appendChild(this.click_);
+    this.click_.addEventListener("click", this.onMouseClick, true);
+}
+
+
+
+/** ****************************************************************************
+ * Draw dot for container
+ ******************************************************************************/
+ContainerVisualisation.prototype.drawDot = function()
+{
+    this.dot_ = document.createElementNS(XUL_NAMESPACE_, "box");
+
+    var style_top = (this.top_ - ((this.dotsize_ / 2) * this.resize_)) + "px";
+    var style_left = ((this.left_ - (this.dotsize_ / 2)) * this.resize_) + "px";
+    var style_height = (this.dotsize_ * this.resize_) + "px";
+    var style_width = (this.dotsize_ * this.resize_) + "px";
+    var style_background = "";
+    var style_border = "";
+    if (this.style_ != "half")
+        style_background = this.colour_;
+    else
+        style_border = (this.dotsize_ / 4 * this.resize_) + 
+                           "px solid " + this.colour_;
+
+    LOGGER_.logDebug("Visualisation.drawDot()",
+                        {"top" : style_top,
+                         "left" : style_left,
+                         "height" : style_height,
+                         "width" : style_width,
+                         "background" : style_background,
+                         "border" : style_border});
+
+    this.dot_.style.position = "relative";
+    this.dot_.style.top = style_top;
+    this.dot_.style.left = style_left;
+    this.dot_.style.width = style_width;
+    this.dot_.style.height = style_height;
+    this.dot_.style.verticalAlign = "top";
+    this.dot_.style.background = style_background;
+    this.dot_.style.border = style_border;
+    if (this.style_ != "dummy")
+        this.dot_.style.MozBorderRadius = style_width;
+    
+    this.stack_.appendChild(this.dot_);
+}
+
+
+
+/** ****************************************************************************
+ * Flash (show and hide) circle to draw attention to selected container
+ ******************************************************************************/
+ContainerVisualisation.prototype.flash = function()
+{
+    if (this.flashcount_ == 0)
+        return;
+
+    this.flashcount_--;
+
+    var ref = this;
+    setTimeout(function() {ref.flashOn();}, 100);
+    setTimeout(function() {ref.flash();}, 1000);
+}
+
+
+
+/** ****************************************************************************
+ * Show circle
+ ******************************************************************************/
+ContainerVisualisation.prototype.flashOn = function()
+{
+    this.circle_.hidden = true;
+    var ref = this;
+    setTimeout(function() {ref.flashOff();}, 500);
+}
+
+
+
+/** ****************************************************************************
+ * Hide circle
+ ******************************************************************************/
+ContainerVisualisation.prototype.flashOff = function(old)
+{
+    this.circle_.hidden = false;
 }
 
 
@@ -259,44 +331,4 @@ ContainerVisualisation.prototype.onMouseClick = function(event)
     if (container && ! container.isDummy())
         THREADARCS_.callback(container.getMessage().getKey(), 
                              container.getMessage().getFolder());
-}
-
-
-
-/** ****************************************************************************
- *
- ******************************************************************************/
-ContainerVisualisation.prototype.flash = function()
-{
-    if (this.flashcount_ == 0)
-        return;
-
-    this.flashcount_--;
-
-    var ref = this;
-    setTimeout(function() {ref.flashOn();}, 100);
-    setTimeout(function() {ref.flash();}, 1000);
-}
-
-
-
-/** ****************************************************************************
- *
- ******************************************************************************/
-ContainerVisualisation.prototype.flashOn = function()
-{
-    this.drawCircle("white");
-
-    var ref = this;
-    setTimeout(function() {ref.flashOff();}, 500);
-}
-
-
-
-/** ****************************************************************************
- *
- ******************************************************************************/
-ContainerVisualisation.prototype.flashOff = function(old)
-{
-    this.drawCircle("black");
 }

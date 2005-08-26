@@ -332,7 +332,8 @@ Visualisation.prototype.drawDot = function(container,
                                          this.dotsize_,
                                          this.resize_,
                                          circle,
-                                         flash);
+                                         flash,
+                                         this.spacing_);
     return msg;
 }
 
@@ -385,7 +386,7 @@ Visualisation.prototype.getResize = function(xcount,
                          "sizex" : sizex,
                          "sizey" : sizey});
 
-    var spaceperarcavailablex = sizex / (xcount - 1);
+    var spaceperarcavailablex = sizex / xcount;
     var spaceperarcavailabley = sizey / 2;
     var spaceperarcneededx = this.spacing_;
     var spaceperarcneededy = (this.dotsize_ / 2) + this.arc_min_height_ + 
@@ -600,7 +601,8 @@ Visualisation.prototype.timeScaling = function(containers,
                         {"action" : "start",
                          "containers" : containers.toString(),
                          "minimaltimedifference" : minimaltimedifference,
-                         "width" : width});
+                         "width" : width,
+                         "no. containers:" : containers.length});
 
     // if we do not want to do timescaling, reset all scaling info to 1
     if (! this.pref_timescaling_)
