@@ -752,7 +752,7 @@ ThreadArcs.prototype.visualise = function(container)
                      "top container" : topcontainer_msgKey,
                      "msgcount" : msgcount});
 
-    this.visualisation_.visualise(container)
+    this.visualisation_.visualise(container);
 }
 
 

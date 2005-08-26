@@ -10,3 +10,5 @@
  ********************************************************/
 -->
 <!ENTITY popup.caption "Settings...">
+<!ENTITY zoomin.tooltip "Zoom in">
+<!ENTITY zoomout.tooltip "Zoom out">

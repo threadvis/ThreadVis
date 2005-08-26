@@ -40,12 +40,26 @@
                           oncommand="goPreferences('threadarcsjs', 'chrome://threadarcsjs/content/Settings.xul','threadarcsjs');" />
             </popup>
         </popupset>
-        <vbox id="ThreadArcsJSBox" 
-              minheight="50" 
-              minwidth="200" 
-              flex="2" 
-              align="right" 
-              context="ThreadArcsJSPopUp" />
+        <hbox id="ThreadArcsJS"
+              style="border: 1px solid #cccccc;">
+            <vbox id="ThreadArcsJSBox" 
+                  style="width: 300px; height: 1px; overflow: hidden;"
+                  context="ThreadArcsJSPopUp" />
+            <vbox>
+                <hbox id="ThreadArcsJSZoomIn"
+                      onclick="zoomIn();">
+                    <label value="+"
+                           style="width: 10px; text-align: center"
+                           tooltiptext="&zoomin.tooltip;" />
+                </hbox>
+                <hbox id="ThreadArcsJSZoomOut"
+                      onclick="zoomOut();">
+                    <label value="-"
+                           style="width: 10px; text-align: center"
+                           tooltiptext="&zoomout.tooltip;" />
+                </hbox>
+            </vbox>
+        </hbox>
     </hbox>
 
 </overlay>

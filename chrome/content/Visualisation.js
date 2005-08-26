@@ -53,9 +53,86 @@ function Visualisation()
     this.pref_timescaling_ = false;
     this.pref_colour = "single";
     this.pref_highlight_ = false;
+    this.zoom_ = 1;
 
     this.preferenceObserverRegister();
     this.preferenceReload();
+}
+
+
+
+/** ****************************************************************************
+ * Calculate size
+ ******************************************************************************/
+Visualisation.prototype.calculateSize = function(containers)
+{
+    // totalmaxheight counts the maximal number of stacked arcs
+    var totalmaxheight = 0;
+
+    // minmaltimedifference stores the minimal time between two messages
+    var minimaltimedifference = Number.MAX_VALUE;
+
+    for (var counter = 0; counter < containers.length; counter++)
+    {
+        var thiscontainer = containers[counter];
+        thiscontainer.x_index_ = counter;
+        thiscontainer.current_arc_height_incoming_ = 0;
+        thiscontainer.current_arc_height_outgoing_ = 0;
+
+        // odd_ tells us if we display the arc above or below the messages
+        thiscontainer.odd_ = thiscontainer.getDepth() % 2 == 0;
+
+        var parent = thiscontainer.getParent();
+        if (parent != null && ! parent.isRoot())
+        {
+            // calculate the current maximal arc height between the parent 
+            // message and this one since we want to draw an arc between this 
+            // message and its parent, and we do not want any arcs to overlap, 
+            // we draw this arc higher than the current highest arc
+            var maxheight = 0;
+            for (var innercounter = parent.x_index_;
+                 innercounter < counter;
+                 innercounter++)
+            {
+                var lookatcontainer = containers[innercounter];
+                if (lookatcontainer.odd_ == parent.odd_ && 
+                    lookatcontainer.current_arc_height_outgoing_ > maxheight)
+                {
+                    maxheight = lookatcontainer.current_arc_height_outgoing_;
+                }
+                if (lookatcontainer.odd_ != parent.odd_ &&
+                    lookatcontainer.current_arc_height_incoming_ > maxheight)
+                {
+                    maxheight = lookatcontainer.current_arc_height_incoming_;
+                }
+            }
+            maxheight++;
+            parent.current_arc_height_outgoing_ = maxheight;
+            thiscontainer.current_arc_height_incoming_ = maxheight;
+        }
+        // also keep track of the current maximal stacked arc height, so that we can resize
+        // the whole extension
+        if (maxheight > totalmaxheight)
+            totalmaxheight = maxheight;
+
+        // also keep track of the time difference between two adjacent messages
+        if (counter < containers.length - 1)
+        {
+            var timedifference = containers[counter + 1].getDate().getTime() - 
+                                 containers[counter].getDate().getTime();
+            // timedifference_ stores the time difference to the _next_ message
+            thiscontainer.timedifference_ = timedifference;
+            // since we could have dummy containers that have the same time as 
+            // the next message, skip any time difference of 0
+            if (timedifference < minimaltimedifference &&
+                timedifference != 0)
+                minimaltimedifference = timedifference;
+        }
+    }
+
+    return {"containers" : containers,
+            "totalmaxheight" : totalmaxheight,
+            "minimaltimedifference" : minimaltimedifference};
 }
 
 
@@ -69,6 +146,88 @@ Visualisation.prototype.clearStack = function()
     LOGGER_.logDebug("Visualisation.clearStack()", {});
     while(this.stack_.firstChild != null)
         this.stack_.removeChild(this.stack_.firstChild);
+
+    this.stack_.style.marginLeft = "0px";
+    this.stack_.style.marginTop = "0px";
+}
+
+
+
+/** ****************************************************************************
+ * Underline authors in header view
+ ******************************************************************************/
+Visualisation.prototype.colourAuthors = function(authors)
+{
+    // colour links
+    var emailfields = new Array();
+
+    // from, reply-to, ... (single value fields)
+    var singlefields = document.getElementById("expandedHeaderView").getElementsByTagName("mail-emailheaderfield");
+    for (var i = 0; i < singlefields.length; i++)
+    {
+        if (singlefields[i].emailAddressNode.attributes["emailAddress"])
+            emailfields.push(singlefields[i].emailAddressNode);
+    }
+
+
+    // to, cc, bcc, ... (multi value fields)
+    var multifields = document.getElementById("expandedHeaderView").getElementsByTagName("mail-multi-emailHeaderField");
+    for (var i = 0; i < multifields.length; i++)
+    {
+        var multifield = multifields[i].emailAddresses.childNodes;
+        for (var j = 0; j < multifield.length; j++)
+        {
+            if (multifield[j].attributes["emailAddress"])
+            emailfields.push(multifield[j]);
+        }
+    }
+
+
+    var emailfield = emailfields.pop();
+    while (emailfield)
+    {
+        var colour = authors[emailfield.attributes["emailAddress"].value];
+        if (colour && this.pref_highlight_)
+            emailfield.style.borderBottom = "2px solid " + this.getColour(colour, 1.0, 1.0);
+        else
+            emailfield.style.borderBottom = "";
+        emailfield = emailfields.pop();
+    }
+}
+
+
+
+/** ****************************************************************************
+ * Convert a HSV colour to a RGB colour
+ *******************************************************************************/
+Visualisation.prototype.convertHSVtoRGB = function(hue,
+                                                   saturation,
+                                                   value)
+{
+    // hue in [0..6]
+    // saturation, value in [0..1]
+    var i = Math.floor(hue);
+    var f = hue - i;
+    if (! i % 2 == 1)
+        f = 1 - f;
+    var m = value * (1 - saturation);
+    var n = value * (1 - saturation * f);
+    switch(i)
+    {
+        case 6:
+        case 0:
+            return {"r" : value, "g" : n, "b" : m};
+        case 1:
+            return {"r" : n, "g" : value, "b" : m};
+        case 2:
+            return {"r" : m, "g" : value, "b" : n};
+        case 3:
+            return {"r" : m, "g" : n, "b" : value};
+        case 4:
+            return {"r" : n, "g" : m, "b" : value};
+        case 5:
+            return {"r" : value, "g" : m, "b" : n};
+    }
 }
 
 
@@ -89,23 +248,37 @@ Visualisation.prototype.createStack = function()
         this.stack_ = document.createElementNS(XUL_NAMESPACE_, "stack");
         this.stack_.setAttribute("id", "ThreadArcsJSStack");
         this.box_.appendChild(this.stack_);
+        this.stack_.addEventListener("mousemove", this.onMouseMove, false);
+        this.stack_.addEventListener("mousedown", this.onMouseDown, false);
+        this.stack_.addEventListener("mouseup", this.onMouseUp, false);
+        var ref = this;
+        this.stack_.addEventListener("DOMMouseScroll", function(event) {ref.onScroll(event);}, false);
     }
     else
     {
         LOGGER_.logDebug("Visualisation.createStack()", {"action" : "clear stack"});
         this.clearStack();
     }
-/*
-    var loading = document.createElementNS(XUL_NAMESPACE_, "image");
 
-    loading.style.marginTop = "20px";
-    loading.setAttribute("src", URL_ + "loading.gif");
-
+    var loading = document.createElementNS(XUL_NAMESPACE_, "description");
+    loading.setAttribute("value", this.strings_.getString("visualisation.loading"));
+    loading.style.position = "relative";
+    loading.style.top = "20px"
+    loading.style.left = "20px"
+    loading.style.color = "#999999";
     this.stack_.appendChild(loading);
+}
 
-    loading = null;
-    div = null;
-    */
+
+
+/** ****************************************************************************
+ * Get hexadecimal representation of a decimal number
+ ******************************************************************************/
+Visualisation.prototype.DECtoHEX = function(dec)
+{
+    var n_ = Math.floor(dec / 16)
+    var _n = dec - n_*16;
+    return ALPHA_[n_] + ALPHA_[_n];
 }
 
 
@@ -196,53 +369,6 @@ Visualisation.prototype.getNewColour = function()
 
 
 /** ****************************************************************************
- * Convert a HSV colour to a RGB colour
- *******************************************************************************/
-Visualisation.prototype.convertHSVtoRGB = function(hue,
-                                                   saturation,
-                                                   value)
-{
-    // hue in [0..6]
-    // saturation, value in [0..1]
-    var i = Math.floor(hue);
-    var f = hue - i;
-    if (! i % 2 == 1)
-        f = 1 - f;
-    var m = value * (1 - saturation);
-    var n = value * (1 - saturation * f);
-    switch(i)
-    {
-        case 6:
-        case 0:
-            return {"r" : value, "g" : n, "b" : m};
-        case 1:
-            return {"r" : n, "g" : value, "b" : m};
-        case 2:
-            return {"r" : m, "g" : value, "b" : n};
-        case 3:
-            return {"r" : m, "g" : n, "b" : value};
-        case 4:
-            return {"r" : n, "g" : m, "b" : value};
-        case 5:
-            return {"r" : value, "g" : m, "b" : n};
-    }
-}
-
-
-
-/** ****************************************************************************
- * Get hexadecimal representation of a decimal number
- ******************************************************************************/
-Visualisation.prototype.DECtoHEX = function(dec)
-{
-    var n_ = Math.floor(dec / 16)
-    var _n = dec - n_*16;
-    return ALPHA_[n_] + ALPHA_[_n];
-}
-
-
-
-/** ****************************************************************************
  * Get resize multiplicator
  * calculate from box width and height
  * and needed width and height
@@ -279,8 +405,27 @@ Visualisation.prototype.getResize = function(xcount,
 
     LOGGER_.logDebug("Visualisation.getResize()",
                         {"action" : "end",
-                        "resize" : resize});
+                        "resize" : resize,
+                        "resizex" : resizex,
+                        "resizey" : resizey,
+                        "spaceperarcavailablex" : spaceperarcavailablex,
+                        "spaceperarcavailabley" : spaceperarcavailabley,
+                        "spaceperarcneededx" : spaceperarcneededx,
+                        "spaceperarcneededy" : spaceperarcneededy});
     return resize;
+}
+
+
+
+/** ****************************************************************************
+ * observe preferences change
+ ******************************************************************************/
+Visualisation.prototype.observe = function(subject, topic, data)
+{
+    if(topic != "nsPref:changed")
+        return;
+    // subject is the nsIPrefBranch we're observing
+    this.preferenceReload();
 }
 
 
@@ -296,6 +441,148 @@ Visualisation.prototype.onMouseClick = function(event)
     if (container && ! container.isDummy())
         THREADARCS_.callback(container.getMessage().getKey(), 
                              container.getMessage().getFolder());
+}
+
+
+
+/** ****************************************************************************
+ * OnMouseDown event handler
+ * on left mouse button down, remember mouse position and enable panning
+ ******************************************************************************/
+Visualisation.prototype.onMouseDown = function(event)
+{
+    // only pan on left click
+    if (event.button != 0)
+        return;
+    
+    this.startx_ = event.clientX;
+    this.starty_ = event.clientY;
+    this.panning_ = true;
+}
+
+
+
+/** ****************************************************************************
+ * OnMouseMove event handler
+ * if panning is enabled, read new mouse position and move box accordingly
+ ******************************************************************************/
+Visualisation.prototype.onMouseMove = function(event)
+{
+    if (this.panning_)
+    {
+        var box = document.getElementById("ThreadArcsJSStack");
+        var x = event.clientX;
+        var y = event.clientY;
+        var dx = x - this.startx_;
+        var dy = y - this.starty_;
+        var currentx = box.style.marginLeft.replace(/px/, "");
+        if (currentx == "") currentx = 0;
+        var currenty = box.style.marginTop.replace(/px/, "");
+        if (currenty == "") currenty = 0;
+        dx = parseInt(currentx) + parseInt(dx);
+        dy = parseInt(currenty) + parseInt(dy);
+        box.style.marginLeft = dx + "px";
+        box.style.marginTop = dy + "px";
+        this.startx_ = x;
+        this.starty_ = y;
+    }
+}
+
+
+
+/** ****************************************************************************
+ * OnMouseUp event handler
+ * disable panning when mouse button is released
+ ******************************************************************************/
+Visualisation.prototype.onMouseUp = function(event)
+{
+    this.panning_ = false;
+}
+
+
+
+/** ****************************************************************************
+ * OnScroll event handler
+ * if mouse wheel is moved, zoom in and out of visualisation
+ ******************************************************************************/
+Visualisation.prototype.onScroll = function(event)
+{
+    // event.detail gives number of lines to scroll
+    // positive number means scroll down
+    if (event.detail > 0)
+    {
+        this.zoomIn();
+    }
+    else
+    {
+        this.zoomOut();
+    }
+}
+
+
+
+/** ****************************************************************************
+ * Preference changing observer
+ ******************************************************************************/
+Visualisation.prototype.preferenceObserverRegister =  function()
+{
+    var prefService = Components.classes["@mozilla.org/preferences-service;1"]
+                      .getService(Components.interfaces.nsIPrefService);
+    this.pref_branch_ = prefService.getBranch(THREADARCSJS_PREF_BRANCH_);
+
+    var pbi = this.pref_branch_.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
+    pbi.addObserver("", this, false);
+}
+
+
+
+/** ****************************************************************************
+ * unregister observer
+ ******************************************************************************/
+Visualisation.prototype.preferenceObserverUnregister = function()
+{
+    if(!this.pref_branch_)
+        return;
+
+    var pbi = this.pref_branch_.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
+    pbi.removeObserver("", this);
+}
+
+
+
+/** ****************************************************************************
+ * reload all preferences
+ ******************************************************************************/
+Visualisation.prototype.preferenceReload = function()
+{
+    // check if preference is set to do timescaling
+    var prefs = Components.classes["@mozilla.org/preferences-service;1"]
+                .getService(Components.interfaces.nsIPrefBranch);
+
+    this.pref_timescaling_ = false;
+    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_DOTIMESCALING_) == prefs.PREF_BOOL)
+        this.pref_timescaling_ = prefs.getBoolPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_DOTIMESCALING_);
+
+    this.pref_colour_ = "single";
+    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONCOLOUR_) == prefs.PREF_STRING)
+        this.pref_colour_ = prefs.getCharPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONCOLOUR_);
+
+    this.pref_highlight_ = false;
+    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONHIGHLIGHT_) == prefs.PREF_BOOL)
+        this.pref_highlight_ = prefs.getBoolPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONHIGHLIGHT_);
+
+    var todecode = "12x12,12,12,32,6,2,24";
+    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONSIZE_) == prefs.PREF_STRING)
+        todecode = prefs.getCharPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONSIZE_);
+
+    todecode = todecode.split(",");
+    this.name_ = todecode[0] + "/";
+    this.dotsize_ = parseInt(todecode[1]);
+    this.arc_min_height_ = parseInt(todecode[2]);
+    this.arc_radius_ = parseInt(todecode[3]);
+    this.arc_difference_ = parseInt(todecode[4]);
+    this.arc_width_ = parseInt(todecode[5]);
+    this.spacing_ = parseInt(todecode[6]);
 }
 
 
@@ -345,7 +632,11 @@ Visualisation.prototype.timeScaling = function(containers,
 
     // max_count_x tells us how many messages we could display if all are 
     // laid out with the minimal horizontal spacing
-    var max_count_x = width / this.spacing_;
+    // e.g.
+    // |---|---|---|
+    // width / this.spacing_ would lead to 3, but in effect we can only
+    // fit 2, since we want some spacing between the messages and the border
+    var max_count_x = (width / this.spacing_) - 1;
 
     LOGGER_.logDebug("Visualisation.timeScaling()", 
                         {"action" : "first pass done",
@@ -389,6 +680,9 @@ Visualisation.prototype.timeScaling = function(containers,
  ******************************************************************************/
 Visualisation.prototype.visualise = function(container)
 {
+    if (container == null)
+        container = this.currentcontainer_;
+
     LOGGER_.logDebug("Visualisation.visualise()",
                         {"action" : "start",
                          "container" : container.toString()});
@@ -396,6 +690,15 @@ Visualisation.prototype.visualise = function(container)
     // clear visualisation
     this.createStack();
     this.clearStack();
+
+    // check if we are still in the same thread as last time
+    // if not, reset zoom level
+    if (! this.currentcontainer_ || 
+        container.getTopContainer() != this.currentcontainer_.getTopContainer())
+        this.zoomReset();
+
+    // remember current container to redraw after zoom
+    this.currentcontainer_ = container;
 
     // get topmost container
     var topcontainer = container.getTopContainer();
@@ -416,15 +719,17 @@ Visualisation.prototype.visualise = function(container)
     var totalmaxheight = presize.totalmaxheight;
     // minmaltimedifference stores the minimal time between two messages
     var minimaltimedifference = presize.minimaltimedifference;
-    
+
 
     // do time scaling
-    var width = this.box_.boxObject.width;
-    var height = this.box_.boxObject.height;
+    var original_width = this.box_.boxObject.width;
+    var original_height = this.box_.boxObject.height;
+    var width = original_width * this.zoom_;
+    var height = original_height * this.zoom_;
+
     containers = this.timeScaling(containers,
                                   minimaltimedifference,
                                   width);
-
 
     // do final resizing
     var x = this.spacing_ / 2;
@@ -433,7 +738,6 @@ Visualisation.prototype.visualise = function(container)
                                   totalmaxheight,
                                   width,
                                   height);
-
 
     // pre-calculate colours for different authors
     var authors = new Object();
@@ -538,9 +842,21 @@ Visualisation.prototype.visualise = function(container)
         }
         x = x + (thiscontainer.x_scaled_ * this.spacing_);
     }
-
+    
+    // underline authors if enabled
     this.colourAuthors(authors);
     
+    // calculate if we have to move the visualisation so that the
+    // selected message is visible
+    if (container.x_position_ > this.box_.boxObject.width)
+    {
+        this.stack_.style.marginLeft = - (container.x_position_ - this.box_.boxObject.width) - this.spacing_ + "px";
+    }
+    this.stack_.style.marginTop = (original_height / 2 - height / 2) + "px";
+    
+    
+    // create a new box and overlay over all other elements to catch
+    // all clicks and drags
     var popupbox = document.createElementNS(XUL_NAMESPACE_, "box");
     popupbox.style.width = "100%";
     popupbox.style.height = "100%";
@@ -551,198 +867,53 @@ Visualisation.prototype.visualise = function(container)
 
 
 /** ****************************************************************************
- * Underline authors in header view
+ * Reset Zoom level
  ******************************************************************************/
-Visualisation.prototype.colourAuthors = function(authors)
+Visualisation.prototype.zoomReset = function()
 {
-    // colour links
-    var emailfields = new Array();
-
-    // from, reply-to, ... (single value fields)
-    var singlefields = document.getElementById("expandedHeaderView").getElementsByTagName("mail-emailheaderfield");
-    for (var i = 0; i < singlefields.length; i++)
-    {
-        if (singlefields[i].emailAddressNode.attributes["emailAddress"])
-            emailfields.push(singlefields[i].emailAddressNode);
-    }
-
-
-    // to, cc, bcc, ... (multi value fields)
-    var multifields = document.getElementById("expandedHeaderView").getElementsByTagName("mail-multi-emailHeaderField");
-    for (var i = 0; i < multifields.length; i++)
-    {
-        var multifield = multifields[i].emailAddresses.childNodes;
-        for (var j = 0; j < multifield.length; j++)
-        {
-            if (multifield[j].attributes["emailAddress"])
-            emailfields.push(multifield[j]);
-        }
-    }
-
-
-    var emailfield = emailfields.pop();
-    while (emailfield)
-    {
-        var colour = authors[emailfield.attributes["emailAddress"].value];
-        if (colour && this.pref_highlight_)
-            emailfield.style.borderBottom = "2px solid " + this.getColour(colour, 1.0, 1.0);
-        else
-            emailfield.style.borderBottom = "";
-        emailfield = emailfields.pop();
-    }
+    this.zoom_ = 1.0;
 }
 
 
 
 /** ****************************************************************************
- * Preference changing observer
+ * Zoom in and draw new visualisation
  ******************************************************************************/
-Visualisation.prototype.preferenceObserverRegister =  function()
+Visualisation.prototype.zoomIn = function()
 {
-    var prefService = Components.classes["@mozilla.org/preferences-service;1"]
-                      .getService(Components.interfaces.nsIPrefService);
-    this.pref_branch_ = prefService.getBranch(THREADARCSJS_PREF_BRANCH_);
-
-    var pbi = this.pref_branch_.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
-    pbi.addObserver("", this, false);
+    this.zoom_ = this.zoom_ + 0.1;
+    this.visualise();
 }
 
 
 
 /** ****************************************************************************
- * unregister observer
+ * Zoom out and draw new visualisation
  ******************************************************************************/
-Visualisation.prototype.preferenceObserverUnregister = function()
+Visualisation.prototype.zoomOut = function()
 {
-    if(!this.pref_branch_)
-        return;
-
-    var pbi = this.pref_branch_.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
-    pbi.removeObserver("", this);
+    this.zoom_ = this.zoom_ - 0.1;
+    if (this.zoom_ < 1)
+        this.zoom_ = 1;
+    this.visualise();
 }
 
 
 
 /** ****************************************************************************
- * observe preferences change
+ * Zoom function to call from user click
  ******************************************************************************/
-Visualisation.prototype.observe = function(subject, topic, data)
+function zoomIn()
 {
-    if(topic != "nsPref:changed")
-        return;
-    // subject is the nsIPrefBranch we're observing
-    this.preferenceReload();
+    THREADARCS_.visualisation_.zoomIn();
 }
 
 
 
 /** ****************************************************************************
- * reload all preferences
+ * Zoom function to call from user click
  ******************************************************************************/
-Visualisation.prototype.preferenceReload = function()
+function zoomOut()
 {
-    // check if preference is set to do timescaling
-    var prefs = Components.classes["@mozilla.org/preferences-service;1"]
-                .getService(Components.interfaces.nsIPrefBranch);
-
-    this.pref_timescaling_ = false;
-    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_DOTIMESCALING_) == prefs.PREF_BOOL)
-        this.pref_timescaling_ = prefs.getBoolPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_DOTIMESCALING_);
-
-    this.pref_colour_ = "single";
-    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONCOLOUR_) == prefs.PREF_STRING)
-        this.pref_colour_ = prefs.getCharPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONCOLOUR_);
-
-    this.pref_highlight_ = false;
-    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONHIGHLIGHT_) == prefs.PREF_BOOL)
-        this.pref_highlight_ = prefs.getBoolPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONHIGHLIGHT_);
-
-    var todecode = "12x12,12,12,32,6,2,24";
-    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONSIZE_) == prefs.PREF_STRING)
-        todecode = prefs.getCharPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONSIZE_);
-
-    todecode = todecode.split(",");
-    this.name_ = todecode[0] + "/";
-    this.dotsize_ = parseInt(todecode[1]);
-    this.arc_min_height_ = parseInt(todecode[2]);
-    this.arc_radius_ = parseInt(todecode[3]);
-    this.arc_difference_ = parseInt(todecode[4]);
-    this.arc_width_ = parseInt(todecode[5]);
-    this.spacing_ = parseInt(todecode[6]);
-}
-
-
-
-/** ****************************************************************************
- * Calculate size
- ******************************************************************************/
-Visualisation.prototype.calculateSize = function(containers)
-{
-    // totalmaxheight counts the maximal number of stacked arcs
-    var totalmaxheight = 0;
-
-    // minmaltimedifference stores the minimal time between two messages
-    var minimaltimedifference = Number.MAX_VALUE;
-
-    for (var counter = 0; counter < containers.length; counter++)
-    {
-        var thiscontainer = containers[counter];
-        thiscontainer.x_index_ = counter;
-        thiscontainer.current_arc_height_incoming_ = 0;
-        thiscontainer.current_arc_height_outgoing_ = 0;
-
-        // odd_ tells us if we display the arc above or below the messages
-        thiscontainer.odd_ = thiscontainer.getDepth() % 2 == 0;
-
-        var parent = thiscontainer.getParent();
-        if (parent != null && ! parent.isRoot())
-        {
-            // calculate the current maximal arc height between the parent 
-            // message and this one since we want to draw an arc between this 
-            // message and its parent, and we do not want any arcs to overlap, 
-            // we draw this arc higher than the current highest arc
-            var maxheight = 0;
-            for (var innercounter = parent.x_index_;
-                 innercounter < counter;
-                 innercounter++)
-            {
-                var lookatcontainer = containers[innercounter];
-                if (lookatcontainer.odd_ == parent.odd_ && 
-                    lookatcontainer.current_arc_height_outgoing_ > maxheight)
-                {
-                    maxheight = lookatcontainer.current_arc_height_outgoing_;
-                }
-                if (lookatcontainer.odd_ != parent.odd_ &&
-                    lookatcontainer.current_arc_height_incoming_ > maxheight)
-                {
-                    maxheight = lookatcontainer.current_arc_height_incoming_;
-                }
-            }
-            maxheight++;
-            parent.current_arc_height_outgoing_ = maxheight;
-            thiscontainer.current_arc_height_incoming_ = maxheight;
-        }
-        // also keep track of the current maximal stacked arc height, so that we can resize
-        // the whole extension
-        if (maxheight > totalmaxheight)
-            totalmaxheight = maxheight;
-
-        // also keep track of the time difference between two adjacent messages
-        if (counter < containers.length - 1)
-        {
-            var timedifference = containers[counter + 1].getDate().getTime() - 
-                                 containers[counter].getDate().getTime();
-            // timedifference_ stores the time difference to the _next_ message
-            thiscontainer.timedifference_ = timedifference;
-            // since we could have dummy containers that have the same time as 
-            // the next message, skip any time difference of 0
-            if (timedifference < minimaltimedifference &&
-                timedifference != 0)
-                minimaltimedifference = timedifference;
-        }
-    }
-
-    return {"containers" : containers,
-            "totalmaxheight" : totalmaxheight,
-            "minimaltimedifference" : minimaltimedifference};
+    THREADARCS_.visualisation_.zoomOut();
 }

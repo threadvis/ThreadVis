@@ -4,9 +4,11 @@
  *
  * (c) 2005 Alexander C. Hubmann
  *
- * DTD file containing EN localisation of UI elements
+ * DTD file containing DE localisation of UI elements
  *
  * Version: $Id$
  ********************************************************/
 -->
 <!ENTITY popup.caption "Einstellungen...">
+<!ENTITY zoomin.tooltip "Visualisierung vergr&#xF6;&#xDF;ern">
+<!ENTITY zoomout.tooltip "Visualisierung verkleinern">
