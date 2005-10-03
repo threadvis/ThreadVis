@@ -377,7 +377,20 @@ ThreadArcs.prototype.addMessagesFromFolder = function(folder)
                          "action" : "start"});
 
     // get messages from current folder
-    var msg_enumerator = folder.getMessages(null);
+    try
+    {
+        var msg_enumerator = folder.getMessages(null);
+    }
+    catch (exception)
+    {
+        LOGGER_.logDebug("ThreadArcs.addMessagesFromFolder()",
+                            {"folder" : folder.URI,
+                             "action" : "caught exception " + exception});
+        this.add_messages_from_folder_done_ = true;
+        this.add_messages_from_folder_doing_ = false;
+        return;
+    }
+    
     this.add_messages_from_folder_doing_ = true;
     var ref = this;
     setTimeout(function(){ref.addMessagesFromFolderEnumerator(msg_enumerator);}, 10);
