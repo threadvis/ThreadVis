@@ -730,7 +730,11 @@ ThreadArcs.prototype.visualiseMsgId = function(message_id)
     }
     else
     {
+        // message id not found, this means we somehow missed to thread
+        // this message
+        // thus, thread the whole folder we are in
         this.clearVisualisation();
+        this.onFolderAdded(GetLoadedMsgFolder());
     }
     container = null;
 }
@@ -913,4 +917,74 @@ ThreadArcs.prototype.onItemRemoved = function(parentItem, item, view)
     var end = new Date();
     var duration = end - start;
     LOGGER_.log("deletemessage", {"action" : "end", "time" : duration});
+}
+
+
+
+/** ****************************************************************************
+ * called when new folder added
+ ******************************************************************************/
+ThreadArcs.prototype.onFolderAdded = function(folder)
+{
+    if (! this.checkEnabledAccountOrFolder(folder))
+        return
+    
+    if (! this.loaded_)
+        return;
+    
+    if (this.add_messages_from_folder_doing_)
+        return;
+    
+    var start = new Date();
+    LOGGER_.log("addadditionalmessagesfolder", {"action" : "start"});
+    // added new message to folder
+    if (folder instanceof Components.interfaces.nsIMsgFolder)
+    {
+        this.add_messages_from_folder_done_ = false;
+        this.add_messages_from_folder_doing_ = false;
+        this.addMessagesFromFolder(folder);
+        this.onFolderAddedWaitForThreading();
+    }
+    var end = new Date();
+    var duration = end - start;
+    LOGGER_.log("addadditionalmessagesfolder", {"action" : "end", "time" : duration});
+}
+
+
+
+/** ****************************************************************************
+ * called to wait to thread new folder
+ ******************************************************************************/
+ThreadArcs.prototype.onFolderAddedWaitForThreading = function()
+{
+    if (this.add_messages_from_folder_done_)
+    {
+        this.threader_.thread();
+        this.onFolderAddedWaitForVisualisation();
+        return;
+    }
+    else
+    {
+        var ref = this;
+        setTimeout(function(){ref.onFolderAddedWaitForThreading();}, 10);
+    }
+}
+
+
+
+/** ****************************************************************************
+ * called to wait to thread new folder
+ ******************************************************************************/
+ThreadArcs.prototype.onFolderAddedWaitForVisualisation = function()
+{
+    if (this.threader_.getDone())
+    {
+        this.setSelectedMessage()
+        return;
+    }
+    else
+    {
+        var ref = this;
+        setTimeout(function(){ref.onFolderAddedWaitForVisualisation();}, 10);
+    }
 }
