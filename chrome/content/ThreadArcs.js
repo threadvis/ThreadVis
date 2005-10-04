@@ -507,8 +507,18 @@ ThreadArcs.prototype.callback = function(msgKey,
     SelectFolder(folder);
 
     // clear current selection
-    var treeBoxObj = GetThreadTree().treeBoxObject;
-    var treeSelection = treeBoxObj.selection;
+    var tree = GetThreadTree();
+    // this is necessary because Thunderbird >= 1.5 uses
+    // tree.view.selection
+    // and
+    // tree.treeBoxObject.selection
+    // doesn't work anymore
+    var treeSelection = null;
+    if (tree.view)
+        treeSelection = tree.view.selection;
+    else
+        treeSelection = tree.treeBoxObject.selection;
+
     treeSelection.clearSelection();
 
     // select message
