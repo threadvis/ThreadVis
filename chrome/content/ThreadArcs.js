@@ -508,6 +508,7 @@ ThreadArcs.prototype.callback = function(msgKey,
 
     // clear current selection
     var tree = GetThreadTree();
+    var treeBoxObj = tree.treeBoxObject;
     // this is necessary because Thunderbird >= 1.5 uses
     // tree.view.selection
     // and
@@ -517,7 +518,7 @@ ThreadArcs.prototype.callback = function(msgKey,
     if (tree.view)
         treeSelection = tree.view.selection;
     else
-        treeSelection = tree.treeBoxObject.selection;
+        treeSelection = treeBoxObj.selection;
 
     treeSelection.clearSelection();
 

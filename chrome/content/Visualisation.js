@@ -146,9 +146,6 @@ Visualisation.prototype.clearStack = function()
     LOGGER_.logDebug("Visualisation.clearStack()", {});
     while(this.stack_.firstChild != null)
         this.stack_.removeChild(this.stack_.firstChild);
-
-    this.stack_.style.marginLeft = "0px";
-    this.stack_.style.marginTop = "0px";
 }
 
 
@@ -589,6 +586,19 @@ Visualisation.prototype.preferenceReload = function()
 
 
 /** ****************************************************************************
+ * Reset stack
+ * set all margins to zero
+ ******************************************************************************/
+Visualisation.prototype.resetStack = function()
+{
+    LOGGER_.logDebug("Visualisation.resetStack()", {});
+    this.stack_.style.marginLeft = "0px";
+    this.stack_.style.marginTop = "0px";
+}
+
+
+
+/** ****************************************************************************
  * If time scaling is enabled, we want to layout the messages so that their 
  * horizontal spacing is proportional to the time difference between 
  * those two messages
@@ -697,7 +707,10 @@ Visualisation.prototype.visualise = function(container)
     // if not, reset zoom level
     if (! this.currentcontainer_ || 
         container.getTopContainer() != this.currentcontainer_.getTopContainer())
+    {
         this.zoomReset();
+        this.resetStack();
+    }
 
     // remember current container to redraw after zoom
     this.currentcontainer_ = container;
@@ -850,10 +863,30 @@ Visualisation.prototype.visualise = function(container)
     
     // calculate if we have to move the visualisation so that the
     // selected message is visible
-    if (container.x_position_ > this.box_.boxObject.width)
+    
+    // get current left margin
+    var old_margin = this.stack_.style.marginLeft;
+    old_margin = parseInt(old_margin.replace(/px/, ""));
+    var new_margin = old_margin;
+    if (container.x_position_ * this.resize_ + old_margin > original_width)
     {
-        this.stack_.style.marginLeft = - (container.x_position_ - this.box_.boxObject.width) - this.spacing_ + "px";
+        // calculate necessary margin
+        new_margin = - (container.x_position_ * this.resize_ - original_width) 
+                     - (this.spacing_ * this.resize_);
+        
+        // if we already see the selected message, don't move any further
+        if (new_margin > old_margin)
+        {
+            new_margin = old_margin;
+        }
     }
+    if (container.x_position_ * this.resize_ + old_margin < this.spacing_ * this.resize_)
+    {
+        // calculate necessary margin
+        new_margin = (- container.x_position_ + this. spacing_)* this.resize_;
+    }
+    
+    this.stack_.style.marginLeft = new_margin + "px";
     this.stack_.style.marginTop = (original_height / 2 - height / 2) + "px";
     
     
