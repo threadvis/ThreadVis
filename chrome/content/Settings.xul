@@ -49,7 +49,7 @@
 
         <tabpanels id="settingstabpanels" flex="1">
 
-            <tabpanel id="about" orient="vertical" flex="1">
+            <tabpanel id="about" orient="vertical" flex="1" class="overflow">
                 <label value="&extension.name;"
                        id="extension-name" />
                 <separator class="thin" />
@@ -87,7 +87,7 @@
                 </groupbox>
             </tabpanel>
 
-            <tabpanel id="visualisation" orient="vertical" flex="1">
+            <tabpanel id="visualisation" orient="vertical" flex="1" class="overflow">
                 <groupbox>
                     <expander id="timescaling"
                               label="&visualisation.timescaling.caption;"
@@ -213,7 +213,7 @@
                </groupbox>
             </tabpanel>
 
-            <tabpanel id="logfiles" orient="vertical" flex="1">
+            <tabpanel id="logfiles" orient="vertical" flex="1" class="overflow">
                 <groupbox>
                     <caption label="&logfiles.caption;" />
                     <checkbox id="dologging"

@@ -4,4 +4,5 @@ locale      threadarcsjs    en-US   jar:chrome/threadarcsjs.jar!/locale/en-US/
 locale      threadarcsjs    de-DE   jar:chrome/threadarcsjs.jar!/locale/de-DE/
 
 overlay     chrome://messenger/content/msgHdrViewOverlay.xul    chrome://threadarcsjs/content/ThreadArcs.xul
-overlay     chome://communicator/content/pref/pref.xul          chrome://threadarcsjs/content/Preferences.xul
+overlay     chrome://communicator/content/pref/pref.xul          chrome://threadarcsjs/content/Preferences.xul
+overlay     chrome://messenger/content/preferences/preferences.xul          chrome://threadarcsjs/content/Preferences.xul

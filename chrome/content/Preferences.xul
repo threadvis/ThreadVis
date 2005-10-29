@@ -15,7 +15,14 @@
 <overlay id="ThreadArcsJSPreferences"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-    <!-- This is for Mozilla -->
+    <!--
+        Please note that there are three different overlays defined in this
+        file. Since Mozilla/Thunderbird tries to match the outermost 
+        element by its ID to apply the overlay, only one of those overlays gets
+        used in each application/version and the others get ignored.
+    -->
+    
+    <!-- This is for Mozilla. -->
     <treechildren id="panelChildren">
         <treeitem id="threadarcsjs"
                   container="false">
@@ -28,7 +35,7 @@
         </treeitem>
     </treechildren>
 
-    <!-- This is for Thunderbird -->
+    <!-- This is for Thunderbird < 1.5 -->
     <vbox id="prefsCategories">
         <button id="threadarcsjs"
                 orient="vertical"
@@ -39,5 +46,11 @@
                 url="chrome://threadarcsjs/content/Settings.xul"
                 style="list-style-image: url(chrome://threadarcsjs/content/images/icon.png);" />
     </vbox>
+
+    <!-- This is for Thunderbird 1.5 -->
+    <prefwindow id="MailPreferences">
+        <prefpane id="paneThreadArcsJS" label="&settings.title;"
+                  src="chrome://threadarcsjs/content/Settings15.xul" />
+    </prefwindow>
 
 </overlay>

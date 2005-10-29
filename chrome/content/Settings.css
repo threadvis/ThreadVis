@@ -8,7 +8,7 @@
  * Version: $Id$
  ******************************************************************************/
 
-tabpanel
+tabpanel.overflow
 {
     overflow: auto;
 }
@@ -55,4 +55,15 @@ tab
     text-decoration: underline;
     color: rgb(0,0,255);
     cursor: pointer;
+}
+
+radio[pane=paneThreadArcsJS]
+{
+    list-style-image: url("chrome://threadarcsjs/content/images/icon.png");
+}
+
+#enableaccounts
+{
+    overflow: auto;
+    height: 220px;
 }
