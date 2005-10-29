@@ -16,7 +16,7 @@
 @echo Creating XPI file
 @echo ======================================================================
 
-@c:\Programme\7-Zip\7z a -tzip ThreadArcsJS.xpi install.js install.rdf chrome.manifest chrome\threadarcsjs.jar defaults\preferences\ThreadArcsJSDefault.js
+@c:\Programme\7-Zip\7z a -tzip ThreadArcsJS.xpi @make.list
 
 @echo ======================================================================
 @echo Done creating XPI file

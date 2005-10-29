@@ -1,0 +1,5 @@
+chrome.manifest
+install.js
+install.rdf
+chrome/threadarcsjs.jar
+defaults/preferences/ThreadArcsJSDefault.js
