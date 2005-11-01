@@ -39,7 +39,7 @@
         <RDF:li>chrome://threadarcsjs/content/Preferences.xul</RDF:li>
     </RDF:Seq>
 
-    <RDF:Seq about="hrome://messenger/content/preferences/preferences.xul">
+    <RDF:Seq about="chrome://messenger/content/preferences/preferences.xul">
         <RDF:li>chrome://threadarcsjs/content/Preferences.xul</RDF:li>
     </RDF:Seq>
 </RDF:RDF>
