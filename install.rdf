@@ -37,7 +37,7 @@
     
     <!-- Front End MetaData -->
     <em:id>{A23E4120-431F-4753-AE53-5D028C42CFDC}</em:id>
-    <em:version>0.5</em:version>
+    <em:version>0.5+</em:version>
     <em:name>Thread Arcs Visualisation</em:name>
     <em:description>Displays a small graphic visualising the thread (context) of the currently selected email.</em:description>
     <em:creator>Alexander C. Hubmann</em:creator>
