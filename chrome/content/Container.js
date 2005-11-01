@@ -681,6 +681,9 @@ Container.prototype.removeChild = function(child)
     if (this.getChild() == child)
     {
         this.setChild(child.getNext());
+        child.removeParent();
+        child.removePrevious();
+        child.removeNext();
     }
     /* otherwise we have to look it up in child list
      * and do some pointer juggling
