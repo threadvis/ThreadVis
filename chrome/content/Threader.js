@@ -77,6 +77,9 @@ function Threader()
     this.group_by_subject_end_ = null;
 
     this.total_messages_ = 0;
+
+    // copy/cut object
+    this.copycut_ = new CopyCut();
 }
 
 
@@ -115,6 +118,17 @@ Threader.prototype.addMessageDetail = function(subject,
                                 uri,
                                 references,
                                 issent));
+}
+
+
+
+/** ****************************************************************************
+ * Find a message
+ ******************************************************************************/
+Threader.prototype.closeCopyCut = function()
+{
+    this.copycut_.write();
+    this.copycut_.close();
 }
 
 
@@ -287,7 +301,9 @@ Threader.prototype.putMessageInContainer = function(message)
                         {"action" : "loop over references"});
     // for each element in references field of message
     var parent_reference_container = null;
+    var parent_reference_id = "";
     var references = message.getReferences().getReferences();
+
     for (referencekey in references)
     {
         var reference_id = references[referencekey];
@@ -305,7 +321,7 @@ Threader.prototype.putMessageInContainer = function(message)
             // index container
             this.id_table_[reference_id] = reference_container;
         }
-
+        
         // 1.B. link reference container together
         LOGGER_.logDebug("Threader.putMessageInContainer()",
                             {"action" : "link references together"});
@@ -314,11 +330,22 @@ Threader.prototype.putMessageInContainer = function(message)
             parent_reference_container != reference_container &&            // and we are not looking at the same container
             ! parent_reference_container.findChild(reference_container))    // see if we are already a child of parent
         {
-            LOGGER_.logDebug("Threader.putMessageInContainer()",
-                                {"action" : "add us to parent reference container"});
-            parent_reference_container.addChild(reference_container);
+            // check if this reference is overridden by a cut
+            // (i.e. thread is split by user)
+            if (this.copycut_.getCut(reference_id) == parent_reference_id)
+            {
+                LOGGER_.logDebug("Threader.putMessageInContainer()",
+                                 {"action" : "message cut, do not add us to parent"});
+            }
+            else
+            {
+                LOGGER_.logDebug("Threader.putMessageInContainer()",
+                                    {"action" : "add us to parent reference container"});
+                parent_reference_container.addChild(reference_container);
+            }
         }
         parent_reference_container = reference_container;
+        parent_reference_id = reference_id;
     }
 
     // set parent of current message to last element in references
@@ -344,13 +371,48 @@ Threader.prototype.putMessageInContainer = function(message)
         message_container.getParent().removeChild(message_container);
     }
 
-    // if we have a suitable parent
-    if (parent_reference_container != null)
+    // get copy
+    // check if user added a new reference, if so, add us to this parent
+    // previous relation should have been taken care of by a cut
+    var copy_id = this.copycut_.getCopy(message.getId());
+    if (copy_id)
     {
-        // add us as child
         LOGGER_.logDebug("Threader.putMessageInContainer()",
-                            {"action" : "add us as child to parent reference container"});
-        parent_reference_container.addChild(message_container);
+                            {"action" : "message copied",
+                             "copy_id" : copy_id});
+        
+        var parent_container = this.id_table_[copy_id];
+        if (parent_container == null)
+        {
+            LOGGER_.logDebug("Threader.putMessageInContainer()",
+                                {"action" : "no container found, create new one"});
+            // no container found, create new one
+            parent_container = new Container();
+            // index container
+            this.id_table_[copy_id] = parent_container;
+        }
+        
+        parent_container.addChild(message_container);
+    }
+    else
+    {
+        // if we have a suitable parent
+        if (parent_reference_container != null)
+        {
+            // and this container wasn't cut
+            if (this.copycut_.getCut(message.getId()) == parent_reference_id)
+            {
+                LOGGER_.logDebug("Threader.putMessageInContainer()",
+                                 {"action" : "message cut, do not add us to parent"});
+            }
+            else
+            {
+                // add us as child
+                LOGGER_.logDebug("Threader.putMessageInContainer()",
+                                    {"action" : "add us as child to parent reference container"});
+                parent_reference_container.addChild(message_container);
+            }
+        }
     }
 }
 
@@ -839,6 +901,9 @@ Threader.prototype.thread = function()
     this.put_containers_in_subject_table_done_ = false;
     this.group_by_subject_done_ = false;
     
+    // open copy/cut database
+    this.copycut_.read();
+    
     this.start_ = (new Date()).getTime();
     LOGGER_.log("threader", {"action" : "start"});
     // 1. For each message
@@ -870,6 +935,9 @@ Threader.prototype.thread = function()
 
     // 6. that's it
     //root_set_.check();
+    
+    // close copy/cut database
+    this.copycut_.close();
 }
 
 

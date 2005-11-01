@@ -71,6 +71,7 @@ function ContainerVisualisation(stack,
     this.drawClick();
 
     this.createToolTip();
+    this.createMenu();
     
     if (this.selected_ && this.draw_circle_ && this.flash_)
         this.flash();
@@ -153,6 +154,142 @@ ContainerVisualisation.prototype.createToolTip = function()
     }
     
     this.stack_.appendChild(tooltip);
+}
+
+
+
+/** ****************************************************************************
+ * create popup menu to delete, copy and cut messages
+ ******************************************************************************/
+ContainerVisualisation.prototype.createMenu = function()
+{
+    var popupset = document.createElementNS(XUL_NAMESPACE_, "popupset");
+    var popup = document.createElementNS(XUL_NAMESPACE_, "popup");
+    var menuitem_delete = document.createElementNS(XUL_NAMESPACE_, "menuitem");
+    var menuitem_cut = document.createElementNS(XUL_NAMESPACE_, "menuitem");
+    var menuitem_paste = document.createElementNS(XUL_NAMESPACE_, "menuitem");
+    
+    var menuname = "dot_popup_" + this.left_;
+    
+    popup.setAttribute("id", menuname);
+    
+    // delete menu item
+    menuitem_delete.setAttribute("label", this.strings_.getString("copycut.delete"));
+    var tooltip_delete = document.createElementNS(XUL_NAMESPACE_, "tooltip");
+    tooltip_delete.setAttribute("orient", "vertical");
+    tooltip_delete.setAttribute("id", "dot_popup_tooltip_delete_" + this.left_);
+    
+    var tooltiplabel_delete = document.createElementNS(XUL_NAMESPACE_, "description");
+    var tooltiptext_delete = document.createTextNode(this.strings_.getString("copycut.delete.tooltip"));
+    tooltiplabel_delete.style.height = "50px";
+    tooltiplabel_delete.appendChild(tooltiptext_delete);
+    tooltip_delete.appendChild(tooltiplabel_delete);
+    
+    popupset.appendChild(tooltip_delete);
+    menuitem_delete.setAttribute("tooltip", "dot_popup_tooltip_delete_" + this.left_);
+
+    
+    // cut menu item
+    menuitem_cut.setAttribute("label", this.strings_.getString("copycut.cut"));
+    var tooltip_cut = document.createElementNS(XUL_NAMESPACE_, "tooltip");
+    tooltip_cut.setAttribute("orient", "vertical");
+    tooltip_cut.setAttribute("id", "dot_popup_tooltip_cut_" + this.left_);
+    
+    var tooltiplabel_cut = document.createElementNS(XUL_NAMESPACE_, "description");
+    var tooltiptext_cut = document.createTextNode(this.strings_.getString("copycut.cut.tooltip"));
+    tooltiplabel_cut.style.height = "50px";
+    tooltiplabel_cut.appendChild(tooltiptext_cut);
+    tooltip_cut.appendChild(tooltiplabel_cut);
+    
+    popupset.appendChild(tooltip_cut);
+    menuitem_cut.setAttribute("tooltip", "dot_popup_tooltip_cut_" + this.left_);
+    
+    
+    // paste menu item
+    menuitem_paste.setAttribute("label", this.strings_.getString("copycut.paste"));
+    var tooltip_paste = document.createElementNS(XUL_NAMESPACE_, "tooltip");
+    tooltip_paste.setAttribute("orient", "vertical");
+    tooltip_paste.setAttribute("id", "dot_popup_tooltip_paste_" + this.left_);
+    
+    var tooltiplabel_paste = document.createElementNS(XUL_NAMESPACE_, "description");
+    var tooltiptext_paste = document.createTextNode(this.strings_.getString("copycut.paste.tooltip"));
+    tooltiplabel_paste.style.height = "50px";
+    tooltiplabel_paste.appendChild(tooltiptext_paste);
+    tooltip_paste.appendChild(tooltiplabel_paste);
+    
+    popupset.appendChild(tooltip_paste);
+    menuitem_paste.setAttribute("tooltip", "dot_popup_tooltip_paste_" + this.left_);
+    
+    
+    popup.appendChild(menuitem_delete);
+    popup.appendChild(menuitem_cut);
+    popup.appendChild(menuitem_paste);
+    
+    popupset.appendChild(popup);
+    this.stack_.appendChild(popupset);
+    this.click_.setAttribute("context", menuname);
+    
+    var ref = this;
+    menuitem_delete.addEventListener("command", function() {ref.deleteParent();}, true);
+    menuitem_cut.addEventListener("command", function() {ref.cut();}, true);
+    menuitem_paste.addEventListener("command", function() {ref.paste();}, true);
+}
+
+
+
+/** ****************************************************************************
+ * cut message
+ * don't do anything until we paste the message
+ * just remember which message we have to cut
+ ******************************************************************************/
+ContainerVisualisation.prototype.cut = function()
+{
+    COPY_MESSAGE_ = this.container_;
+}
+
+
+
+/** ****************************************************************************
+ * paste a previously cut message in this thread
+ ******************************************************************************/
+ContainerVisualisation.prototype.paste = function()
+{
+    if (COPY_MESSAGE_)
+    {
+        var copy_parent = COPY_MESSAGE_.getParent();
+        this.container_.addChild(COPY_MESSAGE_);
+        
+        var this_msgid = ! this.container_.isDummy() ? this.container_.getMessage().getId() : "";
+        var copy_message_msgid = ! COPY_MESSAGE_.isDummy() ? COPY_MESSAGE_.getMessage().getId() : "";
+        var copy_message_parent_msgid = ! copy_parent.isDummy() ? copy_parent.getMessage().getId() : "";
+        
+        if (this_msgid != "" && copy_message_msgid != "")
+        {
+            THREADARCS_.threader_.copycut_.addCut(copy_message_msgid + " " + copy_message_parent_msgid);
+            THREADARCS_.threader_.copycut_.addCopy(copy_message_msgid + " " + this_msgid);
+            THREADARCS_.setSelectedMessage();
+        }
+    }
+}
+
+
+
+/** ****************************************************************************
+ * delete the parent-child relationship for this message
+ * (i.e. delete the reference to the parent)
+ ******************************************************************************/
+ContainerVisualisation.prototype.deleteParent = function()
+{
+    var parent = this.container_.getParent();
+    parent.removeChild(this.container_);
+    parent.getTopContainer().pruneEmptyContainers();
+    var msgid = ! this.container_.isDummy() ? this.container_.getMessage().getId() : "";
+    var parentmsgid = ! parent.isDummy() ? parent.getMessage().getId() : "";
+    if (msgid != "" && parentmsgid != "")
+    {
+        THREADARCS_.threader_.copycut_.addCut(msgid + " " + parentmsgid);
+        THREADARCS_.setSelectedMessage();
+    }
 }
 
 

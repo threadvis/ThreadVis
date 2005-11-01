@@ -21,6 +21,7 @@ var THREADARCS_PARENT_ = null;
 var THREADARCS_ENABLED_ = false;
 var THREADARCS_DISABLEDACCOUNTS_ = "";
 var THREADARCS_DISABLEDFOLDERS_ = new Array();
+var COPY_MESSAGE_ = null;
 
 // add visualisation at startup
 addEventListener("load", createThreadArcs, false);
@@ -212,7 +213,6 @@ function ThreadArcs()
     }
     else
         this.threader_= new Threader();
-
 
     this.add_messages_from_folder_enumerator_maxcounter_ = 100;
 
@@ -763,6 +763,7 @@ ThreadArcs.prototype.setSelectedMessage = function()
 ThreadArcs.prototype.unloadHandler = function()
 {
     LOGGER_.close();
+    this.threader_.closeCopyCut();
 }
 
 

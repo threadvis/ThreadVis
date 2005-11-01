@@ -21,6 +21,7 @@
     <script src="chrome://threadarcsjs/content/ArcVisualisation.js" />
     <script src="chrome://threadarcsjs/content/Container.js" />
     <script src="chrome://threadarcsjs/content/ContainerVisualisation.js" />
+    <script src="chrome://threadarcsjs/content/CopyCut.js" />
     <script src="chrome://threadarcsjs/content/Logger.js" />
     <script src="chrome://threadarcsjs/content/Message.js" />
     <script src="chrome://threadarcsjs/content/PreferenceObserver.js" />
