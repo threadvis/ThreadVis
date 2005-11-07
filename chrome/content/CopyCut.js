@@ -225,7 +225,6 @@ CopyCut.prototype.reset = function()
     }
     catch (ex)
     {
-        alert(ex);
     }
 }
 

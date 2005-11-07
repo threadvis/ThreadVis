@@ -32,7 +32,7 @@
 <!ENTITY visualisation.timescaling.disable                  "Disable Time Scaling">
 <!ENTITY visualisation.timescaling.description.disabled     "If Time Scaling is disabled, the horizontal spacing between two adjacent messages is always constant.">
 <!ENTITY visualisation.timescaling.description.enabled      "If Time Scaling is enabled, the horizontal spacing between two adjacent messages is proportional to the time difference between those two messages.">
-<!ENTITY visualisation.size.caption                         "Visualisation Size">
+<!ENTITY visualisation.size.caption                         "Size">
 <!ENTITY visualisation.size.small                           "small">
 <!ENTITY visualisation.size.medium                          "medium">
 <!ENTITY visualisation.size.large                           "large">

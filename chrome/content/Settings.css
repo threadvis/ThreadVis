@@ -67,3 +67,8 @@ radio[pane=paneThreadArcsJS]
     overflow: auto;
     height: 220px;
 }
+
+.detaileddescription
+{
+    color: rgb(70,70,70);
+}

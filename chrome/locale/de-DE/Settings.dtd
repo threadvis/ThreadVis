@@ -32,7 +32,7 @@
 <!ENTITY visualisation.timescaling.disable                  "Time Scaling deaktivieren">
 <!ENTITY visualisation.timescaling.description.disabled     "Wenn Time Scaling deaktiviert ist, ist der horizontale Abstand zwischen benachbarten Nachrichten immer konstant.">
 <!ENTITY visualisation.timescaling.description.enabled      "Wenn Time Scaling aktiviert ist, ist der horizontale Abstand zwischen benachbarten Nachrichten proportional zum zeitlichen Abstand dieser Nachrichten.">
-<!ENTITY visualisation.size.caption                         "Gr&#xF6;&#xDF;e der Visualisierung">
+<!ENTITY visualisation.size.caption                         "Gr&#xF6;&#xDF;e">
 <!ENTITY visualisation.size.small                           "klein">
 <!ENTITY visualisation.size.medium                          "mittel">
 <!ENTITY visualisation.size.large                           "gro&#xDF;">

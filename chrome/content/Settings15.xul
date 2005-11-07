@@ -54,7 +54,7 @@
                         type="bool" />
         </preferences>
 
-        <tabbox flex="1">
+        <tabbox flex="1" id="ThreadArcsJSTabBox">
             <tabs id="settingstabs">
                 <tab label="&about.tab;" />
                 <tab label="&visualisation.timescaling.caption;" />
@@ -69,32 +69,25 @@
                 <tabpanel id="about" orient="vertical" flex="1">
                     <label value="&extension.name;"
                            id="extension-name" />
-                    <separator class="thin" />
                     <hbox>
                         <image src="chrome://threadarcsjs/content/images/about.png" />
                     </hbox>
-                    <separator class="thin" />
                     <label value="&about.version; &extension.version;"
                            id="about-version" />
-                    <separator class="thin" />
                     <description id="about-description">
                         &extension.description;
                     </description>
-                    <separator class="thin" />
                     <label id="about-copyright">
                         &extension.copyright;
                     </label>
-                    <separator class="thin" />
                     <label value="&extension.email;"
                            onclick="writeEmail();"
                            id="about-email" />
-                    <separator class="thin" />
                     <label href="&extension.homepage;"
                            value="&extension.homepage;"
                            onclick="openURL(event.target.getAttribute('href'));"
                            id="about-homepage" />
-
-                    <separator />
+                    <separator class="thin" />
                     <groupbox>
                         <checkbox id="enablethreadarcs"
                                   label="&extension.enabled;"
@@ -103,132 +96,118 @@
                 </tabpanel>
 
                 <tabpanel id="visualisation.timescaling" orient="vertical" flex="1">
-                    <groupbox>
-                        <caption label="&visualisation.timescaling.caption;" />
-                        <radiogroup id="dotimescaling"
-                                    preference="extensions.threadarcsjs.timescaling.enabled">
-                            <vbox>
-                                <radio value="false"
-                                       label="&visualisation.timescaling.disable;" />
-                                <hbox class="indent">
-                                    <image src="chrome://threadarcsjs/content/images/timescaling_disabled.png" />
-                                </hbox>
-                                <separator class="thin" />
-                                <label class="indent">
-                                    &visualisation.timescaling.description.disabled;
-                                </label>
-                            </vbox>
-                            <separator />
-                            <vbox>
-                                <radio value="true" label="&visualisation.timescaling.enable;" />
-                                <hbox class="indent">
-                                    <image src="chrome://threadarcsjs/content/images/timescaling_enabled.png"/>
-                                </hbox>
-                                <separator class="thin" />
-                                <label class="indent">
-                                    &visualisation.timescaling.description.enabled;
-                                </label>
-                            </vbox>
-                        </radiogroup>
-                    </groupbox>
+                    <radiogroup id="dotimescaling"
+                                preference="extensions.threadarcsjs.timescaling.enabled">
+                        <vbox>
+                            <radio value="false"
+                                   label="&visualisation.timescaling.disable;" />
+                            <hbox class="indent">
+                                <image src="chrome://threadarcsjs/content/images/timescaling_disabled.png" />
+                            </hbox>
+                            <separator class="thin" />
+                            <label class="indent">
+                                &visualisation.timescaling.description.disabled;
+                            </label>
+                        </vbox>
+                        <separator />
+                        <vbox>
+                            <radio value="true" label="&visualisation.timescaling.enable;" />
+                            <hbox class="indent">
+                                <image src="chrome://threadarcsjs/content/images/timescaling_enabled.png"/>
+                            </hbox>
+                            <separator class="thin" />
+                            <label class="indent">
+                                &visualisation.timescaling.description.enabled;
+                            </label>
+                        </vbox>
+                    </radiogroup>
                 </tabpanel>
 
                 <tabpanel id="visualisation.size" orient="vertical" flex="1">
-                    <groupbox>
-                        <caption label="&visualisation.size.caption;" />
-                        <radiogroup id="visualisationsize"
-                                    preference="extensions.threadarcsjs.visualisation.size">
-                            <hbox>
-                                <radio value="8x8,8,8,24,4,1,16"
-                                       label="&visualisation.size.small;" />
-                                <image src="chrome://threadarcsjs/content/images/size_8.png" />
-                            </hbox>
-                            <separator class="thin" />
-                            <hbox>
-                                <radio value="12x12,12,12,32,6,2,24"
-                                       label="&visualisation.size.medium;" />
-                                <image src="chrome://threadarcsjs/content/images/size_12.png" />
-                            </hbox>
-                            <separator class="thin" />
-                            <hbox>
-                                <radio value="16x16,16,16,40,8,3,32"
-                                       label="&visualisation.size.large;" />
-                                <image src="chrome://threadarcsjs/content/images/size_16.png" />
-                            </hbox>
-                        </radiogroup>
-                    </groupbox>
+                    <radiogroup id="visualisationsize"
+                                preference="extensions.threadarcsjs.visualisation.size">
+                        <hbox>
+                            <radio value="8x8,8,8,24,4,1,16"
+                                   label="&visualisation.size.small;" />
+                            <image src="chrome://threadarcsjs/content/images/size_8.png" />
+                        </hbox>
+                        <separator class="thin" />
+                        <hbox>
+                            <radio value="12x12,12,12,32,6,2,24"
+                                   label="&visualisation.size.medium;" />
+                            <image src="chrome://threadarcsjs/content/images/size_12.png" />
+                        </hbox>
+                        <separator class="thin" />
+                        <hbox>
+                            <radio value="16x16,16,16,40,8,3,32"
+                                   label="&visualisation.size.large;" />
+                            <image src="chrome://threadarcsjs/content/images/size_16.png" />
+                        </hbox>
+                    </radiogroup>
                 </tabpanel>
 
                 <tabpanel id="visualisation.colour" orient="vertical" flex="1">
-                    <groupbox>
-                        <caption label="&visualisation.colour.caption;" />
-                        <radiogroup id="visualisationcolour"
-                                    preference="extensions.threadarcsjs.visualisation.colour"
-                                    oncommand="toggleHighlight();">
-                           <radio value="single"
-                                  label="&visualisation.colour.single.caption;" />
-                           <label class="indent">
-                               &visualisation.colour.single.description;
-                           </label>
-                           <radio value="author"
-                                  label="&visualisation.colour.author.caption;"
-                                  id="visualisationcolourauthor" />
-                            <label class="indent">
-                               &visualisation.colour.author.description;
-                            </label>
-                        </radiogroup>
-                        <checkbox id="visualisationhighlight"
-                                  label="&visualisation.colour.highlight;"
-                                  preference="extensions.threadarcsjs.visualisation.highlight" />
-                    </groupbox>
+                    <radiogroup id="visualisationcolour"
+                                preference="extensions.threadarcsjs.visualisation.colour"
+                                oncommand="toggleHighlight();">
+                       <radio value="single"
+                              label="&visualisation.colour.single.caption;" />
+                       <label class="indent">
+                           &visualisation.colour.single.description;
+                       </label>
+                       <radio value="author"
+                              label="&visualisation.colour.author.caption;"
+                              id="visualisationcolourauthor" />
+                        <label class="indent">
+                           &visualisation.colour.author.description;
+                        </label>
+                    </radiogroup>
+                    <checkbox id="visualisationhighlight"
+                              label="&visualisation.colour.highlight;"
+                              class="indent"
+                              preference="extensions.threadarcsjs.visualisation.highlight" />
                 </tabpanel>
 
                 <tabpanel id="visualisation.accountsfolders" orient="vertical" flex="1">
-                    <groupbox>
-                        <caption label="&visualisation.enabledaccounts.caption;" />
-                        <textbox id="hidden_disabledaccounts"
-                                 preference="extensions.threadarcsjs.disabledaccounts"
-                                 hidden="true" />
-                        <label class="indent">
-                            &visualisation.enabledaccounts.description;
-                        </label>
-                        <separator />
-                        <vbox id="enableaccounts"
-                              style="overflow: auto;"
-                              class="indent" />
-                        <textbox id="hidden_disabledfolders"
-                                 preference="extensions.threadarcsjs.disabledfolders"
-                                 hidden="true" />
-                    </groupbox>
+                    <textbox id="hidden_disabledaccounts"
+                             preference="extensions.threadarcsjs.disabledaccounts"
+                             hidden="true" />
+                    <label class="indent">
+                        &visualisation.enabledaccounts.description;
+                    </label>
+                    <separator />
+                    <vbox id="enableaccounts"
+                          style="overflow: auto;"
+                          class="indent" />
+                    <textbox id="hidden_disabledfolders"
+                             preference="extensions.threadarcsjs.disabledfolders"
+                             hidden="true" />
                 </tabpanel>
 
                 <tabpanel id="logfiles" orient="vertical" flex="1">
-                    <groupbox>
-                        <caption label="&logfiles.caption;" />
-                        <checkbox id="dologging"
-                                  oncommand="toggleLogging();"
-                                  label="&logfiles.enable.checkbox;"
-                                  preference="extensions.threadarcsjs.logging.enabled"/>
-                        <label class="indent">
-                            &logfiles.enable.description.whatlogged;
-                        </label>
-                        <label class="indent">
-                            &logfiles.enable.description.sending;
-                        </label>
-                        <separator class="thin" />
-                        <checkbox id="dologgingdebug"
-                                  label="&logfiles.debug.checkbox;"
-                                  preference="extensions.threadarcsjs.logging.debug" />
-                        <label class="indent">
-                            &logfiles.debug.description.general;
-                        </label>
-                        <label class="indent">
-                            &logfiles.debug.description.personalinfo;
-                        </label>
-                        <label class="indent">
-                            &logfiles.debug.description.size;
-                        </label>
-                    </groupbox>
+                    <checkbox id="dologging"
+                              oncommand="toggleLogging();"
+                              label="&logfiles.enable.checkbox;"
+                              preference="extensions.threadarcsjs.logging.enabled"/>
+                    <label class="indent detaileddescription">
+                        &logfiles.enable.description.whatlogged;
+                    </label>
+                    <label class="indent detaileddescription">
+                        &logfiles.enable.description.sending;
+                    </label>
+                    <separator class="thin" />
+                    <checkbox id="dologgingdebug"
+                              label="&logfiles.debug.checkbox;"
+                              preference="extensions.threadarcsjs.logging.debug" />
+                    <label class="indent detaileddescription">
+                        &logfiles.debug.description.general;
+                    </label>
+                    <label class="indent detaileddescription">
+                        &logfiles.debug.description.personalinfo;
+                    </label>
+                    <label class="indent detaileddescription">
+                        &logfiles.debug.description.size;
+                    </label>
                     <separator class="thin" />
                     <button id="sendlog"
                             label="&logfiles.send.button;"
