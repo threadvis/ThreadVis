@@ -42,7 +42,7 @@
 <!ENTITY visualisation.colour.author.caption                "Mehrere Farben">
 <!ENTITY visualisation.colour.author.description            "Verwendet verschiedene Farben f&#xFC;r verschiedene Autoren.">
 <!ENTITY visualisation.colour.highlight                     "Die Email-Adressen der Autoren farbig unterstreichen.">
-<!ENTITY about.tab                                          "&#xDC;ber die Erweiterung">
+<!ENTITY about.tab                                          "Info">
 <!ENTITY about.version                                      "Version">
 <!ENTITY extension.description                              "Zeigt eine kleine Grafik, die den Kontext der aktuell angezeigten Nachricht visualisiert.">
 <!ENTITY extension.copyright                                "&#xA9; 2004-2005 Alexander C. Hubmann">
