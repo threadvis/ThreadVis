@@ -245,6 +245,11 @@ ContainerVisualisation.prototype.createMenu = function()
 ContainerVisualisation.prototype.cut = function()
 {
     COPY_MESSAGE_ = this.container_;
+    var msgkey = COPY_MESSAGE_.isDummy() ? 
+                    "DUMMY" : 
+                    COPY_MESSAGE_.getMessage().getKey();
+    LOGGER_.log("copycut", {"action" : "cutmessage",
+                            "msgkey" : msgkey});
 }
 
 
@@ -260,14 +265,21 @@ ContainerVisualisation.prototype.paste = function()
         this.container_.addChild(COPY_MESSAGE_);
         
         var this_msgid = ! this.container_.isDummy() ? this.container_.getMessage().getId() : "";
+        var this_msgkey = ! this.container_.isDummy() ? this.container_.getMessage().getKey() : "";
         var copy_message_msgid = ! COPY_MESSAGE_.isDummy() ? COPY_MESSAGE_.getMessage().getId() : "";
+        var copy_message_msgkey = ! COPY_MESSAGE_.isDummy() ? COPY_MESSAGE_.getMessage().getKey() : "";
         var copy_message_parent_msgid = ! copy_parent.isDummy() ? copy_parent.getMessage().getId() : "";
+        var copy_message_parent_msgkey = ! copy_parent.isDummy() ? copy_parent.getMessage().getKey() : "";
         
         if (this_msgid != "" && copy_message_msgid != "")
         {
             THREADARCS_.threader_.copycut_.addCut(copy_message_msgid + " " + copy_message_parent_msgid);
             THREADARCS_.threader_.copycut_.addCopy(copy_message_msgid + " " + this_msgid);
             THREADARCS_.setSelectedMessage();
+            
+            LOGGER_.log("copycut", {"action" : "pastemessage",
+                                    "copied-msgkey" : copy_message_msgkey,
+                                    "pasted-msgkey" : this_msgkey});
         }
     }
 }
@@ -284,11 +296,15 @@ ContainerVisualisation.prototype.deleteParent = function()
     parent.removeChild(this.container_);
     parent.getTopContainer().pruneEmptyContainers();
     var msgid = ! this.container_.isDummy() ? this.container_.getMessage().getId() : "";
+    var msgkey = ! this.container_.isDummy() ? this.container_.getMessage().getKey() : "";
     var parentmsgid = ! parent.isDummy() ? parent.getMessage().getId() : "";
     if (msgid != "" && parentmsgid != "")
     {
         THREADARCS_.threader_.copycut_.addCut(msgid + " " + parentmsgid);
         THREADARCS_.setSelectedMessage();
+        
+        LOGGER_.log("copycut", {"action" : "deletemessage",
+                                "msgkey" : msgkey});
     }
 }
 
