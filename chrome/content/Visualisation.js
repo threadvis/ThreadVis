@@ -880,10 +880,10 @@ Visualisation.prototype.visualise = function(container)
             new_margin = old_margin;
         }
     }
-    if (container.x_position_ * this.resize_ + old_margin < this.spacing_ * this.resize_)
+    if (container.x_position_ * this.resize_ + old_margin < (this.spacing_ / 2) * this.resize_)
     {
         // calculate necessary margin
-        new_margin = (- container.x_position_ + this. spacing_)* this.resize_;
+        new_margin = (- container.x_position_ + (this. spacing_ / 2))* this.resize_;
     }
     
     this.stack_.style.marginLeft = new_margin + "px";
