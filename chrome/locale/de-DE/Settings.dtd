@@ -49,4 +49,4 @@
 <!ENTITY extension.homepage                                 "http://www.sbox.tugraz.at/home/x/xpert/threadarcs/">
 <!ENTITY extension.email                                    "xpert@sbox.tugraz.at">
 <!ENTITY extension.name                                     "Thread Arcs Visualisation">
-<!ENTITY extension.version                                  "0.6">
+<!ENTITY extension.version                                  "0.6+">

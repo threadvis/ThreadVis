@@ -918,6 +918,7 @@ Visualisation.prototype.zoomIn = function()
 {
     this.zoom_ = this.zoom_ + 0.1;
     this.visualise();
+    LOGGER_.log("zoom", {"action" : "in", "zoomlevel" : this.zoom_});
 }
 
 
@@ -931,6 +932,7 @@ Visualisation.prototype.zoomOut = function()
     if (this.zoom_ < 1)
         this.zoom_ = 1;
     this.visualise();
+    LOGGER_.log("zoom", {"action" : "out", "zoomlevel" : this.zoom_});
 }
 
 

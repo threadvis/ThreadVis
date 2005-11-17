@@ -214,6 +214,9 @@ function ThreadArcs()
     else
         this.threader_= new Threader();
 
+    // remember msgkey of selected message
+    this.selected_msgkey_ = "";
+
     this.add_messages_from_folder_enumerator_maxcounter_ = 100;
 
 
@@ -540,7 +543,7 @@ ThreadArcs.prototype.getAllFolders = function(folder)
  * called after mouse click in extension
  * select message in mail view
  ******************************************************************************/
-ThreadArcs.prototype.callback = function(msgKey,
+ThreadArcs.prototype.callback = function(msg_key,
                                          folder)
 {
     if (! THREADARCS_ENABLED_)
@@ -551,7 +554,9 @@ ThreadArcs.prototype.callback = function(msgKey,
 
     LOGGER_.log("msgselect",
                     {"from" : "extension",
-                     "key" : msgKey});
+                     "key" : msg_key});
+
+    this.selected_msgkey_ = msg_key;
 
     // get folder for message
     SelectFolder(folder);
@@ -573,7 +578,7 @@ ThreadArcs.prototype.callback = function(msgKey,
     treeSelection.clearSelection();
 
     // select message
-    gDBView.selectMsgByKey(msgKey);
+    gDBView.selectMsgByKey(msg_key);
 
     treeBoxObj.ensureRowIsVisible(treeSelection.currentIndex);
 }
@@ -734,9 +739,14 @@ ThreadArcs.prototype.setSelectedMessage = function()
     var msg = messenger.messageServiceFromURI(msg_uri)
               .messageURIToMsgHdr(msg_uri);
 
-    LOGGER_.log("msgselect",
+    // only log as a "user" select if this message was not already
+    // selected by the extension
+    if (this.selected_msgkey_ != msg.messageKey)
+    {
+        LOGGER_.log("msgselect",
                     {"from" : "user",
                      "key" : msg.messageKey});
+    }
 
     if (this.server_.key != msg.folder.server.key)
     {
@@ -762,6 +772,8 @@ ThreadArcs.prototype.setSelectedMessage = function()
  ******************************************************************************/
 ThreadArcs.prototype.unloadHandler = function()
 {
+    LOGGER_.log("threadarcs",
+        {"action": "unload"});
     LOGGER_.close();
     this.threader_.closeCopyCut();
 }
