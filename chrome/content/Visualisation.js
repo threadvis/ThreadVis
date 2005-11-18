@@ -138,6 +138,23 @@ Visualisation.prototype.calculateSize = function(containers)
 
 
 /** ****************************************************************************
+ * Check size of stack
+ * if resized, resize visualisation
+ ******************************************************************************/
+Visualisation.prototype.checkSize = function()
+{
+    var old = this.oldtime;
+    this.oldtime = (new Date()).getTime();
+    
+    if (this.box_.boxObject.height != this.box_height_)
+        this.visualise();
+    
+    this.box_height_ = this.box_.boxObject.height;
+}
+
+
+
+/** ****************************************************************************
  * Clear stack
  * delete all children
  ******************************************************************************/
@@ -166,29 +183,35 @@ Visualisation.prototype.colourAuthors = function(authors)
             emailfields.push(singlefields[i].emailAddressNode);
     }
 
-
     // to, cc, bcc, ... (multi value fields)
     var multifields = document.getElementById("expandedHeaderView").getElementsByTagName("mail-multi-emailHeaderField");
     for (var i = 0; i < multifields.length; i++)
     {
+        // get "normal" header fields (i.e. non expanded cc and to)
         var multifield = multifields[i].emailAddresses.childNodes;
         for (var j = 0; j < multifield.length; j++)
         {
             if (multifield[j].attributes["emailAddress"])
-            emailfields.push(multifield[j]);
+                emailfields.push(multifield[j]);
+        }
+        
+        // get "expanded" header fields
+        multifield = multifields[i].longEmailAddresses.childNodes;
+        for (var j = 0; j < multifield.length; j++)
+        {
+            if (multifield[j].attributes["emailAddress"])
+                emailfields.push(multifield[j]);
         }
     }
 
-
-    var emailfield = emailfields.pop();
-    while (emailfield)
+    var emailfield = null;
+    while (emailfield = emailfields.pop())
     {
         var colour = authors[emailfield.attributes["emailAddress"].value];
         if (colour && this.pref_highlight_)
             emailfield.style.borderBottom = "2px solid " + this.getColour(colour, 1.0, 1.0);
         else
             emailfield.style.borderBottom = "";
-        emailfield = emailfields.pop();
     }
 }
 
@@ -250,6 +273,7 @@ Visualisation.prototype.createStack = function()
         this.stack_.addEventListener("mouseup", this.onMouseUp, false);
         var ref = this;
         this.stack_.addEventListener("DOMMouseScroll", function(event) {ref.onScroll(event);}, false);
+        this.stack_.addEventListener("resize", function(event) {alert("here");}, false);
     }
     else
     {
@@ -897,6 +921,12 @@ Visualisation.prototype.visualise = function(container)
     popupbox.style.height = "100%";
     popupbox.setAttribute("context", "ThreadArcsJSPopUp");
     this.stack_.appendChild(popupbox);
+    
+    // check for resize of box
+    this.box_height_ = this.box_.boxObject.height;
+    var ref = this;
+    clearInterval(this.check_resize_interval_);
+    this.check_resize_interval_ = setInterval(function() {ref.checkSize();}, 100);
 }
 
 
