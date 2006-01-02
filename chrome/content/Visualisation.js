@@ -944,11 +944,19 @@ Visualisation.prototype.zoomReset = function()
 /** ****************************************************************************
  * Zoom in and draw new visualisation
  ******************************************************************************/
-Visualisation.prototype.zoomIn = function()
+Visualisation.prototype.zoomIn = function(amount)
 {
-    this.zoom_ = this.zoom_ + 0.1;
-    this.visualise();
-    LOGGER_.log("zoom", {"action" : "in", "zoomlevel" : this.zoom_});
+    if (! isFinite(amount) || amount == 0)
+        amount = 1;
+
+    this.zoom_ = this.zoom_ + 0.1 * amount;
+    
+    clearTimeout(this.zoom_timeout_);
+    var ref = this;
+    this.zoom_timeout_ = setTimeout(function() {ref.visualise();}, 500);
+    
+    //this.visualise();
+    LOGGER_.log("zoom", {"action" : "in", "zoomlevel" : this.zoom_, "delta" : amount});
 }
 
 
@@ -956,13 +964,20 @@ Visualisation.prototype.zoomIn = function()
 /** ****************************************************************************
  * Zoom out and draw new visualisation
  ******************************************************************************/
-Visualisation.prototype.zoomOut = function()
+Visualisation.prototype.zoomOut = function(amount)
 {
-    this.zoom_ = this.zoom_ - 0.1;
+    if (! isFinite(amount) || amount == 0)
+        amount = 1;
+    
+    this.zoom_ = this.zoom_ - 0.1 * amount;
     if (this.zoom_ < 1)
         this.zoom_ = 1;
-    this.visualise();
-    LOGGER_.log("zoom", {"action" : "out", "zoomlevel" : this.zoom_});
+    
+    clearTimeout(this.zoom_timeout_);
+    var ref = this;
+    this.zoom_timeout_ = setTimeout(function() {ref.visualise();}, 500);
+    
+    LOGGER_.log("zoom", {"action" : "out", "zoomlevel" : this.zoom_, "delta" : amount});
 }
 
 

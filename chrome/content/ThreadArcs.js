@@ -446,6 +446,7 @@ ThreadArcs.prototype.addMessagesFromFolder = function(folder)
     
     this.add_messages_from_folder_doing_ = true;
     var ref = this;
+    this.add_messages_from_folder_enumerator_counter_ = 0;
     setTimeout(function(){ref.addMessagesFromFolderEnumerator(msg_enumerator);}, 10);
 }
 
@@ -471,6 +472,7 @@ ThreadArcs.prototype.addMessagesFromFolderEnumerator = function(enumerator)
         this.add_messages_from_folder_enumerator_counter_++;
         if (this.add_messages_from_folder_enumerator_counter_ >= this.add_messages_from_folder_enumerator_maxcounter_)
         {
+            LOGGER_.logDebug("ThreadArcs.addMessagesFromFolderEnumerator()", {"action" : "pause"});
             var ref = this;
             this.add_messages_from_folder_enumerator_counter_ = 0;
             setTimeout(function() {ref.addMessagesFromFolderEnumerator(enumerator);}, 10);
