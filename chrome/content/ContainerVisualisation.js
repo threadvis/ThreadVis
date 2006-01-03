@@ -63,10 +63,11 @@ function ContainerVisualisation(stack,
 
     this.drawDot();
 
-    if (this.selected_ && this.draw_circle_)
-    {
-        this.drawCircle("black");
-    }
+    this.drawCircle("black");
+    if (! (this.selected_ && this.draw_circle_))
+        this.hideCircle();
+    else
+        this.showCircle();
 
     this.drawClick();
 
@@ -74,7 +75,34 @@ function ContainerVisualisation(stack,
     this.createMenu();
     
     if (this.selected_ && this.draw_circle_ && this.flash_)
-        this.flash();
+        this.startFlash();
+}
+
+
+
+/** ****************************************************************************
+ * Re-Draw all elements
+ ******************************************************************************/
+ContainerVisualisation.prototype.redraw = function(resize, left, top, selected, flash)
+{
+    this.resize_ = resize;
+    this.left_ = left;
+    this.top_ = top;
+    this.selected_ = selected;
+    this.flash_ = flash;
+    
+    this.redrawDot();
+    this.redrawCircle("black");
+    if (! (this.selected_ && this.draw_circle_))
+        this.hideCircle();
+    else
+        this.showCircle();
+
+    this.redrawClick();
+
+    if (this.selected_ && this.draw_circle_ && this.flash_)
+        this.startFlash();
+
 }
 
 
@@ -311,13 +339,35 @@ ContainerVisualisation.prototype.deleteParent = function()
 
 
 /** ****************************************************************************
- * Draw circle around container if container is slected
+ * Draw circle around container if container is selected
  ******************************************************************************/
 ContainerVisualisation.prototype.drawCircle = function(colour)
 {
     if (! this.circle_)
         this.circle_ = document.createElementNS(XUL_NAMESPACE_, "box");
 
+    this.visualiseCircle(colour);
+
+    this.stack_.appendChild(this.circle_);
+}
+
+
+
+/** ****************************************************************************
+ * Re-Draw circle around container if container is selected
+ ******************************************************************************/
+ContainerVisualisation.prototype.redrawCircle = function(colour)
+{
+    this.visualiseCircle(colour);
+}
+
+
+
+/** ****************************************************************************
+ * Visualise circle around container if container is selected
+ ******************************************************************************/
+ContainerVisualisation.prototype.visualiseCircle = function(colour)
+{
     var style_top = (this.top_ - ((this.dotsize_ * 4/6) * this.resize_)) + "px";
     var style_left = ((this.left_ - (this.dotsize_ * 4/6)) * this.resize_) + "px";
     var style_height = (this.dotsize_ * 8/6 * this.resize_) + "px";
@@ -344,8 +394,6 @@ ContainerVisualisation.prototype.drawCircle = function(colour)
     this.circle_.style.verticalAlign = "top";
     this.circle_.style.border = style_border;
     this.circle_.style.MozBorderRadius = style_width;
-    
-    this.stack_.appendChild(this.circle_);
 }
 
 
@@ -355,8 +403,32 @@ ContainerVisualisation.prototype.drawCircle = function(colour)
  ******************************************************************************/
 ContainerVisualisation.prototype.drawClick = function()
 {
-    this.click_ = document.createElementNS(XUL_NAMESPACE_, "box");
+    if (! this.click_)
+        this.click_ = document.createElementNS(XUL_NAMESPACE_, "box");
 
+    this.visualiseClick();
+
+    this.stack_.appendChild(this.click_);
+    this.click_.addEventListener("click", this.onMouseClick, true);
+}
+
+
+
+/** ****************************************************************************
+ * Re-Draw container around dot to catch click events and show tooltip
+ ******************************************************************************/
+ContainerVisualisation.prototype.redrawClick = function()
+{
+    this.visualiseClick();
+}
+
+
+
+/** ****************************************************************************
+ * Visualise container around dot to catch click events and show tooltip
+ ******************************************************************************/
+ContainerVisualisation.prototype.visualiseClick = function()
+{
     var style_top = (this.top_ - ((this.spacing_ / 2) * this.resize_)) + "px";
     var style_left = ((this.left_ - this.spacing_ / 2) * this.resize_) + "px";
     var style_height = (this.spacing_ * this.resize_) + "px";
@@ -380,9 +452,7 @@ ContainerVisualisation.prototype.drawClick = function()
     this.click_.style.verticalAlign = "top";
     this.click_.container = this.container_;
     this.click_.setAttribute("tooltip", "ThreadArcsJS_" + this.left_);
-
-    this.stack_.appendChild(this.click_);
-    this.click_.addEventListener("click", this.onMouseClick, true);
+    this.click_.style.cursor = "default";
 }
 
 
@@ -394,6 +464,28 @@ ContainerVisualisation.prototype.drawDot = function()
 {
     this.dot_ = document.createElementNS(XUL_NAMESPACE_, "box");
 
+    this.visualiseDot();
+
+    this.stack_.appendChild(this.dot_);
+}
+
+
+
+/** ****************************************************************************
+ * Re-Draw dot for container
+ ******************************************************************************/
+ContainerVisualisation.prototype.redrawDot = function()
+{
+    this.visualiseDot();
+}
+
+
+
+/** ****************************************************************************
+ * Draw dot for container
+ ******************************************************************************/
+ContainerVisualisation.prototype.visualiseDot = function()
+{
     var style_top = (this.top_ - ((this.dotsize_ / 2) * this.resize_)) + "px";
     var style_left = ((this.left_ - (this.dotsize_ / 2)) * this.resize_) + "px";
     var style_height = (this.dotsize_ * this.resize_) + "px";
@@ -424,8 +516,33 @@ ContainerVisualisation.prototype.drawDot = function()
     this.dot_.style.border = style_border;
     if (this.style_ != "dummy")
         this.dot_.style.MozBorderRadius = style_width;
-    
-    this.stack_.appendChild(this.dot_);
+    else
+        this.dot_.style.MozBorderRadius = "";
+    this.dot_.style.cursor = "default";
+}
+
+
+
+/** ****************************************************************************
+ * Flash (show and hide) circle to draw attention to selected container
+ ******************************************************************************/
+ContainerVisualisation.prototype.startFlash = function()
+{
+    this.flashcount_ = 3;
+    this.flash();
+}
+
+
+
+/** ****************************************************************************
+ * Stop flashing
+ ******************************************************************************/
+ContainerVisualisation.prototype.stopFlash = function()
+{
+    clearInterval(this.flashinterval_);
+    clearTimeout(this.flashontimeout_);
+    clearTimeout(this.flashofftimeout_);
+    this.hideCircle();
 }
 
 
@@ -436,13 +553,15 @@ ContainerVisualisation.prototype.drawDot = function()
 ContainerVisualisation.prototype.flash = function()
 {
     if (this.flashcount_ == 0)
+    {
+        clearTimeout(this.flashtimeout_);
         return;
+    }
 
     this.flashcount_--;
 
     var ref = this;
-    setTimeout(function() {ref.flashOn();}, 100);
-    setTimeout(function() {ref.flash();}, 1000);
+    this.flashontimout_ = setTimeout(function() {ref.flashOn();}, 10);
 }
 
 
@@ -452,9 +571,9 @@ ContainerVisualisation.prototype.flash = function()
  ******************************************************************************/
 ContainerVisualisation.prototype.flashOn = function()
 {
-    this.circle_.hidden = true;
+    this.hideCircle();
     var ref = this;
-    setTimeout(function() {ref.flashOff();}, 500);
+    this.flashofftimeout_ = setTimeout(function() {ref.flashOff();}, 500);
 }
 
 
@@ -463,6 +582,28 @@ ContainerVisualisation.prototype.flashOn = function()
  * Hide circle
  ******************************************************************************/
 ContainerVisualisation.prototype.flashOff = function(old)
+{
+    this.showCircle();
+    var ref = this;
+    this.flashtimeout_ = setTimeout(function() {ref.flash();}, 500);
+}
+
+
+
+/** ****************************************************************************
+ * Hide circle
+ ******************************************************************************/
+ContainerVisualisation.prototype.hideCircle = function()
+{
+    this.circle_.hidden = true;
+}
+
+
+
+/** ****************************************************************************
+ * Show circle
+ ******************************************************************************/
+ContainerVisualisation.prototype.showCircle = function()
 {
     this.circle_.hidden = false;
 }

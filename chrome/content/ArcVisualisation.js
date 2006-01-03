@@ -65,6 +65,34 @@ function ArcVisualisation(stack,
  ******************************************************************************/
 ArcVisualisation.prototype.drawArc = function()
 {
+    this.arc_ = document.createElementNS(XUL_NAMESPACE_, "box");
+    
+    this.visualise();
+    this.stack_.appendChild(this.arc_);
+}
+
+
+
+/** ****************************************************************************
+ * Re-Draw arc
+ ******************************************************************************/
+ArcVisualisation.prototype.redrawArc = function(resize, left, right, top)
+{
+    this.resize_ = resize;
+    this.left_ = left;
+    this.top_ = top;
+    this.right_ = right;
+    
+    this.visualise();
+}
+
+
+
+/** ****************************************************************************
+ * Visualise arc
+ ******************************************************************************/
+ArcVisualisation.prototype.visualise = function()
+{
     var arc_top = 0;
     var fill_top = 0;
     if (this.vposition_ == "top")
@@ -79,6 +107,7 @@ ArcVisualisation.prototype.drawArc = function()
                        this.resize_) + "px";
     var style_width = ((this.right_ - this.left_ + this.arc_width_) * this.resize_)+ "px";
     var style_background = this.colour_;
+    
     LOGGER_.logDebug("Visualisation.drawArc()",
                         {"action" : "draw arc",
                          "top" : style_top,
@@ -86,35 +115,34 @@ ArcVisualisation.prototype.drawArc = function()
                          "height" : style_height,
                          "width" : style_width,
                          "background" : style_background});
-
-    var arc = document.createElementNS(XUL_NAMESPACE_, "box");
-    arc.style.position = "relative";
-    arc.style.top = style_top;
-    arc.style.left = style_left;
-    arc.style.height = style_height;
-    arc.style.width = style_width;
-    arc.style.verticalAlign = "top";
+    
+    
+    this.arc_.style.position = "relative";
+    this.arc_.style.top = style_top;
+    this.arc_.style.left = style_left;
+    this.arc_.style.height = style_height;
+    this.arc_.style.width = style_width;
+    this.arc_.style.verticalAlign = "top";
     if (this.vposition_ == "top")
     {
-        arc.style.MozBorderRadiusTopleft = this.arc_radius_ + "px";
-        arc.style.MozBorderRadiusTopright = this.arc_radius_ + "px"
-        arc.style.borderTop = (this.arc_width_ * this.resize_) + 
-                              "px solid " + style_background;
-        arc.style.borderLeft = (this.arc_width_ * this.resize_) + 
-                               "px solid " + style_background;
-        arc.style.borderRight = (this.arc_width_ * this.resize_) + 
-                                "px solid " + style_background;
+        this.arc_.style.MozBorderRadiusTopleft = this.arc_radius_ + "px";
+        this.arc_.style.MozBorderRadiusTopright = this.arc_radius_ + "px"
+        this.arc_.style.borderTop = (this.arc_width_ * this.resize_) + 
+                                   "px solid " + style_background;
+        this.arc_.style.borderLeft = (this.arc_width_ * this.resize_) + 
+                                    "px solid " + style_background;
+        this.arc_.style.borderRight = (this.arc_width_ * this.resize_) + 
+                                     "px solid " + style_background;
     }
     else
     {
-        arc.style.MozBorderRadiusBottomleft = this.arc_radius_ + "px";
-        arc.style.MozBorderRadiusBottomright = this.arc_radius_ + "px";
-        arc.style.borderBottom = (this.arc_width_ * this.resize_) + 
-                                 "px solid " + style_background;
-        arc.style.borderLeft = (this.arc_width_ * this.resize_) + 
-                               "px solid " + style_background;
-        arc.style.borderRight = (this.arc_width_ * this.resize_) + 
-                                "px solid " + style_background;
+        this.arc_.style.MozBorderRadiusBottomleft = this.arc_radius_ + "px";
+        this.arc_.style.MozBorderRadiusBottomright = this.arc_radius_ + "px";
+        this.arc_.style.borderBottom = (this.arc_width_ * this.resize_) + 
+                                      "px solid " + style_background;
+        this.arc_.style.borderLeft = (this.arc_width_ * this.resize_) + 
+                                    "px solid " + style_background;
+        this.arc_.style.borderRight = (this.arc_width_ * this.resize_) + 
+                                     "px solid " + style_background;
     }
-    this.stack_.appendChild(arc);
 }

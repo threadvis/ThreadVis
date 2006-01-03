@@ -42,7 +42,7 @@
             </popup>
         </popupset>
         <hbox id="ThreadArcsJS"
-              style="border: 1px solid #cccccc;">
+              style="border: 1px solid #cccccc; cursor: move;">
             <vbox id="ThreadArcsJSBox" 
                   style="width: 300px; height: 1px; overflow: hidden;"
                   context="ThreadArcsJSPopUp" />

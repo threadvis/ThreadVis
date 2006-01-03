@@ -57,6 +57,11 @@ function Visualisation()
 
     this.preferenceObserverRegister();
     this.preferenceReload();
+
+    this.authors_ = null;
+    this.containers_ = null;
+    this.containervisualisations_ = null;
+    this.arcvisualisations_ = null;
 }
 
 
@@ -143,13 +148,12 @@ Visualisation.prototype.calculateSize = function(containers)
  ******************************************************************************/
 Visualisation.prototype.checkSize = function()
 {
-    var old = this.oldtime;
-    this.oldtime = (new Date()).getTime();
-    
+    /*
     if (this.box_.boxObject.height != this.box_height_)
         this.visualise();
     
     this.box_height_ = this.box_.boxObject.height;
+    */
 }
 
 
@@ -268,12 +272,11 @@ Visualisation.prototype.createStack = function()
         this.stack_ = document.createElementNS(XUL_NAMESPACE_, "stack");
         this.stack_.setAttribute("id", "ThreadArcsJSStack");
         this.box_.appendChild(this.stack_);
-        this.stack_.addEventListener("mousemove", this.onMouseMove, false);
-        this.stack_.addEventListener("mousedown", this.onMouseDown, false);
-        this.stack_.addEventListener("mouseup", this.onMouseUp, false);
+        this.box_.addEventListener("mousemove", this.onMouseMove, false);
+        this.box_.addEventListener("mousedown", this.onMouseDown, false);
+        this.box_.addEventListener("mouseup", this.onMouseUp, false);
         var ref = this;
-        this.stack_.addEventListener("DOMMouseScroll", function(event) {ref.onScroll(event);}, false);
-        this.stack_.addEventListener("resize", function(event) {alert("here");}, false);
+        this.box_.addEventListener("DOMMouseScroll", function(event) {ref.onScroll(event);}, false);
     }
     else
     {
@@ -724,16 +727,23 @@ Visualisation.prototype.visualise = function(container)
                          "container" : container.toString()});
 
     // clear visualisation
-    this.createStack();
-    this.clearStack();
+    //this.createStack();
+    //this.clearStack();
 
     // check if we are still in the same thread as last time
     // if not, reset zoom level
     if (! this.currentcontainer_ || 
         container.getTopContainer() != this.currentcontainer_.getTopContainer())
     {
+        this.createStack();
+        this.clearStack();
         this.zoomReset();
         this.resetStack();
+    }
+    else
+    {
+        this.visualiseExisting(container);
+        return;
     }
 
     // remember current container to redraw after zoom
@@ -743,17 +753,17 @@ Visualisation.prototype.visualise = function(container)
     var topcontainer = container.getTopContainer();
 
     // get all containers in thread as array
-    var containers = new Array();
-    containers.push(topcontainer);
-    containers = containers.concat(topcontainer.getChildren());
+    this.containers_ = new Array();
+    this.containers_.push(topcontainer);
+    this.containers_ = this.containers_.concat(topcontainer.getChildren());
 
     // sort containers by date
-    containers.sort(Container_sortFunction);
+    this.containers_.sort(Container_sortFunction);
 
 
     // pre-calculate size
-    var presize = this.calculateSize(containers);
-    containers = presize.containers;
+    var presize = this.calculateSize(this.containers_);
+    this.containers_ = presize.containers;
     // totalmaxheight counts the maximal number of stacked arcs
     var totalmaxheight = presize.totalmaxheight;
     // minmaltimedifference stores the minimal time between two messages
@@ -766,27 +776,30 @@ Visualisation.prototype.visualise = function(container)
     var width = original_width * this.zoom_;
     var height = original_height * this.zoom_;
 
-    containers = this.timeScaling(containers,
-                                  minimaltimedifference,
-                                  width);
+    this.containers_ = this.timeScaling(this.containers_,
+                                        minimaltimedifference,
+                                        width);
 
     // do final resizing
     var x = this.spacing_ / 2;
     this.box_.style.paddingRight = x + "px";
-    this.resize_ = this.getResize(containers.length,
+    this.resize_ = this.getResize(this.containers_.length,
                                   totalmaxheight,
                                   width,
                                   height);
 
     // pre-calculate colours for different authors
-    var authors = new Object();
+    this.authors_ = new Object();
     this.lastcolour_ = 2;
 
+    this.containervisualisations_ = new Array();
+    this.arcvisualisations_ = new Array();
+    
     for (var counter = 0;
-         counter < containers.length;
+         counter < this.containers_.length;
          counter++)
     {
-        var thiscontainer = containers[counter];
+        var thiscontainer = this.containers_[counter];
 
         var selected = thiscontainer == container;
 
@@ -802,14 +815,14 @@ Visualisation.prototype.visualise = function(container)
             }
             else
             {
-                if (authors[thiscontainer.getMessage().getFromEmail()] != null)
+                if (this.authors_[thiscontainer.getMessage().getFromEmail()] != null)
                 {
-                    colour = authors[thiscontainer.getMessage().getFromEmail()];
+                    colour = this.authors_[thiscontainer.getMessage().getFromEmail()];
                 }
                 else
                 {
                     colour = this.getNewColour();
-                    authors[thiscontainer.getMessage().getFromEmail()] = colour;
+                    this.authors_[thiscontainer.getMessage().getFromEmail()] = colour;
                 }
                 if (selected)
                     colour = this.getColour(colour, 1, 0.8);
@@ -824,15 +837,16 @@ Visualisation.prototype.visualise = function(container)
 
         // at the moment, always flash
         // note: dot only flashes if circle == true
-        var flash = true;
+        var flash = false;
 
-        this.drawDot(thiscontainer,
-                     colour,
-                     x,
-                     (height / 2),
-                     selected,
-                     circle,
-                     flash);
+        this.containervisualisations_[thiscontainer] =
+            this.drawDot(thiscontainer,
+                         colour,
+                         x,
+                         (height / 2),
+                         selected,
+                         circle,
+                         flash);
 
         thiscontainer.x_position_ = x;
         thiscontainer.current_arc_height_incoming_ = 0;
@@ -851,7 +865,7 @@ Visualisation.prototype.visualise = function(container)
                  innercounter < counter;
                  innercounter++)
             {
-                var lookatcontainer = containers[innercounter];
+                var lookatcontainer = this.containers_[innercounter];
                 if (lookatcontainer.odd_ == parent.odd_ && 
                     lookatcontainer.current_arc_height_outgoing_ > maxheight)
                 {
@@ -872,22 +886,23 @@ Visualisation.prototype.visualise = function(container)
             if (this.pref_colour_ == "single")
                 colour = parent == container || selected ? COLOUR_SINGLE_ : COLOUR_DUMMY_;
 
-            this.drawArc(colour,
-                         position,
-                         maxheight,
-                         parent.x_position_,
-                         x,
-                         (height / 2));
+            this.arcvisualisations_[thiscontainer] =
+                this.drawArc(colour,
+                             position,
+                             maxheight,
+                             parent.x_position_,
+                             x,
+                             (height / 2));
         }
         x = x + (thiscontainer.x_scaled_ * this.spacing_);
     }
     
     // underline authors if enabled
-    this.colourAuthors(authors);
+    this.colourAuthors(this.authors_);
     
     // calculate if we have to move the visualisation so that the
     // selected message is visible
-    
+    this.moveVisualisation(container);
     // get current left margin
     var old_margin = this.stack_.style.marginLeft;
     old_margin = parseInt(old_margin.replace(/px/, ""));
@@ -923,10 +938,132 @@ Visualisation.prototype.visualise = function(container)
     this.stack_.appendChild(popupbox);
     
     // check for resize of box
+    
     this.box_height_ = this.box_.boxObject.height;
     var ref = this;
     clearInterval(this.check_resize_interval_);
     this.check_resize_interval_ = setInterval(function() {ref.checkSize();}, 100);
+}
+
+
+
+/** ****************************************************************************
+ * Visualise an existing thread
+ ******************************************************************************/
+Visualisation.prototype.visualiseExisting = function(container)
+{
+    // remember current container to redraw after zoom
+    this.currentcontainer_ = container;
+    
+    // pre-calculate size
+    var presize = this.calculateSize(this.containers_);
+    this.containers_ = presize.containers;
+    // totalmaxheight counts the maximal number of stacked arcs
+    var totalmaxheight = presize.totalmaxheight;
+    // minmaltimedifference stores the minimal time between two messages
+    var minimaltimedifference = presize.minimaltimedifference;
+    
+    var original_width = this.box_.boxObject.width;
+    var original_height = this.box_.boxObject.height;
+    var width = original_width * this.zoom_;
+    var height = original_height * this.zoom_;
+    
+    this.containers_ = this.timeScaling(this.containers_,
+                                        minimaltimedifference,
+                                        width);
+    
+    // do final resizing
+    var x = this.spacing_ / 2;
+    this.box_.style.paddingRight = x + "px";
+    this.resize_ = this.getResize(this.containers_.length,
+                                  totalmaxheight,
+                                  width,
+                                  height);
+
+
+    for (var counter = 0;
+         counter < this.containers_.length;
+         counter++)
+    {
+        var thiscontainer = this.containers_[counter];
+
+        var selected = thiscontainer == container;
+
+        // only display black circle to highlight selected message
+        // if we are using more than one colour
+        var circle = this.pref_colour_ == "single" ? false : true;
+
+        // at the moment, always flash
+        // note: dot only flashes if circle == true
+        var flash = false;
+
+        this.containervisualisations_[thiscontainer].redraw(this.resize_, x, (height / 2), selected, flash);
+
+        thiscontainer.x_position_ = x;
+        
+        var parent = thiscontainer.getParent()
+        if (parent != null && ! parent.isRoot())
+        {
+            this.arcvisualisations_[thiscontainer].redrawArc(this.resize_, parent.x_position_, x, (height / 2))
+        }
+        
+        x = x + (thiscontainer.x_scaled_ * this.spacing_);
+    }
+    
+    // calculate if we have to move the visualisation so that the
+    // selected message is visible
+    this.moveVisualisation(container);
+    
+    /*
+    // undo all circles
+    for (var i in this.containervisualisations_)
+    {
+        this.containervisualisations_[i].stopFlash();
+    }
+    
+    // draw new circle
+    this.containervisualisations_[container].startFlash();
+    */
+    // underline authors if enabled
+    this.colourAuthors(this.authors_);
+}
+
+
+
+/** ****************************************************************************
+ * Move visualisation to show current message
+ ******************************************************************************/
+Visualisation.prototype.moveVisualisation = function(container)
+{
+    // get current left margin
+    var old_margin = this.stack_.style.marginLeft;
+    old_margin = parseInt(old_margin.replace(/px/, ""));
+    var new_margin = old_margin;
+    
+    var original_width = this.box_.boxObject.width;
+    var original_height = this.box_.boxObject.height;
+    var height = original_height * this.zoom_;
+    
+    if (container.x_position_ * this.resize_ + old_margin > original_width)
+    {
+        // calculate necessary margin
+        new_margin = - (container.x_position_ * this.resize_ - original_width) 
+                     - (this.spacing_ * this.resize_);
+        
+        // if we already see the selected message, don't move any further
+        if (new_margin > old_margin)
+        {
+            new_margin = old_margin;
+        }
+    }
+    if (container.x_position_ * this.resize_ + old_margin < (this.spacing_ / 2) * this.resize_)
+    {
+        // calculate necessary margin
+        new_margin = (- container.x_position_ + (this. spacing_ / 2))* this.resize_;
+    }
+    
+    this.stack_.style.marginLeft = new_margin + "px";
+    this.stack_.style.marginTop = (original_height / 2 - height / 2) + "px";
 }
 
 
