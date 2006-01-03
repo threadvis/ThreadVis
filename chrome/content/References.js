@@ -61,7 +61,7 @@ References.prototype.getReferences = function()
 
 
 /** ****************************************************************************
- * Get string representation of object
+ * get string representation of object
  ******************************************************************************/
 References.prototype.toString = function()
 {

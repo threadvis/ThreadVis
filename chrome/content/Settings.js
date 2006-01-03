@@ -13,13 +13,15 @@
 var XUL_NAMESPACE_ =
     "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
+// preference branch for this extension
 var THREADARCSJS_PREF_BRANCH_ = "extensions.threadarcsjs.";
+// name of preference for enabled accounts and folders
 var THREADARCSJS_PREF_ENABLEDACCOUNTS_ = "enabledaccounts";
 
 
 
 /** ****************************************************************************
- * init
+ * init the dialog, read all settings, build the account list, ...
  ******************************************************************************/
 function init()
 {
@@ -32,26 +34,175 @@ function init()
 
 
 /** ****************************************************************************
- * write an email to the author
+ * add attachments from file objects
  ******************************************************************************/
-function writeEmail()
+function addAttachments(composeFields, attachments)
 {
-    composeEmail("xpert@sbox.tugraz.at",
-                 "[ThreadArcsJS] <insert subject here>", null)
+    for (key in attachments)
+    {
+        var file = attachments[key];
+        var attachment = Components.classes["@mozilla.org/messengercompose/attachment;1"]
+                         .createInstance(Components.interfaces.nsIMsgAttachment);
+        var ios = Components.classes["@mozilla.org/network/io-service;1"]
+                  .getService(Components.interfaces.nsIIOService);
+        var fileHandler = ios.getProtocolHandler("file")
+                          .QueryInterface(Components.interfaces.nsIFileProtocolHandler);
+        attachment.url = fileHandler.getURLSpecFromFile(file);
+        composeFields.addAttachment(attachment);
+    }
 }
 
 
 
 /** ****************************************************************************
- * send the logfiles to the author
+ * build the account list
+ * get all accounts, display checkbox for each
  ******************************************************************************/
-function sendLogfiles()
+function buildAccountList()
 {
-    var logfiles = getLogfiles();
-    composeEmail("xpert@sbox.tugraz.at",
-                 "[ThreadArcsJS] Auto-Email-Logs",
-                 null,
-                 logfiles);
+    var account_box = document.getElementById("enableaccounts");
+    var pref = document.getElementById("hidden_disabledaccounts").value;
+    
+    var account_manager = Components.classes["@mozilla.org/messenger/account-manager;1"]
+                         .getService(Components.interfaces.nsIMsgAccountManager);
+    
+    var accounts = account_manager.accounts;
+    for (var i = 0; i < accounts.Count(); i++) 
+    {
+        var account = accounts.QueryElementAt(i, Components.interfaces.nsIMsgAccount);
+        
+        // get folders
+        var root_folder = account.incomingServer.rootFolder;
+        var folders = getAllFolders(root_folder);
+        
+        var checkbox = document.createElementNS(XUL_NAMESPACE_, "checkbox");
+        checkbox.setAttribute("label", account.incomingServer.prettyName);
+        checkbox.setAttribute("oncommand", "buildAccountPreference();");
+        checkbox.setAttribute("accountkey", account.key);
+        checkbox.setAttribute("checkboxtype", "account");
+        var regexp = new RegExp(account.key);
+        if (pref != "" && pref.match(regexp))
+        {
+            checkbox.setAttribute("checked", false);
+        }
+        else
+        {
+            checkbox.setAttribute("checked", true);
+        }
+        account_box.appendChild(checkbox);
+        buildFolderCheckboxes(account_box, folders, account.key, 1);
+        
+        var separator = document.createElementNS(XUL_NAMESPACE_, "separator");
+        separator.setAttribute("class", "groove");
+        account_box.appendChild(separator);
+    }
+}
+
+
+
+/** ****************************************************************************
+ * create a string preference of all selected accounts
+ ******************************************************************************/
+function buildAccountPreference()
+{
+    var account_box = document.getElementById("enableaccounts");
+    var pref = document.getElementById("hidden_disabledaccounts");
+    
+    var prefstring = "";
+    
+    var checkboxes = account_box.getElementsByAttribute("checkboxtype", "account");
+    
+    for (var i = 0; i < checkboxes.length; i++)
+    {
+        var checkbox = checkboxes.item(i);
+        if (! checkbox.checked)
+        {
+            prefstring += " " + checkbox.getAttribute("accountkey");
+        }
+        
+        var folder_checkboxes = account_box.getElementsByAttribute("checkboxtype", "folder");
+        for (var j = 0; j < folder_checkboxes.length; j++)
+        {
+            var folder_checkbox = folder_checkboxes.item(j);
+            if (folder_checkbox.getAttribute("accountkey") == checkbox.getAttribute("accountkey"))
+            {
+                if (checkbox.checked)
+                {
+                    folder_checkbox.disabled = false;
+                }
+                else
+                {
+                    folder_checkbox.disabled = true;
+                }
+            }
+        }
+        
+    }
+    pref.value = prefstring;
+}
+
+
+
+/** ****************************************************************************
+ * create checkbox elements for all folders
+ ******************************************************************************/
+function buildFolderCheckboxes(box, folders, account, indent)
+{
+    var pref = document.getElementById("hidden_disabledfolders").value;
+    
+    for (var i = 0; i < folders.length; i++)
+    {
+        var folder = folders[i];
+        
+        if (folder instanceof Array)
+        {
+            buildFolderCheckboxes(box, folder, account, ++indent);
+            return;
+        }
+        
+        var checkbox = document.createElementNS(XUL_NAMESPACE_, "checkbox");
+        checkbox.setAttribute("label", folder.name);
+        checkbox.setAttribute("oncommand", "buildFolderPreference();");
+        checkbox.setAttribute("folderuri", folder.URI);
+        checkbox.setAttribute("checkboxtype", "folder");
+        checkbox.setAttribute("accountkey", account);
+        checkbox.style.paddingLeft = indent + "em";
+        var regexp = new RegExp(folder.URI + " ");
+        if (pref != "" && pref.match(regexp))
+        {
+            checkbox.setAttribute("checked", false);
+        }
+        else
+        {
+            checkbox.setAttribute("checked", true);
+        }
+        box.appendChild(checkbox);
+    }
+}
+
+
+
+/** ****************************************************************************
+ * create a string preference of all selected folders
+ ******************************************************************************/
+function buildFolderPreference()
+{
+    var account_box = document.getElementById("enableaccounts");
+    var pref = document.getElementById("hidden_disabledfolders");
+    
+    var prefstring = "";
+    
+    var checkboxes = account_box.getElementsByAttribute("checkboxtype", "folder");
+    
+    for (var i = 0; i < checkboxes.length; i++)
+    {
+        var checkbox = checkboxes.item(i);
+        if (! checkbox.checked)
+        {
+            prefstring += checkbox.getAttribute("folderuri") + " ";
+        }
+    }
+    pref.value = prefstring;
 }
 
 
@@ -99,6 +250,47 @@ function composeEmail(to,
 
 
 /** ****************************************************************************
+ * get all subfolders starting from "folder" as array
+ ******************************************************************************/
+function getAllFolders(folder)
+{
+    var folder_enumerator = folder.GetSubFolders();
+    var current_folder = null;
+    var folders = new Array();
+    
+    while (true)
+    {
+        try
+        {
+            current_folder = folder_enumerator.currentItem();
+        }
+        catch (Exception)
+        {
+            break;
+        }
+
+        if (current_folder instanceof Components.interfaces.nsIMsgFolder)
+            folders.push(current_folder);
+
+        if (current_folder.hasSubFolders)
+            folders.push(this.getAllFolders(current_folder));
+
+        try
+        {
+            folder_enumerator.next();
+        }
+        catch (Exception)
+        {
+            break;
+        }
+    }
+    
+    return folders;
+}
+
+
+
+/** ****************************************************************************
  * return file objects for all logfiles
  ******************************************************************************/
 function getLogfiles()
@@ -111,97 +303,10 @@ function getLogfiles()
         file = logger.getFile();
 
     if (file)
-    {
         if (file.exists())
             logfiles.push(file);
-    }
 
     return logfiles;
-}
-
-
-
-/** ****************************************************************************
- * add attachments from file objects
- ******************************************************************************/
-function addAttachments(composeFields, attachments)
-{
-    for (key in attachments)
-    {
-        var file = attachments[key];
-        var attachment = Components.classes["@mozilla.org/messengercompose/attachment;1"]
-                         .createInstance(Components.interfaces.nsIMsgAttachment);
-        var ios = Components.classes["@mozilla.org/network/io-service;1"]
-                  .getService(Components.interfaces.nsIIOService);
-        var fileHandler = ios.getProtocolHandler("file")
-                          .QueryInterface(Components.interfaces.nsIFileProtocolHandler);
-        attachment.url = fileHandler.getURLSpecFromFile(file);
-        composeFields.addAttachment(attachment);
-    }
-}
-
-
-
-/** ****************************************************************************
- * reset the logfiles
- ******************************************************************************/
-function resetLogfiles()
-{
-    var logger = getLogger();
-
-    if (logger)
-    {
-        logger.reset(true);
-    }
-    else
-    {
-        alert(parent.getElementById("ThreadArcsJSStrings").getString("logger.couldnotdeletefile"));
-    }
-}
-
-
-
-/** ****************************************************************************
- * Enable or disable the debug checkbox
- ******************************************************************************/
-function toggleLogging()
-{
-    var logcheckbox = document.getElementById("dologging");
-    var debugcheckbox = document.getElementById("dologgingdebug");
-    if (logcheckbox.checked)
-        debugcheckbox.disabled = false;
-    else
-        debugcheckbox.disabled = true;
-}
-
-
-
-/** ****************************************************************************
- * Enable or disable the highlight checkbox
- ******************************************************************************/
-function toggleHighlight()
-{
-    var colourradio = document.getElementById("visualisationcolourauthor");
-    var highlightcheckbox = document.getElementById("visualisationhighlight");
-    if (colourradio.selected)
-        highlightcheckbox.disabled = false;
-    else
-        highlightcheckbox.disabled = true;
-}
-
-
-
-/** ****************************************************************************
- * open a homepage
- ******************************************************************************/
-function openURL(url)
-{
-    var uri = Components.classes["@mozilla.org/network/standard-url;1"]
-              .createInstance(Components.interfaces.nsIURI);
-    uri.spec = url;
-    var protocolSvc = Components.classes["@mozilla.org/uriloader/external-protocol-service;1"]
-                      .getService(Components.interfaces.nsIExternalProtocolService);
-    protocolSvc.loadUrl(uri);
 }
 
 
@@ -235,197 +340,84 @@ function getLogger(object)
 
 
 /** ****************************************************************************
- * get all subfolders starting from "folder" as array
+ * open a homepage
  ******************************************************************************/
-function getAllFolders(folder)
+function openURL(url)
 {
-    var folder_enumerator = folder.GetSubFolders();
-    var current_folder = null;
-    var folders = new Array();
-    
-    while (true)
-    {
-        try
-        {
-            current_folder = folder_enumerator.currentItem();
-        }
-        catch (Exception)
-        {
-            break;
-        }
-
-        if (current_folder instanceof Components.interfaces.nsIMsgFolder)
-        {
-            folders.push(current_folder);
-        }
-
-        if (current_folder.hasSubFolders)
-        {
-            folders.push(this.getAllFolders(current_folder));
-        }
-
-        try
-        {
-            folder_enumerator.next();
-        }
-        catch (Exception)
-        {
-            break;
-        }
-    }
-    
-    return folders;
+    var uri = Components.classes["@mozilla.org/network/standard-url;1"]
+              .createInstance(Components.interfaces.nsIURI);
+    uri.spec = url;
+    var protocolSvc = Components.classes["@mozilla.org/uriloader/external-protocol-service;1"]
+                      .getService(Components.interfaces.nsIExternalProtocolService);
+    protocolSvc.loadUrl(uri);
 }
 
 
 
 /** ****************************************************************************
- * create checkbox elements for all folders
+ * reset the logfiles
  ******************************************************************************/
-function buildFolderCheckboxes(box, folders, account, indent)
+function resetLogfiles()
 {
-    var pref = document.getElementById("hidden_disabledfolders").value;
-    
-    for (var i = 0; i < folders.length; i++)
-    {
-        var folder = folders[i];
-        
-        if (folder instanceof Array)
-        {
-            buildFolderCheckboxes(box, folder, account, ++indent);
-            return;
-        }
-        
-        var checkbox = document.createElementNS(XUL_NAMESPACE_, "checkbox");
-        checkbox.setAttribute("label", folder.name);
-        checkbox.setAttribute("oncommand", "buildFolderPreference();");
-        checkbox.setAttribute("folderuri", folder.URI);
-        checkbox.setAttribute("checkboxtype", "folder");
-        checkbox.setAttribute("accountkey", account);
-        checkbox.style.paddingLeft = indent + "em";
-        var regexp = new RegExp(folder.URI + " ");
-        if (pref != "" && pref.match(regexp))
-        {
-            checkbox.setAttribute("checked", false);
-        }
-        else
-        {
-            checkbox.setAttribute("checked", true);
-        }
-        box.appendChild(checkbox);
-    }
+    var logger = getLogger();
+
+    if (logger)
+        logger.reset(true);
+    else
+        alert(parent.getElementById("ThreadArcsJSStrings").getString("logger.couldnotdeletefile"));
 }
 
 
 
 /** ****************************************************************************
- * Build the account list
- * get all accounts, display checkbox for each
+ * send the logfiles to the author
  ******************************************************************************/
-function buildAccountList()
+function sendLogfiles()
 {
-    var account_box = document.getElementById("enableaccounts");
-    var pref = document.getElementById("hidden_disabledaccounts").value;
-    
-    var account_manager = Components.classes["@mozilla.org/messenger/account-manager;1"]
-                         .getService(Components.interfaces.nsIMsgAccountManager);
-    
-    var accounts = account_manager.accounts;
-    for (var i = 0; i < accounts.Count(); i++) 
-    {
-        var account = accounts.QueryElementAt(i, Components.interfaces.nsIMsgAccount);
-        
-        // get folders
-        var root_folder = account.incomingServer.rootFolder;
-        var folders = getAllFolders(root_folder);
-        
-        var checkbox = document.createElementNS(XUL_NAMESPACE_, "checkbox");
-        checkbox.setAttribute("label", account.incomingServer.prettyName);
-        checkbox.setAttribute("oncommand", "buildAccountPreference();");
-        checkbox.setAttribute("accountkey", account.key);
-        checkbox.setAttribute("checkboxtype", "account");
-        var regexp = new RegExp(account.key);
-        if (pref != "" && pref.match(regexp))
-        {
-            checkbox.setAttribute("checked", false);
-        }
-        else
-        {
-            checkbox.setAttribute("checked", true);
-        }
-        account_box.appendChild(checkbox);
-        buildFolderCheckboxes(account_box, folders, account.key, 1);
-        
-        var separator = document.createElementNS(XUL_NAMESPACE_, "separator");
-        separator.setAttribute("class", "groove");
-        account_box.appendChild(separator);
-    }
+    var logfiles = getLogfiles();
+    composeEmail("xpert@sbox.tugraz.at",
+                 "[ThreadArcsJS] Auto-Email-Logs",
+                 null,
+                 logfiles);
 }
 
 
 
 /** ****************************************************************************
- * Create a string preference of all selected accounts
+ * enable or disable the highlight checkbox
  ******************************************************************************/
-function buildAccountPreference()
+function toggleHighlight()
 {
-    var account_box = document.getElementById("enableaccounts");
-    var pref = document.getElementById("hidden_disabledaccounts");
-    
-    var prefstring = "";
-    
-    var checkboxes = account_box.getElementsByAttribute("checkboxtype", "account");
-    
-    for (var i = 0; i < checkboxes.length; i++)
-    {
-        var checkbox = checkboxes.item(i);
-        if (! checkbox.checked)
-        {
-            prefstring += " " + checkbox.getAttribute("accountkey");
-        }
-        
-        var folder_checkboxes = account_box.getElementsByAttribute("checkboxtype", "folder");
-        for (var j = 0; j < folder_checkboxes.length; j++)
-        {
-            var folder_checkbox = folder_checkboxes.item(j);
-            if (folder_checkbox.getAttribute("accountkey") == checkbox.getAttribute("accountkey"))
-            {
-                if (checkbox.checked)
-                {
-                    folder_checkbox.disabled = false;
-                }
-                else
-                {
-                    folder_checkbox.disabled = true;
-                }
-            }
-        }
-        
-    }
-    pref.value = prefstring;
+    var colourradio = document.getElementById("visualisationcolourauthor");
+    var highlightcheckbox = document.getElementById("visualisationhighlight");
+    if (colourradio.selected)
+        highlightcheckbox.disabled = false;
+    else
+        highlightcheckbox.disabled = true;
 }
 
 
 
 /** ****************************************************************************
- * Create a string preference of all selected folders
+ * enable or disable the debug checkbox
  ******************************************************************************/
-function buildFolderPreference()
+function toggleLogging()
 {
-    var account_box = document.getElementById("enableaccounts");
-    var pref = document.getElementById("hidden_disabledfolders");
-    
-    var prefstring = "";
-    
-    var checkboxes = account_box.getElementsByAttribute("checkboxtype", "folder");
-    
-    for (var i = 0; i < checkboxes.length; i++)
-    {
-        var checkbox = checkboxes.item(i);
-        if (! checkbox.checked)
-        {
-            prefstring += checkbox.getAttribute("folderuri") + " ";
-        }
-    }
-    pref.value = prefstring;
+    var logcheckbox = document.getElementById("dologging");
+    var debugcheckbox = document.getElementById("dologgingdebug");
+    if (logcheckbox.checked)
+        debugcheckbox.disabled = false;
+    else
+        debugcheckbox.disabled = true;
+}
+
+
+
+/** ****************************************************************************
+ * write an email to the author
+ ******************************************************************************/
+function writeEmail()
+{
+    composeEmail("xpert@sbox.tugraz.at",
+                 "[ThreadArcsJS] <insert subject here>", null)
 }

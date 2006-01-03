@@ -443,6 +443,44 @@ Visualisation.prototype.getResize = function(xcount,
 
 
 /** ****************************************************************************
+ * Move visualisation to show current message
+ ******************************************************************************/
+Visualisation.prototype.moveVisualisation = function(container)
+{
+    // get current left margin
+    var old_margin = this.stack_.style.marginLeft;
+    old_margin = parseInt(old_margin.replace(/px/, ""));
+    var new_margin = old_margin;
+    
+    var original_width = this.box_.boxObject.width;
+    var original_height = this.box_.boxObject.height;
+    var height = original_height * this.zoom_;
+    
+    if (container.x_position_ * this.resize_ + old_margin > original_width)
+    {
+        // calculate necessary margin
+        new_margin = - (container.x_position_ * this.resize_ - original_width) 
+                     - (this.spacing_ * this.resize_);
+        
+        // if we already see the selected message, don't move any further
+        if (new_margin > old_margin)
+        {
+            new_margin = old_margin;
+        }
+    }
+    if (container.x_position_ * this.resize_ + old_margin < (this.spacing_ / 2) * this.resize_)
+    {
+        // calculate necessary margin
+        new_margin = (- container.x_position_ + (this. spacing_ / 2))* this.resize_;
+    }
+    
+    this.stack_.style.marginLeft = new_margin + "px";
+    this.stack_.style.marginTop = (original_height / 2 - height / 2) + "px";
+}
+
+
+
+/** ****************************************************************************
  * observe preferences change
  ******************************************************************************/
 Visualisation.prototype.observe = function(subject, topic, data)
@@ -726,10 +764,6 @@ Visualisation.prototype.visualise = function(container)
                         {"action" : "start",
                          "container" : container.toString()});
 
-    // clear visualisation
-    //this.createStack();
-    //this.clearStack();
-
     // check if we are still in the same thread as last time
     // if not, reset zoom level
     if (! this.currentcontainer_ || 
@@ -835,7 +869,7 @@ Visualisation.prototype.visualise = function(container)
         // if we are using more than one colour
         var circle = this.pref_colour_ == "single" ? false : true;
 
-        // at the moment, always flash
+        // at the moment, don't flash
         // note: dot only flashes if circle == true
         var flash = false;
 
@@ -993,7 +1027,7 @@ Visualisation.prototype.visualiseExisting = function(container)
         // if we are using more than one colour
         var circle = this.pref_colour_ == "single" ? false : true;
 
-        // at the moment, always flash
+        // at the moment, don't flash
         // note: dot only flashes if circle == true
         var flash = false;
 
@@ -1014,66 +1048,8 @@ Visualisation.prototype.visualiseExisting = function(container)
     // selected message is visible
     this.moveVisualisation(container);
     
-    /*
-    // undo all circles
-    for (var i in this.containervisualisations_)
-    {
-        this.containervisualisations_[i].stopFlash();
-    }
-    
-    // draw new circle
-    this.containervisualisations_[container].startFlash();
-    */
     // underline authors if enabled
     this.colourAuthors(this.authors_);
-}
-
-
-
-/** ****************************************************************************
- * Move visualisation to show current message
- ******************************************************************************/
-Visualisation.prototype.moveVisualisation = function(container)
-{
-    // get current left margin
-    var old_margin = this.stack_.style.marginLeft;
-    old_margin = parseInt(old_margin.replace(/px/, ""));
-    var new_margin = old_margin;
-    
-    var original_width = this.box_.boxObject.width;
-    var original_height = this.box_.boxObject.height;
-    var height = original_height * this.zoom_;
-    
-    if (container.x_position_ * this.resize_ + old_margin > original_width)
-    {
-        // calculate necessary margin
-        new_margin = - (container.x_position_ * this.resize_ - original_width) 
-                     - (this.spacing_ * this.resize_);
-        
-        // if we already see the selected message, don't move any further
-        if (new_margin > old_margin)
-        {
-            new_margin = old_margin;
-        }
-    }
-    if (container.x_position_ * this.resize_ + old_margin < (this.spacing_ / 2) * this.resize_)
-    {
-        // calculate necessary margin
-        new_margin = (- container.x_position_ + (this. spacing_ / 2))* this.resize_;
-    }
-    
-    this.stack_.style.marginLeft = new_margin + "px";
-    this.stack_.style.marginTop = (original_height / 2 - height / 2) + "px";
-}
-
-
-
-/** ****************************************************************************
- * Reset Zoom level
- ******************************************************************************/
-Visualisation.prototype.zoomReset = function()
-{
-    this.zoom_ = 1.0;
 }
 
 
@@ -1115,6 +1091,16 @@ Visualisation.prototype.zoomOut = function(amount)
     this.zoom_timeout_ = setTimeout(function() {ref.visualise();}, 500);
     
     LOGGER_.log("zoom", {"action" : "out", "zoomlevel" : this.zoom_, "delta" : amount});
+}
+
+
+
+/** ****************************************************************************
+ * Reset Zoom level
+ ******************************************************************************/
+Visualisation.prototype.zoomReset = function()
+{
+    this.zoom_ = 1.0;
 }
 
 

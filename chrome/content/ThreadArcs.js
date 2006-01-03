@@ -276,95 +276,6 @@ function ThreadArcs()
 
 
 /** ****************************************************************************
- * Add all messages from current account
- ******************************************************************************/
-ThreadArcs.prototype.addMessages = function()
-{
-    if (! THREADARCS_ENABLED_)
-        return;
-    if (! this.checkEnabledAccountOrFolder())
-        return;
-
-    LOGGER_.log("addmessages", {"action" : "start"});
-    this.add_messages_start_time = new Date();
-    this.loading_ = true;
-    this.loaded_ = false;
-
-    this.add_messages_done_ = false;
-
-    // get root folder
-    var folder = GetLoadedMsgFolder();
-    var root = folder.rootFolder;
-
-    this.server_ = folder.server;
-    this.account_ = (Components.classes["@mozilla.org/messenger/account-manager;1"]
-                    .getService(Components.interfaces.nsIMsgAccountManager))
-                    .FindAccountForServer(this.server_);
-
-    this.folders_ = new Array();
-    this.getAllFolders(root);
-
-    this.waitForAddMessages();
-}
-
-
-
-/** ****************************************************************************
- * Wait until all messages are added
- ******************************************************************************/
-ThreadArcs.prototype.waitForAddMessages = function()
-{
-    if (! THREADARCS_ENABLED_)
-        return;
-    
-    if (! this.checkEnabledAccountOrFolder())
-        return;
-
-    if (this.add_messages_done_)
-    {
-        this.loaded_ = true;
-        this.loading_ = false;
-        this.add_messages_end_time = new Date();
-        var duration = this.add_messages_end_time - this.add_messages_start_time;
-        LOGGER_.log("addmessages", {"action" : "end", "time" : duration});
-        return;
-    }
-
-    // if we are already adding messages, wait until we are finished
-    // to look at new folder
-    if (this.add_messages_from_folder_doing_)
-    {
-        var ref = this;
-        setTimeout(function(){ref.waitForAddMessages();}, 10);
-        return;
-    }
-
-
-    // look at next folder
-    var folder = this.folders_.shift();
-    LOGGER_.logDebug("ThreadArcs.waitForAddMessages()",
-                        {"action" : "next folder",
-                         "folder" : folder});
-
-    // if folder == null, we don't have any folders left to look at
-    if (folder == null)
-    {
-        this.add_messages_done_ = true;
-    }
-    else
-    {
-        this.add_messages_from_folder_doing_ = true;
-        this.add_messages_from_folder_done_ = false;
-        this.addMessagesFromFolder(folder);
-    }
-
-    var ref = this;
-    setTimeout(function(){ref.waitForAddMessages();}, 10);
-}
-
-
-
-/** ****************************************************************************
  * Add a message to the threader
  ******************************************************************************/
 ThreadArcs.prototype.addMessage = function(header)
@@ -398,6 +309,40 @@ ThreadArcs.prototype.addMessage = function(header)
 
     message.setSent(issent);
     this.threader_.addMessage(message);
+}
+
+
+
+/** ****************************************************************************
+ * Add all messages from current account
+ ******************************************************************************/
+ThreadArcs.prototype.addMessages = function()
+{
+    if (! THREADARCS_ENABLED_)
+        return;
+    if (! this.checkEnabledAccountOrFolder())
+        return;
+
+    LOGGER_.log("addmessages", {"action" : "start"});
+    this.add_messages_start_time = new Date();
+    this.loading_ = true;
+    this.loaded_ = false;
+
+    this.add_messages_done_ = false;
+
+    // get root folder
+    var folder = GetLoadedMsgFolder();
+    var root = folder.rootFolder;
+
+    this.server_ = folder.server;
+    this.account_ = (Components.classes["@mozilla.org/messenger/account-manager;1"]
+                    .getService(Components.interfaces.nsIMsgAccountManager))
+                    .FindAccountForServer(this.server_);
+
+    this.folders_ = new Array();
+    this.getAllFolders(root);
+
+    this.waitForAddMessages();
 }
 
 
@@ -490,52 +435,6 @@ ThreadArcs.prototype.addMessagesFromFolderEnumerator = function(enumerator)
                         {"action" : "end"});
     this.add_messages_from_folder_done_ = true;
     this.add_messages_from_folder_doing_ = false;
-}
-
-
-
-/** ****************************************************************************
- * Build a list of all folders to add messages from
- ******************************************************************************/
-ThreadArcs.prototype.getAllFolders = function(folder)
-{
-    if (! THREADARCS_ENABLED_)
-        return;
-    if (! this.checkEnabledAccountOrFolder())
-        return
-
-
-    LOGGER_.logDebug("ThreadArcs.getAllFolders()",
-                        {"folder" : folder.URI});
-    var folder_enumerator = folder.GetSubFolders();
-    var current_folder = null;
-    while (true)
-    {
-        try
-        {
-            current_folder = folder_enumerator.currentItem();
-        }
-        catch (Exception)
-        {
-            break;
-        }
-
-        if (current_folder instanceof Components.interfaces.nsIMsgFolder)
-            this.folders_.push(current_folder);
-
-        if (current_folder.hasSubFolders)
-            this.getAllFolders(current_folder);
-
-        try
-        {
-            folder_enumerator.next();
-        }
-        catch (Exception)
-        {
-            break;
-        }
-    }
-
 }
 
 
@@ -655,6 +554,43 @@ ThreadArcs.prototype.clearVisualisation = function()
 
 
 /** ****************************************************************************
+ * create thread arcs xul box
+ ******************************************************************************/
+function createBox()
+{
+    if (document.getElementById("ThreadArcsJSBox"))
+        return;
+
+    var box = document.createElementNS(XUL_NAMESPACE_, "vbox");
+    box.setAttribute("id", "ThreadArcsJSBox");
+    box.setAttribute("minheight", 50);
+    box.setAttribute("minwidth", 200);
+    box.setAttribute("flex", 2);
+    box.setAttribute("align", "right");
+    box.setAttribute("context", "ThreadArcsJSPopUp");
+    
+    var headerbox = document.getElementById("expandedHeaderView");
+    headerbox.appendChild(box);
+}
+
+
+
+/** ****************************************************************************
+ * delete thread arcs xul box
+ ******************************************************************************/
+function deleteBox()
+{
+    var box = document.getElementById("ThreadArcsJSBox");
+    if (! box)
+        return;
+
+    var headerbox = document.getElementById("expandedHeaderView");
+    headerbox.removeChild(box);
+}
+
+
+
+/** ****************************************************************************
  * thread all messages
  ******************************************************************************/
 ThreadArcs.prototype.doThreading = function()
@@ -689,6 +625,51 @@ ThreadArcs.prototype.doThreading = function()
 
 
 /** ****************************************************************************
+ * Build a list of all folders to add messages from
+ ******************************************************************************/
+ThreadArcs.prototype.getAllFolders = function(folder)
+{
+    if (! THREADARCS_ENABLED_)
+        return;
+    if (! this.checkEnabledAccountOrFolder())
+        return
+
+
+    LOGGER_.logDebug("ThreadArcs.getAllFolders()",
+                        {"folder" : folder.URI});
+    var folder_enumerator = folder.GetSubFolders();
+    var current_folder = null;
+    while (true)
+    {
+        try
+        {
+            current_folder = folder_enumerator.currentItem();
+        }
+        catch (Exception)
+        {
+            break;
+        }
+
+        if (current_folder instanceof Components.interfaces.nsIMsgFolder)
+            this.folders_.push(current_folder);
+
+        if (current_folder.hasSubFolders)
+            this.getAllFolders(current_folder);
+
+        try
+        {
+            folder_enumerator.next();
+        }
+        catch (Exception)
+        {
+            break;
+        }
+    }
+}
+
+
+
+/** ****************************************************************************
  * add all messages
  * if not already done
  ******************************************************************************/
@@ -707,6 +688,156 @@ ThreadArcs.prototype.initMessages = function()
         var ref = this;
         setTimeout(function(){ref.addMessages();}, 100);
     }
+}
+
+
+
+/** ****************************************************************************
+ * called when new folder added
+ ******************************************************************************/
+ThreadArcs.prototype.onFolderAdded = function(folder)
+{
+    if (! this.checkEnabledAccountOrFolder(folder))
+        return
+    
+    if (! this.loaded_)
+        return;
+    
+    if (this.add_messages_from_folder_doing_)
+        return;
+    
+    var start = new Date();
+    LOGGER_.log("addadditionalmessagesfolder", {"action" : "start"});
+    // added new message to folder
+    if (folder instanceof Components.interfaces.nsIMsgFolder)
+    {
+        this.add_messages_from_folder_done_ = false;
+        this.add_messages_from_folder_doing_ = false;
+        this.addMessagesFromFolder(folder);
+        this.onFolderAddedWaitForThreading();
+    }
+    var end = new Date();
+    var duration = end - start;
+    LOGGER_.log("addadditionalmessagesfolder", {"action" : "end", "time" : duration});
+}
+
+
+
+/** ****************************************************************************
+ * called to wait to thread new folder
+ ******************************************************************************/
+ThreadArcs.prototype.onFolderAddedWaitForThreading = function()
+{
+    if (this.add_messages_from_folder_done_)
+    {
+        this.threader_.thread();
+        this.onFolderAddedWaitForVisualisation();
+        return;
+    }
+    else
+    {
+        var ref = this;
+        setTimeout(function(){ref.onFolderAddedWaitForThreading();}, 10);
+    }
+}
+
+
+
+/** ****************************************************************************
+ * called to wait to thread new folder
+ ******************************************************************************/
+ThreadArcs.prototype.onFolderAddedWaitForVisualisation = function()
+{
+    if (this.threader_.getDone())
+    {
+        this.setSelectedMessage()
+        return;
+    }
+    else
+    {
+        var ref = this;
+        setTimeout(function(){ref.onFolderAddedWaitForVisualisation();}, 10);
+    }
+}
+
+
+
+/** ****************************************************************************
+ * called when new messages arrive
+ * either from server or moved from one folder to the other (only POP!!)
+ ******************************************************************************/
+ThreadArcs.prototype.onItemAdded = function(parentItem, item, view)
+{
+    var start = new Date();
+    LOGGER_.log("addadditionalmessages", {"action" : "start"});
+    // added new message to folder
+    if (item instanceof Components.interfaces.nsIMsgDBHdr)
+    {
+        this.addMessage(item);
+        this.threader_.thread();
+    }
+    var end = new Date();
+    var duration = end - start;
+    LOGGER_.log("addadditionalmessages", {"action" : "end", "time" : duration});
+}
+
+
+
+/** ****************************************************************************
+ * called when messages are deleted
+ * not called at the moment
+ ******************************************************************************/
+ThreadArcs.prototype.onItemRemoved = function(parentItem, item, view)
+{
+    var start = new Date();
+    LOGGER_.log("deletemessage", {"action" : "start"});
+    // added new message to folder
+    if (item instanceof Components.interfaces.nsIMsgDBHdr)
+    {
+        var container = this.threader_.findContainer(item.messageId);
+        if (container)
+        {
+            container.setMessage(null);
+        }
+    }
+    var end = new Date();
+    var duration = end - start;
+    LOGGER_.log("deletemessage", {"action" : "end", "time" : duration});
+}
+
+
+
+/** ****************************************************************************
+ * "enabledaccounts" preference changed
+ ******************************************************************************/
+function preferenceDisabledAccountsChanged(value)
+{
+    THREADARCS_ENABLEDACCOUNTS_ = value;
+    createThreadArcs();
+    THREADARCS_.doLoad.onStartHeaders();
+}
+
+
+
+/** ****************************************************************************
+ * "enabled" preference changed
+ ******************************************************************************/
+function preferenceEnabledChanged(value)
+{
+    THREADARCS_ENABLED_ = value;
+    createThreadArcs();
+}
+
+
+
+/** ****************************************************************************
+ * "disabledfolders" preference changed
+ ******************************************************************************/
+function preferenceDisabledFoldersChanged(value)
+{
+    THREADARCS_DISABLEDFOLDERS_ = value;
+    createThreadArcs();
+    THREADARCS_.doLoad.onStartHeaders();
 }
 
 
@@ -783,6 +914,38 @@ ThreadArcs.prototype.unloadHandler = function()
 
 
 /** ****************************************************************************
+ * Visualise a container
+ ******************************************************************************/
+ThreadArcs.prototype.visualise = function(container)
+{
+    if (! THREADARCS_ENABLED_)
+        return;
+    if (! this.checkEnabledAccountOrFolder())
+        return
+
+
+    LOGGER_.logDebug("ThreadArcs.visualise()",
+                        {"container" : container});
+
+    var msgkey = container.isDummy() ? 
+                    "DUMMY" : 
+                    container.getMessage().getKey();
+    var topcontainer_msgKey = container.getTopContainer().isDummy() ? 
+                                    "DUMMY" : 
+                                    container.getTopContainer().getMessage().getKey();
+    var msgcount = container.getTopContainer().getCountRecursive();
+
+    LOGGER_.log("visualise",
+                    {"msgkey" : msgkey,
+                     "top container" : topcontainer_msgKey,
+                     "msgcount" : msgcount});
+
+    this.visualisation_.visualise(container);
+}
+
+
+
+/** ****************************************************************************
  * visualise a message id
  * find the container
  * call method visualise(container)
@@ -818,33 +981,56 @@ ThreadArcs.prototype.visualiseMsgId = function(message_id)
 
 
 /** ****************************************************************************
- * Visualise a container
+ * Wait until all messages are added
  ******************************************************************************/
-ThreadArcs.prototype.visualise = function(container)
+ThreadArcs.prototype.waitForAddMessages = function()
 {
     if (! THREADARCS_ENABLED_)
         return;
+    
     if (! this.checkEnabledAccountOrFolder())
-        return
+        return;
+
+    if (this.add_messages_done_)
+    {
+        this.loaded_ = true;
+        this.loading_ = false;
+        this.add_messages_end_time = new Date();
+        var duration = this.add_messages_end_time - this.add_messages_start_time;
+        LOGGER_.log("addmessages", {"action" : "end", "time" : duration});
+        return;
+    }
+
+    // if we are already adding messages, wait until we are finished
+    // to look at new folder
+    if (this.add_messages_from_folder_doing_)
+    {
+        var ref = this;
+        setTimeout(function(){ref.waitForAddMessages();}, 10);
+        return;
+    }
 
 
-    LOGGER_.logDebug("ThreadArcs.visualise()",
-                        {"container" : container});
+    // look at next folder
+    var folder = this.folders_.shift();
+    LOGGER_.logDebug("ThreadArcs.waitForAddMessages()",
+                        {"action" : "next folder",
+                         "folder" : folder});
 
-    var msgkey = container.isDummy() ? 
-                    "DUMMY" : 
-                    container.getMessage().getKey();
-    var topcontainer_msgKey = container.getTopContainer().isDummy() ? 
-                                    "DUMMY" : 
-                                    container.getTopContainer().getMessage().getKey();
-    var msgcount = container.getTopContainer().getCountRecursive();
+    // if folder == null, we don't have any folders left to look at
+    if (folder == null)
+    {
+        this.add_messages_done_ = true;
+    }
+    else
+    {
+        this.add_messages_from_folder_doing_ = true;
+        this.add_messages_from_folder_done_ = false;
+        this.addMessagesFromFolder(folder);
+    }
 
-    LOGGER_.log("visualise",
-                    {"msgkey" : msgkey,
-                     "top container" : topcontainer_msgKey,
-                     "msgcount" : msgcount});
-
-    this.visualisation_.visualise(container);
+    var ref = this;
+    setTimeout(function(){ref.waitForAddMessages();}, 10);
 }
 
 
@@ -875,192 +1061,5 @@ ThreadArcs.prototype.waitForThreading = function()
     {
         var ref = this;
         setTimeout(function(){ref.waitForThreading();}, 100);
-    }
-}
-
-
-
-/** ****************************************************************************
- * "enabled" preference changed
- ******************************************************************************/
-function preferenceEnabledChanged(value)
-{
-    THREADARCS_ENABLED_ = value;
-    createThreadArcs();
-}
-
-
-
-/** ****************************************************************************
- * "enabledaccounts" preference changed
- ******************************************************************************/
-function preferenceDisabledAccountsChanged(value)
-{
-    THREADARCS_ENABLEDACCOUNTS_ = value;
-    createThreadArcs();
-    THREADARCS_.doLoad.onStartHeaders();
-}
-
-
-
-/** ****************************************************************************
- * "disabledfolders" preference changed
- ******************************************************************************/
-function preferenceDisabledFoldersChanged(value)
-{
-    THREADARCS_DISABLEDFOLDERS_ = value;
-    createThreadArcs();
-    THREADARCS_.doLoad.onStartHeaders();
-}
-
-
-
-/** ****************************************************************************
- * create thread arcs xul box
- ******************************************************************************/
-function createBox()
-{
-    if (document.getElementById("ThreadArcsJSBox"))
-        return;
-
-    var box = document.createElementNS(XUL_NAMESPACE_, "vbox");
-    box.setAttribute("id", "ThreadArcsJSBox");
-    box.setAttribute("minheight", 50);
-    box.setAttribute("minwidth", 200);
-    box.setAttribute("flex", 2);
-    box.setAttribute("align", "right");
-    box.setAttribute("context", "ThreadArcsJSPopUp");
-    
-    var headerbox = document.getElementById("expandedHeaderView");
-    headerbox.appendChild(box);
-}
-
-
-
-/** ****************************************************************************
- * delete thread arcs xul box
- ******************************************************************************/
-function deleteBox()
-{
-    var box = document.getElementById("ThreadArcsJSBox");
-    if (! box)
-        return;
-
-    var headerbox = document.getElementById("expandedHeaderView");
-    headerbox.removeChild(box);
-}
-
-
-
-/** ****************************************************************************
- * called when new messages arrive
- * either from server or moved from one folder to the other (only POP!!)
- ******************************************************************************/
-ThreadArcs.prototype.onItemAdded = function(parentItem, item, view)
-{
-    var start = new Date();
-    LOGGER_.log("addadditionalmessages", {"action" : "start"});
-    // added new message to folder
-    if (item instanceof Components.interfaces.nsIMsgDBHdr)
-    {
-        this.addMessage(item);
-        this.threader_.thread();
-    }
-    var end = new Date();
-    var duration = end - start;
-    LOGGER_.log("addadditionalmessages", {"action" : "end", "time" : duration});
-}
-
-
-
-/** ****************************************************************************
- * called when messages are deleted
- * not called at the moment
- ******************************************************************************/
-ThreadArcs.prototype.onItemRemoved = function(parentItem, item, view)
-{
-    var start = new Date();
-    LOGGER_.log("deletemessage", {"action" : "start"});
-    // added new message to folder
-    if (item instanceof Components.interfaces.nsIMsgDBHdr)
-    {
-        var container = this.threader_.findContainer(item.messageId);
-        if (container)
-        {
-            container.setMessage(null);
-        }
-    }
-    var end = new Date();
-    var duration = end - start;
-    LOGGER_.log("deletemessage", {"action" : "end", "time" : duration});
-}
-
-
-
-/** ****************************************************************************
- * called when new folder added
- ******************************************************************************/
-ThreadArcs.prototype.onFolderAdded = function(folder)
-{
-    if (! this.checkEnabledAccountOrFolder(folder))
-        return
-    
-    if (! this.loaded_)
-        return;
-    
-    if (this.add_messages_from_folder_doing_)
-        return;
-    
-    var start = new Date();
-    LOGGER_.log("addadditionalmessagesfolder", {"action" : "start"});
-    // added new message to folder
-    if (folder instanceof Components.interfaces.nsIMsgFolder)
-    {
-        this.add_messages_from_folder_done_ = false;
-        this.add_messages_from_folder_doing_ = false;
-        this.addMessagesFromFolder(folder);
-        this.onFolderAddedWaitForThreading();
-    }
-    var end = new Date();
-    var duration = end - start;
-    LOGGER_.log("addadditionalmessagesfolder", {"action" : "end", "time" : duration});
-}
-
-
-
-/** ****************************************************************************
- * called to wait to thread new folder
- ******************************************************************************/
-ThreadArcs.prototype.onFolderAddedWaitForThreading = function()
-{
-    if (this.add_messages_from_folder_done_)
-    {
-        this.threader_.thread();
-        this.onFolderAddedWaitForVisualisation();
-        return;
-    }
-    else
-    {
-        var ref = this;
-        setTimeout(function(){ref.onFolderAddedWaitForThreading();}, 10);
-    }
-}
-
-
-
-/** ****************************************************************************
- * called to wait to thread new folder
- ******************************************************************************/
-ThreadArcs.prototype.onFolderAddedWaitForVisualisation = function()
-{
-    if (this.threader_.getDone())
-    {
-        this.setSelectedMessage()
-        return;
-    }
-    else
-    {
-        var ref = this;
-        setTimeout(function(){ref.onFolderAddedWaitForVisualisation();}, 10);
     }
 }

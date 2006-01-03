@@ -35,6 +35,53 @@ function PreferenceObserver()
 
 
 /** ****************************************************************************
+ * do callbacks after preference change
+ ******************************************************************************/
+PreferenceObserver.prototype.doCallback = function()
+{
+    for (var pref in this.preferences_)
+    {
+        var value = this.preferences_[pref];
+        var array = this.callback_[pref];
+        if (array)
+        {
+            for (var key in array)
+            {
+                var func = array[key];
+                func(value);
+            }
+        }
+    }
+}
+
+
+
+/** ****************************************************************************
+ * get preference value for given preference
+ ******************************************************************************/
+PreferenceObserver.prototype.getPreference = function(pref)
+{
+    return this.preferences_[pref];
+}
+
+
+
+/** ****************************************************************************
+ * observe preferences changes
+ ******************************************************************************/
+PreferenceObserver.prototype.observe = function(subject, topic, data)
+{
+    if(topic != "nsPref:changed")
+        return;
+
+    // reload preferences
+    this.preferenceReload();
+    this.doCallback();
+}
+
+
+
+/** ****************************************************************************
  * reload preferences
  ******************************************************************************/
 PreferenceObserver.prototype.preferenceReload = function()
@@ -73,35 +120,6 @@ PreferenceObserver.prototype.register =  function()
 
 
 /** ****************************************************************************
- * unregister observer
- ******************************************************************************/
-PreferenceObserver.prototype.unregister = function()
-{
-    if(!this.pref_branch_)
-        return;
-
-    var pbi = this.pref_branch_.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
-    pbi.removeObserver("", this);
-}
-
-
-
-/** ****************************************************************************
- * observe preferences changes
- ******************************************************************************/
-PreferenceObserver.prototype.observe = function(subject, topic, data)
-{
-    if(topic != "nsPref:changed")
-        return;
-
-    // reload preferences
-    this.preferenceReload();
-    this.doCallback();
-}
-
-
-
-/** ****************************************************************************
  * register a callback hook
  ******************************************************************************/
 PreferenceObserver.prototype.registerCallback = function(preference, func)
@@ -115,31 +133,13 @@ PreferenceObserver.prototype.registerCallback = function(preference, func)
 
 
 /** ****************************************************************************
- * do callbacks after preference change
+ * unregister observer
  ******************************************************************************/
-PreferenceObserver.prototype.doCallback = function()
+PreferenceObserver.prototype.unregister = function()
 {
-    for (var pref in this.preferences_)
-    {
-        var value = this.preferences_[pref];
-        var array = this.callback_[pref];
-        if (array)
-        {
-            for (var key in array)
-            {
-                var func = array[key];
-                func(value);
-            }
-        }
-    }
-}
+    if(!this.pref_branch_)
+        return;
 
-
-
-/** ****************************************************************************
- * do callbacks after preference change
- ******************************************************************************/
-PreferenceObserver.prototype.getPreference = function(pref)
-{
-    return this.preferences_[pref];
+    var pbi = this.pref_branch_.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
+    pbi.removeObserver("", this);
 }

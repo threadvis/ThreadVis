@@ -67,16 +67,6 @@ function Logger()
 
 
 /** ****************************************************************************
- * Return if we do logging
- ******************************************************************************/
-Logger.prototype.doLogging = function()
-{
-    return this.pref_enablelogging_;
-}
-
-
-
-/** ****************************************************************************
  * close the logfile
  ******************************************************************************/
 Logger.prototype.close = function()
@@ -90,6 +80,57 @@ Logger.prototype.close = function()
                                        LOGGER_ENDTAG_.length);
         this.file_output_stream_.close();
     }
+}
+
+
+
+/** ****************************************************************************
+ * convert an object to xml
+ ******************************************************************************/
+Logger.prototype.decode = function(object)
+{
+    var logtext = "";
+    for (var key in object)
+    {
+        logtext += '<info key="' + key + '">';
+        if (typeof(object[key]) == "object")
+            logtext += this.decode(object[key]);
+        else
+            logtext += object[key];
+        logtext += "</info>";
+    }
+    return logtext;
+}
+
+
+
+/** ****************************************************************************
+ * convert an object to xml
+ * this method is called in debug mode
+ * so use CDATA blocks to escape
+ ******************************************************************************/
+Logger.prototype.decodeDebug = function(object)
+{
+    var logtext = "";
+    for (var key in object)
+    {
+        logtext += '<info key="' + key + '">';
+        logtext += "<![CDATA[";
+        logtext += object[key];
+        logtext += "]]>";
+        logtext += "</info>";
+    }
+    return logtext;
+}
+
+
+
+/** ****************************************************************************
+ * Return if we do logging
+ ******************************************************************************/
+Logger.prototype.doLogging = function()
+{
+    return this.pref_enablelogging_;
 }
 
 
@@ -144,42 +185,29 @@ Logger.prototype.logDebug = function(item,
 
 
 /** ****************************************************************************
- * convert an object to xml
+ * observe preferences changes
  ******************************************************************************/
-Logger.prototype.decode = function(object)
+Logger.prototype.observe = function(subject, topic, data)
 {
-    var logtext = "";
-    for (var key in object)
+    if(topic != "nsPref:changed")
+        return;
+
+    // reload preferences
+    this.preferenceReload();
+
+    // if logging is enabled, but not ready:
+    // this means it was just enabled, so open logfile
+    if (this.pref_enablelogging_ && ! this.ready_)
     {
-        logtext += '<info key="' + key + '">';
-        if (typeof(object[key]) == "object")
-            logtext += this.decode(object[key]);
-        else
-            logtext += object[key];
-        logtext += "</info>";
+        this.open();
     }
-    return logtext;
-}
 
-
-
-/** ****************************************************************************
- * convert an object to xml
- * this method is called in debug mode
- * so use CDATA blocks to escape
- ******************************************************************************/
-Logger.prototype.decodeDebug = function(object)
-{
-    var logtext = "";
-    for (var key in object)
+    // if logging is disabled, but ready
+    // this means it was just disabled, so close logfile
+    if (!this.pref_enablelogging_ && this.ready_)
     {
-        logtext += '<info key="' + key + '">';
-        logtext += "<![CDATA[";
-        logtext += object[key];
-        logtext += "]]>";
-        logtext += "</info>";
+        this.close();
     }
-    return logtext;
 }
 
 
@@ -209,27 +237,30 @@ Logger.prototype.open = function()
 
 
 /** ****************************************************************************
- * reset the logfile
+ * Preference changing observer
  ******************************************************************************/
-Logger.prototype.reset = function(delete_file)
+Logger.prototype.preferenceObserverRegister =  function()
 {
-    if (this.ready_)
-        this.close();
+    var prefService = Components.classes["@mozilla.org/preferences-service;1"]
+                      .getService(Components.interfaces.nsIPrefService);
+    this.pref_branch_ = prefService.getBranch(THREADARCSJS_PREF_BRANCH_);
 
-    try
-    {
-        if (delete_file && this.file_)
-            this.file_.remove(false);
-        alert(this.strings_.getString("logger.deletedfile"));
-    }
-    catch (ex)
-    {
-        alert(this.strings_.getString("logger.couldnotdeletefile"));
-        alert(ex);
-    }
+    var pbi = this.pref_branch_.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
+    pbi.addObserver("", this, false);
+}
 
-    if (this.pref_enablelogging_)
-        this.open();
+
+
+/** ****************************************************************************
+ * unregister observer
+ ******************************************************************************/
+Logger.prototype.preferenceObserverUnregister = function()
+{
+    if(!this.pref_branch_)
+        return;
+
+    var pbi = this.pref_branch_.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
+    pbi.removeObserver("", this);
 }
 
 
@@ -253,55 +284,25 @@ Logger.prototype.preferenceReload = function()
 
 
 /** ****************************************************************************
- * Preference changing observer
+ * reset the logfile
  ******************************************************************************/
-Logger.prototype.preferenceObserverRegister =  function()
+Logger.prototype.reset = function(delete_file)
 {
-    var prefService = Components.classes["@mozilla.org/preferences-service;1"]
-                      .getService(Components.interfaces.nsIPrefService);
-    this.pref_branch_ = prefService.getBranch(THREADARCSJS_PREF_BRANCH_);
-
-    var pbi = this.pref_branch_.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
-    pbi.addObserver("", this, false);
-}
-
-
-/** ****************************************************************************
- * unregister observer
- ******************************************************************************/
-Logger.prototype.preferenceObserverUnregister = function()
-{
-    if(!this.pref_branch_)
-        return;
-
-    var pbi = this.pref_branch_.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
-    pbi.removeObserver("", this);
-}
-
-
-/** ****************************************************************************
- * observe preferences changes
- ******************************************************************************/
-Logger.prototype.observe = function(subject, topic, data)
-{
-    if(topic != "nsPref:changed")
-        return;
-
-    // reload preferences
-    this.preferenceReload();
-
-    // if logging is enabled, but not ready:
-    // this means it was just enabled, so open logfile
-    if (this.pref_enablelogging_ && ! this.ready_)
-    {
-        this.open();
-    }
-
-    // if logging is disabled, but ready
-    // this means it was just disabled, so close logfile
-    if (!this.pref_enablelogging_ && this.ready_)
-    {
+    if (this.ready_)
         this.close();
-    }
-}
 
+    try
+    {
+        if (delete_file && this.file_)
+            this.file_.remove(false);
+        alert(this.strings_.getString("logger.deletedfile"));
+    }
+    catch (ex)
+    {
+        alert(this.strings_.getString("logger.couldnotdeletefile"));
+        alert(ex);
+    }
+
+    if (this.pref_enablelogging_)
+        this.open();
+}

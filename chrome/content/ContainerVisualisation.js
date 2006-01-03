@@ -81,112 +81,6 @@ function ContainerVisualisation(stack,
 
 
 /** ****************************************************************************
- * Re-Draw all elements
- ******************************************************************************/
-ContainerVisualisation.prototype.redraw = function(resize, left, top, selected, flash)
-{
-    this.resize_ = resize;
-    this.left_ = left;
-    this.top_ = top;
-    this.selected_ = selected;
-    this.flash_ = flash;
-    
-    this.redrawDot();
-    this.redrawCircle("black");
-    if (! (this.selected_ && this.draw_circle_))
-        this.hideCircle();
-    else
-        this.showCircle();
-
-    this.redrawClick();
-
-    if (this.selected_ && this.draw_circle_ && this.flash_)
-        this.startFlash();
-
-}
-
-
-
-/** ****************************************************************************
- * Create tooltip for container containing information about container
- ******************************************************************************/
-ContainerVisualisation.prototype.createToolTip = function()
-{
-    var tooltip = document.createElementNS(XUL_NAMESPACE_, "tooltip");
-    tooltip.setAttribute("orient", "vertical");
-    tooltip.setAttribute("id", "ThreadArcsJS_" + this.left_);
-
-
-    if (! this.container_.isDummy())
-    {
-        LOGGER_.logDebug("Visualisation.drawDot()",
-                            {"action" : "create tooltip start"});
-
-        // if container container message, view details
-        var authorlabel = document.createElementNS(XUL_NAMESPACE_, "label");
-        var authortext = document.createElementNS(XUL_NAMESPACE_, "label");
-        var author = document.createElementNS(XUL_NAMESPACE_, "hbox");
-        author.appendChild(authorlabel);
-        author.appendChild(authortext);
-        authorlabel.setAttribute("value",
-                                 this.strings_.getString("tooltip.from"));
-        authorlabel.style.fontWeight = "bold";
-        authortext.setAttribute("value",
-                                this.container_.getMessage().getFrom());
-
-        var datelabel = document.createElementNS(XUL_NAMESPACE_, "label");
-        var datetext = document.createElementNS(XUL_NAMESPACE_, "label");
-        var date = document.createElementNS(XUL_NAMESPACE_, "hbox");
-        date.appendChild(datelabel);
-        date.appendChild(datetext);
-        datelabel.setAttribute("value",
-                               this.strings_.getString("tooltip.date"));
-        datelabel.style.fontWeight = "bold";
-        datetext.setAttribute("value",
-                              this.container_.getMessage().getDate());
-
-        var subjectlabel = document.createElementNS(XUL_NAMESPACE_, "label");
-        var subjecttext = document.createElementNS(XUL_NAMESPACE_, "label");
-        var subject = document.createElementNS(XUL_NAMESPACE_, "hbox");
-        subject.appendChild(subjectlabel);
-        subject.appendChild(subjecttext);
-        subjectlabel.setAttribute("value",
-                                  this.strings_.getString("tooltip.subject"));
-        subjectlabel.style.fontWeight = "bold";
-        subjecttext.setAttribute("value",
-                                 this.container_.getMessage().getSubject());
-
-        tooltip.appendChild(author);
-        tooltip.appendChild(date);
-        tooltip.appendChild(subject);
-
-        LOGGER_.logDebug("Visualisation.drawDot()",
-                            {"action" : "create tooltip end"});
-    }
-    else
-    {
-        LOGGER_.logDebug("Visualisation.drawDot()",
-                            {"action" : "create missing tooltip start"});
-
-        // otherwise we display info about missing message
-        var desc1 = document.createElementNS(XUL_NAMESPACE_, "description");
-        var desc2 = document.createElementNS(XUL_NAMESPACE_, "description");
-        desc1.setAttribute("value",
-                           this.strings_.getString("tooltip.missingmessage"));
-        desc2.setAttribute("value",
-                           this.strings_.getString("tooltip.missingmessagedetail"));
-        tooltip.appendChild(desc1);
-        tooltip.appendChild(desc2);
-        LOGGER_.logDebug("Visualisation.drawDot()",
-                            {"action" : "create missing tooltip end"});
-    }
-    
-    this.stack_.appendChild(tooltip);
-}
-
-
-
-/** ****************************************************************************
  * create popup menu to delete, copy and cut messages
  ******************************************************************************/
 ContainerVisualisation.prototype.createMenu = function()
@@ -266,6 +160,84 @@ ContainerVisualisation.prototype.createMenu = function()
 
 
 /** ****************************************************************************
+ * Create tooltip for container containing information about container
+ ******************************************************************************/
+ContainerVisualisation.prototype.createToolTip = function()
+{
+    var tooltip = document.createElementNS(XUL_NAMESPACE_, "tooltip");
+    tooltip.setAttribute("orient", "vertical");
+    tooltip.setAttribute("id", "ThreadArcsJS_" + this.left_);
+
+    if (! this.container_.isDummy())
+    {
+        LOGGER_.logDebug("Visualisation.drawDot()",
+                            {"action" : "create tooltip start"});
+
+        // if container container message, view details
+        var authorlabel = document.createElementNS(XUL_NAMESPACE_, "label");
+        var authortext = document.createElementNS(XUL_NAMESPACE_, "label");
+        var author = document.createElementNS(XUL_NAMESPACE_, "hbox");
+        author.appendChild(authorlabel);
+        author.appendChild(authortext);
+        authorlabel.setAttribute("value",
+                                 this.strings_.getString("tooltip.from"));
+        authorlabel.style.fontWeight = "bold";
+        authortext.setAttribute("value",
+                                this.container_.getMessage().getFrom());
+
+        var datelabel = document.createElementNS(XUL_NAMESPACE_, "label");
+        var datetext = document.createElementNS(XUL_NAMESPACE_, "label");
+        var date = document.createElementNS(XUL_NAMESPACE_, "hbox");
+        date.appendChild(datelabel);
+        date.appendChild(datetext);
+        datelabel.setAttribute("value",
+                               this.strings_.getString("tooltip.date"));
+        datelabel.style.fontWeight = "bold";
+        datetext.setAttribute("value",
+                              this.container_.getMessage().getDate());
+
+        var subjectlabel = document.createElementNS(XUL_NAMESPACE_, "label");
+        var subjecttext = document.createElementNS(XUL_NAMESPACE_, "label");
+        var subject = document.createElementNS(XUL_NAMESPACE_, "hbox");
+        subject.appendChild(subjectlabel);
+        subject.appendChild(subjecttext);
+        subjectlabel.setAttribute("value",
+                                  this.strings_.getString("tooltip.subject"));
+        subjectlabel.style.fontWeight = "bold";
+        subjecttext.setAttribute("value",
+                                 this.container_.getMessage().getSubject());
+
+        tooltip.appendChild(author);
+        tooltip.appendChild(date);
+        tooltip.appendChild(subject);
+
+        LOGGER_.logDebug("Visualisation.drawDot()",
+                            {"action" : "create tooltip end"});
+    }
+    else
+    {
+        LOGGER_.logDebug("Visualisation.drawDot()",
+                            {"action" : "create missing tooltip start"});
+
+        // otherwise we display info about missing message
+        var desc1 = document.createElementNS(XUL_NAMESPACE_, "description");
+        var desc2 = document.createElementNS(XUL_NAMESPACE_, "description");
+        desc1.setAttribute("value",
+                           this.strings_.getString("tooltip.missingmessage"));
+        desc2.setAttribute("value",
+                           this.strings_.getString("tooltip.missingmessagedetail"));
+        tooltip.appendChild(desc1);
+        tooltip.appendChild(desc2);
+        LOGGER_.logDebug("Visualisation.drawDot()",
+                            {"action" : "create missing tooltip end"});
+    }
+    
+    this.stack_.appendChild(tooltip);
+}
+
+
+
+/** ****************************************************************************
  * cut message
  * don't do anything until we paste the message
  * just remember which message we have to cut
@@ -278,38 +250,6 @@ ContainerVisualisation.prototype.cut = function()
                     COPY_MESSAGE_.getMessage().getKey();
     LOGGER_.log("copycut", {"action" : "cutmessage",
                             "msgkey" : msgkey});
-}
-
-
-
-/** ****************************************************************************
- * paste a previously cut message in this thread
- ******************************************************************************/
-ContainerVisualisation.prototype.paste = function()
-{
-    if (COPY_MESSAGE_)
-    {
-        var copy_parent = COPY_MESSAGE_.getParent();
-        this.container_.addChild(COPY_MESSAGE_);
-        
-        var this_msgid = ! this.container_.isDummy() ? this.container_.getMessage().getId() : "";
-        var this_msgkey = ! this.container_.isDummy() ? this.container_.getMessage().getKey() : "";
-        var copy_message_msgid = ! COPY_MESSAGE_.isDummy() ? COPY_MESSAGE_.getMessage().getId() : "";
-        var copy_message_msgkey = ! COPY_MESSAGE_.isDummy() ? COPY_MESSAGE_.getMessage().getKey() : "";
-        var copy_message_parent_msgid = ! copy_parent.isDummy() ? copy_parent.getMessage().getId() : "";
-        var copy_message_parent_msgkey = ! copy_parent.isDummy() ? copy_parent.getMessage().getKey() : "";
-        
-        if (this_msgid != "" && copy_message_msgid != "")
-        {
-            THREADARCS_.threader_.copycut_.addCut(copy_message_msgid + " " + copy_message_parent_msgid);
-            THREADARCS_.threader_.copycut_.addCopy(copy_message_msgid + " " + this_msgid);
-            THREADARCS_.setSelectedMessage();
-            
-            LOGGER_.log("copycut", {"action" : "pastemessage",
-                                    "copied-msgkey" : copy_message_msgkey,
-                                    "pasted-msgkey" : this_msgkey});
-        }
-    }
 }
 
 
@@ -354,11 +294,229 @@ ContainerVisualisation.prototype.drawCircle = function(colour)
 
 
 /** ****************************************************************************
+ * Draw container around dot to catch click events and show tooltip
+ ******************************************************************************/
+ContainerVisualisation.prototype.drawClick = function()
+{
+    if (! this.click_)
+        this.click_ = document.createElementNS(XUL_NAMESPACE_, "box");
+
+    this.visualiseClick();
+
+    this.stack_.appendChild(this.click_);
+    this.click_.addEventListener("click", this.onMouseClick, true);
+}
+
+
+
+/** ****************************************************************************
+ * Draw dot for container
+ ******************************************************************************/
+ContainerVisualisation.prototype.drawDot = function()
+{
+    this.dot_ = document.createElementNS(XUL_NAMESPACE_, "box");
+
+    this.visualiseDot();
+
+    this.stack_.appendChild(this.dot_);
+}
+
+
+
+/** ****************************************************************************
+ * Flash (show and hide) circle to draw attention to selected container
+ ******************************************************************************/
+ContainerVisualisation.prototype.flash = function()
+{
+    if (this.flashcount_ == 0)
+    {
+        clearTimeout(this.flashtimeout_);
+        return;
+    }
+
+    this.flashcount_--;
+
+    var ref = this;
+    this.flashontimout_ = setTimeout(function() {ref.flashOn();}, 10);
+}
+
+
+
+/** ****************************************************************************
+ * Hide circle
+ ******************************************************************************/
+ContainerVisualisation.prototype.flashOff = function(old)
+{
+    this.showCircle();
+    var ref = this;
+    this.flashtimeout_ = setTimeout(function() {ref.flash();}, 500);
+}
+
+
+
+/** ****************************************************************************
+ * Show circle
+ ******************************************************************************/
+ContainerVisualisation.prototype.flashOn = function()
+{
+    this.hideCircle();
+    var ref = this;
+    this.flashofftimeout_ = setTimeout(function() {ref.flashOff();}, 500);
+}
+
+
+
+/** ****************************************************************************
+ * Hide circle
+ ******************************************************************************/
+ContainerVisualisation.prototype.hideCircle = function()
+{
+    this.circle_.hidden = true;
+}
+
+
+
+/** ****************************************************************************
+ * mouse click event handler
+ * display message user clicked on
+ ******************************************************************************/
+ContainerVisualisation.prototype.onMouseClick = function(event)
+{
+    // only react to left mouse click
+    if (event.button != 0)
+        return;
+
+    LOGGER_.logDebug("Visualisation.onMouseClick()", {});
+    var container = event.target.container;
+    if (container && ! container.isDummy())
+        THREADARCS_.callback(container.getMessage().getKey(), 
+                             container.getMessage().getFolder());
+}
+
+
+
+/** ****************************************************************************
+ * paste a previously cut message in this thread
+ ******************************************************************************/
+ContainerVisualisation.prototype.paste = function()
+{
+    if (COPY_MESSAGE_)
+    {
+        var copy_parent = COPY_MESSAGE_.getParent();
+        this.container_.addChild(COPY_MESSAGE_);
+        
+        var this_msgid = ! this.container_.isDummy() ? this.container_.getMessage().getId() : "";
+        var this_msgkey = ! this.container_.isDummy() ? this.container_.getMessage().getKey() : "";
+        var copy_message_msgid = ! COPY_MESSAGE_.isDummy() ? COPY_MESSAGE_.getMessage().getId() : "";
+        var copy_message_msgkey = ! COPY_MESSAGE_.isDummy() ? COPY_MESSAGE_.getMessage().getKey() : "";
+        var copy_message_parent_msgid = ! copy_parent.isDummy() ? copy_parent.getMessage().getId() : "";
+        var copy_message_parent_msgkey = ! copy_parent.isDummy() ? copy_parent.getMessage().getKey() : "";
+        
+        if (this_msgid != "" && copy_message_msgid != "")
+        {
+            THREADARCS_.threader_.copycut_.addCut(copy_message_msgid + " " + copy_message_parent_msgid);
+            THREADARCS_.threader_.copycut_.addCopy(copy_message_msgid + " " + this_msgid);
+            THREADARCS_.setSelectedMessage();
+            
+            LOGGER_.log("copycut", {"action" : "pastemessage",
+                                    "copied-msgkey" : copy_message_msgkey,
+                                    "pasted-msgkey" : this_msgkey});
+        }
+    }
+}
+
+
+
+/** ****************************************************************************
+ * Re-Draw all elements
+ ******************************************************************************/
+ContainerVisualisation.prototype.redraw = function(resize,
+                                                   left,
+                                                   top,
+                                                   selected,
+                                                   flash)
+{
+    this.resize_ = resize;
+    this.left_ = left;
+    this.top_ = top;
+    this.selected_ = selected;
+    this.flash_ = flash;
+    
+    this.redrawDot();
+    this.redrawCircle("black");
+    if (! (this.selected_ && this.draw_circle_))
+        this.hideCircle();
+    else
+        this.showCircle();
+
+    this.redrawClick();
+
+    if (this.selected_ && this.draw_circle_ && this.flash_)
+        this.startFlash();
+}
+
+
+
+/** ****************************************************************************
  * Re-Draw circle around container if container is selected
  ******************************************************************************/
 ContainerVisualisation.prototype.redrawCircle = function(colour)
 {
     this.visualiseCircle(colour);
+}
+
+
+
+/** ****************************************************************************
+ * Re-Draw container around dot to catch click events and show tooltip
+ ******************************************************************************/
+ContainerVisualisation.prototype.redrawClick = function()
+{
+    this.visualiseClick();
+}
+
+
+
+/** ****************************************************************************
+ * Re-Draw dot for container
+ ******************************************************************************/
+ContainerVisualisation.prototype.redrawDot = function()
+{
+    this.visualiseDot();
+}
+
+
+
+/** ****************************************************************************
+ * Show circle
+ ******************************************************************************/
+ContainerVisualisation.prototype.showCircle = function()
+{
+    this.circle_.hidden = false;
+}
+
+
+
+/** ****************************************************************************
+ * Flash (show and hide) circle to draw attention to selected container
+ ******************************************************************************/
+ContainerVisualisation.prototype.startFlash = function()
+{
+    this.flashcount_ = 3;
+    this.flash();
+}
+
+
+
+/** ****************************************************************************
+ * Stop flashing
+ ******************************************************************************/
+ContainerVisualisation.prototype.stopFlash = function()
+{
+    clearInterval(this.flashinterval_);
+    clearTimeout(this.flashontimeout_);
+    clearTimeout(this.flashofftimeout_);
+    this.hideCircle();
 }
 
 
@@ -399,32 +557,6 @@ ContainerVisualisation.prototype.visualiseCircle = function(colour)
 
 
 /** ****************************************************************************
- * Draw container around dot to catch click events and show tooltip
- ******************************************************************************/
-ContainerVisualisation.prototype.drawClick = function()
-{
-    if (! this.click_)
-        this.click_ = document.createElementNS(XUL_NAMESPACE_, "box");
-
-    this.visualiseClick();
-
-    this.stack_.appendChild(this.click_);
-    this.click_.addEventListener("click", this.onMouseClick, true);
-}
-
-
-
-/** ****************************************************************************
- * Re-Draw container around dot to catch click events and show tooltip
- ******************************************************************************/
-ContainerVisualisation.prototype.redrawClick = function()
-{
-    this.visualiseClick();
-}
-
-
-
-/** ****************************************************************************
  * Visualise container around dot to catch click events and show tooltip
  ******************************************************************************/
 ContainerVisualisation.prototype.visualiseClick = function()
@@ -453,30 +585,6 @@ ContainerVisualisation.prototype.visualiseClick = function()
     this.click_.container = this.container_;
     this.click_.setAttribute("tooltip", "ThreadArcsJS_" + this.left_);
     this.click_.style.cursor = "default";
-}
-
-
-
-/** ****************************************************************************
- * Draw dot for container
- ******************************************************************************/
-ContainerVisualisation.prototype.drawDot = function()
-{
-    this.dot_ = document.createElementNS(XUL_NAMESPACE_, "box");
-
-    this.visualiseDot();
-
-    this.stack_.appendChild(this.dot_);
-}
-
-
-
-/** ****************************************************************************
- * Re-Draw dot for container
- ******************************************************************************/
-ContainerVisualisation.prototype.redrawDot = function()
-{
-    this.visualiseDot();
 }
 
 
@@ -519,110 +627,4 @@ ContainerVisualisation.prototype.visualiseDot = function()
     else
         this.dot_.style.MozBorderRadius = "";
     this.dot_.style.cursor = "default";
-}
-
-
-
-/** ****************************************************************************
- * Flash (show and hide) circle to draw attention to selected container
- ******************************************************************************/
-ContainerVisualisation.prototype.startFlash = function()
-{
-    this.flashcount_ = 3;
-    this.flash();
-}
-
-
-
-/** ****************************************************************************
- * Stop flashing
- ******************************************************************************/
-ContainerVisualisation.prototype.stopFlash = function()
-{
-    clearInterval(this.flashinterval_);
-    clearTimeout(this.flashontimeout_);
-    clearTimeout(this.flashofftimeout_);
-    this.hideCircle();
-}
-
-
-
-/** ****************************************************************************
- * Flash (show and hide) circle to draw attention to selected container
- ******************************************************************************/
-ContainerVisualisation.prototype.flash = function()
-{
-    if (this.flashcount_ == 0)
-    {
-        clearTimeout(this.flashtimeout_);
-        return;
-    }
-
-    this.flashcount_--;
-
-    var ref = this;
-    this.flashontimout_ = setTimeout(function() {ref.flashOn();}, 10);
-}
-
-
-
-/** ****************************************************************************
- * Show circle
- ******************************************************************************/
-ContainerVisualisation.prototype.flashOn = function()
-{
-    this.hideCircle();
-    var ref = this;
-    this.flashofftimeout_ = setTimeout(function() {ref.flashOff();}, 500);
-}
-
-
-
-/** ****************************************************************************
- * Hide circle
- ******************************************************************************/
-ContainerVisualisation.prototype.flashOff = function(old)
-{
-    this.showCircle();
-    var ref = this;
-    this.flashtimeout_ = setTimeout(function() {ref.flash();}, 500);
-}
-
-
-
-/** ****************************************************************************
- * Hide circle
- ******************************************************************************/
-ContainerVisualisation.prototype.hideCircle = function()
-{
-    this.circle_.hidden = true;
-}
-
-
-
-/** ****************************************************************************
- * Show circle
- ******************************************************************************/
-ContainerVisualisation.prototype.showCircle = function()
-{
-    this.circle_.hidden = false;
-}
-
-
-
-/** ****************************************************************************
- * mouse click event handler
- * display message user clicked on
- ******************************************************************************/
-ContainerVisualisation.prototype.onMouseClick = function(event)
-{
-    // only react to left mouse click
-    if (event.button != 0)
-        return;
-
-    LOGGER_.logDebug("Visualisation.onMouseClick()", {});
-    var container = event.target.container;
-    if (container && ! container.isDummy())
-        THREADARCS_.callback(container.getMessage().getKey(), 
-                             container.getMessage().getFolder());
 }
