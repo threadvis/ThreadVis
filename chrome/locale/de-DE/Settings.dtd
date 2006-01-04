@@ -2,7 +2,7 @@
 /* *******************************************************
  * Settings.dtd
  *
- * (c) 2005 Alexander C. Hubmann
+ * (c) 2005-2006 Alexander C. Hubmann
  *
  * DTD file containing DE localisation of UI elements
  *
@@ -25,6 +25,9 @@
 <!ENTITY logfiles.reset.button                              "Log-Dateien zur&#xFC;cksetzen">
 <!ENTITY logfiles.reset.tooltip                             "Setzt die Log-Dateien auf Gr&#xF6;&#xDF;e 0 zur&#xFC;ck. Sie k&#xF6;nnen dies tun, nachdem Sie die Log-Dateien abgeschickt haben, um Speicherplatz zu sparen.">
 <!ENTITY visualisation.tab                                  "Visualisierung">
+<!ENTITY visualisation.defaultzoom.caption                  "Maximale Gr&#xF6;&#xDF;e der Visualisierung">
+<!ENTITY visualisation.defaultzoom.width                    "fache Breite">
+<!ENTITY visualisation.defaultzoom.height                   "fache H&#xF6;he">
 <!ENTITY visualisation.enabledaccounts.caption              "Aktivierte Konten und Ordner">
 <!ENTITY visualisation.enabledaccounts.description          "Aktiviert die Erweiterung nur f&#xFC;r die ausgew&#xE4;hlten Konten und Ordner.">
 <!ENTITY visualisation.timescaling.caption                  "Time Scaling">
@@ -32,6 +35,7 @@
 <!ENTITY visualisation.timescaling.disable                  "Time Scaling deaktivieren">
 <!ENTITY visualisation.timescaling.description.disabled     "Wenn Time Scaling deaktiviert ist, ist der horizontale Abstand zwischen benachbarten Nachrichten immer konstant.">
 <!ENTITY visualisation.timescaling.description.enabled      "Wenn Time Scaling aktiviert ist, ist der horizontale Abstand zwischen benachbarten Nachrichten proportional zum zeitlichen Abstand dieser Nachrichten.">
+<!ENTITY visualisation.timeline.enable                      "Die vergangene Zeit zwischen den einzelnen Nachrichten in der Visualisierung einblenden.">
 <!ENTITY visualisation.size.caption                         "Gr&#xF6;&#xDF;e">
 <!ENTITY visualisation.size.small                           "klein">
 <!ENTITY visualisation.size.medium                          "mittel">

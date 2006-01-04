@@ -1,7 +1,7 @@
 /** ****************************************************************************
  * ArcVisualisation.js
  *
- * (c) 2005 Alexander C. Hubmann
+ * (c) 2005-2006 Alexander C. Hubmann
  *
  * JavaScript file to visualise message in thread arcs
  *

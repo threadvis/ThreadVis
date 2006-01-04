@@ -1,7 +1,7 @@
 /* *****************************************************************************
  * Logger.js
  *
- * (c) 2005 Alexander C. Hubmann
+ * (c) 2005-2006 Alexander C. Hubmann
  *
  * JavaScript file to log events
  *

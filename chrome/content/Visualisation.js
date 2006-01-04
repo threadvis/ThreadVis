@@ -1,7 +1,7 @@
 /** ****************************************************************************
  * Visualisation.js
  *
- * (c) 2005 Alexander C. Hubmann
+ * (c) 2005-2006 Alexander C. Hubmann
  *
  * JavaScript file to visualise thread arcs
  * Re-implementation from Java
@@ -17,9 +17,12 @@ var XUL_NAMESPACE_ =
 var URL_ = "chrome://threadarcsjs/content/images/";
 var THREADARCSJS_PREF_BRANCH_ = "extensions.threadarcsjs.";
 var VISUALISATION_PREF_DOTIMESCALING_ = "timescaling.enabled";
+var VISUALISATION_PREF_DOTIMELINE_ = "timeline.enabled";
 var VISUALISATION_PREF_VISUALISATIONSIZE_ = "visualisation.size";
 var VISUALISATION_PREF_VISUALISATIONCOLOUR_ = "visualisation.colour";
 var VISUALISATION_PREF_VISUALISATIONHIGHLIGHT_ = "visualisation.highlight";
+var VISUALISATION_PREF_DEFAULTZOOM_HEIGHT_ = "defaultzoom.height";
+var VISUALISATION_PREF_DEFAULTZOOM_WIDTH_ = "defaultzoom.width";
 
 var ALPHA_ = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
 
@@ -51,8 +54,11 @@ function Visualisation()
     // set default resize parameter
     this.resize_ = 1;
     this.pref_timescaling_ = false;
+    this.pref_timeline_ = false;
     this.pref_colour = "single";
     this.pref_highlight_ = false;
+    this.pref_defaultzoom_height_ = 1;
+    this.pref_defaultzoom_width_ = 1;
     this.zoom_ = 1;
 
     this.preferenceObserverRegister();
@@ -62,6 +68,7 @@ function Visualisation()
     this.containers_ = null;
     this.containervisualisations_ = null;
     this.arcvisualisations_ = null;
+    this.timeline_ = null;
 }
 
 
@@ -148,12 +155,10 @@ Visualisation.prototype.calculateSize = function(containers)
  ******************************************************************************/
 Visualisation.prototype.checkSize = function()
 {
-    /*
     if (this.box_.boxObject.height != this.box_height_)
         this.visualise();
     
     this.box_height_ = this.box_.boxObject.height;
-    */
 }
 
 
@@ -454,7 +459,7 @@ Visualisation.prototype.moveVisualisation = function(container)
     
     var original_width = this.box_.boxObject.width;
     var original_height = this.box_.boxObject.height;
-    var height = original_height * this.zoom_;
+    var height = original_height * this.zoom_ * this.pref_defaultzoom_height_;
     
     if (container.x_position_ * this.resize_ + old_margin > original_width)
     {
@@ -618,13 +623,16 @@ Visualisation.prototype.preferenceObserverUnregister = function()
  ******************************************************************************/
 Visualisation.prototype.preferenceReload = function()
 {
-    // check if preference is set to do timescaling
     var prefs = Components.classes["@mozilla.org/preferences-service;1"]
                 .getService(Components.interfaces.nsIPrefBranch);
 
     this.pref_timescaling_ = false;
     if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_DOTIMESCALING_) == prefs.PREF_BOOL)
         this.pref_timescaling_ = prefs.getBoolPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_DOTIMESCALING_);
+
+    this.pref_timeline_ = false;
+    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_DOTIMELINE_) == prefs.PREF_BOOL)
+        this.pref_timeline_ = prefs.getBoolPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_DOTIMELINE_);
 
     this.pref_colour_ = "single";
     if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONCOLOUR_) == prefs.PREF_STRING)
@@ -633,6 +641,14 @@ Visualisation.prototype.preferenceReload = function()
     this.pref_highlight_ = false;
     if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONHIGHLIGHT_) == prefs.PREF_BOOL)
         this.pref_highlight_ = prefs.getBoolPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONHIGHLIGHT_);
+
+    this.pref_defaultzoom_height_ = 1;
+    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_DEFAULTZOOM_HEIGHT_) == prefs.PREF_INT)
+        this.pref_defaultzoom_height_ = prefs.getIntPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_DEFAULTZOOM_HEIGHT_);
+
+    this.pref_defaultzoom_width_ = 1;
+    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_DEFAULTZOOM_WIDTH_) == prefs.PREF_INT)
+        this.pref_defaultzoom_width_ = prefs.getIntPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_DEFAULTZOOM_WIDTH_);
 
     var todecode = "12x12,12,12,32,6,2,24";
     if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONSIZE_) == prefs.PREF_STRING)
@@ -807,8 +823,9 @@ Visualisation.prototype.visualise = function(container)
     // do time scaling
     var original_width = this.box_.boxObject.width;
     var original_height = this.box_.boxObject.height;
-    var width = original_width * this.zoom_;
-    var height = original_height * this.zoom_;
+
+    var width = original_width * this.zoom_ * this.pref_defaultzoom_width_;
+    var height = original_height * this.zoom_ * this.pref_defaultzoom_height_;
 
     this.containers_ = this.timeScaling(this.containers_,
                                         minimaltimedifference,
@@ -977,6 +994,18 @@ Visualisation.prototype.visualise = function(container)
     var ref = this;
     clearInterval(this.check_resize_interval_);
     this.check_resize_interval_ = setInterval(function() {ref.checkSize();}, 100);
+    
+    if (this.pref_timeline_)
+    {
+        this.timeline_ = new Timeline(this.stack_,
+                                      this.strings_,
+                                      this.containers_,
+                                      this.resize_,
+                                      this.dotsize_,
+                                      (height / 2) - this.arc_min_height_ - this.dotsize_ + this.arc_width_ + 2);
+        this.timeline_.draw();
+    }
+
 }
 
 
@@ -999,8 +1028,8 @@ Visualisation.prototype.visualiseExisting = function(container)
     
     var original_width = this.box_.boxObject.width;
     var original_height = this.box_.boxObject.height;
-    var width = original_width * this.zoom_;
-    var height = original_height * this.zoom_;
+    var width = original_width * this.zoom_ * this.pref_defaultzoom_width_;
+    var height = original_height * this.zoom_ * this.pref_defaultzoom_height_;
     
     this.containers_ = this.timeScaling(this.containers_,
                                         minimaltimedifference,
@@ -1050,6 +1079,10 @@ Visualisation.prototype.visualiseExisting = function(container)
     
     // underline authors if enabled
     this.colourAuthors(this.authors_);
+    
+    if (this.pref_timeline_ && this.timeline_)
+        this.timeline_.redraw(this.resize_,
+                              (height / 2) - this.arc_min_height_ - this.dotsize_ + this.arc_width_ + 2);
 }
 
 

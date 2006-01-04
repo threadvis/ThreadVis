@@ -3,7 +3,7 @@
 /** ****************************************************************************
  * Settings.xul
  *
- * (c) 2005 Alexander C. Hubmann
+ * (c) 2005-2006 Alexander C. Hubmann
  *
  * XUL file to display settings dialog
  *
@@ -31,7 +31,10 @@
                        "hidden_disabledaccounts",
                        "hidden_disabledfolders",
                        "dotimescaling",
+                       "enabletimeline",
                        "visualisationsize",
+                       "defaultzoomwidth",
+                       "defaultzoomheight",
                        "visualisationcolour",
                        "visualisationhighlight",
                        "dologging",
@@ -96,7 +99,7 @@
                               clearhidden="true">
                         <radiogroup id="dotimescaling"
                                     prefstring="extensions.threadarcsjs.timescaling.enabled"
-                                    prefdefval="false"
+                                    prefdefval="true"
                                     preftype="bool">
                             <vbox>
                                 <radio value="false"
@@ -121,6 +124,12 @@
                                 </label>
                             </vbox>
                         </radiogroup>
+                        <separator />
+                            <checkbox id="enabletimeline"
+                                      label="&visualisation.timeline.enable;"
+                                      prefstring="extensions.threadarcsjs.timeline.enabled"
+                                      prefdefval="true"
+                                      preftype="bool" />
                     </expander>
                 </groupbox>
 
@@ -152,6 +161,26 @@
                                 <image src="images/size_16.png" />
                             </hbox>
                         </radiogroup>
+                        <separator />
+                        <groupbox>
+                            <caption label="&visualisation.defaultzoom.caption;" />
+                            <hbox>
+                                <textbox id="defaultzoomwidth"
+                                         prefstring="extensions.threadarcsjs.defaultzoom.width"
+                                         prefdefval="1"
+                                         preftype="int"
+                                         size="2" />
+                                <label value="&visualisation.defaultzoom.width;" />
+                            </hbox>
+                            <hbox>
+                                <textbox id="defaultzoomheight"
+                                         prefstring="extensions.threadarcsjs.defaultzoom.height"
+                                         prefdefval="1"
+                                         preftype="int"
+                                         size="2" />
+                                <label value="&visualisation.defaultzoom.height;" />
+                            </hbox>
+                        </groupbox>
                     </expander>
                 </groupbox>
 

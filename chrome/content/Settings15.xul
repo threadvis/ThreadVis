@@ -3,7 +3,7 @@
 /** ****************************************************************************
  * Settings15.xul
  *
- * (c) 2005 Alexander C. Hubmann
+ * (c) 2005-2006 Alexander C. Hubmann
  *
  * XUL file to display settings dialog in Thunderbird 1.5
  * We need a separate file since the format for the settings dialog
@@ -37,9 +37,18 @@
             <preference id="extensions.threadarcsjs.timescaling.enabled"
                         name="extensions.threadarcsjs.timescaling.enabled"
                         type="bool" />
+            <preference id="extensions.threadarcsjs.timeline.enabled"
+                        name="extensions.threadarcsjs.timeline.enabled"
+                        type="bool" />
             <preference id="extensions.threadarcsjs.visualisation.size"
                         name="extensions.threadarcsjs.visualisation.size"
                         type="string" />
+            <preference id="extensions.threadarcsjs.defaultzoom.height"
+                        name="extensions.threadarcsjs.defaultzoom.height"
+                        type="int" />
+            <preference id="extensions.threadarcsjs.defaultzoom.width"
+                        name="extensions.threadarcsjs.defaultzoom.width"
+                        type="int" />
             <preference id="extensions.threadarcsjs.visualisation.colour"
                         name="extensions.threadarcsjs.visualisation.colour"
                         type="string" />
@@ -121,6 +130,10 @@
                             </label>
                         </vbox>
                     </radiogroup>
+                    <separator />
+                    <checkbox id="enabletimeline"
+                              label="&visualisation.timeline.enable;"
+                              preference="extensions.threadarcsjs.timeline.enabled" />
                 </tabpanel>
 
                 <tabpanel id="visualisation.size" orient="vertical" flex="1">
@@ -144,6 +157,22 @@
                             <image src="chrome://threadarcsjs/content/images/size_16.png" />
                         </hbox>
                     </radiogroup>
+                    <separator />
+                    <groupbox>
+                        <caption label="&visualisation.defaultzoom.caption;" />
+                        <hbox>
+                            <textbox id="defaultzoomwidth"
+                                     preference="extensions.threadarcsjs.defaultzoom.width"
+                                     size="2" />
+                            <label value="&visualisation.defaultzoom.width;" />
+                        </hbox>
+                        <hbox>
+                            <textbox id="defaultzoomheight"
+                                     preference="extensions.threadarcsjs.defaultzoom.height"
+                                     size="2" />
+                            <label value="&visualisation.defaultzoom.height;" />
+                        </hbox>
+                    </groupbox>
                 </tabpanel>
 
                 <tabpanel id="visualisation.colour" orient="vertical" flex="1">

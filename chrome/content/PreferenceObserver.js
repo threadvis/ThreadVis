@@ -1,7 +1,7 @@
 /** ****************************************************************************
  * PreferenceObserver.js
  *
- * (c) 2005 Alexander C. Hubmann
+ * (c) 2005-2006 Alexander C. Hubmann
  *
  * JavaScript file to react to preference changing events
  *

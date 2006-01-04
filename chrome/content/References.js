@@ -1,7 +1,7 @@
 /** ****************************************************************************
  * References.js
  *
- * (c) 2005 Alexander C. Hubmann
+ * (c) 2005-2006 Alexander C. Hubmann
  *
  * Wrapper for references
  * Re-write from Java

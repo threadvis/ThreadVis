@@ -1,7 +1,7 @@
 /** ****************************************************************************
  * Settings.js
  *
- * (c) 2005 Alexander C. Hubmann
+ * (c) 2005-2006 Alexander C. Hubmann
  *
  * JavaScript file for settings dialog
  *
@@ -139,6 +139,10 @@ function buildAccountPreference()
         
     }
     pref.value = prefstring;
+    // We need to call doCommand(), because otherwise Thunderbird 1.5 doesn't update
+    // the underlying preference upon closing the window (i.e. ignores the new
+    // value of the textbox).
+    pref.doCommand();
 }
 
 
@@ -203,6 +207,10 @@ function buildFolderPreference()
         }
     }
     pref.value = prefstring;
+    // We need to call doCommand(), because otherwise Thunderbird 1.5 doesn't update
+    // the underlying preference upon closing the window (i.e. ignores the new
+    // value of the textbox).
+    pref.doCommand();
 }
 
 

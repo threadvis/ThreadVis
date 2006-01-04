@@ -1,7 +1,7 @@
 /** ****************************************************************************
  * ContainerVisualisation.js
  *
- * (c) 2005 Alexander C. Hubmann
+ * (c) 2005-2006 Alexander C. Hubmann
  *
  * JavaScript file to visualise message in thread arcs
  *
@@ -303,6 +303,9 @@ ContainerVisualisation.prototype.drawClick = function()
 
     this.visualiseClick();
 
+    this.click_.container = this.container_;
+    this.click_.setAttribute("tooltip", "ThreadArcsJS_" + this.left_);
+
     this.stack_.appendChild(this.click_);
     this.click_.addEventListener("click", this.onMouseClick, true);
 }
@@ -582,9 +585,8 @@ ContainerVisualisation.prototype.visualiseClick = function()
     this.click_.style.width = style_width;
     this.click_.style.height = style_height;
     this.click_.style.verticalAlign = "top";
-    this.click_.container = this.container_;
-    this.click_.setAttribute("tooltip", "ThreadArcsJS_" + this.left_);
     this.click_.style.cursor = "default";
+    this.click_.style.zIndex = "2";
 }
 
 
