@@ -172,6 +172,11 @@ Visualisation.prototype.clearStack = function()
     LOGGER_.logDebug("Visualisation.clearStack()", {});
     while(this.stack_.firstChild != null)
         this.stack_.removeChild(this.stack_.firstChild);
+    
+    // reset move
+    this.stack_.style.marginLeft = "0px";
+    this.stack_.style.marginTop = "0px";
+
 }
 
 
@@ -271,16 +276,17 @@ Visualisation.prototype.createStack = function()
     this.stack_ = document.getElementById("ThreadArcsJSStack");
     this.strings_ = document.getElementById("ThreadArcsJSStrings");
 
+    var ref = this;
     if (! this.stack_)
     {
         LOGGER_.logDebug("Visualisation.createStack()", {"action" : "create stack"});
         this.stack_ = document.createElementNS(XUL_NAMESPACE_, "stack");
         this.stack_.setAttribute("id", "ThreadArcsJSStack");
+        this.stack_.style.position = "relative";
         this.box_.appendChild(this.stack_);
-        this.box_.addEventListener("mousemove", this.onMouseMove, false);
-        this.box_.addEventListener("mousedown", this.onMouseDown, false);
-        this.box_.addEventListener("mouseup", this.onMouseUp, false);
-        var ref = this;
+        this.box_.addEventListener("mousemove", function(event) {ref.onMouseMove(event);}, false);
+        this.box_.addEventListener("mousedown", function(event) {ref.onMouseDown(event);}, false);
+        this.box_.addEventListener("mouseup", function(event) { ref.onMouseUp(event); }, false);
         this.box_.addEventListener("DOMMouseScroll", function(event) {ref.onScroll(event);}, false);
     }
     else
@@ -538,21 +544,42 @@ Visualisation.prototype.onMouseMove = function(event)
 {
     if (this.panning_)
     {
-        var box = document.getElementById("ThreadArcsJSStack");
         var x = event.clientX;
         var y = event.clientY;
         var dx = x - this.startx_;
         var dy = y - this.starty_;
-        var currentx = box.style.marginLeft.replace(/px/, "");
+        var currentx = this.stack_.style.marginLeft.replace(/px/, "");
         if (currentx == "") currentx = 0;
-        var currenty = box.style.marginTop.replace(/px/, "");
+        var currenty = this.stack_.style.marginTop.replace(/px/, "");
         if (currenty == "") currenty = 0;
         dx = parseInt(currentx) + parseInt(dx);
         dy = parseInt(currenty) + parseInt(dy);
-        box.style.marginLeft = dx + "px";
-        box.style.marginTop = dy + "px";
         this.startx_ = x;
         this.starty_ = y;
+        
+        var boxwidth = this.box_.boxObject.width;
+        var boxheight = this.box_.boxObject.height;
+        var stackwidth = this.stack_.boxObject.width;
+        var stackheight = this.stack_.boxObject.height;
+        
+        // don't move more to the right than necessary
+        if (dx > 0)
+            dx = 0;
+        
+        // don't move more to the left than necessary
+        if (dx < boxwidth - stackwidth)
+            dx = boxwidth - stackwidth;
+        
+        // don't move more to the top than necessary
+        if (dy < boxheight - stackheight)
+            dy = boxheight - stackheight;
+        
+        // don't move more to the bottom than necessary
+        if (dy > this.totalheight_ - stackheight)
+            dy = this.totalheight_ - stackheight;
+        
+        this.stack_.style.marginLeft = dx + "px";
+        this.stack_.style.marginTop = dy + "px";
     }
 }
 
@@ -954,31 +981,6 @@ Visualisation.prototype.visualise = function(container)
     // calculate if we have to move the visualisation so that the
     // selected message is visible
     this.moveVisualisation(container);
-    // get current left margin
-    var old_margin = this.stack_.style.marginLeft;
-    old_margin = parseInt(old_margin.replace(/px/, ""));
-    var new_margin = old_margin;
-    if (container.x_position_ * this.resize_ + old_margin > original_width)
-    {
-        // calculate necessary margin
-        new_margin = - (container.x_position_ * this.resize_ - original_width) 
-                     - (this.spacing_ * this.resize_);
-        
-        // if we already see the selected message, don't move any further
-        if (new_margin > old_margin)
-        {
-            new_margin = old_margin;
-        }
-    }
-    if (container.x_position_ * this.resize_ + old_margin < (this.spacing_ / 2) * this.resize_)
-    {
-        // calculate necessary margin
-        new_margin = (- container.x_position_ + (this. spacing_ / 2))* this.resize_;
-    }
-    
-    this.stack_.style.marginLeft = new_margin + "px";
-    this.stack_.style.marginTop = (original_height / 2 - height / 2) + "px";
-    
     
     // create a new box and overlay over all other elements to catch
     // all clicks and drags
@@ -1005,7 +1007,8 @@ Visualisation.prototype.visualise = function(container)
                                       (height / 2) - this.arc_min_height_ - this.dotsize_ + this.arc_width_ + 2);
         this.timeline_.draw();
     }
-
+    
+    this.totalheight_ = 2* ( (this.dotsize_ / 2) + this.arc_min_height_ + (totalmaxheight + 1) * this.arc_difference_ );
 }
 
 
@@ -1083,6 +1086,8 @@ Visualisation.prototype.visualiseExisting = function(container)
     if (this.pref_timeline_ && this.timeline_)
         this.timeline_.redraw(this.resize_,
                               (height / 2) - this.arc_min_height_ - this.dotsize_ + this.arc_width_ + 2);
+
+    this.totalheight_ = 2* ( (this.dotsize_ / 2) + this.arc_min_height_ + (totalmaxheight + 1) * this.arc_difference_ );
 }
 
 
@@ -1116,8 +1121,10 @@ Visualisation.prototype.zoomOut = function(amount)
         amount = 1;
     
     this.zoom_ = this.zoom_ - 0.1 * amount;
-    if (this.zoom_ < 1)
-        this.zoom_ = 1;
+    //if (this.zoom_ < 1)
+    //    this.zoom_ = 1;
+    if (this.zoom_ < 0.1)
+        this.zoom_ = 0.1;
     
     clearTimeout(this.zoom_timeout_);
     var ref = this;

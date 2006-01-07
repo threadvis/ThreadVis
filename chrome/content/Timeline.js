@@ -97,6 +97,7 @@ Timeline.prototype.drawTime = function(container, left, right, string, tooltip)
     elem.style.top = style_top;
     elem.style.width = style_width;
     elem.style.zIndex = "1";
+    elem.style.cursor = "move";
     
     elem.setAttribute("value", string);
     elem.setAttribute("tooltiptext", tooltip);
