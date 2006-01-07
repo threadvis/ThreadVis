@@ -529,7 +529,7 @@ ContainerVisualisation.prototype.stopFlash = function()
  ******************************************************************************/
 ContainerVisualisation.prototype.visualiseCircle = function(colour)
 {
-    var style_top = (this.top_ - ((this.dotsize_ * 4/6) * this.resize_)) + "px";
+    var style_top = ((this.top_ - (this.dotsize_ * 4/6)) * this.resize_) + "px";
     var style_left = ((this.left_ - (this.dotsize_ * 4/6)) * this.resize_) + "px";
     var style_height = (this.dotsize_ * 8/6 * this.resize_) + "px";
     var style_width = (this.dotsize_ * 8/6 * this.resize_) + "px";
@@ -564,7 +564,7 @@ ContainerVisualisation.prototype.visualiseCircle = function(colour)
  ******************************************************************************/
 ContainerVisualisation.prototype.visualiseClick = function()
 {
-    var style_top = (this.top_ - ((this.spacing_ / 2) * this.resize_)) + "px";
+    var style_top = ((this.top_ - (this.spacing_ / 2)) * this.resize_) + "px";
     var style_left = ((this.left_ - this.spacing_ / 2) * this.resize_) + "px";
     var style_height = (this.spacing_ * this.resize_) + "px";
     var style_width = (this.spacing_ * this.resize_) + "px";
@@ -596,7 +596,7 @@ ContainerVisualisation.prototype.visualiseClick = function()
  ******************************************************************************/
 ContainerVisualisation.prototype.visualiseDot = function()
 {
-    var style_top = (this.top_ - ((this.dotsize_ / 2) * this.resize_)) + "px";
+    var style_top = ((this.top_ - (this.dotsize_ / 2)) * this.resize_) + "px";
     var style_left = ((this.left_ - (this.dotsize_ / 2)) * this.resize_) + "px";
     var style_height = (this.dotsize_ * this.resize_) + "px";
     var style_width = (this.dotsize_ * this.resize_) + "px";

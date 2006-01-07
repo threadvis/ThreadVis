@@ -80,7 +80,13 @@ Visualisation.prototype.calculateSize = function(containers)
 {
     // totalmaxheight counts the maximal number of stacked arcs
     var totalmaxheight = 0;
-
+    
+    // topheight counts the maximal number of stacked arcs on top
+    var topheight = 0;
+    
+    // bottomheight counts the maximal number of stacked arcs on bottom
+    var bottomheight = 0;
+    
     // minmaltimedifference stores the minimal time between two messages
     var minimaltimedifference = Number.MAX_VALUE;
 
@@ -126,7 +132,13 @@ Visualisation.prototype.calculateSize = function(containers)
         // the whole extension
         if (maxheight > totalmaxheight)
             totalmaxheight = maxheight;
-
+        
+        if (parent.odd_ && maxheight > topheight)
+            topheight = maxheight;
+        
+        if (! parent.odd_ && maxheight > bottomheight)
+            bottomheight = maxheight;
+        
         // also keep track of the time difference between two adjacent messages
         if (counter < containers.length - 1)
         {
@@ -144,7 +156,9 @@ Visualisation.prototype.calculateSize = function(containers)
 
     return {"containers" : containers,
             "totalmaxheight" : totalmaxheight,
-            "minimaltimedifference" : minimaltimedifference};
+            "minimaltimedifference" : minimaltimedifference,
+            "topheight": topheight,
+            "bottomheight" : bottomheight};
 }
 
 
@@ -486,7 +500,6 @@ Visualisation.prototype.moveVisualisation = function(container)
     }
     
     this.stack_.style.marginLeft = new_margin + "px";
-    this.stack_.style.marginTop = (original_height / 2 - height / 2) + "px";
 }
 
 
@@ -567,17 +580,19 @@ Visualisation.prototype.onMouseMove = function(event)
             dx = 0;
         
         // don't move more to the left than necessary
-        if (dx < boxwidth - stackwidth)
+        if (stackwidth > boxwidth && dx < boxwidth - stackwidth)
             dx = boxwidth - stackwidth;
         
         // don't move more to the top than necessary
-        if (dy < boxheight - stackheight)
+        if (stackheight < boxheight && dy < 0)
+            dy = 0;
+        if (stackheight > boxheight && dy < boxheight - stackheight)
             dy = boxheight - stackheight;
         
-        // don't move more to the bottom than necessary
-        if (dy > this.totalheight_ - stackheight)
-            dy = this.totalheight_ - stackheight;
-        
+         // don't move more to the bottom than necessary
+        if (dy > 0)
+            dy = 0;
+
         this.stack_.style.marginLeft = dx + "px";
         this.stack_.style.marginTop = dy + "px";
     }
@@ -846,6 +861,8 @@ Visualisation.prototype.visualise = function(container)
     // minmaltimedifference stores the minimal time between two messages
     var minimaltimedifference = presize.minimaltimedifference;
 
+    var topheight = this.dotsize_ / 2 + this.arc_min_height_ + presize.topheight * this.arc_difference_;
+    var bottomheight = this.dotsize_ / 2 + this.arc_min_height_ + presize.bottomheight * this.arc_difference_;
 
     // do time scaling
     var original_width = this.box_.boxObject.width;
@@ -860,7 +877,6 @@ Visualisation.prototype.visualise = function(container)
 
     // do final resizing
     var x = this.spacing_ / 2;
-    this.box_.style.paddingRight = x + "px";
     this.resize_ = this.getResize(this.containers_.length,
                                   totalmaxheight,
                                   width,
@@ -921,7 +937,7 @@ Visualisation.prototype.visualise = function(container)
             this.drawDot(thiscontainer,
                          colour,
                          x,
-                         (height / 2),
+                         topheight,
                          selected,
                          circle,
                          flash);
@@ -970,7 +986,7 @@ Visualisation.prototype.visualise = function(container)
                              maxheight,
                              parent.x_position_,
                              x,
-                             (height / 2));
+                             topheight);
         }
         x = x + (thiscontainer.x_scaled_ * this.spacing_);
     }
@@ -1004,11 +1020,9 @@ Visualisation.prototype.visualise = function(container)
                                       this.containers_,
                                       this.resize_,
                                       this.dotsize_,
-                                      (height / 2) - this.arc_min_height_ - this.dotsize_ + this.arc_width_ + 2);
+                                      topheight - this.arc_min_height_ - this.dotsize_ + this.arc_width_ + 2);
         this.timeline_.draw();
     }
-    
-    this.totalheight_ = 2* ( (this.dotsize_ / 2) + this.arc_min_height_ + (totalmaxheight + 1) * this.arc_difference_ );
 }
 
 
@@ -1028,7 +1042,10 @@ Visualisation.prototype.visualiseExisting = function(container)
     var totalmaxheight = presize.totalmaxheight;
     // minmaltimedifference stores the minimal time between two messages
     var minimaltimedifference = presize.minimaltimedifference;
-    
+
+    var topheight = this.dotsize_ / 2 + this.arc_min_height_ + presize.topheight * this.arc_difference_;
+    var bottomheight = this.dotsize_ / 2 + this.arc_min_height_ + presize.bottomheight * this.arc_difference_;
+
     var original_width = this.box_.boxObject.width;
     var original_height = this.box_.boxObject.height;
     var width = original_width * this.zoom_ * this.pref_defaultzoom_width_;
@@ -1040,7 +1057,6 @@ Visualisation.prototype.visualiseExisting = function(container)
     
     // do final resizing
     var x = this.spacing_ / 2;
-    this.box_.style.paddingRight = x + "px";
     this.resize_ = this.getResize(this.containers_.length,
                                   totalmaxheight,
                                   width,
@@ -1063,14 +1079,14 @@ Visualisation.prototype.visualiseExisting = function(container)
         // note: dot only flashes if circle == true
         var flash = false;
 
-        this.containervisualisations_[thiscontainer].redraw(this.resize_, x, (height / 2), selected, flash);
+        this.containervisualisations_[thiscontainer].redraw(this.resize_, x, topheight, selected, flash);
 
         thiscontainer.x_position_ = x;
         
         var parent = thiscontainer.getParent()
         if (parent != null && ! parent.isRoot())
         {
-            this.arcvisualisations_[thiscontainer].redrawArc(this.resize_, parent.x_position_, x, (height / 2))
+            this.arcvisualisations_[thiscontainer].redrawArc(this.resize_, parent.x_position_, x, topheight)
         }
         
         x = x + (thiscontainer.x_scaled_ * this.spacing_);
@@ -1085,9 +1101,7 @@ Visualisation.prototype.visualiseExisting = function(container)
     
     if (this.pref_timeline_ && this.timeline_)
         this.timeline_.redraw(this.resize_,
-                              (height / 2) - this.arc_min_height_ - this.dotsize_ + this.arc_width_ + 2);
-
-    this.totalheight_ = 2* ( (this.dotsize_ / 2) + this.arc_min_height_ + (totalmaxheight + 1) * this.arc_difference_ );
+                              topheight - this.arc_min_height_ - this.dotsize_ + this.arc_width_ + 2);
 }
 
 
@@ -1106,7 +1120,6 @@ Visualisation.prototype.zoomIn = function(amount)
     var ref = this;
     this.zoom_timeout_ = setTimeout(function() {ref.visualise();}, 500);
     
-    //this.visualise();
     LOGGER_.log("zoom", {"action" : "in", "zoomlevel" : this.zoom_, "delta" : amount});
 }
 

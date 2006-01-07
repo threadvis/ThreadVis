@@ -96,10 +96,10 @@ ArcVisualisation.prototype.visualise = function()
     var arc_top = 0;
     var fill_top = 0;
     if (this.vposition_ == "top")
-        arc_top = this.top_ - (((this.dotsize_ / 2) + this.arc_min_height_ + 
-                  (this.arc_difference_ * this.height_)) * this.resize_);
+        arc_top = (this.top_ - ((this.dotsize_ / 2) + this.arc_min_height_ + 
+                  (this.arc_difference_ * this.height_))) * this.resize_;
     else
-        arc_top = this.top_ + ((this.dotsize_ / 2) * this.resize_);
+        arc_top = (this.top_ + (this.dotsize_ / 2)) * this.resize_;
 
     var style_top = (arc_top) + "px";
     var style_left = ((this.left_ - (this.arc_width_ / 2)) * this.resize_) + "px";
