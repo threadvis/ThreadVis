@@ -26,6 +26,7 @@
     <script src="chrome://threadarcsjs/content/Message.js" />
     <script src="chrome://threadarcsjs/content/PreferenceObserver.js" />
     <script src="chrome://threadarcsjs/content/References.js" />
+    <script src="chrome://threadarcsjs/content/Scrollbar.js" />
     <script src="chrome://threadarcsjs/content/ThreadArcs.js" />
     <script src="chrome://threadarcsjs/content/Threader.js" />
     <script src="chrome://threadarcsjs/content/Timeline.js" />
@@ -43,10 +44,35 @@
             </popup>
         </popupset>
         <hbox id="ThreadArcsJS"
-              style="border: 1px solid #cccccc; cursor: move;">
-            <vbox id="ThreadArcsJSBox" 
-                  style="width: 300px; height: 1px; overflow: hidden;"
-                  context="ThreadArcsJSPopUp" />
+              style="border: 1px solid #cccccc;">
+            <hbox>
+                <vbox>
+                    <vbox id="ThreadArcsJSBox" 
+                          style="width: 300px; max-width: 300px; height: 1px; overflow: hidden; cursor: move;"
+                          context="ThreadArcsJSPopUp"
+                          flex="1" />
+                    <vbox style="height: 5px;">
+                        <stack id="ThreadArcsJSScrollbarHorizontalBox"
+                               style="background: #cccccc; border: 1px solid #333333;"
+                               hidden="true">
+                            <box id="ThreadArcsJSScrollbarHorizontal"
+                                 style="height: 3px; background: #333333; cursor: e-resize;" />
+                        </stack>
+                    </vbox>
+                </vbox>
+                <vbox>
+                    <hbox style="width: 5px;"
+                          flex="1">
+                        <stack id="ThreadArcsJSScrollbarVerticalBox"
+                               style="background: #cccccc; border: 1px solid #333333;"
+                               hidden="true">
+                            <box id="ThreadArcsJSScrollbarVertical"
+                                 style="width: 3px; background: #333333; cursor: s-resize;" />
+                        </stack>
+                    </hbox>
+                    <hbox style="height: 5px;" />
+                </vbox>
+            </hbox>
             <vbox>
                 <hbox id="ThreadArcsJSZoomIn"
                       onclick="zoomIn();">

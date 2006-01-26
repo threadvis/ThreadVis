@@ -10,6 +10,7 @@ content/Message.js
 content/Preferences.xul
 content/PreferenceObserver.js
 content/References.js
+content/Scrollbar.js
 content/Settings.css
 content/Settings.js
 content/Settings.xul

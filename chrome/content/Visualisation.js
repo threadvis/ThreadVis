@@ -69,6 +69,7 @@ function Visualisation()
     this.containervisualisations_ = null;
     this.arcvisualisations_ = null;
     this.timeline_ = null;
+    this.scrollbar_ = null;
 }
 
 
@@ -153,7 +154,7 @@ Visualisation.prototype.calculateSize = function(containers)
                 minimaltimedifference = timedifference;
         }
     }
-
+    
     return {"containers" : containers,
             "totalmaxheight" : totalmaxheight,
             "minimaltimedifference" : minimaltimedifference,
@@ -190,7 +191,7 @@ Visualisation.prototype.clearStack = function()
     // reset move
     this.stack_.style.marginLeft = "0px";
     this.stack_.style.marginTop = "0px";
-
+    this.stack_.style.padding = "10px";
 }
 
 
@@ -505,6 +506,19 @@ Visualisation.prototype.moveVisualisation = function(container)
 
 
 /** ****************************************************************************
+ * Move visualisation by given delta
+ ******************************************************************************/
+Visualisation.prototype.moveVisualisationTo = function(position)
+{
+    if (position.x)
+        this.stack_.style.marginLeft = position.x + "px";
+    if (position.y)
+        this.stack_.style.marginTop = position.y + "px";
+}
+
+
+
+/** ****************************************************************************
  * observe preferences change
  ******************************************************************************/
 Visualisation.prototype.observe = function(subject, topic, data)
@@ -593,8 +607,13 @@ Visualisation.prototype.onMouseMove = function(event)
         if (dy > 0)
             dy = 0;
 
-        this.stack_.style.marginLeft = dx + "px";
-        this.stack_.style.marginTop = dy + "px";
+        var position = new Object;
+        position.x = dx;
+        position.y = dy;
+        this.moveVisualisationTo(position);
+        
+        this.scrollbar_.init(this.box_);
+        this.scrollbar_.draw();
     }
 }
 
@@ -1023,6 +1042,13 @@ Visualisation.prototype.visualise = function(container)
                                       topheight - this.arc_min_height_ - this.dotsize_ + this.arc_width_ + 2);
         this.timeline_.draw();
     }
+    
+    if (! this.scrollbar_)
+        this.scrollbar_ = new Scrollbar(this,
+                                        this.stack_,
+                                        this.box_);
+    this.scrollbar_.init(this.box_);
+    this.scrollbar_.draw();
 }
 
 
@@ -1102,6 +1128,8 @@ Visualisation.prototype.visualiseExisting = function(container)
     if (this.pref_timeline_ && this.timeline_)
         this.timeline_.redraw(this.resize_,
                               topheight - this.arc_min_height_ - this.dotsize_ + this.arc_width_ + 2);
+    
+    this.scrollbar_.draw();
 }
 
 
