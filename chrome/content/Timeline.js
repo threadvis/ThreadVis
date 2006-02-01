@@ -16,14 +16,15 @@ var XUL_NAMESPACE_ =
 /** ****************************************************************************
  * Constructor for timeline class
  ******************************************************************************/
-function Timeline(stack, strings, containers, resize, dotsize, vertical)
+function Timeline(stack, strings, containers, resize, dotsize, top, top_delta)
 {
     this.stack_ = stack;
     this.strings_ = strings;
     this.containers_ = containers;
     this.resize_ = resize;
     this.dotsize_ = dotsize;
-    this.vertical_ = vertical;
+    this.top_ = top;
+    this.top_delta_ = top_delta;
     
     this.times_ = Array();
 }
@@ -82,7 +83,7 @@ Timeline.prototype.drawTime = function(container, left, right, string, tooltip)
     var style_bordertop = "";
     var style_fontsize = "9px";
     var style_left = ((left - this.dotsize_ / 2)* this.resize_) + "px";
-    var style_top = this.vertical_ + "px";
+    var style_top = (this.top_ - this.top_delta_) * this.resize_ + "px";
     var style_width = ((right - left) * this.resize_) + "px";
     
     // set style
@@ -105,6 +106,13 @@ Timeline.prototype.drawTime = function(container, left, right, string, tooltip)
     // and add to stack only if we just created the element
     if (newelem)
         this.stack_.appendChild(elem);
+    
+    // hide if not enough space
+    if (((right - left) * this.resize_ < 20) || (this.top_delta_ * this.resize_ < 9))
+        elem.hidden = true;
+    else
+        elem.hidden = false;
+
 }
 
 

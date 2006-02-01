@@ -42,6 +42,9 @@ function Scrollbar(visualisation, stack, box)
 
 
 
+/** ****************************************************************************
+ * Init height of scrollbars
+ ******************************************************************************/
 Scrollbar.prototype.init = function(box)
 {
     this.box_ = box;
@@ -71,10 +74,13 @@ Scrollbar.prototype.draw = function()
 
 
 
+/** ****************************************************************************
+ * Calculate size of scrollbars
+ * Determine if scrollbars need to be drawn
+ ******************************************************************************/
 Scrollbar.prototype.calculateSize = function()
 {
     var boxwidth = this.box_.boxObject.width;
-    //var boxheight = this.box_.boxObject.height;
     var boxheight = this.total_height_;
     var stackwidth = this.stack_.boxObject.width;
     var stackheight = this.stack_.boxObject.height;
@@ -89,11 +95,11 @@ Scrollbar.prototype.calculateSize = function()
         height = boxheight;
     
     var hidehorizontal = false;
-    if (width == boxwidth)
+    if (Math.abs(width - boxwidth) < 2)
         hidehorizontal = true;
     
     var hidevertical = false;
-    if (height == boxheight)
+    if (Math.abs(height - boxheight) < 2)
         hidevertical = true;
     
     var size = new Object();
@@ -107,6 +113,9 @@ Scrollbar.prototype.calculateSize = function()
 
 
 
+/** ****************************************************************************
+ * Calculate positions of the scrollbars
+ ******************************************************************************/
 Scrollbar.prototype.calculatePosition = function()
 {
     var boxwidth = this.box_.boxObject.width;
@@ -130,6 +139,10 @@ Scrollbar.prototype.calculatePosition = function()
 
 
 
+/** ****************************************************************************
+ * React to mousemovement over horizontal scrollbar
+ * Do actual scrolling
+ ******************************************************************************/
 Scrollbar.prototype.onMouseMoveHorizontal = function(event)
 {
     if (this.panning_horizontal_)
@@ -167,8 +180,13 @@ Scrollbar.prototype.onMouseMoveHorizontal = function(event)
 
 
 
+/** ****************************************************************************
+ * React to mousedown event on horizontal scrollbar
+ * Start scrolling
+ ******************************************************************************/
 Scrollbar.prototype.onMouseDownHorizontal = function(event)
 {
+    // only react to left mousebutton
     if (event.button != 0)
         return;
     
@@ -178,6 +196,10 @@ Scrollbar.prototype.onMouseDownHorizontal = function(event)
 
 
 
+/** ****************************************************************************
+ * React to mouseup event on horizontal scrollbar
+ * Stop scrolling
+ ******************************************************************************/
 Scrollbar.prototype.onMouseUpHorizontal = function(event)
 {
     this.panning_horizontal_ = false;
@@ -185,6 +207,10 @@ Scrollbar.prototype.onMouseUpHorizontal = function(event)
 
 
 
+/** ****************************************************************************
+ * React to mousemovement over vertical scrollbar
+ * Do actual scrolling
+ ******************************************************************************/
 Scrollbar.prototype.onMouseMoveVertical = function(event)
 {
     if (this.panning_vertical_)
@@ -223,6 +249,10 @@ Scrollbar.prototype.onMouseMoveVertical = function(event)
 
 
 
+/** ****************************************************************************
+ * React to mousedown event on vertical scrollbar
+ * Start scrolling
+ ******************************************************************************/
 Scrollbar.prototype.onMouseDownVertical = function(event)
 {
     if (event.button != 0)
@@ -234,6 +264,10 @@ Scrollbar.prototype.onMouseDownVertical = function(event)
 
 
 
+/** ****************************************************************************
+ * React to mouseup event on vertical scrollbar
+ * Stop scrolling
+ ******************************************************************************/
 Scrollbar.prototype.onMouseUpVertical = function(event)
 {
     this.panning_vertical_ = false;

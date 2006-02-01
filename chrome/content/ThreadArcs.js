@@ -963,14 +963,15 @@ ThreadArcs.prototype.visualiseMsgId = function(message_id)
 
     var container = this.threader_.findContainer(message_id);
 
-    if (container != null)
+    if (container != null && ! container.isDummy())
     {
         this.visualise(container);
     }
     else
     {
-        // message id not found, this means we somehow missed to thread
-        // this message
+        // - message id not found, or
+        // - container with id was dummy
+        // this means we somehow missed to thread this message
         // thus, thread the whole folder we are in
         this.clearVisualisation();
         this.onFolderAdded(GetLoadedMsgFolder());

@@ -26,8 +26,8 @@
 <!ENTITY logfiles.reset.tooltip                             "Resets the logfiles to size 0. Do this after sending the logfiles to save diskspace.">
 <!ENTITY visualisation.tab                                  "Visualisation">
 <!ENTITY visualisation.defaultzoom.caption                  "Maximum size of the visualisation">
-<!ENTITY visualisation.defaultzoom.width                    "times the width">
-<!ENTITY visualisation.defaultzoom.height                   "times the height">
+<!ENTITY visualisation.defaultzoom.width                    "x visible width">
+<!ENTITY visualisation.defaultzoom.height                   "x visible height">
 <!ENTITY visualisation.enabledaccounts.caption              "Enabled Accounts and Folders">
 <!ENTITY visualisation.enabledaccounts.description          "Only enable extension for selected accounts and folders.">
 <!ENTITY visualisation.timescaling.caption                  "Time Scaling">

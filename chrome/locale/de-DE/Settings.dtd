@@ -26,8 +26,8 @@
 <!ENTITY logfiles.reset.tooltip                             "Setzt die Log-Dateien auf Gr&#xF6;&#xDF;e 0 zur&#xFC;ck. Sie k&#xF6;nnen dies tun, nachdem Sie die Log-Dateien abgeschickt haben, um Speicherplatz zu sparen.">
 <!ENTITY visualisation.tab                                  "Visualisierung">
 <!ENTITY visualisation.defaultzoom.caption                  "Maximale Gr&#xF6;&#xDF;e der Visualisierung">
-<!ENTITY visualisation.defaultzoom.width                    "fache Breite">
-<!ENTITY visualisation.defaultzoom.height                   "fache H&#xF6;he">
+<!ENTITY visualisation.defaultzoom.width                    "x sichtbare Breite">
+<!ENTITY visualisation.defaultzoom.height                   "x sichtbare H&#xF6;he">
 <!ENTITY visualisation.enabledaccounts.caption              "Aktivierte Konten und Ordner">
 <!ENTITY visualisation.enabledaccounts.description          "Aktiviert die Erweiterung nur f&#xFC;r die ausgew&#xE4;hlten Konten und Ordner.">
 <!ENTITY visualisation.timescaling.caption                  "Time Scaling">

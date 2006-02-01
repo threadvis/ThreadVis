@@ -191,7 +191,7 @@ Visualisation.prototype.clearStack = function()
     // reset move
     this.stack_.style.marginLeft = "0px";
     this.stack_.style.marginTop = "0px";
-    this.stack_.style.padding = "10px";
+    this.stack_.style.padding = "5px";
 }
 
 
@@ -1039,7 +1039,8 @@ Visualisation.prototype.visualise = function(container)
                                       this.containers_,
                                       this.resize_,
                                       this.dotsize_,
-                                      topheight - this.arc_min_height_ - this.dotsize_ + this.arc_width_ + 2);
+                                      topheight,
+                                      this.arc_min_height_ + this.dotsize_ - this.arc_width_ - 2);
         this.timeline_.draw();
     }
     
@@ -1127,7 +1128,8 @@ Visualisation.prototype.visualiseExisting = function(container)
     
     if (this.pref_timeline_ && this.timeline_)
         this.timeline_.redraw(this.resize_,
-                              topheight - this.arc_min_height_ - this.dotsize_ + this.arc_width_ + 2);
+                              topheight,
+                              this.arc_min_height_ + this.dotsize_ - this.arc_width_ - 2);
     
     this.scrollbar_.draw();
 }
@@ -1141,7 +1143,7 @@ Visualisation.prototype.zoomIn = function(amount)
 {
     if (! isFinite(amount) || amount == 0)
         amount = 1;
-
+    
     this.zoom_ = this.zoom_ + 0.1 * amount;
     
     clearTimeout(this.zoom_timeout_);
