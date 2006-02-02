@@ -75,6 +75,73 @@ function Visualisation()
 
 
 /** ****************************************************************************
+ * Calculate heights for all arcs
+ ******************************************************************************/
+Visualisation.prototype.calculateArcHeights = function(containers)
+{
+    // reset all heights
+    for (var counter = 0;
+         counter < containers.length;
+         counter++)
+    {
+        var thiscontainer = containers[counter];
+        thiscontainer.current_arc_height_incoming_ = new Array();
+        thiscontainer.current_arc_height_outgoing_ = new Array();
+    }
+    
+    for (var counter = 0;
+         counter < containers.length;
+         counter++)
+    {
+        var thiscontainer = containers[counter];
+        thiscontainer.x_index_ = counter;
+
+        // odd_ tells us if we display the arc above or below the messages
+        thiscontainer.odd_ = thiscontainer.getDepth() % 2 == 0;
+
+        var parent = thiscontainer.getParent();
+        if (parent != null && ! parent.isRoot())
+        {
+            // find a free arc height between the parent message and this one
+            // since we want to draw an arc between this message and its parent,
+            // and we do not want any arcs to overlap
+            var free_height = 1;
+            var blocked = true;
+            while (blocked)
+            {
+                blocked = false;
+                for (var innercounter = parent.x_index_;
+                     innercounter < counter;
+                     innercounter++)
+                {
+                    var lookatcontainer = containers[innercounter];
+                    if (lookatcontainer.odd_ == parent.odd_ && 
+                        lookatcontainer.current_arc_height_outgoing_[free_height] == 1)
+                    {
+                        free_height++;
+                        blocked = true;
+                        break;
+                    }
+                    if (lookatcontainer.odd_ != parent.odd_ &&
+                        lookatcontainer.current_arc_height_incoming_[free_height] == 1)
+                    {
+                        free_height++;
+                        blocked = true;
+                        break;
+                    }
+                }
+            }
+            parent.current_arc_height_outgoing_[free_height] = 1;
+            thiscontainer.current_arc_height_incoming_[free_height] = 1;
+            
+            thiscontainer.arc_height_ = free_height;
+        }
+    }
+}
+
+
+
+/** ****************************************************************************
  * Calculate size
  ******************************************************************************/
 Visualisation.prototype.calculateSize = function(containers)
@@ -91,12 +158,11 @@ Visualisation.prototype.calculateSize = function(containers)
     // minmaltimedifference stores the minimal time between two messages
     var minimaltimedifference = Number.MAX_VALUE;
 
+    this.calculateArcHeights(containers);
+
     for (var counter = 0; counter < containers.length; counter++)
     {
         var thiscontainer = containers[counter];
-        thiscontainer.x_index_ = counter;
-        thiscontainer.current_arc_height_incoming_ = 0;
-        thiscontainer.current_arc_height_outgoing_ = 0;
 
         // odd_ tells us if we display the arc above or below the messages
         thiscontainer.odd_ = thiscontainer.getDepth() % 2 == 0;
@@ -104,41 +170,16 @@ Visualisation.prototype.calculateSize = function(containers)
         var parent = thiscontainer.getParent();
         if (parent != null && ! parent.isRoot())
         {
-            // calculate the current maximal arc height between the parent 
-            // message and this one since we want to draw an arc between this 
-            // message and its parent, and we do not want any arcs to overlap, 
-            // we draw this arc higher than the current highest arc
-            var maxheight = 0;
-            for (var innercounter = parent.x_index_;
-                 innercounter < counter;
-                 innercounter++)
-            {
-                var lookatcontainer = containers[innercounter];
-                if (lookatcontainer.odd_ == parent.odd_ && 
-                    lookatcontainer.current_arc_height_outgoing_ > maxheight)
-                {
-                    maxheight = lookatcontainer.current_arc_height_outgoing_;
-                }
-                if (lookatcontainer.odd_ != parent.odd_ &&
-                    lookatcontainer.current_arc_height_incoming_ > maxheight)
-                {
-                    maxheight = lookatcontainer.current_arc_height_incoming_;
-                }
-            }
-            maxheight++;
-            parent.current_arc_height_outgoing_ = maxheight;
-            thiscontainer.current_arc_height_incoming_ = maxheight;
-        }
         // also keep track of the current maximal stacked arc height, so that we can resize
         // the whole extension
-        if (maxheight > totalmaxheight)
-            totalmaxheight = maxheight;
+        if (parent.odd_ && thiscontainer.arc_height_ > topheight)
+        {
+            topheight = thiscontainer.arc_height_;
+        }
         
-        if (parent.odd_ && maxheight > topheight)
-            topheight = maxheight;
-        
-        if (! parent.odd_ && maxheight > bottomheight)
-            bottomheight = maxheight;
+        if (! parent.odd_ && thiscontainer.arc_height_ > bottomheight)
+            bottomheight = thiscontainer.arc_height_;
+        }
         
         // also keep track of the time difference between two adjacent messages
         if (counter < containers.length - 1)
@@ -154,6 +195,8 @@ Visualisation.prototype.calculateSize = function(containers)
                 minimaltimedifference = timedifference;
         }
     }
+    
+    totalmaxheight = Math.max(topheight, bottomheight);
     
     return {"containers" : containers,
             "totalmaxheight" : totalmaxheight,
@@ -962,8 +1005,6 @@ Visualisation.prototype.visualise = function(container)
                          flash);
 
         thiscontainer.x_position_ = x;
-        thiscontainer.current_arc_height_incoming_ = 0;
-        thiscontainer.current_arc_height_outgoing_ = 0;
 
         // draw arc
         var parent = thiscontainer.getParent()
@@ -972,28 +1013,8 @@ Visualisation.prototype.visualise = function(container)
             var position = "bottom";
             if (parent.odd_)
                 position = "top";
-
-            var maxheight = 0;
-            for (var innercounter = parent.x_index_;
-                 innercounter < counter;
-                 innercounter++)
-            {
-                var lookatcontainer = this.containers_[innercounter];
-                if (lookatcontainer.odd_ == parent.odd_ && 
-                    lookatcontainer.current_arc_height_outgoing_ > maxheight)
-                {
-                    maxheight = lookatcontainer.current_arc_height_outgoing_;
-                }
-                if (lookatcontainer.odd_ != parent.odd_ &&
-                    lookatcontainer.current_arc_height_incoming_ > maxheight)
-                {
-                    maxheight = lookatcontainer.current_arc_height_incoming_;
-                }
-            }
-            maxheight++;
-            parent.current_arc_height_outgoing_ = maxheight;
-            thiscontainer.current_arc_height_incoming_ = maxheight;
-
+            
+            var arc_height = thiscontainer.arc_height_;
             // if we are using a single colour, display all arcs from
             // a selected message in this colour
             if (this.pref_colour_ == "single")
@@ -1002,7 +1023,7 @@ Visualisation.prototype.visualise = function(container)
             this.arcvisualisations_[thiscontainer] =
                 this.drawArc(colour,
                              position,
-                             maxheight,
+                             arc_height,
                              parent.x_position_,
                              x,
                              topheight);
