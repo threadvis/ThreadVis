@@ -675,12 +675,20 @@ Container.prototype.removeChildren = function()
  ******************************************************************************/
 Container.prototype.removeChild = function(child)
 {
+    // check if child is in fact our child
+    if (child.getParent() != this)
+        return;
+    
     /* if child is the first in list, we can remove it
      * by setting the next child in list as first
      */
     if (this.getChild() == child)
     {
         this.setChild(child.getNext());
+        
+        if (child.hasNext())
+            child.getNext().removePrevious();
+        
         child.removeParent();
         child.removePrevious();
         child.removeNext();
@@ -690,26 +698,15 @@ Container.prototype.removeChild = function(child)
      */
     else
     {
-        var container = null;
-        for (container = this.getChild();
-             container != null;
-             container = container.getNext())
-        {
-            if (child == container)
-            {
-                if (child.hasPrevious())
-                    child.getPrevious().setNext(container.getNext());
-
-                if (child.hasNext())
-                    child.getNext().setPrevious(container.getPrevious());
-
-                container.removeParent();
-                container.removePrevious();
-                container.removeNext();
-
-                return;
-            }
-        }
+        if (child.hasPrevious())
+            child.getPrevious().setNext(child.getNext());
+        
+        if (child.hasNext())
+            child.getNext().setPrevious(child.getPrevious());
+        
+        child.removeParent();
+        child.removePrevious();
+        child.removeNext();
     }
 }
 
