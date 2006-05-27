@@ -160,8 +160,8 @@ function buildFolderCheckboxes(box, folders, account, indent)
         
         if (folder instanceof Array)
         {
-            buildFolderCheckboxes(box, folder, account, ++indent);
-            return;
+            buildFolderCheckboxes(box, folder, account, indent + 1);
+            continue;
         }
         
         var checkbox = document.createElementNS(XUL_NAMESPACE_, "checkbox");
