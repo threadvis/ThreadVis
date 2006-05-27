@@ -98,14 +98,25 @@ Timeline.prototype.drawTime = function(container, left, right, string, tooltip)
     elem.style.top = style_top;
     elem.style.width = style_width;
     elem.style.zIndex = "1";
-    elem.style.cursor = "move";
+    //elem.style.cursor = "move";
     
     elem.setAttribute("value", string);
     elem.setAttribute("tooltiptext", tooltip);
     
     // and add to stack only if we just created the element
     if (newelem)
+    {
         this.stack_.appendChild(elem);
+        
+        // prevent mousedown event from bubbling to box object
+        // prevent dragging of visualisation by clicking on message
+        elem.addEventListener("mousedown",
+            function(event)
+            {
+                event.stopPropagation();
+            },
+            true);
+    }
     
     // hide if not enough space
     if (((right - left) * this.resize_ < 20) || (this.top_delta_ * this.resize_ < 9))

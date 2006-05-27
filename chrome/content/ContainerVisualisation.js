@@ -308,6 +308,15 @@ ContainerVisualisation.prototype.drawClick = function()
 
     this.stack_.appendChild(this.click_);
     this.click_.addEventListener("click", this.onMouseClick, true);
+    
+    // prevent mousedown event from bubbling to box object
+    // prevent dragging of visualisation by clicking on message
+    this.click_.addEventListener("mousedown",
+        function(event)
+        {
+            event.stopPropagation();
+        },
+        true);
 }
 
 
@@ -585,7 +594,10 @@ ContainerVisualisation.prototype.visualiseClick = function()
     this.click_.style.width = style_width;
     this.click_.style.height = style_height;
     this.click_.style.verticalAlign = "top";
-    this.click_.style.cursor = "default";
+    if (this.style_ == "dummy")
+        this.click_.style.cursor = "default";
+    else
+        this.click_.style.cursor = "pointer";
     this.click_.style.zIndex = "2";
 }
 

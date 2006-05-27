@@ -602,6 +602,9 @@ Visualisation.prototype.onMouseDown = function(event)
     this.startx_ = event.clientX;
     this.starty_ = event.clientY;
     this.panning_ = true;
+    
+    // set mouse cursor
+    this.box_.style.cursor = "-moz-grabbing";
 }
 
 
@@ -669,6 +672,9 @@ Visualisation.prototype.onMouseMove = function(event)
 Visualisation.prototype.onMouseUp = function(event)
 {
     this.panning_ = false;
+    
+    // reset mouse cursor
+    this.box_.style.cursor = "-moz-grab";
 }
 
 
@@ -944,6 +950,9 @@ Visualisation.prototype.visualise = function(container)
                                   width,
                                   height);
 
+    // set cursor
+    this.box_.style.cursor = "-moz-grab";
+
     // pre-calculate colours for different authors
     this.authors_ = new Object();
     this.lastcolour_ = 2;
@@ -1110,6 +1119,8 @@ Visualisation.prototype.visualiseExisting = function(container)
                                   width,
                                   height);
 
+    // set cursor
+    this.box_.style.cursor = "-moz-grab";
 
     for (var counter = 0;
          counter < this.containers_.length;

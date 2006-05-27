@@ -48,7 +48,7 @@
             <hbox>
                 <vbox>
                     <vbox id="ThreadArcsJSBox" 
-                          style="width: 300px; max-width: 300px; height: 1px; overflow: hidden; cursor: move;"
+                          style='width: 300px; max-width: 300px; height: 1px; overflow: hidden;'
                           context="ThreadArcsJSPopUp"
                           flex="1" />
                     <vbox style="height: 5px;">

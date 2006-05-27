@@ -16,7 +16,7 @@
 @echo Creating chrome JAR file ...
 @echo ======================================================================
 
-@c:\Programme\7-Zip\7z a -tzip threadarcsjs.jar @make.list
+@c:\Programme\7-Zip\7z a -mx0 -tzip threadarcsjs.jar @make.list
 
 @echo ======================================================================
 @echo Done creating chrome JAR file
