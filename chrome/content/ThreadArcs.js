@@ -22,6 +22,7 @@ var THREADARCS_ENABLED_ = false;
 var THREADARCS_DISABLEDACCOUNTS_ = "";
 var THREADARCS_DISABLEDFOLDERS_ = new Array();
 var COPY_MESSAGE_ = null;
+var POPUP_WINDOW_ = null;
 
 // add visualisation at startup
 addEventListener("load", createThreadArcs, false);
@@ -210,12 +211,19 @@ function ThreadArcs()
         this.loaded_ = THREADARCS_PARENT_.loaded_;
         this.threaded_ = THREADARCS_PARENT_.threaded_;
         this.server_ = THREADARCS_PARENT_.server_;
+        
+        // visualise selected message
+        this.visualise(THREADARCS_PARENT_.selected_container_);
+        return;
     }
     else
         this.threader_= new Threader();
 
     // remember msgkey of selected message
     this.selected_msgkey_ = "";
+
+    // remember container of selected message
+    this.selected_container_ = null;
 
     this.add_messages_from_folder_enumerator_maxcounter_ = 100;
 
@@ -460,10 +468,11 @@ ThreadArcs.prototype.callback = function(msg_key,
     this.selected_msgkey_ = msg_key;
 
     // get folder for message
-    SelectFolder(folder);
+    this.getMainWindow().SelectFolder(folder);
 
     // clear current selection
-    var tree = GetThreadTree();
+    var tree = this.getMainWindow().GetThreadTree();
+    
     var treeBoxObj = tree.treeBoxObject;
     // this is necessary because Thunderbird >= 1.5 uses
     // tree.view.selection
@@ -479,7 +488,7 @@ ThreadArcs.prototype.callback = function(msg_key,
     treeSelection.clearSelection();
 
     // select message
-    gDBView.selectMsgByKey(msg_key);
+    this.getMainWindow().gDBView.selectMsgByKey(msg_key);
 
     treeBoxObj.ensureRowIsVisible(treeSelection.currentIndex);
 }
@@ -492,7 +501,7 @@ ThreadArcs.prototype.callback = function(msg_key,
 ThreadArcs.prototype.checkEnabledAccountOrFolder = function(folder)
 {
     if (! folder)
-        folder = GetLoadedMsgFolder();
+        folder = this.getMainWindow().GetLoadedMsgFolder();
 
     if (! folder)
         return false;
@@ -664,6 +673,24 @@ ThreadArcs.prototype.getAllFolders = function(folder)
         {
             break;
         }
+    }
+}
+
+
+
+/** ****************************************************************************
+ * Return main window object
+******************************************************************************/
+ThreadArcs.prototype.getMainWindow = function()
+{
+    var w = window;
+    
+    while (w != null)
+    {
+        if (typeof(w.GetThreadTree) == "function")
+            return w;
+        
+        w = window.opener;
     }
 }
 
@@ -844,7 +871,7 @@ function preferenceDisabledFoldersChanged(value)
 
 /** ****************************************************************************
  * Called when a message is selected
- * Call applet with messageid to visualise
+ * Call visualisation with messageid to visualise
  ******************************************************************************/
 ThreadArcs.prototype.setSelectedMessage = function()
 {
@@ -923,7 +950,6 @@ ThreadArcs.prototype.visualise = function(container)
     if (! this.checkEnabledAccountOrFolder())
         return
 
-
     LOGGER_.logDebug("ThreadArcs.visualise()",
                         {"container" : container});
 
@@ -941,6 +967,7 @@ ThreadArcs.prototype.visualise = function(container)
                      "msgcount" : msgcount});
 
     this.visualisation_.visualise(container);
+    this.selected_container_ = container;
 }
 
 
@@ -966,6 +993,10 @@ ThreadArcs.prototype.visualiseMsgId = function(message_id)
     if (container != null && ! container.isDummy())
     {
         this.visualise(container);
+        
+        // visualise any popup windows that might exist
+        if (POPUP_WINDOW_)
+            POPUP_WINDOW_.THREADARCS_.visualise(container);
     }
     else
     {
@@ -974,6 +1005,8 @@ ThreadArcs.prototype.visualiseMsgId = function(message_id)
         // this means we somehow missed to thread this message
         // thus, thread the whole folder we are in
         this.clearVisualisation();
+        if (POPUP_WINDOW_)
+            POPUP_WINDOW_.THREADARCS_.clearVisualisation();
         this.onFolderAdded(GetLoadedMsgFolder());
     }
     container = null;
@@ -1063,4 +1096,20 @@ ThreadArcs.prototype.waitForThreading = function()
         var ref = this;
         setTimeout(function(){ref.waitForThreading();}, 100);
     }
+}
+
+
+
+/** ****************************************************************************
+ * display a popup window for the visualisation
+ ******************************************************************************/
+function displayVisualisationWindow()
+{
+    POPUP_WINDOW_  = window.openDialog("chrome://threadarcsjs/content/ThreadArcsPopup.xul");
+    // get currently loaded message
+    var msg_uri = GetLoadedMessage();
+    var msg = messenger.messageServiceFromURI(msg_uri)
+              .messageURIToMsgHdr(msg_uri);
+
+    setTimeout(function() {POPUP_WINDOW_.THREADARCS_.visualiseMsgId(msg.messageId);}, 1000);
 }

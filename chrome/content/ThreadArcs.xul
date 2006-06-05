@@ -39,8 +39,10 @@
         </stringbundleset>
         <popupset>
             <popup id="ThreadArcsJSPopUp">
-                <menuitem label="&popup.caption;" 
+                <menuitem label="&popup.settings;" 
                           oncommand="openThreadArcsJSOptionsDialog();" />
+                <menuitem label="&popup.popupwindow;"
+                          oncommand="displayVisualisationWindow();" />
             </popup>
         </popupset>
         <hbox id="ThreadArcsJS"

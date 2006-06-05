@@ -18,6 +18,7 @@ content/Settings15.xul
 content/SettingsDialog.xul
 content/ThreadArcs.js
 content/ThreadArcs.xul
+content/ThreadArcsPopup.xul
 content/Threader.js
 content/Timeline.js
 content/Visualisation.js

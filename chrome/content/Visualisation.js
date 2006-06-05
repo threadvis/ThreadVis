@@ -247,6 +247,10 @@ Visualisation.prototype.colourAuthors = function(authors)
     // colour links
     var emailfields = new Array();
 
+    // check to see if we have the element expandedHeaderView
+    if (document.getElementById("expandedHeaderView") == null)
+        return;
+
     // from, reply-to, ... (single value fields)
     var singlefields = document.getElementById("expandedHeaderView").getElementsByTagName("mail-emailheaderfield");
     for (var i = 0; i < singlefields.length; i++)

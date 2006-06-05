@@ -2,13 +2,15 @@
 /* *******************************************************
  * ThreadArcs.dtd
  *
- * (c) 2005 Alexander C. Hubmann
+ * (c) 2005-2006 Alexander C. Hubmann
  *
  * DTD file containing EN localisation of UI elements
  *
  * Version: $Id$
  ********************************************************/
 -->
-<!ENTITY popup.caption "Settings...">
+<!ENTITY popup.popupwindow "Display in popup-window">
+<!ENTITY popup.settings "Settings...">
+<!ENTITY popupwindow.title "ThreadArcs Visualisation">
 <!ENTITY zoomin.tooltip "Zoom in">
 <!ENTITY zoomout.tooltip "Zoom out">
