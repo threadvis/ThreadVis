@@ -204,13 +204,14 @@
                     <label class="indent">
                         &visualisation.enabledaccounts.description;
                     </label>
-                    <separator />
-                    <vbox id="enableaccounts"
-                          style="overflow: auto;"
-                          class="indent" />
-                    <textbox id="hidden_disabledfolders"
-                             preference="extensions.threadarcsjs.disabledfolders"
-                             hidden="true" />
+                    <groupbox>
+                            <vbox id="enableaccounts"
+                                style="overflow: auto;"
+                                class="indent" />
+                            <textbox id="hidden_disabledfolders"
+                                     preference="extensions.threadarcsjs.disabledfolders"
+                                     hidden="true" />
+                        </groupbox>
                 </tabpanel>
 
                 <tabpanel id="logfiles" orient="vertical" flex="1">
