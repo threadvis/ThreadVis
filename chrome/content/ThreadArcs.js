@@ -1113,3 +1113,16 @@ function displayVisualisationWindow()
 
     setTimeout(function() {POPUP_WINDOW_.THREADARCS_.visualiseMsgId(msg.messageId);}, 1000);
 }
+
+
+
+/** ****************************************************************************
+ * log all JavaScript errors to logfile
+ ******************************************************************************/
+window.onerror = logJavaScriptErrors;
+function logJavaScriptErrors(message, file, line)
+{
+    LOGGER_.logDebug("threadarcs-jserror", {"message": message,
+                                            "file" : file,
+                                            "line" : line});
+}

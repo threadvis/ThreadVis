@@ -1142,6 +1142,16 @@ Visualisation.prototype.visualiseExisting = function(container)
         // note: dot only flashes if circle == true
         var flash = false;
 
+        // if thread has changed and we don't have all container visualisations
+        if (this.containervisualisations_[thiscontainer] == null)
+        {
+            LOGGER_.logDebug("Visualisation.visualiseExisting()", {"action" : "cached visualisation does not contain this message, redraw"});
+            // do a full redraw
+            this.currentcontainer_ = null;
+            this.visualise(container);
+            return;
+        }
+
         this.containervisualisations_[thiscontainer].redraw(this.resize_, x, topheight, selected, flash);
 
         thiscontainer.x_position_ = x;
