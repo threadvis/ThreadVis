@@ -11,8 +11,8 @@
  * Version: $Id$
  ******************************************************************************/
 -->
-<!DOCTYPE overlay SYSTEM "chrome://threadarcsjs/locale/Settings.dtd">
-<overlay id="ThreadArcsJSPreferences"
+<!DOCTYPE overlay SYSTEM "chrome://threadvis/locale/Settings.dtd">
+<overlay id="ThreadVisPreferences"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
     <!--
@@ -24,33 +24,33 @@
     
     <!-- This is for Mozilla. -->
     <treechildren id="panelChildren">
-        <treeitem id="threadarcsjs"
+        <treeitem id="threadvis"
                   container="false">
             <treerow>
                 <treecell id="multizillaPrefCell"
                           class="treecell-indent"
                           label="&settings.title;"
-                          url="chrome://threadarcsjs/content/Settings.xul" />
+                          url="chrome://threadvis/content/Settings.xul" />
             </treerow>
         </treeitem>
     </treechildren>
 
     <!-- This is for Thunderbird < 1.5 -->
     <vbox id="prefsCategories">
-        <button id="threadarcsjs"
+        <button id="threadvis"
                 orient="vertical"
                 class="buttonBoxButton"
                 type="radio"
                 label="&settings.title;"
                 group="categories"
-                url="chrome://threadarcsjs/content/Settings.xul"
-                style="list-style-image: url(chrome://threadarcsjs/content/images/icon.png);" />
+                url="chrome://threadvis/content/Settings.xul"
+                style="list-style-image: url(chrome://threadvis/content/images/icon.png);" />
     </vbox>
 
     <!-- This is for Thunderbird 1.5 -->
     <prefwindow id="MailPreferences">
-        <prefpane id="paneThreadArcsJS" label="&settings.title;"
-                  src="chrome://threadarcsjs/content/Settings15.xul" />
+        <prefpane id="paneThreadVis" label="&settings.title;"
+                  src="chrome://threadvis/content/Settings15.xul" />
     </prefwindow>
 
 </overlay>

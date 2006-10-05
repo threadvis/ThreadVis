@@ -1,8 +1,8 @@
-content     threadarcsjs    jar:chrome/threadarcsjs.jar!/content/
+content     threadvis    jar:chrome/threadvis.jar!/content/
 
-locale      threadarcsjs    en-US   jar:chrome/threadarcsjs.jar!/locale/en-US/
-locale      threadarcsjs    de-DE   jar:chrome/threadarcsjs.jar!/locale/de-DE/
+locale      threadvis    en-US   jar:chrome/threadvis.jar!/locale/en-US/
+locale      threadvis    de-DE   jar:chrome/threadvis.jar!/locale/de-DE/
 
-overlay     chrome://messenger/content/msgHdrViewOverlay.xul    chrome://threadarcsjs/content/ThreadArcs.xul
-overlay     chrome://communicator/content/pref/pref.xul          chrome://threadarcsjs/content/Preferences.xul
-overlay     chrome://messenger/content/preferences/preferences.xul          chrome://threadarcsjs/content/Preferences.xul
+overlay     chrome://messenger/content/msgHdrViewOverlay.xul    chrome://threadvis/content/ThreadVis.xul
+overlay     chrome://communicator/content/pref/pref.xul          chrome://threadvis/content/Preferences.xul
+overlay     chrome://messenger/content/preferences/preferences.xul          chrome://threadvis/content/Preferences.xul

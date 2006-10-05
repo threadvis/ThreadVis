@@ -12,22 +12,22 @@
 -->
 <?xml-stylesheet href="chrome://communicator/skin/pref/pref.css" type="text/css"?>
 <?xml-stylesheet href="chrome://communicator/skin/" type="text/css"?>
-<?xml-stylesheet href="chrome://threadarcsjs/content/Settings.css" type="text/css"?>
-<?xml-stylesheet href="chrome://threadarcsjs/content/Expander.css" type="text/css"?>
+<?xml-stylesheet href="chrome://threadvis/content/Settings.css" type="text/css"?>
+<?xml-stylesheet href="chrome://threadvis/content/Expander.css" type="text/css"?>
 
-<!DOCTYPE page SYSTEM "chrome://threadarcsjs/locale/Settings.dtd">
+<!DOCTYPE page SYSTEM "chrome://threadvis/locale/Settings.dtd">
 <page xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
       headertitle="&settings.title;"
-      onload="parent.initPanel('chrome://threadarcsjs/content/Settings.xul'); init();"
+      onload="parent.initPanel('chrome://threadvis/content/Settings.xul'); init();"
       defaultStyling="true"
       extraStyling="true">
 
     <script type="application/x-javascript"
-            src="chrome://threadarcsjs/content/Settings.js" />
+            src="chrome://threadvis/content/Settings.js" />
 
     <script type="application/x-javascript">
     <![CDATA[
-    var _elementIDs = ["enablethreadarcs",
+    var _elementIDs = ["enablethreadvis",
                        "hidden_disabledaccounts",
                        "hidden_disabledfolders",
                        "dotimescaling",
@@ -82,9 +82,9 @@
 
                 <separator />
                 <groupbox>
-                    <checkbox id="enablethreadarcs"
+                    <checkbox id="enablethreadvis"
                               label="&extension.enabled;"
-                              prefstring="extensions.threadarcsjs.enabled"
+                              prefstring="extensions.threadvis.enabled"
                               prefdefval="true"
                               preftype="bool" />
                 </groupbox>
@@ -98,7 +98,7 @@
                               persist="open"
                               clearhidden="true">
                         <radiogroup id="dotimescaling"
-                                    prefstring="extensions.threadarcsjs.timescaling.enabled"
+                                    prefstring="extensions.threadvis.timescaling.enabled"
                                     prefdefval="true"
                                     preftype="bool">
                             <vbox>
@@ -127,7 +127,7 @@
                         <separator />
                             <checkbox id="enabletimeline"
                                       label="&visualisation.timeline.enable;"
-                                      prefstring="extensions.threadarcsjs.timeline.enabled"
+                                      prefstring="extensions.threadvis.timeline.enabled"
                                       prefdefval="true"
                                       preftype="bool" />
                     </expander>
@@ -140,7 +140,7 @@
                               persist="open"
                               clearhidden="true">
                         <radiogroup id="visualisationsize"
-                                    prefstring="extensions.threadarcsjs.visualisation.size"
+                                    prefstring="extensions.threadvis.visualisation.size"
                                     prefdefval="12x12,12,12,12,6,-1,1,24"
                                     preftype="string">
                             <hbox>
@@ -166,7 +166,7 @@
                             <caption label="&visualisation.defaultzoom.caption;" />
                             <hbox>
                                 <textbox id="defaultzoomwidth"
-                                         prefstring="extensions.threadarcsjs.defaultzoom.width"
+                                         prefstring="extensions.threadvis.defaultzoom.width"
                                          prefdefval="1"
                                          preftype="int"
                                          size="2" />
@@ -174,7 +174,7 @@
                             </hbox>
                             <hbox>
                                 <textbox id="defaultzoomheight"
-                                         prefstring="extensions.threadarcsjs.defaultzoom.height"
+                                         prefstring="extensions.threadvis.defaultzoom.height"
                                          prefdefval="1"
                                          preftype="int"
                                          size="2" />
@@ -191,7 +191,7 @@
                               persist="open"
                               clearhidden="true">
                         <radiogroup id="visualisationcolour"
-                                    prefstring="extensions.threadarcsjs.visualisation.colour"
+                                    prefstring="extensions.threadvis.visualisation.colour"
                                     prefdefval="author"
                                     preftype="string"
                                     oncommand="toggleHighlight();">
@@ -209,7 +209,7 @@
                         </radiogroup>
                         <checkbox id="visualisationhighlight"
                                   label="&visualisation.colour.highlight;"
-                                  prefstring="extensions.threadarcsjs.visualisation.highlight"
+                                  prefstring="extensions.threadvis.visualisation.highlight"
                                   prefdefval="true"
                                   preftype="bool" />
                     </expander>
@@ -222,7 +222,7 @@
                               persist="open"
                               clearhidden="true">
                         <textbox id="hidden_disabledaccounts"
-                               prefstring="extensions.threadarcsjs.disabledaccounts"
+                               prefstring="extensions.threadvis.disabledaccounts"
                                prefdefval="*"
                                preftype="string"
                                hidden="true" />
@@ -234,7 +234,7 @@
                               style="overflow: auto;" 
                               class="indent" />
                         <textbox id="hidden_disabledfolders"
-                                 prefstring="extensions.threadarcsjs.disabledfolders"
+                                 prefstring="extensions.threadvis.disabledfolders"
                                  prefdefval=""
                                  preftype="string" 
                                  hidden="true" />
@@ -248,7 +248,7 @@
                     <checkbox id="dologging"
                               oncommand="toggleLogging();"
                               label="&logfiles.enable.checkbox;"
-                              prefstring="extensions.threadarcsjs.logging.enabled"
+                              prefstring="extensions.threadvis.logging.enabled"
                               prefdefval="false"
                               preftype="bool"/>
                     <label class="indent">
@@ -260,7 +260,7 @@
                     <separator class="thin" />
                     <checkbox id="dologgingdebug"
                               label="&logfiles.debug.checkbox;"
-                              prefstring="extensions.threadarcsjs.logging.debug"
+                              prefstring="extensions.threadvis.logging.debug"
                               prefdefval="false"
                               preftype="bool"/>
                     <label class="indent">

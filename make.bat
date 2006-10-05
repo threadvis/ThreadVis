@@ -10,13 +10,13 @@
 @echo Deleting XPI file
 @echo ======================================================================
 
-@del ThreadArcsJS.xpi
+@del ThreadVis.xpi
 
 @echo ======================================================================
 @echo Creating XPI file
 @echo ======================================================================
 
-@c:\Programme\7-Zip\7z a -tzip ThreadArcsJS.xpi @make.list
+@c:\Programme\7-Zip\7z a -tzip ThreadVis.xpi @make.list
 
 @echo ======================================================================
 @echo Done creating XPI file

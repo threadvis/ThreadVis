@@ -16,10 +16,10 @@ content/Settings.js
 content/Settings.xul
 content/Settings15.xul
 content/SettingsDialog.xul
-content/ThreadArcs.js
-content/ThreadArcs.xul
-content/ThreadArcsPopup.xul
 content/Threader.js
+content/ThreadVis.js
+content/ThreadVis.xul
+content/ThreadVisPopup.xul
 content/Timeline.js
 content/Visualisation.js
 content/images/about.png
@@ -34,9 +34,9 @@ content/images/twisty-closed.png
 content/images/twisty-open.png
 locale/en-US/contents.rdf
 locale/en-US/Settings.dtd
-locale/en-US/ThreadArcs.dtd
-locale/en-US/ThreadArcs.properties
+locale/en-US/ThreadVis.dtd
+locale/en-US/ThreadVis.properties
 locale/de-DE/contents.rdf
 locale/de-DE/Settings.dtd
-locale/de-DE/ThreadArcs.dtd
-locale/de-DE/ThreadArcs.properties
+locale/de-DE/ThreadVis.dtd
+locale/de-DE/ThreadVis.properties

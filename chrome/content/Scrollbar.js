@@ -24,11 +24,11 @@ function Scrollbar(visualisation, stack, box)
     
     this.init(box);
     
-    this.box_horizontal_ = document.getElementById("ThreadArcsJSScrollbarHorizontalBox");
-    this.horizontal_ = document.getElementById("ThreadArcsJSScrollbarHorizontal");
+    this.box_horizontal_ = document.getElementById("ThreadVisScrollbarHorizontalBox");
+    this.horizontal_ = document.getElementById("ThreadVisScrollbarHorizontal");
     
-    this.box_vertical_ = document.getElementById("ThreadArcsJSScrollbarVerticalBox");
-    this.vertical_ = document.getElementById("ThreadArcsJSScrollbarVertical");
+    this.box_vertical_ = document.getElementById("ThreadVisScrollbarVerticalBox");
+    this.vertical_ = document.getElementById("ThreadVisScrollbarVertical");
     
     var ref = this;
     this.horizontal_.addEventListener("mousemove", function(event) {ref.onMouseMoveHorizontal(event);}, false);

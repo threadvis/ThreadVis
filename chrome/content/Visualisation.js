@@ -14,8 +14,8 @@
 var XUL_NAMESPACE_ =
     "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
-var URL_ = "chrome://threadarcsjs/content/images/";
-var THREADARCSJS_PREF_BRANCH_ = "extensions.threadarcsjs.";
+var URL_ = "chrome://threadvis/content/images/";
+var THREADVIS_PREF_BRANCH_ = "extensions.threadvis.";
 var VISUALISATION_PREF_DOTIMESCALING_ = "timescaling.enabled";
 var VISUALISATION_PREF_DOTIMELINE_ = "timeline.enabled";
 var VISUALISATION_PREF_VISUALISATIONSIZE_ = "visualisation.size";
@@ -334,16 +334,16 @@ Visualisation.prototype.convertHSVtoRGB = function(hue,
 Visualisation.prototype.createStack = function()
 {
     LOGGER_.logDebug("Visualisation.createStack()", {});
-    this.box_ = document.getElementById("ThreadArcsJSBox");
-    this.stack_ = document.getElementById("ThreadArcsJSStack");
-    this.strings_ = document.getElementById("ThreadArcsJSStrings");
+    this.box_ = document.getElementById("ThreadVisBox");
+    this.stack_ = document.getElementById("ThreadVisStack");
+    this.strings_ = document.getElementById("ThreadVisStrings");
 
     var ref = this;
     if (! this.stack_)
     {
         LOGGER_.logDebug("Visualisation.createStack()", {"action" : "create stack"});
         this.stack_ = document.createElementNS(XUL_NAMESPACE_, "stack");
-        this.stack_.setAttribute("id", "ThreadArcsJSStack");
+        this.stack_.setAttribute("id", "ThreadVisStack");
         this.stack_.style.position = "relative";
         this.box_.appendChild(this.stack_);
         this.box_.addEventListener("mousemove", function(event) {ref.onMouseMove(event);}, false);
@@ -587,8 +587,8 @@ Visualisation.prototype.onMouseClick = function(event)
     LOGGER_.logDebug("Visualisation.onMouseClick()", {});
     var container = event.target.container;
     if (container && ! container.isDummy())
-        THREADARCS_.callback(container.getMessage().getKey(), 
-                             container.getMessage().getFolder());
+        THREADVIS_.callback(container.getMessage().getKey(), 
+                            container.getMessage().getFolder());
 }
 
 
@@ -710,7 +710,7 @@ Visualisation.prototype.preferenceObserverRegister =  function()
 {
     var prefService = Components.classes["@mozilla.org/preferences-service;1"]
                       .getService(Components.interfaces.nsIPrefService);
-    this.pref_branch_ = prefService.getBranch(THREADARCSJS_PREF_BRANCH_);
+    this.pref_branch_ = prefService.getBranch(THREADVIS_PREF_BRANCH_);
 
     var pbi = this.pref_branch_.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
     pbi.addObserver("", this, false);
@@ -741,32 +741,32 @@ Visualisation.prototype.preferenceReload = function()
                 .getService(Components.interfaces.nsIPrefBranch);
 
     this.pref_timescaling_ = false;
-    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_DOTIMESCALING_) == prefs.PREF_BOOL)
-        this.pref_timescaling_ = prefs.getBoolPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_DOTIMESCALING_);
+    if (prefs.getPrefType(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_DOTIMESCALING_) == prefs.PREF_BOOL)
+        this.pref_timescaling_ = prefs.getBoolPref(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_DOTIMESCALING_);
 
     this.pref_timeline_ = false;
-    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_DOTIMELINE_) == prefs.PREF_BOOL)
-        this.pref_timeline_ = prefs.getBoolPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_DOTIMELINE_);
+    if (prefs.getPrefType(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_DOTIMELINE_) == prefs.PREF_BOOL)
+        this.pref_timeline_ = prefs.getBoolPref(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_DOTIMELINE_);
 
     this.pref_colour_ = "single";
-    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONCOLOUR_) == prefs.PREF_STRING)
-        this.pref_colour_ = prefs.getCharPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONCOLOUR_);
+    if (prefs.getPrefType(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONCOLOUR_) == prefs.PREF_STRING)
+        this.pref_colour_ = prefs.getCharPref(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONCOLOUR_);
 
     this.pref_highlight_ = false;
-    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONHIGHLIGHT_) == prefs.PREF_BOOL)
-        this.pref_highlight_ = prefs.getBoolPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONHIGHLIGHT_);
+    if (prefs.getPrefType(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONHIGHLIGHT_) == prefs.PREF_BOOL)
+        this.pref_highlight_ = prefs.getBoolPref(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONHIGHLIGHT_);
 
     this.pref_defaultzoom_height_ = 1;
-    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_DEFAULTZOOM_HEIGHT_) == prefs.PREF_INT)
-        this.pref_defaultzoom_height_ = prefs.getIntPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_DEFAULTZOOM_HEIGHT_);
+    if (prefs.getPrefType(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_DEFAULTZOOM_HEIGHT_) == prefs.PREF_INT)
+        this.pref_defaultzoom_height_ = prefs.getIntPref(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_DEFAULTZOOM_HEIGHT_);
 
     this.pref_defaultzoom_width_ = 1;
-    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_DEFAULTZOOM_WIDTH_) == prefs.PREF_INT)
-        this.pref_defaultzoom_width_ = prefs.getIntPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_DEFAULTZOOM_WIDTH_);
+    if (prefs.getPrefType(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_DEFAULTZOOM_WIDTH_) == prefs.PREF_INT)
+        this.pref_defaultzoom_width_ = prefs.getIntPref(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_DEFAULTZOOM_WIDTH_);
 
     var todecode = "12x12,12,12,32,6,2,24";
-    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONSIZE_) == prefs.PREF_STRING)
-        todecode = prefs.getCharPref(THREADARCSJS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONSIZE_);
+    if (prefs.getPrefType(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONSIZE_) == prefs.PREF_STRING)
+        todecode = prefs.getCharPref(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONSIZE_);
 
     todecode = todecode.split(",");
     this.name_ = todecode[0] + "/";
@@ -1056,7 +1056,7 @@ Visualisation.prototype.visualise = function(container)
     var popupbox = document.createElementNS(XUL_NAMESPACE_, "box");
     popupbox.style.width = "100%";
     popupbox.style.height = "100%";
-    popupbox.setAttribute("context", "ThreadArcsJSPopUp");
+    popupbox.setAttribute("context", "ThreadVisPopUp");
     this.stack_.appendChild(popupbox);
     
     // check for resize of box
@@ -1239,7 +1239,7 @@ Visualisation.prototype.zoomReset = function()
  ******************************************************************************/
 function zoomIn()
 {
-    THREADARCS_.visualisation_.zoomIn();
+    THREADVIS_.visualisation_.zoomIn();
 }
 
 
@@ -1249,5 +1249,5 @@ function zoomIn()
  ******************************************************************************/
 function zoomOut()
 {
-    THREADARCS_.visualisation_.zoomOut();
+    THREADVIS_.visualisation_.zoomOut();
 }

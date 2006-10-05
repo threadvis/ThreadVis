@@ -12,11 +12,11 @@
 
 var LOGGER_EXTENSION_PATH_ = "extensions";
 var LOGGER_EXTENSION_GUID_ = "{A23E4120-431F-4753-AE53-5D028C42CFDC}";
-var LOGGER_LOGFILENAME_ = "threadarcsjs.log.xml";
-var THREADARCSJS_PREF_BRANCH_ = "extensions.threadarcsjs.";
+var LOGGER_LOGFILENAME_ = "threadvis.log.xml";
+var THREADVIS_PREF_BRANCH_ = "extensions.threadvis.";
 var LOGGER_PREF_DOLOGGING_ = "logging.enabled";
 var LOGGER_PREF_DOLOGGING_DEBUG_ = "logging.debug";
-var LOGGER_STARTTAG_ = '\n<log extensionversion="0.7.1">';
+var LOGGER_STARTTAG_ = '\n<log extensionversion="0.8pre">';
 var LOGGER_ENDTAG_ = "\n</log>";
 
 
@@ -31,7 +31,7 @@ function Logger()
     // init class variables
     this.pref_enablelogging_ = false;
     this.pref_enablelogging_debug_ = false;
-    this.strings_ = document.getElementById("ThreadArcsJSStrings");
+    this.strings_ = document.getElementById("ThreadVisStrings");
 
     this.preferenceObserverRegister();
     this.preferenceReload();
@@ -243,7 +243,7 @@ Logger.prototype.preferenceObserverRegister =  function()
 {
     var prefService = Components.classes["@mozilla.org/preferences-service;1"]
                       .getService(Components.interfaces.nsIPrefService);
-    this.pref_branch_ = prefService.getBranch(THREADARCSJS_PREF_BRANCH_);
+    this.pref_branch_ = prefService.getBranch(THREADVIS_PREF_BRANCH_);
 
     var pbi = this.pref_branch_.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
     pbi.addObserver("", this, false);
@@ -273,12 +273,12 @@ Logger.prototype.preferenceReload = function()
     var prefs = Components.classes["@mozilla.org/preferences-service;1"]
                 .getService(Components.interfaces.nsIPrefBranch);
     this.pref_enablelogging_ = false;
-    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_) == prefs.PREF_BOOL)
-        this.pref_enablelogging_ = prefs.getBoolPref(THREADARCSJS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_);
+    if (prefs.getPrefType(THREADVIS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_) == prefs.PREF_BOOL)
+        this.pref_enablelogging_ = prefs.getBoolPref(THREADVIS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_);
 
     this.pref_enablelogging_debug_ = false;
-    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_DEBUG_) == prefs.PREF_BOOL)
-        this.pref_enablelogging_debug_ = prefs.getBoolPref(THREADARCSJS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_DEBUG_);
+    if (prefs.getPrefType(THREADVIS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_DEBUG_) == prefs.PREF_BOOL)
+        this.pref_enablelogging_debug_ = prefs.getBoolPref(THREADVIS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_DEBUG_);
 }
 
 

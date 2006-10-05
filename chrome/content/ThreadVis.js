@@ -1,9 +1,9 @@
 /** ****************************************************************************
- * ThreadArcs.js
+ * ThreadVis.js
  *
  * (c) 2005-2006 Alexander C. Hubmann
  *
- * JavaScript file for Mozilla part of ThreadArcs Extension
+ * JavaScript file for Mozilla part of ThreadVis Extension
  *
  * Version: $Id$
  ******************************************************************************/
@@ -14,25 +14,25 @@ var HTML_NAMESPACE_ =
 var XUL_NAMESPACE_ =
     "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
-var THREADARCS_ = null;
+var THREADVIS_ = null;
 var LOGGER_ = null;
 var PREFERENCE_OBSERVER_ = null;
-var THREADARCS_PARENT_ = null;
-var THREADARCS_ENABLED_ = false;
-var THREADARCS_DISABLEDACCOUNTS_ = "";
-var THREADARCS_DISABLEDFOLDERS_ = new Array();
+var THREADVIS_PARENT_ = null;
+var THREADVIS_ENABLED_ = false;
+var THREADVIS_DISABLEDACCOUNTS_ = "";
+var THREADVIS_DISABLEDFOLDERS_ = new Array();
 var COPY_MESSAGE_ = null;
 var POPUP_WINDOW_ = null;
 
 // add visualisation at startup
-addEventListener("load", createThreadArcs, false);
+addEventListener("load", createThreadVis, false);
 
 
 
 /** ****************************************************************************
- * create one and only one thread arcs object
+ * create one and only one threadvis object
  ******************************************************************************/
-function createThreadArcs()
+function createThreadVis()
 {
     // create preference observer
     var preference_observer = checkForPreferenceObserver(window);
@@ -48,11 +48,11 @@ function createThreadArcs()
         PREFERENCE_OBSERVER_.registerCallback("disabledfolders", preferenceDisabledFoldersChanged);
     }
 
-    THREADARCS_ENABLED_ = PREFERENCE_OBSERVER_.getPreference("enabled");
-    THREADARCS_DISABLEDACCOUNTS_ = PREFERENCE_OBSERVER_.getPreference("disabledaccounts");
-    THREADARCS_DISABLEDFOLDERS_ = PREFERENCE_OBSERVER_.getPreference("disabledfolders");
+    THREADVIS_ENABLED_ = PREFERENCE_OBSERVER_.getPreference("enabled");
+    THREADVIS_DISABLEDACCOUNTS_ = PREFERENCE_OBSERVER_.getPreference("disabledaccounts");
+    THREADVIS_DISABLEDFOLDERS_ = PREFERENCE_OBSERVER_.getPreference("disabledfolders");
 
-    if (! THREADARCS_ENABLED_)
+    if (! THREADVIS_ENABLED_)
     {
         deleteBox();
         return;
@@ -67,9 +67,9 @@ function createThreadArcs()
     else
         LOGGER_ = new Logger();
 
-    THREADARCS_PARENT_ = checkForThreadArcs(window);
-    if (THREADARCS_ == null)
-        THREADARCS_ = new ThreadArcs();
+    THREADVIS_PARENT_ = checkForThreadVis(window);
+    if (THREADVIS_ == null)
+        THREADVIS_ = new ThreadVis();
 }
 
 
@@ -93,21 +93,21 @@ function checkForLogger(win)
 
 
 /** ****************************************************************************
- * Check all openers for threadarcs
+ * Check all openers for threadvis
  ******************************************************************************/
-function checkForThreadArcs(win)
+function checkForThreadVis(win)
 {
     if (! win)
         return null;
 
-    if (win.THREADARCS_)
-        return win.THREADARCS_;
+    if (win.THREADVIS_)
+        return win.THREADVIS_;
 
-    if (win.THREADARCS_PARENT_)
-        return win.THREADARCS_PARENT_;
+    if (win.THREADVIS_PARENT_)
+        return win.THREADVIS_PARENT_;
 
     if (win.opener)
-        return checkForThreadArcs(win.opener);
+        return checkForThreadVis(win.opener);
 
     return null;
 }
@@ -135,7 +135,7 @@ function checkForPreferenceObserver(win)
 /** ****************************************************************************
  * Open the options dialog for this extension
  ******************************************************************************/
-function openThreadArcsJSOptionsDialog()
+function openThreadVisOptionsDialog()
 {
     if (typeof(openOptionsDialog) == "undefined")
     {
@@ -143,7 +143,7 @@ function openThreadArcsJSOptionsDialog()
         // Although Thunderbird also knows goPreferences, Thunderbird 1.5
         // has some problems with it, so we use it only for Mozilla and use
         // openOptionsDialog for Thunderbird. For details see comments below.
-        goPreferences('threadarcsjs', 'chrome://threadarcsjs/content/Settings.xul','threadarcsjs');
+        goPreferences('threadvis', 'chrome://threadvis/content/Settings.xul','threadvis');
     }
     else
     {
@@ -173,10 +173,10 @@ function openThreadArcsJSOptionsDialog()
         // have two separate XUL files to edit the preferences for this extension.
         //
         // So we have Settings15.xul which gets used in Thunderbird 1.5 (and 
-        // which defines the paneThreadArcsJS component which gets passed as
+        // which defines the paneThreadVis component which gets passed as
         // aPaneID), and we have Settings.xul which gets used in Thunderbird < 1.5
         // and Mozilla (which URL gets passed as paneURL).
-        openOptionsDialog('paneThreadArcsJS', 'chrome://threadarcsjs/content/Settings.xul');
+        openOptionsDialog('paneThreadVis', 'chrome://threadvis/content/Settings.xul');
     }
 }
 
@@ -185,9 +185,9 @@ function openThreadArcsJSOptionsDialog()
 /** ****************************************************************************
  * constructor
  ******************************************************************************/
-function ThreadArcs()
+function ThreadVis()
 {
-    LOGGER_.log("threadarcs",
+    LOGGER_.log("threadvis",
                     {"action": "startup"});
 
     // synchronization variables
@@ -205,15 +205,15 @@ function ThreadArcs()
     this.clearVisualisation();
 
     // threader object
-    if (THREADARCS_PARENT_)
+    if (THREADVIS_PARENT_)
     {
-        this.threader_ = THREADARCS_PARENT_.threader_;
-        this.loaded_ = THREADARCS_PARENT_.loaded_;
-        this.threaded_ = THREADARCS_PARENT_.threaded_;
-        this.server_ = THREADARCS_PARENT_.server_;
+        this.threader_ = THREADVIS_PARENT_.threader_;
+        this.loaded_ = THREADVIS_PARENT_.loaded_;
+        this.threaded_ = THREADVIS_PARENT_.threaded_;
+        this.server_ = THREADVIS_PARENT_.server_;
         
         // visualise selected message
-        this.visualise(THREADARCS_PARENT_.selected_container_);
+        this.visualise(THREADVIS_PARENT_.selected_container_);
         return;
     }
     else
@@ -286,15 +286,15 @@ function ThreadArcs()
 /** ****************************************************************************
  * Add a message to the threader
  ******************************************************************************/
-ThreadArcs.prototype.addMessage = function(header)
+ThreadVis.prototype.addMessage = function(header)
 {
-    if (! THREADARCS_ENABLED_)
+    if (! THREADVIS_ENABLED_)
         return;
     if (! this.checkEnabledAccountOrFolder())
         return
 
 
-    LOGGER_.logDebug("ThreadArcs.addMessage()", {});
+    LOGGER_.logDebug("ThreadVis.addMessage()", {});
     var date = new Date();
     // PRTime is in microseconds, Javascript time is in milliseconds
     // so divide by 1000 when converting
@@ -324,9 +324,9 @@ ThreadArcs.prototype.addMessage = function(header)
 /** ****************************************************************************
  * Add all messages from current account
  ******************************************************************************/
-ThreadArcs.prototype.addMessages = function()
+ThreadVis.prototype.addMessages = function()
 {
-    if (! THREADARCS_ENABLED_)
+    if (! THREADVIS_ENABLED_)
         return;
     if (! this.checkEnabledAccountOrFolder())
         return;
@@ -358,9 +358,9 @@ ThreadArcs.prototype.addMessages = function()
 /** ****************************************************************************
  * Add all messages in this folder
  ******************************************************************************/
-ThreadArcs.prototype.addMessagesFromFolder = function(folder)
+ThreadVis.prototype.addMessagesFromFolder = function(folder)
 {
-    if (! THREADARCS_ENABLED_)
+    if (! THREADVIS_ENABLED_)
         return;
 
     if (! this.checkEnabledAccountOrFolder(folder))
@@ -372,13 +372,13 @@ ThreadArcs.prototype.addMessagesFromFolder = function(folder)
 
     if (this.add_messages_from_folder_done_)
     {
-        LOGGER_.logDebug("ThreadArcs.addMessagesFromFolder()",
+        LOGGER_.logDebug("ThreadVis.addMessagesFromFolder()",
                             {"folder" : folder.URI,
                              "action" : "end"});
         return;
     }
 
-    LOGGER_.logDebug("ThreadArcs.addMessagesFromFolder()",
+    LOGGER_.logDebug("ThreadVis.addMessagesFromFolder()",
                         {"folder" : folder.URI,
                          "action" : "start"});
 
@@ -389,7 +389,7 @@ ThreadArcs.prototype.addMessagesFromFolder = function(folder)
     }
     catch (exception)
     {
-        LOGGER_.logDebug("ThreadArcs.addMessagesFromFolder()",
+        LOGGER_.logDebug("ThreadVis.addMessagesFromFolder()",
                             {"folder" : folder.URI,
                              "action" : "caught exception " + exception});
         this.add_messages_from_folder_done_ = true;
@@ -410,22 +410,22 @@ ThreadArcs.prototype.addMessagesFromFolder = function(folder)
  * do a setTimeout call every this.add_messages_from_folder_enumerator_maxcounter_ messages
  * to give ui time to do its thing
  ******************************************************************************/
-ThreadArcs.prototype.addMessagesFromFolderEnumerator = function(enumerator)
+ThreadVis.prototype.addMessagesFromFolderEnumerator = function(enumerator)
 {
-    if (! THREADARCS_ENABLED_)
+    if (! THREADVIS_ENABLED_)
         return;
     if (! this.checkEnabledAccountOrFolder())
         return
 
 
-    LOGGER_.logDebug("ThreadArcs.addMessagesFromFolderEnumerator()", {"action" : "start"});
+    LOGGER_.logDebug("ThreadVis.addMessagesFromFolderEnumerator()", {"action" : "start"});
     var header = null;
     while (enumerator.hasMoreElements())
     {
         this.add_messages_from_folder_enumerator_counter_++;
         if (this.add_messages_from_folder_enumerator_counter_ >= this.add_messages_from_folder_enumerator_maxcounter_)
         {
-            LOGGER_.logDebug("ThreadArcs.addMessagesFromFolderEnumerator()", {"action" : "pause"});
+            LOGGER_.logDebug("ThreadVis.addMessagesFromFolderEnumerator()", {"action" : "pause"});
             var ref = this;
             this.add_messages_from_folder_enumerator_counter_ = 0;
             setTimeout(function() {ref.addMessagesFromFolderEnumerator(enumerator);}, 10);
@@ -439,7 +439,7 @@ ThreadArcs.prototype.addMessagesFromFolderEnumerator = function(enumerator)
         }
     }
 
-    LOGGER_.logDebug("ThreadArcs.addMessagesFromFolderEnumerator()",
+    LOGGER_.logDebug("ThreadVis.addMessagesFromFolderEnumerator()",
                         {"action" : "end"});
     this.add_messages_from_folder_done_ = true;
     this.add_messages_from_folder_doing_ = false;
@@ -452,10 +452,10 @@ ThreadArcs.prototype.addMessagesFromFolderEnumerator = function(enumerator)
  * called after mouse click in extension
  * select message in mail view
  ******************************************************************************/
-ThreadArcs.prototype.callback = function(msg_key,
+ThreadVis.prototype.callback = function(msg_key,
                                          folder)
 {
-    if (! THREADARCS_ENABLED_)
+    if (! THREADVIS_ENABLED_)
         return;
     if (! this.checkEnabledAccountOrFolder())
         return
@@ -498,7 +498,7 @@ ThreadArcs.prototype.callback = function(msg_key,
 /** ****************************************************************************
  * Check if current account is enabled in extension
  ******************************************************************************/
-ThreadArcs.prototype.checkEnabledAccountOrFolder = function(folder)
+ThreadVis.prototype.checkEnabledAccountOrFolder = function(folder)
 {
     if (! folder)
         folder = this.getMainWindow().GetLoadedMsgFolder();
@@ -513,22 +513,22 @@ ThreadArcs.prototype.checkEnabledAccountOrFolder = function(folder)
 
     var regexp_account = new RegExp(account.key);
 
-    if (THREADARCS_DISABLEDACCOUNTS_ != "" && 
-        THREADARCS_DISABLEDACCOUNTS_.match(regexp_account))
+    if (THREADVIS_DISABLEDACCOUNTS_ != "" && 
+        THREADVIS_DISABLEDACCOUNTS_.match(regexp_account))
     {
         LOGGER_.logDebug("accountdisabled",
-                            {"total_regexp" : THREADARCS_DISABLEDACCOUNTS_,
+                            {"total_regexp" : THREADVIS_DISABLEDACCOUNTS_,
                              "this_account" : account.key});
         return false;
     }
     else
     {
         var regexp_folder = new RegExp(folder.URI + " ");
-        if (THREADARCS_DISABLEDFOLDERS_ != "" && 
-            THREADARCS_DISABLEDFOLDERS_.match(regexp_folder))
+        if (THREADVIS_DISABLEDFOLDERS_ != "" && 
+            THREADVIS_DISABLEDFOLDERS_.match(regexp_folder))
         {
             LOGGER_.logDebug("folderdisabled",
-                                {"total_regexp" : THREADARCS_DISABLEDFOLDERS_,
+                                {"total_regexp" : THREADVIS_DISABLEDFOLDERS_,
                                 "this_folder" : folder.URI});
             return false;
         }
@@ -544,11 +544,11 @@ ThreadArcs.prototype.checkEnabledAccountOrFolder = function(folder)
 /** ****************************************************************************
  * clear visualisation
  ******************************************************************************/
-ThreadArcs.prototype.clearVisualisation = function()
+ThreadVis.prototype.clearVisualisation = function()
 {
-    LOGGER_.logDebug("ThreadArcs.clearVisualisation()", {"clear" : this.clear_});
+    LOGGER_.logDebug("ThreadVis.clearVisualisation()", {"clear" : this.clear_});
 
-    if (! THREADARCS_ENABLED_ )
+    if (! THREADVIS_ENABLED_ )
     {
         return;
     }
@@ -563,20 +563,20 @@ ThreadArcs.prototype.clearVisualisation = function()
 
 
 /** ****************************************************************************
- * create thread arcs xul box
+ * create threadvis xul box
  ******************************************************************************/
 function createBox()
 {
-    if (document.getElementById("ThreadArcsJSBox"))
+    if (document.getElementById("ThreadVisBox"))
         return;
 
     var box = document.createElementNS(XUL_NAMESPACE_, "vbox");
-    box.setAttribute("id", "ThreadArcsJSBox");
+    box.setAttribute("id", "ThreadVisBox");
     box.setAttribute("minheight", 50);
     box.setAttribute("minwidth", 200);
     box.setAttribute("flex", 2);
     box.setAttribute("align", "right");
-    box.setAttribute("context", "ThreadArcsJSPopUp");
+    box.setAttribute("context", "ThreadVisPopUp");
     
     var headerbox = document.getElementById("expandedHeaderView");
     headerbox.appendChild(box);
@@ -585,11 +585,11 @@ function createBox()
 
 
 /** ****************************************************************************
- * delete thread arcs xul box
+ * delete threadvis xul box
  ******************************************************************************/
 function deleteBox()
 {
-    var box = document.getElementById("ThreadArcsJSBox");
+    var box = document.getElementById("ThreadVisBox");
     if (! box)
         return;
 
@@ -602,15 +602,15 @@ function deleteBox()
 /** ****************************************************************************
  * thread all messages
  ******************************************************************************/
-ThreadArcs.prototype.doThreading = function()
+ThreadVis.prototype.doThreading = function()
 {
-    if (! THREADARCS_ENABLED_)
+    if (! THREADVIS_ENABLED_)
         return;
     if (! this.checkEnabledAccountOrFolder())
         return
 
 
-    LOGGER_.logDebug("ThreadArcs.doThreading()", {});
+    LOGGER_.logDebug("ThreadVis.doThreading()", {});
     if (! this.threading_ && ! this.threaded_)
     {
         this.threading_ = true;
@@ -636,15 +636,15 @@ ThreadArcs.prototype.doThreading = function()
 /** ****************************************************************************
  * Build a list of all folders to add messages from
  ******************************************************************************/
-ThreadArcs.prototype.getAllFolders = function(folder)
+ThreadVis.prototype.getAllFolders = function(folder)
 {
-    if (! THREADARCS_ENABLED_)
+    if (! THREADVIS_ENABLED_)
         return;
     if (! this.checkEnabledAccountOrFolder())
         return
 
 
-    LOGGER_.logDebug("ThreadArcs.getAllFolders()",
+    LOGGER_.logDebug("ThreadVis.getAllFolders()",
                         {"folder" : folder.URI});
     var folder_enumerator = folder.GetSubFolders();
     var current_folder = null;
@@ -681,7 +681,7 @@ ThreadArcs.prototype.getAllFolders = function(folder)
 /** ****************************************************************************
  * Return main window object
 ******************************************************************************/
-ThreadArcs.prototype.getMainWindow = function()
+ThreadVis.prototype.getMainWindow = function()
 {
     var w = window;
     
@@ -700,15 +700,15 @@ ThreadArcs.prototype.getMainWindow = function()
  * add all messages
  * if not already done
  ******************************************************************************/
-ThreadArcs.prototype.initMessages = function()
+ThreadVis.prototype.initMessages = function()
 {
-    if (! THREADARCS_ENABLED_)
+    if (! THREADVIS_ENABLED_)
         return;
     if (! this.checkEnabledAccountOrFolder())
         return
 
 
-    LOGGER_.logDebug("ThreadArcs.initMessages()", {});
+    LOGGER_.logDebug("ThreadVis.initMessages()", {});
     if (! this.loaded_ && ! this.loading_)
     {
         this.loading_ = true;
@@ -722,7 +722,7 @@ ThreadArcs.prototype.initMessages = function()
 /** ****************************************************************************
  * called when new folder added
  ******************************************************************************/
-ThreadArcs.prototype.onFolderAdded = function(folder)
+ThreadVis.prototype.onFolderAdded = function(folder)
 {
     if (! this.checkEnabledAccountOrFolder(folder))
         return
@@ -753,7 +753,7 @@ ThreadArcs.prototype.onFolderAdded = function(folder)
 /** ****************************************************************************
  * called to wait to thread new folder
  ******************************************************************************/
-ThreadArcs.prototype.onFolderAddedWaitForThreading = function()
+ThreadVis.prototype.onFolderAddedWaitForThreading = function()
 {
     if (this.add_messages_from_folder_done_)
     {
@@ -773,7 +773,7 @@ ThreadArcs.prototype.onFolderAddedWaitForThreading = function()
 /** ****************************************************************************
  * called to wait to thread new folder
  ******************************************************************************/
-ThreadArcs.prototype.onFolderAddedWaitForVisualisation = function()
+ThreadVis.prototype.onFolderAddedWaitForVisualisation = function()
 {
     if (this.threader_.getDone())
     {
@@ -793,7 +793,7 @@ ThreadArcs.prototype.onFolderAddedWaitForVisualisation = function()
  * called when new messages arrive
  * either from server or moved from one folder to the other (only POP!!)
  ******************************************************************************/
-ThreadArcs.prototype.onItemAdded = function(parentItem, item, view)
+ThreadVis.prototype.onItemAdded = function(parentItem, item, view)
 {
     var start = new Date();
     LOGGER_.log("addadditionalmessages", {"action" : "start"});
@@ -814,7 +814,7 @@ ThreadArcs.prototype.onItemAdded = function(parentItem, item, view)
  * called when messages are deleted
  * not called at the moment
  ******************************************************************************/
-ThreadArcs.prototype.onItemRemoved = function(parentItem, item, view)
+ThreadVis.prototype.onItemRemoved = function(parentItem, item, view)
 {
     var start = new Date();
     LOGGER_.log("deletemessage", {"action" : "start"});
@@ -839,9 +839,9 @@ ThreadArcs.prototype.onItemRemoved = function(parentItem, item, view)
  ******************************************************************************/
 function preferenceDisabledAccountsChanged(value)
 {
-    THREADARCS_ENABLEDACCOUNTS_ = value;
-    createThreadArcs();
-    THREADARCS_.doLoad.onStartHeaders();
+    THREADVIS_ENABLEDACCOUNTS_ = value;
+    createThreadVis();
+    THREADVIS_.doLoad.onStartHeaders();
 }
 
 
@@ -851,8 +851,8 @@ function preferenceDisabledAccountsChanged(value)
  ******************************************************************************/
 function preferenceEnabledChanged(value)
 {
-    THREADARCS_ENABLED_ = value;
-    createThreadArcs();
+    THREADVIS_ENABLED_ = value;
+    createThreadVis();
 }
 
 
@@ -862,9 +862,9 @@ function preferenceEnabledChanged(value)
  ******************************************************************************/
 function preferenceDisabledFoldersChanged(value)
 {
-    THREADARCS_DISABLEDFOLDERS_ = value;
-    createThreadArcs();
-    THREADARCS_.doLoad.onStartHeaders();
+    THREADVIS_DISABLEDFOLDERS_ = value;
+    createThreadVis();
+    THREADVIS_.doLoad.onStartHeaders();
 }
 
 
@@ -873,9 +873,9 @@ function preferenceDisabledFoldersChanged(value)
  * Called when a message is selected
  * Call visualisation with messageid to visualise
  ******************************************************************************/
-ThreadArcs.prototype.setSelectedMessage = function()
+ThreadVis.prototype.setSelectedMessage = function()
 {
-    if (! THREADARCS_ENABLED_)
+    if (! THREADVIS_ENABLED_)
         return;
     if (! this.checkEnabledAccountOrFolder())
     {
@@ -884,7 +884,7 @@ ThreadArcs.prototype.setSelectedMessage = function()
     }
 
 
-    LOGGER_.logDebug("ThreadArcs.setSelectedMessage()", {});
+    LOGGER_.logDebug("ThreadVis.setSelectedMessage()", {});
     if (! this.loaded_ || ! this.threaded_)
     {
         var ref = this;
@@ -930,9 +930,9 @@ ThreadArcs.prototype.setSelectedMessage = function()
 /** ****************************************************************************
  * close log file on unload
  ******************************************************************************/
-ThreadArcs.prototype.unloadHandler = function()
+ThreadVis.prototype.unloadHandler = function()
 {
-    LOGGER_.log("threadarcs",
+    LOGGER_.log("threadvis",
         {"action": "unload"});
     LOGGER_.close();
     this.threader_.closeCopyCut();
@@ -943,14 +943,14 @@ ThreadArcs.prototype.unloadHandler = function()
 /** ****************************************************************************
  * Visualise a container
  ******************************************************************************/
-ThreadArcs.prototype.visualise = function(container)
+ThreadVis.prototype.visualise = function(container)
 {
-    if (! THREADARCS_ENABLED_)
+    if (! THREADVIS_ENABLED_)
         return;
     if (! this.checkEnabledAccountOrFolder())
         return
 
-    LOGGER_.logDebug("ThreadArcs.visualise()",
+    LOGGER_.logDebug("ThreadVis.visualise()",
                         {"container" : container});
 
     var msgkey = container.isDummy() ? 
@@ -977,15 +977,15 @@ ThreadArcs.prototype.visualise = function(container)
  * find the container
  * call method visualise(container)
  ******************************************************************************/
-ThreadArcs.prototype.visualiseMsgId = function(message_id)
+ThreadVis.prototype.visualiseMsgId = function(message_id)
 {
-    if (! THREADARCS_ENABLED_)
+    if (! THREADVIS_ENABLED_)
         return;
     if (! this.checkEnabledAccountOrFolder())
         return
 
 
-    LOGGER_.logDebug("ThreadArcs.visualiseMsgId()",
+    LOGGER_.logDebug("ThreadVis.visualiseMsgId()",
                         {"message-id" : message_id});
 
     var container = this.threader_.findContainer(message_id);
@@ -996,7 +996,7 @@ ThreadArcs.prototype.visualiseMsgId = function(message_id)
         
         // visualise any popup windows that might exist
         if (POPUP_WINDOW_)
-            POPUP_WINDOW_.THREADARCS_.visualise(container);
+            POPUP_WINDOW_.THREADVIS_.visualise(container);
     }
     else
     {
@@ -1006,7 +1006,7 @@ ThreadArcs.prototype.visualiseMsgId = function(message_id)
         // thus, thread the whole folder we are in
         this.clearVisualisation();
         if (POPUP_WINDOW_)
-            POPUP_WINDOW_.THREADARCS_.clearVisualisation();
+            POPUP_WINDOW_.THREADVIS_.clearVisualisation();
         this.onFolderAdded(GetLoadedMsgFolder());
     }
     container = null;
@@ -1017,9 +1017,9 @@ ThreadArcs.prototype.visualiseMsgId = function(message_id)
 /** ****************************************************************************
  * Wait until all messages are added
  ******************************************************************************/
-ThreadArcs.prototype.waitForAddMessages = function()
+ThreadVis.prototype.waitForAddMessages = function()
 {
-    if (! THREADARCS_ENABLED_)
+    if (! THREADVIS_ENABLED_)
         return;
     
     if (! this.checkEnabledAccountOrFolder())
@@ -1047,7 +1047,7 @@ ThreadArcs.prototype.waitForAddMessages = function()
 
     // look at next folder
     var folder = this.folders_.shift();
-    LOGGER_.logDebug("ThreadArcs.waitForAddMessages()",
+    LOGGER_.logDebug("ThreadVis.waitForAddMessages()",
                         {"action" : "next folder",
                          "folder" : folder});
 
@@ -1073,15 +1073,15 @@ ThreadArcs.prototype.waitForAddMessages = function()
  * wait for all messages to be added
  * then start threading
  ******************************************************************************/
-ThreadArcs.prototype.waitForThreading = function()
+ThreadVis.prototype.waitForThreading = function()
 {
-    if (! THREADARCS_ENABLED_)
+    if (! THREADVIS_ENABLED_)
         return;
     if (! this.checkEnabledAccountOrFolder())
         return
 
 
-    LOGGER_.logDebug("ThreadArcs.waitForThreading()", {});
+    LOGGER_.logDebug("ThreadVis.waitForThreading()", {});
 
     if (this.loaded_ &&
         ! this.threaded_ &&
@@ -1105,13 +1105,13 @@ ThreadArcs.prototype.waitForThreading = function()
  ******************************************************************************/
 function displayVisualisationWindow()
 {
-    POPUP_WINDOW_  = window.openDialog("chrome://threadarcsjs/content/ThreadArcsPopup.xul");
+    POPUP_WINDOW_ = window.openDialog("chrome://threadvis/content/ThreadVisPopup.xul");
     // get currently loaded message
     var msg_uri = GetLoadedMessage();
     var msg = messenger.messageServiceFromURI(msg_uri)
               .messageURIToMsgHdr(msg_uri);
 
-    setTimeout(function() {POPUP_WINDOW_.THREADARCS_.visualiseMsgId(msg.messageId);}, 1000);
+    setTimeout(function() {POPUP_WINDOW_.THREADVIS_.visualiseMsgId(msg.messageId);}, 1000);
 }
 
 
@@ -1122,7 +1122,7 @@ function displayVisualisationWindow()
 window.onerror = logJavaScriptErrors;
 function logJavaScriptErrors(message, file, line)
 {
-    LOGGER_.logDebug("threadarcs-jserror", {"message": message,
-                                            "file" : file,
-                                            "line" : line});
+    LOGGER_.logDebug("threadvis-jserror", {"message": message,
+                                           "file" : file,
+                                           "line" : line});
 }

@@ -12,58 +12,58 @@
  * Version: $Id$
  ******************************************************************************/
 -->
-<?xml-stylesheet href="chrome://threadarcsjs/content/Settings.css" type="text/css"?>
-<?xml-stylesheet href="chrome://threadarcsjs/content/Expander.css" type="text/css"?>
+<?xml-stylesheet href="chrome://threadvis/content/Settings.css" type="text/css"?>
+<?xml-stylesheet href="chrome://threadvis/content/Expander.css" type="text/css"?>
 
-<!DOCTYPE overlay SYSTEM "chrome://threadarcsjs/locale/Settings.dtd">
-<overlay id="ThreadArcsJSPaneOverlay"
+<!DOCTYPE overlay SYSTEM "chrome://threadvis/locale/Settings.dtd">
+<overlay id="ThreadVisPaneOverlay"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
            
-    <prefpane id="paneThreadArcsJS" onpaneload="init();">
+    <prefpane id="paneThreadVis" onpaneload="init();">
 
         <script type="application/x-javascript"
-                src="chrome://threadarcsjs/content/Settings.js" />
+                src="chrome://threadvis/content/Settings.js" />
 
         <preferences>
-            <preference id="extensions.threadarcsjs.enabled"
-                        name="extensions.threadarcsjs.enabled"
+            <preference id="extensions.threadvis.enabled"
+                        name="extensions.threadvis.enabled"
                         type="bool" />
-            <preference id="extensions.threadarcsjs.disabledaccounts"
-                        name="extensions.threadarcsjs.disabledaccounts"
+            <preference id="extensions.threadvis.disabledaccounts"
+                        name="extensions.threadvis.disabledaccounts"
                         type="string" />
-            <preference id="extensions.threadarcsjs.disabledfolders"
-                        name="extensions.threadarcsjs.disabledfolders"
+            <preference id="extensions.threadvis.disabledfolders"
+                        name="extensions.threadvis.disabledfolders"
                         type="string" />
-            <preference id="extensions.threadarcsjs.timescaling.enabled"
-                        name="extensions.threadarcsjs.timescaling.enabled"
+            <preference id="extensions.threadvis.timescaling.enabled"
+                        name="extensions.threadvis.timescaling.enabled"
                         type="bool" />
-            <preference id="extensions.threadarcsjs.timeline.enabled"
-                        name="extensions.threadarcsjs.timeline.enabled"
+            <preference id="extensions.threadvis.timeline.enabled"
+                        name="extensions.threadvis.timeline.enabled"
                         type="bool" />
-            <preference id="extensions.threadarcsjs.visualisation.size"
-                        name="extensions.threadarcsjs.visualisation.size"
+            <preference id="extensions.threadvis.visualisation.size"
+                        name="extensions.threadvis.visualisation.size"
                         type="string" />
-            <preference id="extensions.threadarcsjs.defaultzoom.height"
-                        name="extensions.threadarcsjs.defaultzoom.height"
+            <preference id="extensions.threadvis.defaultzoom.height"
+                        name="extensions.threadvis.defaultzoom.height"
                         type="int" />
-            <preference id="extensions.threadarcsjs.defaultzoom.width"
-                        name="extensions.threadarcsjs.defaultzoom.width"
+            <preference id="extensions.threadvis.defaultzoom.width"
+                        name="extensions.threadvis.defaultzoom.width"
                         type="int" />
-            <preference id="extensions.threadarcsjs.visualisation.colour"
-                        name="extensions.threadarcsjs.visualisation.colour"
+            <preference id="extensions.threadvis.visualisation.colour"
+                        name="extensions.threadvis.visualisation.colour"
                         type="string" />
-            <preference id="extensions.threadarcsjs.visualisation.highlight"
-                        name="extensions.threadarcsjs.visualisation.highlight"
+            <preference id="extensions.threadvis.visualisation.highlight"
+                        name="extensions.threadvis.visualisation.highlight"
                         type="bool" />
-            <preference id="extensions.threadarcsjs.logging.enabled"
-                        name="extensions.threadarcsjs.logging.enabled"
+            <preference id="extensions.threadvis.logging.enabled"
+                        name="extensions.threadvis.logging.enabled"
                         type="bool" />
-            <preference id="extensions.threadarcsjs.logging.debug"
-                        name="extensions.threadarcsjs.logging.debug"
+            <preference id="extensions.threadvis.logging.debug"
+                        name="extensions.threadvis.logging.debug"
                         type="bool" />
         </preferences>
 
-        <tabbox flex="1" id="ThreadArcsJSTabBox">
+        <tabbox flex="1" id="ThreadVisTabBox">
             <tabs id="settingstabs">
                 <tab label="&about.tab;" />
                 <tab label="&visualisation.timescaling.caption;" />
@@ -79,7 +79,7 @@
                     <label value="&extension.name;"
                            id="extension-name" />
                     <hbox>
-                        <image src="chrome://threadarcsjs/content/images/about.png" />
+                        <image src="chrome://threadvis/content/images/about.png" />
                     </hbox>
                     <label value="&about.version; &extension.version;"
                            id="about-version" />
@@ -98,20 +98,20 @@
                            id="about-homepage" />
                     <separator class="thin" />
                     <groupbox>
-                        <checkbox id="enablethreadarcs"
+                        <checkbox id="enablethreadvis"
                                   label="&extension.enabled;"
-                                  preference="extensions.threadarcsjs.enabled" />
+                                  preference="extensions.threadvis.enabled" />
                     </groupbox>
                 </tabpanel>
 
                 <tabpanel id="visualisation.timescaling" orient="vertical" flex="1">
                     <radiogroup id="dotimescaling"
-                                preference="extensions.threadarcsjs.timescaling.enabled">
+                                preference="extensions.threadvis.timescaling.enabled">
                         <vbox>
                             <radio value="false"
                                    label="&visualisation.timescaling.disable;" />
                             <hbox class="indent">
-                                <image src="chrome://threadarcsjs/content/images/timescaling_disabled.png" />
+                                <image src="chrome://threadvis/content/images/timescaling_disabled.png" />
                             </hbox>
                             <separator class="thin" />
                             <label class="indent">
@@ -122,7 +122,7 @@
                         <vbox>
                             <radio value="true" label="&visualisation.timescaling.enable;" />
                             <hbox class="indent">
-                                <image src="chrome://threadarcsjs/content/images/timescaling_enabled.png"/>
+                                <image src="chrome://threadvis/content/images/timescaling_enabled.png"/>
                             </hbox>
                             <separator class="thin" />
                             <label class="indent">
@@ -133,28 +133,28 @@
                     <separator />
                     <checkbox id="enabletimeline"
                               label="&visualisation.timeline.enable;"
-                              preference="extensions.threadarcsjs.timeline.enabled" />
+                              preference="extensions.threadvis.timeline.enabled" />
                 </tabpanel>
 
                 <tabpanel id="visualisation.size" orient="vertical" flex="1">
                     <radiogroup id="visualisationsize"
-                                preference="extensions.threadarcsjs.visualisation.size">
+                                preference="extensions.threadvis.visualisation.size">
                         <hbox>
                             <radio value="8x8,8,8,24,4,1,16"
                                    label="&visualisation.size.small;" />
-                            <image src="chrome://threadarcsjs/content/images/size_8.png" />
+                            <image src="chrome://threadvis/content/images/size_8.png" />
                         </hbox>
                         <separator class="thin" />
                         <hbox>
                             <radio value="12x12,12,12,32,6,2,24"
                                    label="&visualisation.size.medium;" />
-                            <image src="chrome://threadarcsjs/content/images/size_12.png" />
+                            <image src="chrome://threadvis/content/images/size_12.png" />
                         </hbox>
                         <separator class="thin" />
                         <hbox>
                             <radio value="16x16,16,16,40,8,3,32"
                                    label="&visualisation.size.large;" />
-                            <image src="chrome://threadarcsjs/content/images/size_16.png" />
+                            <image src="chrome://threadvis/content/images/size_16.png" />
                         </hbox>
                     </radiogroup>
                     <separator />
@@ -162,13 +162,13 @@
                         <caption label="&visualisation.defaultzoom.caption;" />
                         <hbox>
                             <textbox id="defaultzoomwidth"
-                                     preference="extensions.threadarcsjs.defaultzoom.width"
+                                     preference="extensions.threadvis.defaultzoom.width"
                                      size="2" />
                             <label value="&visualisation.defaultzoom.width;" />
                         </hbox>
                         <hbox>
                             <textbox id="defaultzoomheight"
-                                     preference="extensions.threadarcsjs.defaultzoom.height"
+                                     preference="extensions.threadvis.defaultzoom.height"
                                      size="2" />
                             <label value="&visualisation.defaultzoom.height;" />
                         </hbox>
@@ -177,7 +177,7 @@
 
                 <tabpanel id="visualisation.colour" orient="vertical" flex="1">
                     <radiogroup id="visualisationcolour"
-                                preference="extensions.threadarcsjs.visualisation.colour"
+                                preference="extensions.threadvis.visualisation.colour"
                                 oncommand="toggleHighlight();">
                        <radio value="single"
                               label="&visualisation.colour.single.caption;" />
@@ -194,12 +194,12 @@
                     <checkbox id="visualisationhighlight"
                               label="&visualisation.colour.highlight;"
                               class="indent"
-                              preference="extensions.threadarcsjs.visualisation.highlight" />
+                              preference="extensions.threadvis.visualisation.highlight" />
                 </tabpanel>
 
                 <tabpanel id="visualisation.accountsfolders" orient="vertical" flex="1">
                     <textbox id="hidden_disabledaccounts"
-                             preference="extensions.threadarcsjs.disabledaccounts"
+                             preference="extensions.threadvis.disabledaccounts"
                              hidden="true" />
                     <label class="indent">
                         &visualisation.enabledaccounts.description;
@@ -209,7 +209,7 @@
                                 style="overflow: auto;"
                                 class="indent" />
                             <textbox id="hidden_disabledfolders"
-                                     preference="extensions.threadarcsjs.disabledfolders"
+                                     preference="extensions.threadvis.disabledfolders"
                                      hidden="true" />
                         </groupbox>
                 </tabpanel>
@@ -218,7 +218,7 @@
                     <checkbox id="dologging"
                               oncommand="toggleLogging();"
                               label="&logfiles.enable.checkbox;"
-                              preference="extensions.threadarcsjs.logging.enabled"/>
+                              preference="extensions.threadvis.logging.enabled"/>
                     <label class="indent detaileddescription">
                         &logfiles.enable.description.whatlogged;
                     </label>
@@ -228,7 +228,7 @@
                     <separator class="thin" />
                     <checkbox id="dologgingdebug"
                               label="&logfiles.debug.checkbox;"
-                              preference="extensions.threadarcsjs.logging.debug" />
+                              preference="extensions.threadvis.logging.debug" />
                     <label class="indent detaileddescription">
                         &logfiles.debug.description.general;
                     </label>

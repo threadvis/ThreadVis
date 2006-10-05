@@ -1,6 +1,6 @@
 <!--
 /* *******************************************************
- * ThreadArcs.dtd
+ * ThreadVis.dtd
  *
  * (c) 2005-2006 Alexander C. Hubmann
  *
@@ -11,6 +11,6 @@
 -->
 <!ENTITY popup.popupwindow "Display in popup-window">
 <!ENTITY popup.settings "Settings...">
-<!ENTITY popupwindow.title "ThreadArcs Visualisation">
+<!ENTITY popupwindow.title "ThreadVis">
 <!ENTITY zoomin.tooltip "Zoom in">
 <!ENTITY zoomout.tooltip "Zoom out">

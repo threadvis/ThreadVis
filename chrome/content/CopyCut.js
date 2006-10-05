@@ -12,7 +12,7 @@
 
 var COPYCUT_EXTENSION_PATH_ = "extensions";
 var COPYCUT_EXTENSION_GUID_ = "{A23E4120-431F-4753-AE53-5D028C42CFDC}";
-var COPYCUT_FILENAME_ = "threadarcsjs.copycut";
+var COPYCUT_FILENAME_ = "threadvis.copycut";
 var COPYCUT_DIVIDER = "<<<<<<<<<<>>>>>>>>>>";
 
 

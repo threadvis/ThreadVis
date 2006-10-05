@@ -3,7 +3,7 @@
  *
  * (c) 2005-2006 Alexander C. Hubmann
  *
- * JavaScript file to visualise message in thread arcs
+ * JavaScript file to visualise message in threadvis
  *
  * Version: $Id$
  ******************************************************************************/

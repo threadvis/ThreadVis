@@ -14,13 +14,13 @@
     xmlns:chrome="http://www.mozilla.org/rdf/chrome#"> 
 
     <RDF:Seq about="urn:mozilla:package:root"> 
-      <RDF:li resource="urn:mozilla:package:threadarcsjs"/> 
+      <RDF:li resource="urn:mozilla:package:threadvis"/> 
     </RDF:Seq> 
 
-    <RDF:Description about="urn:mozilla:package:threadarcsjs" 
-          chrome:displayName="Thread Arcs Visualisation"
+    <RDF:Description about="urn:mozilla:package:threadvis" 
+          chrome:displayName="ThreadVis"
           chrome:author="Alexander C. Hubmann" 
-          chrome:name="threadarcsjs"
+          chrome:name="threadvis"
           chrome:extension="true"
           chrome:description="Displays a small graphic visualising the thread (context) of the currently selected email."> 
     </RDF:Description>
@@ -32,14 +32,14 @@
     </RDF:Seq>
 
     <RDF:Seq about="chrome://messenger/content/msgHdrViewOverlay.xul">
-        <RDF:li>chrome://threadarcsjs/content/ThreadArcs.xul</RDF:li>
+        <RDF:li>chrome://threadvis/content/ThreadVis.xul</RDF:li>
     </RDF:Seq>
 
     <RDF:Seq about="chrome://communicator/content/pref/pref.xul">
-        <RDF:li>chrome://threadarcsjs/content/Preferences.xul</RDF:li>
+        <RDF:li>chrome://threadvis/content/Preferences.xul</RDF:li>
     </RDF:Seq>
 
     <RDF:Seq about="chrome://messenger/content/preferences/preferences.xul">
-        <RDF:li>chrome://threadarcsjs/content/Preferences.xul</RDF:li>
+        <RDF:li>chrome://threadvis/content/Preferences.xul</RDF:li>
     </RDF:Seq>
 </RDF:RDF>

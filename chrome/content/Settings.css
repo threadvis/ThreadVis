@@ -57,9 +57,9 @@ tab
     cursor: pointer;
 }
 
-radio[pane=paneThreadArcsJS]
+radio[pane=paneThreadVis]
 {
-    list-style-image: url("chrome://threadarcsjs/content/images/icon.png");
+    list-style-image: url("chrome://threadvis/content/images/icon.png");
 }
 
 #enableaccounts

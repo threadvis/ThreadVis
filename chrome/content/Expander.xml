@@ -19,7 +19,7 @@
 
     <binding id="expander" display="xul:vbox">
         <resources>
-            <stylesheet src="chrome://threadarcsjs/content/Expander.css" />
+            <stylesheet src="chrome://threadvis/content/Expander.css" />
         </resources>
         <content>
             <xul:hbox align="center">

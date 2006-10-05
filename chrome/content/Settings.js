@@ -14,9 +14,9 @@ var XUL_NAMESPACE_ =
     "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
 // preference branch for this extension
-var THREADARCSJS_PREF_BRANCH_ = "extensions.threadarcsjs.";
+var THREADVIS_PREF_BRANCH_ = "extensions.threadvis.";
 // name of preference for enabled accounts and folders
-var THREADARCSJS_PREF_ENABLEDACCOUNTS_ = "enabledaccounts";
+var THREADVIS_PREF_ENABLEDACCOUNTS_ = "enabledaccounts";
 
 
 
@@ -372,7 +372,7 @@ function resetLogfiles()
     if (logger)
         logger.reset(true);
     else
-        alert(parent.getElementById("ThreadArcsJSStrings").getString("logger.couldnotdeletefile"));
+        alert(parent.getElementById("ThreadVisStrings").getString("logger.couldnotdeletefile"));
 }
 
 
@@ -384,7 +384,7 @@ function sendLogfiles()
 {
     var logfiles = getLogfiles();
     composeEmail("xpert@sbox.tugraz.at",
-                 "[ThreadArcsJS] Auto-Email-Logs",
+                 "[ThreadVis] Auto-Email-Logs",
                  null,
                  logfiles);
 }
@@ -427,5 +427,5 @@ function toggleLogging()
 function writeEmail()
 {
     composeEmail("xpert@sbox.tugraz.at",
-                 "[ThreadArcsJS] <insert subject here>", null)
+                 "[ThreadVis] <insert subject here>", null)
 }

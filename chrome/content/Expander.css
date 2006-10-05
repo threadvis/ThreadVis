@@ -11,7 +11,7 @@
 
 expander
 {
-    -moz-binding: url("chrome://threadarcsjs/content/Expander.xml#expander");
+    -moz-binding: url("chrome://threadvis/content/Expander.xml#expander");
     -moz-box-orient: vertical;
     margin: 2px 4px 2px 5px;
     padding-top: 2px;
@@ -49,7 +49,7 @@ expander
 button[type="disclosure"]
 {
     -moz-appearance: none;
-    list-style-image: url("chrome://threadarcsjs/content/images/twisty-closed.png");
+    list-style-image: url("chrome://threadvis/content/images/twisty-closed.png");
     border: 0px !important;
     margin: 0px !important;
     padding: 0px !important;
@@ -59,5 +59,5 @@ button[type="disclosure"]
 
 button[type="disclosure"][open="true"]
 {
-    list-style-image: url("chrome://threadarcsjs/content/images/twisty-open.png"); 
+    list-style-image: url("chrome://threadvis/content/images/twisty-open.png"); 
 }

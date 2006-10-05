@@ -20,13 +20,13 @@
             <RDF:Seq>
                 <RDF:li>
                     <RDF:Description>
-                        <em:version>0.7.1</em:version>
+                        <em:version>0.8pre</em:version>
                         <em:targetApplication>
                             <Description>
                                 <em:id>{3550f703-e582-4d05-9a08-453d09bdfdc6}</em:id>
                                 <em:minVersion>1.0</em:minVersion>
                                 <em:maxVersion>1.5.*</em:maxVersion>
-                                <em:updateLink>http://www.sbox.tugraz.at/home/x/xpert/threadarcs/ThreadArcsJS.xpi</em:updateLink>
+                                <em:updateLink>http://www.sbox.tugraz.at/home/x/xpert/threadvis/ThreadVis.xpi</em:updateLink>
                             </Description>
                         </em:targetApplication>
                         <em:targetApplication>
@@ -34,15 +34,15 @@
                                 <em:id>{86c18b42-e466-45a9-ae7a-9b95ba6f5640}</em:id>
                                 <em:minVersion>1.7</em:minVersion>
                                 <em:maxVersion>1.7+</em:maxVersion>
-                                <em:updateLink>http://www.sbox.tugraz.at/home/x/xpert/threadarcs/ThreadArcsJS.xpi</em:updateLink>
+                                <em:updateLink>http://www.sbox.tugraz.at/home/x/xpert/threadvis/ThreadVis.xpi</em:updateLink>
                             </Description>
                         </em:targetApplication>
                     </RDF:Description>
                 </RDF:li>
             </RDF:Seq>
         </em:updates>
-        <em:version>0.7.1</em:version>
-        <em:updateLink>http://www.sbox.tugraz.at/home/x/xpert/threadarcs/ThreadArcsJS.xpi</em:updateLink>
+        <em:version>0.8pre</em:version>
+        <em:updateLink>http://www.sbox.tugraz.at/home/x/xpert/threadvis/ThreadVis.xpi</em:updateLink>
     </RDF:Description>
 
 </RDF:RDF>

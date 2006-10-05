@@ -20,7 +20,7 @@
     <RDF:Description about="urn:mozilla:locale:en-US" chrome:name="en-US"> 
         <chrome:packages> 
             <RDF:Seq about="urn:mozilla:locale:en-US:packages"> 
-                <RDF:li resource="urn:mozilla:locale:en-US:threadarcsjs" /> 
+                <RDF:li resource="urn:mozilla:locale:en-US:threadvis" /> 
             </RDF:Seq> 
         </chrome:packages> 
     </RDF:Description> 

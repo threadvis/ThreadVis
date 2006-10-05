@@ -37,18 +37,18 @@
     
     <!-- Front End MetaData -->
     <em:id>{A23E4120-431F-4753-AE53-5D028C42CFDC}</em:id>
-    <em:version>0.7.1</em:version>
-    <em:name>Thread Arcs Visualisation</em:name>
+    <em:version>0.8pre</em:version>
+    <em:name>ThreadVis</em:name>
     <em:description>Displays a small graphic visualising the thread (context) of the currently selected email.</em:description>
     <em:creator>Alexander C. Hubmann</em:creator>
-    <em:homepageURL>http://www.sbox.tugraz.at/home/x/xpert/threadarcs/</em:homepageURL>
-    <em:optionsURL>chrome://threadarcsjs/content/SettingsDialog.xul</em:optionsURL>
-    <em:updateURL>http://www.sbox.tugraz.at/home/x/xpert/threadarcs/update.rdf</em:updateURL>
-    <em:iconURL>chrome://threadarcsjs/content/images/icon.png</em:iconURL>
+    <em:homepageURL>http://www.sbox.tugraz.at/home/x/xpert/threadvis/</em:homepageURL>
+    <em:optionsURL>chrome://threadvis/content/SettingsDialog.xul</em:optionsURL>
+    <em:updateURL>http://www.sbox.tugraz.at/home/x/xpert/threadvis/update.rdf</em:updateURL>
+    <em:iconURL>chrome://threadvis/content/images/icon.png</em:iconURL>
 
     <!-- Packages, Skins and Locales that this extension registers -->
     <em:file>
-      <Description about="urn:mozilla:extension:file:threadarcsjs.jar">
+      <Description about="urn:mozilla:extension:file:threadvis.jar">
         <em:package>content/</em:package>
         <em:locale>locale/en-US/</em:locale>
         <em:locale>locale/de-DE/</em:locale>

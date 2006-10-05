@@ -10,10 +10,10 @@
 
 
 
-var THREADARCSJS_PREF_BRANCH_ = "extensions.threadarcsjs.";
-var THREADARCSJS_PREF_ENABLED_ = "enabled";
-var THREADARCSJS_PREF_DISABLEDACCOUNTS_ = "disabledaccounts";
-var THREADARCSJS_PREF_DISABLEDFOLDERS_ = "disabledfolders";
+var THREADVIS_PREF_BRANCH_ = "extensions.threadvis.";
+var THREADVIS_PREF_ENABLED_ = "enabled";
+var THREADVIS_PREF_DISABLEDACCOUNTS_ = "disabledaccounts";
+var THREADVIS_PREF_DISABLEDFOLDERS_ = "disabledfolders";
 
 
 
@@ -90,16 +90,16 @@ PreferenceObserver.prototype.preferenceReload = function()
                 .getService(Components.interfaces.nsIPrefBranch);
 
     this.preferences_["enabled"] = false;
-    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + THREADARCSJS_PREF_ENABLED_) == prefs.PREF_BOOL)
-        this.preferences_["enabled"] = prefs.getBoolPref(THREADARCSJS_PREF_BRANCH_ + THREADARCSJS_PREF_ENABLED_);
+    if (prefs.getPrefType(THREADVIS_PREF_BRANCH_ + THREADVIS_PREF_ENABLED_) == prefs.PREF_BOOL)
+        this.preferences_["enabled"] = prefs.getBoolPref(THREADVIS_PREF_BRANCH_ + THREADVIS_PREF_ENABLED_);
 
     this.preferences_["disabledaccounts"] = "";
-    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + THREADARCSJS_PREF_DISABLEDACCOUNTS_) == prefs.PREF_STRING)
-        this.preferences_["disabledaccounts"] = prefs.getCharPref(THREADARCSJS_PREF_BRANCH_ + THREADARCSJS_PREF_DISABLEDACCOUNTS_);
+    if (prefs.getPrefType(THREADVIS_PREF_BRANCH_ + THREADVIS_PREF_DISABLEDACCOUNTS_) == prefs.PREF_STRING)
+        this.preferences_["disabledaccounts"] = prefs.getCharPref(THREADVIS_PREF_BRANCH_ + THREADVIS_PREF_DISABLEDACCOUNTS_);
 
     this.preferences_["disabledfolders"] = "";
-    if (prefs.getPrefType(THREADARCSJS_PREF_BRANCH_ + THREADARCSJS_PREF_DISABLEDFOLDERS_) == prefs.PREF_STRING)
-        this.preferences_["disabledfolders"] = prefs.getCharPref(THREADARCSJS_PREF_BRANCH_ + THREADARCSJS_PREF_DISABLEDFOLDERS_);
+    if (prefs.getPrefType(THREADVIS_PREF_BRANCH_ + THREADVIS_PREF_DISABLEDFOLDERS_) == prefs.PREF_STRING)
+        this.preferences_["disabledfolders"] = prefs.getCharPref(THREADVIS_PREF_BRANCH_ + THREADVIS_PREF_DISABLEDFOLDERS_);
 }
 
 
@@ -111,7 +111,7 @@ PreferenceObserver.prototype.register =  function()
 {
     var prefService = Components.classes["@mozilla.org/preferences-service;1"]
                       .getService(Components.interfaces.nsIPrefService);
-    this.pref_branch_ = prefService.getBranch(THREADARCSJS_PREF_BRANCH_);
+    this.pref_branch_ = prefService.getBranch(THREADVIS_PREF_BRANCH_);
 
     var pbi = this.pref_branch_.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
     pbi.addObserver("", this, false);

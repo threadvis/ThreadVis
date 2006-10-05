@@ -11,14 +11,14 @@
 var XpiInstaller =
 {
     // --- Editable items begin ---
-    extFullName: 'Thread Arcs Visualisation', // The name displayed to the user (don't include the version)
-    extShortName: 'threadarcsjs', // The leafname of the JAR file (without the .jar part)
-    extVersion: '0.7.1',
+    extFullName: 'ThreadVis', // The name displayed to the user (don't include the version)
+    extShortName: 'threadvis', // The leafname of the JAR file (without the .jar part)
+    extVersion: '0.8pre',
     extAuthor: 'Alexander C. Hubmann',
     extLocaleNames: ["en-US", "de-DE"], // e.g. ['en-US', 'en-GB']
     extSkinNames: null, // e.g. ['classic', 'modern']
     extPostInstallMessage: null, // Set to null for no post-install message
-    extDefaultPrefs: ["ThreadArcsJSDefault.js"],  //e.g. ["default1.js", "default2.js"]
+    extDefaultPrefs: ["ThreadVisJSDefault.js"],  //e.g. ["default1.js", "default2.js"]
     // --- Editable items end ---
 
     profileInstall: true,

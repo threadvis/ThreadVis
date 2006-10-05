@@ -3,7 +3,7 @@
  *
  * (c) 2005-2006 Alexander C. Hubmann
  *
- * JavaScript file to visualise message in thread arcs
+ * JavaScript file to visualise message in threadvis
  *
  * Version: $Id$
  ******************************************************************************/
@@ -166,7 +166,7 @@ ContainerVisualisation.prototype.createToolTip = function()
 {
     var tooltip = document.createElementNS(XUL_NAMESPACE_, "tooltip");
     tooltip.setAttribute("orient", "vertical");
-    tooltip.setAttribute("id", "ThreadArcsJS_" + this.left_);
+    tooltip.setAttribute("id", "ThreadVis_" + this.left_);
 
     if (! this.container_.isDummy())
     {
@@ -268,8 +268,8 @@ ContainerVisualisation.prototype.deleteParent = function()
     var parentmsgid = ! parent.isDummy() ? parent.getMessage().getId() : "";
     if (msgid != "" && parentmsgid != "")
     {
-        THREADARCS_.threader_.copycut_.addCut(msgid + " " + parentmsgid);
-        THREADARCS_.setSelectedMessage();
+        THREADVIS_.threader_.copycut_.addCut(msgid + " " + parentmsgid);
+        THREADVIS_.setSelectedMessage();
         
         LOGGER_.log("copycut", {"action" : "deletemessage",
                                 "msgkey" : msgkey});
@@ -304,7 +304,7 @@ ContainerVisualisation.prototype.drawClick = function()
     this.visualiseClick();
 
     this.click_.container = this.container_;
-    this.click_.setAttribute("tooltip", "ThreadArcsJS_" + this.left_);
+    this.click_.setAttribute("tooltip", "ThreadVis_" + this.left_);
 
     this.stack_.appendChild(this.click_);
     this.click_.addEventListener("click", this.onMouseClick, true);
@@ -401,7 +401,7 @@ ContainerVisualisation.prototype.onMouseClick = function(event)
     LOGGER_.logDebug("Visualisation.onMouseClick()", {});
     var container = event.target.container;
     if (container && ! container.isDummy())
-        THREADARCS_.callback(container.getMessage().getKey(), 
+        THREADVIS_.callback(container.getMessage().getKey(), 
                              container.getMessage().getFolder());
 }
 
@@ -426,9 +426,9 @@ ContainerVisualisation.prototype.paste = function()
         
         if (this_msgid != "" && copy_message_msgid != "")
         {
-            THREADARCS_.threader_.copycut_.addCut(copy_message_msgid + " " + copy_message_parent_msgid);
-            THREADARCS_.threader_.copycut_.addCopy(copy_message_msgid + " " + this_msgid);
-            THREADARCS_.setSelectedMessage();
+            THREADVIS_.threader_.copycut_.addCut(copy_message_msgid + " " + copy_message_parent_msgid);
+            THREADVIS_.threader_.copycut_.addCopy(copy_message_msgid + " " + this_msgid);
+            THREADVIS_.setSelectedMessage();
             
             LOGGER_.log("copycut", {"action" : "pastemessage",
                                     "copied-msgkey" : copy_message_msgkey,

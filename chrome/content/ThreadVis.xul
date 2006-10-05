@@ -2,11 +2,11 @@
 
 <!--
 /** ****************************************************************************
- * ThreadArcs.xul
+ * ThreadVis.xul
  *
  * (c) 2005-2006 Alexander C. Hubmann
  *
- * XUL file to display ThreadArcs extension
+ * XUL file to display ThreadVis extension
  *
  * Version: $Id$
  ******************************************************************************/
@@ -14,50 +14,50 @@
 
 
 
-<!DOCTYPE overlay SYSTEM "chrome://threadarcsjs/locale/ThreadArcs.dtd">
-<overlay id="ThreadArcsJS"
+<!DOCTYPE overlay SYSTEM "chrome://threadvis/locale/ThreadVis.dtd">
+<overlay id="ThreadVis"
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-    <script src="chrome://threadarcsjs/content/ArcVisualisation.js" />
-    <script src="chrome://threadarcsjs/content/Container.js" />
-    <script src="chrome://threadarcsjs/content/ContainerVisualisation.js" />
-    <script src="chrome://threadarcsjs/content/CopyCut.js" />
-    <script src="chrome://threadarcsjs/content/Logger.js" />
-    <script src="chrome://threadarcsjs/content/Message.js" />
-    <script src="chrome://threadarcsjs/content/PreferenceObserver.js" />
-    <script src="chrome://threadarcsjs/content/References.js" />
-    <script src="chrome://threadarcsjs/content/Scrollbar.js" />
-    <script src="chrome://threadarcsjs/content/ThreadArcs.js" />
-    <script src="chrome://threadarcsjs/content/Threader.js" />
-    <script src="chrome://threadarcsjs/content/Timeline.js" />
-    <script src="chrome://threadarcsjs/content/Visualisation.js" />
+    <script src="chrome://threadvis/content/ArcVisualisation.js" />
+    <script src="chrome://threadvis/content/Container.js" />
+    <script src="chrome://threadvis/content/ContainerVisualisation.js" />
+    <script src="chrome://threadvis/content/CopyCut.js" />
+    <script src="chrome://threadvis/content/Logger.js" />
+    <script src="chrome://threadvis/content/Message.js" />
+    <script src="chrome://threadvis/content/PreferenceObserver.js" />
+    <script src="chrome://threadvis/content/References.js" />
+    <script src="chrome://threadvis/content/Scrollbar.js" />
+    <script src="chrome://threadvis/content/Threader.js" />
+    <script src="chrome://threadvis/content/ThreadVis.js" />
+    <script src="chrome://threadvis/content/Timeline.js" />
+    <script src="chrome://threadvis/content/Visualisation.js" />
 
     <hbox id="expandedHeaderView">
         <stringbundleset>
-            <stringbundle id="ThreadArcsJSStrings" 
-                          src="chrome://threadarcsjs/locale/ThreadArcs.properties" />
+            <stringbundle id="ThreadVisStrings" 
+                          src="chrome://threadvis/locale/ThreadVis.properties" />
         </stringbundleset>
         <popupset>
-            <popup id="ThreadArcsJSPopUp">
+            <popup id="ThreadVisPopUp">
                 <menuitem label="&popup.settings;" 
-                          oncommand="openThreadArcsJSOptionsDialog();" />
+                          oncommand="openThreadVisOptionsDialog();" />
                 <menuitem label="&popup.popupwindow;"
                           oncommand="displayVisualisationWindow();" />
             </popup>
         </popupset>
-        <hbox id="ThreadArcsJS"
+        <hbox id="ThreadVis"
               style="border: 1px solid #cccccc;">
             <hbox>
                 <vbox>
-                    <vbox id="ThreadArcsJSBox" 
+                    <vbox id="ThreadVisBox" 
                           style='width: 300px; max-width: 300px; height: 1px; overflow: hidden;'
-                          context="ThreadArcsJSPopUp"
+                          context="ThreadVisPopUp"
                           flex="1" />
                     <vbox style="height: 5px;">
-                        <stack id="ThreadArcsJSScrollbarHorizontalBox"
+                        <stack id="ThreadVisScrollbarHorizontalBox"
                                style="background: #cccccc; border: 1px solid #333333;"
                                hidden="true">
-                            <box id="ThreadArcsJSScrollbarHorizontal"
+                            <box id="ThreadVisScrollbarHorizontal"
                                  style="height: 3px; background: #333333; cursor: e-resize;" />
                         </stack>
                     </vbox>
@@ -65,10 +65,10 @@
                 <vbox>
                     <hbox style="width: 5px;"
                           flex="1">
-                        <stack id="ThreadArcsJSScrollbarVerticalBox"
+                        <stack id="ThreadVisScrollbarVerticalBox"
                                style="background: #cccccc; border: 1px solid #333333;"
                                hidden="true">
-                            <box id="ThreadArcsJSScrollbarVertical"
+                            <box id="ThreadVisScrollbarVertical"
                                  style="width: 3px; background: #333333; cursor: s-resize;" />
                         </stack>
                     </hbox>
@@ -76,13 +76,13 @@
                 </vbox>
             </hbox>
             <vbox>
-                <hbox id="ThreadArcsJSZoomIn"
+                <hbox id="ThreadVisZoomIn"
                       onclick="zoomIn();">
                     <label value="+"
                            style="width: 10px; text-align: center"
                            tooltiptext="&zoomin.tooltip;" />
                 </hbox>
-                <hbox id="ThreadArcsJSZoomOut"
+                <hbox id="ThreadVisZoomOut"
                       onclick="zoomOut();">
                     <label value="-"
                            style="width: 10px; text-align: center"

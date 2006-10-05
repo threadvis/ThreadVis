@@ -10,13 +10,13 @@
 @echo Deleting chrome JAR file ...
 @echo ======================================================================
 
-@del threadarcsjs.jar
+@del threadvis.jar
 
 @echo ======================================================================
 @echo Creating chrome JAR file ...
 @echo ======================================================================
 
-@c:\Programme\7-Zip\7z a -mx0 -tzip threadarcsjs.jar @make.list
+@c:\Programme\7-Zip\7z a -mx0 -tzip threadvis.jar @make.list
 
 @echo ======================================================================
 @echo Done creating chrome JAR file
@@ -31,6 +31,6 @@
 @echo Copying file
 @echo ======================================================================
 
-@copy threadarcsjs.jar "c:\Dokumente und Einstellungen\sascha\Anwendungsdaten\Thunderbird\Profiles\u0f36pb7.default\extensions\{A23E4120-431F-4753-AE53-5D028C42CFDC}\chrome\"
-@copy threadarcsjs.jar "C:\Dokumente und Einstellungen\sascha\Anwendungsdaten\Mozilla\Profiles\default\6rdqou0o.slt\chrome"
+@copy threadvis.jar "c:\Dokumente und Einstellungen\sascha\Anwendungsdaten\Thunderbird\Profiles\u0f36pb7.default\extensions\{A23E4120-431F-4753-AE53-5D028C42CFDC}\chrome\"
+@copy threadvis.jar "C:\Dokumente und Einstellungen\sascha\Anwendungsdaten\Mozilla\Profiles\default\6rdqou0o.slt\chrome"
 @rem @pause
