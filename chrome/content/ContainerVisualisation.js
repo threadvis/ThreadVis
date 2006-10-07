@@ -398,6 +398,10 @@ ContainerVisualisation.prototype.onMouseClick = function(event)
     if (event.button != 0)
         return;
 
+    // check for double click
+    if (event.detail > 1)
+        ThreadPaneDoubleClick();
+
     LOGGER_.logDebug("Visualisation.onMouseClick()", {});
     var container = event.target.container;
     if (container && ! container.isDummy())
