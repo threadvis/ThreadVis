@@ -49,7 +49,7 @@ Scrollbar.prototype.init = function(box)
 {
     this.box_ = box;
     this.total_height_ = this.box_.boxObject.height - 4;
-    this.total_width_ = this.box_.boxObject.width;
+    this.total_width_ = this.box_.boxObject.width - 4;
 }
 
 
@@ -119,7 +119,6 @@ Scrollbar.prototype.calculateSize = function()
 Scrollbar.prototype.calculatePosition = function()
 {
     var boxwidth = this.box_.boxObject.width;
-    //var boxheight = this.box_.boxObject.height;
     var boxheight = this.total_height_;
     var stackwidth = this.stack_.boxObject.width;
     var stackheight = this.stack_.boxObject.height;
@@ -156,7 +155,7 @@ Scrollbar.prototype.onMouseMoveHorizontal = function(event)
         this.startx_ = x;
         
         var barwidth = this.horizontal_.boxObject.width;
-        var totalwidth = this.box_.boxObject.width;
+        var totalwidth = this.total_width_;
         
         if (dx < 0)
             dx = 0;
@@ -224,7 +223,6 @@ Scrollbar.prototype.onMouseMoveVertical = function(event)
         this.starty_ = y;
         
         var barheight = this.vertical_.boxObject.height;
-        //var totalheight = this.box_.boxObject.height;
         var totalheight = this.total_height_;
         
         if (dy < 0)

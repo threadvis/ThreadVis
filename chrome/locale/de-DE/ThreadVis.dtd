@@ -9,6 +9,8 @@
  * Version: $Id$
  ********************************************************/
 -->
+<!ENTITY popup.legendin "Legende einblenden">
+<!ENTITY popup.legendout "Legende ausblenden">
 <!ENTITY popup.popupwindow "In eigenem Fenster darstellen">
 <!ENTITY popup.settings "Einstellungen...">
 <!ENTITY popupwindow.title "ThreadVis">

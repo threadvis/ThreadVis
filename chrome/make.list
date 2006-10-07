@@ -24,7 +24,9 @@ content/Timeline.js
 content/Visualisation.js
 content/images/about.png
 content/images/icon.png
-content/images/loading.gif
+content/images/legend.png
+content/images/minus.png
+content/images/plus.png
 content/images/size_8.png
 content/images/size_12.png
 content/images/size_16.png
@@ -32,6 +34,7 @@ content/images/timescaling_disabled.png
 content/images/timescaling_enabled.png
 content/images/twisty-closed.png
 content/images/twisty-open.png
+content/images/window.png
 locale/en-US/contents.rdf
 locale/en-US/Settings.dtd
 locale/en-US/ThreadVis.dtd

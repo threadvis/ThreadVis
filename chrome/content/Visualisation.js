@@ -213,10 +213,15 @@ Visualisation.prototype.calculateSize = function(containers)
  ******************************************************************************/
 Visualisation.prototype.checkSize = function()
 {
-    if (this.box_.boxObject.height != this.box_height_)
+    if (this.box_.boxObject.height != this.box_height_ || 
+        this.box_.boxObject.width != this.box_width_)
+    {
+        this.resetStack();
         this.visualise();
+    }
     
     this.box_height_ = this.box_.boxObject.height;
+    this.box_width_ = this.box_.boxObject.width;
 }
 
 
@@ -283,7 +288,11 @@ Visualisation.prototype.colourAuthors = function(authors)
     var emailfield = null;
     while (emailfield = emailfields.pop())
     {
-        var colour = authors[emailfield.attributes["emailAddress"].value];
+        var author = authors[emailfield.attributes["emailAddress"].value];
+        var colour = null;
+        if (author)
+            colour = author.colour;
+        
         if (colour && this.pref_highlight_)
             emailfield.style.borderBottom = "2px solid " + this.getColour(colour, 1.0, 1.0);
         else
@@ -324,6 +333,49 @@ Visualisation.prototype.convertHSVtoRGB = function(hue,
         case 5:
             return {"r" : value, "g" : m, "b" : n};
     }
+}
+
+
+
+/** ****************************************************************************
+ * Build legend popup containing all authors of current thread
+ ******************************************************************************/
+Visualisation.prototype.createLegend = function(authors)
+{
+    var legend = document.getElementById("ThreadVisLegendPopUp");
+    while(legend.firstChild != null)
+        legend.removeChild(legend.firstChild);
+    
+    for (var email in authors)
+    {
+        var colour = authors[email].colour;
+        var name = authors[email].name;
+        var count = authors[email].count;
+        legend.appendChild(this.createLegendBox(colour, name, count));
+    }
+}
+
+
+
+/** ****************************************************************************
+ * Build one row for legend
+ ******************************************************************************/
+Visualisation.prototype.createLegendBox = function(colour, name, count)
+{
+    var box = document.createElementNS(XUL_NAMESPACE_, "hbox");
+    
+    var colourbox = document.createElementNS(XUL_NAMESPACE_, "hbox");
+    colourbox.style.background = this.getColour(colour, 1.0, 1.0);
+    colourbox.style.width = "20px";
+    box.appendChild(colourbox);
+    
+    var namebox = document.createElementNS(XUL_NAMESPACE_, "description");
+    var nametext = document.createTextNode(name + " (" + count + ")");
+    namebox.appendChild(nametext)
+    
+    box.appendChild(namebox);
+    
+    return box;
 }
 
 
@@ -603,6 +655,12 @@ Visualisation.prototype.onMouseDown = function(event)
     if (event.button != 0)
         return;
     
+    // remember box size now
+    this.box_width_ = this.box_.boxObject.width;
+    this.box_height = this.box_.boxObject.height;
+    this.stack_width_ = this.stack_.boxObject.width;
+    this.stack_height_ = this.stack_.boxObject.height;
+    
     this.startx_ = event.clientX;
     this.starty_ = event.clientY;
     this.panning_ = true;
@@ -634,32 +692,30 @@ Visualisation.prototype.onMouseMove = function(event)
         this.startx_ = x;
         this.starty_ = y;
         
-        var boxwidth = this.box_.boxObject.width;
-        var boxheight = this.box_.boxObject.height;
-        var stackwidth = this.stack_.boxObject.width;
-        var stackheight = this.stack_.boxObject.height;
+        // set mininum dx to a little less than available to prevent overpanning
+        var mindx = Math.min(this.box_width_ - this.stack_width_ + 4, 0);
+        var mindy = Math.min(this.box_height_ - this.stack_height_, 0);
         
         // don't move more to the right than necessary
         if (dx > 0)
             dx = 0;
         
         // don't move more to the left than necessary
-        if (stackwidth > boxwidth && dx < boxwidth - stackwidth)
-            dx = boxwidth - stackwidth;
-        
-        // don't move more to the top than necessary
-        if (stackheight < boxheight && dy < 0)
-            dy = 0;
-        if (stackheight > boxheight && dy < boxheight - stackheight)
-            dy = boxheight - stackheight;
+        if (dx < mindx)
+            dx = mindx;
         
          // don't move more to the bottom than necessary
         if (dy > 0)
             dy = 0;
-
+        
+        // don't move more to the top than necessary
+        if (dy < mindy)
+            dy = mindy;
+        
         var position = new Object;
         position.x = dx;
         position.y = dy;
+        
         this.moveVisualisationTo(position);
         
         this.scrollbar_.init(this.box_);
@@ -986,12 +1042,16 @@ Visualisation.prototype.visualise = function(container)
             {
                 if (this.authors_[thiscontainer.getMessage().getFromEmail()] != null)
                 {
-                    colour = this.authors_[thiscontainer.getMessage().getFromEmail()];
+                    colour = this.authors_[thiscontainer.getMessage().getFromEmail()].colour;
+                    this.authors_[thiscontainer.getMessage().getFromEmail()].count = 
+                    this.authors_[thiscontainer.getMessage().getFromEmail()].count + 1;
                 }
                 else
                 {
                     colour = this.getNewColour();
-                    this.authors_[thiscontainer.getMessage().getFromEmail()] = colour;
+                    this.authors_[thiscontainer.getMessage().getFromEmail()] = {"colour" : colour, 
+                                                                                "name" : thiscontainer.getMessage().getFrom(),
+                                                                                "count" : 1};
                 }
                 if (selected)
                     colour = this.getColour(colour, 1, 0.8);
@@ -1046,6 +1106,7 @@ Visualisation.prototype.visualise = function(container)
     
     // underline authors if enabled
     this.colourAuthors(this.authors_);
+    this.createLegend(this.authors_);
     
     // calculate if we have to move the visualisation so that the
     // selected message is visible
@@ -1171,6 +1232,7 @@ Visualisation.prototype.visualiseExisting = function(container)
     
     // underline authors if enabled
     this.colourAuthors(this.authors_);
+    this.createLegend(this.authors_);
     
     if (this.pref_timeline_ && this.timeline_)
         this.timeline_.redraw(this.resize_,
