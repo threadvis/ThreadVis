@@ -16,6 +16,7 @@ var LOGGER_LOGFILENAME_ = "threadvis.log.xml";
 var THREADVIS_PREF_BRANCH_ = "extensions.threadvis.";
 var LOGGER_PREF_DOLOGGING_ = "logging.enabled";
 var LOGGER_PREF_DOLOGGING_DEBUG_ = "logging.debug";
+var LOGGER_PREF_DOLOGGING_DEBUG_LEVEL_ = "logging.debug.level";
 var LOGGER_STARTTAG_ = '\n<log extensionversion="0.8pre">';
 var LOGGER_ENDTAG_ = "\n</log>";
 
@@ -31,7 +32,14 @@ function Logger()
     // init class variables
     this.pref_enablelogging_ = false;
     this.pref_enablelogging_debug_ = false;
+    this.pref_logging_debug_level_ = 0;
     this.strings_ = document.getElementById("ThreadVisStrings");
+
+    this.LEVEL_ERROR_ = 0;
+    this.LEVEL_INFORM_ = 1;
+    this.LEVEL_VIS_ = 2;
+    this.LEVEL_EMAIL_ = 3;
+    this.LEVEL_ALL_ = 4;
 
     this.preferenceObserverRegister();
     this.preferenceReload();
@@ -167,11 +175,13 @@ Logger.prototype.log = function(item,
 /** ****************************************************************************
  * write a string to the file in debug mode
  ******************************************************************************/
-Logger.prototype.logDebug = function(item,
+Logger.prototype.logDebug = function(level,
+                                     item,
                                      infos)
 {
     if (this.ready_ && 
-        this.pref_enablelogging_debug_)
+        this.pref_enablelogging_debug_ &&
+        this.pref_logging_debug_level_ >= level)
     {
         var date = new Date();
         var logtext = "";
@@ -279,6 +289,10 @@ Logger.prototype.preferenceReload = function()
     this.pref_enablelogging_debug_ = false;
     if (prefs.getPrefType(THREADVIS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_DEBUG_) == prefs.PREF_BOOL)
         this.pref_enablelogging_debug_ = prefs.getBoolPref(THREADVIS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_DEBUG_);
+
+    this.pref_logging_debug_level_ = 0;
+    if (prefs.getPrefType(THREADVIS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_DEBUG_LEVEL_) == prefs.PREF_INT)
+        this.pref_logging_debug_level_ = prefs.getIntPref(THREADVIS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_DEBUG_LEVEL_);
 }
 
 

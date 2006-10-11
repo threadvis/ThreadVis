@@ -20,6 +20,7 @@
 <!ENTITY logfiles.debug.description.general                 "If you experience any problems using the extension, enable debug logging to include more information in the logfiles.">
 <!ENTITY logfiles.debug.description.personalinfo            "Attention: This information may include personal information such as message-ids, the structure of the threads you are viewing, etc.">
 <!ENTITY logfiles.debug.description.size                    "Also keep in mind that enabling this option will greatly increase the size of the logfiles and reduce the performance of the extension!">
+<!ENTITY logfiles.debug.level                               "Log-Level (0-4):">
 <!ENTITY logfiles.send.button                               "Send Logfiles">
 <!ENTITY logfiles.send.tooltip                              "Creates a new empty email and attaches the logfiles.">
 <!ENTITY logfiles.reset.button                              "Reset Logfiles">

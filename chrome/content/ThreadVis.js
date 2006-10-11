@@ -294,7 +294,7 @@ ThreadVis.prototype.addMessage = function(header)
         return
 
 
-    LOGGER_.logDebug("ThreadVis.addMessage()", {});
+    LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "ThreadVis.addMessage()", {});
     var date = new Date();
     // PRTime is in microseconds, Javascript time is in milliseconds
     // so divide by 1000 when converting
@@ -372,13 +372,13 @@ ThreadVis.prototype.addMessagesFromFolder = function(folder)
 
     if (this.add_messages_from_folder_done_)
     {
-        LOGGER_.logDebug("ThreadVis.addMessagesFromFolder()",
+        LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "ThreadVis.addMessagesFromFolder()",
                             {"folder" : folder.URI,
                              "action" : "end"});
         return;
     }
 
-    LOGGER_.logDebug("ThreadVis.addMessagesFromFolder()",
+    LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "ThreadVis.addMessagesFromFolder()",
                         {"folder" : folder.URI,
                          "action" : "start"});
 
@@ -389,7 +389,7 @@ ThreadVis.prototype.addMessagesFromFolder = function(folder)
     }
     catch (exception)
     {
-        LOGGER_.logDebug("ThreadVis.addMessagesFromFolder()",
+        LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "ThreadVis.addMessagesFromFolder()",
                             {"folder" : folder.URI,
                              "action" : "caught exception " + exception});
         this.add_messages_from_folder_done_ = true;
@@ -418,14 +418,14 @@ ThreadVis.prototype.addMessagesFromFolderEnumerator = function(enumerator)
         return
 
 
-    LOGGER_.logDebug("ThreadVis.addMessagesFromFolderEnumerator()", {"action" : "start"});
+    LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "ThreadVis.addMessagesFromFolderEnumerator()", {"action" : "start"});
     var header = null;
     while (enumerator.hasMoreElements())
     {
         this.add_messages_from_folder_enumerator_counter_++;
         if (this.add_messages_from_folder_enumerator_counter_ >= this.add_messages_from_folder_enumerator_maxcounter_)
         {
-            LOGGER_.logDebug("ThreadVis.addMessagesFromFolderEnumerator()", {"action" : "pause"});
+            LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "ThreadVis.addMessagesFromFolderEnumerator()", {"action" : "pause"});
             var ref = this;
             this.add_messages_from_folder_enumerator_counter_ = 0;
             setTimeout(function() {ref.addMessagesFromFolderEnumerator(enumerator);}, 10);
@@ -439,7 +439,7 @@ ThreadVis.prototype.addMessagesFromFolderEnumerator = function(enumerator)
         }
     }
 
-    LOGGER_.logDebug("ThreadVis.addMessagesFromFolderEnumerator()",
+    LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "ThreadVis.addMessagesFromFolderEnumerator()",
                         {"action" : "end"});
     this.add_messages_from_folder_done_ = true;
     this.add_messages_from_folder_doing_ = false;
@@ -516,7 +516,7 @@ ThreadVis.prototype.checkEnabledAccountOrFolder = function(folder)
     if (THREADVIS_DISABLEDACCOUNTS_ != "" && 
         THREADVIS_DISABLEDACCOUNTS_.match(regexp_account))
     {
-        LOGGER_.logDebug("accountdisabled",
+        LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "accountdisabled",
                             {"total_regexp" : THREADVIS_DISABLEDACCOUNTS_,
                              "this_account" : account.key});
         return false;
@@ -527,7 +527,7 @@ ThreadVis.prototype.checkEnabledAccountOrFolder = function(folder)
         if (THREADVIS_DISABLEDFOLDERS_ != "" && 
             THREADVIS_DISABLEDFOLDERS_.match(regexp_folder))
         {
-            LOGGER_.logDebug("folderdisabled",
+            LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "folderdisabled",
                                 {"total_regexp" : THREADVIS_DISABLEDFOLDERS_,
                                 "this_folder" : folder.URI});
             return false;
@@ -546,7 +546,7 @@ ThreadVis.prototype.checkEnabledAccountOrFolder = function(folder)
  ******************************************************************************/
 ThreadVis.prototype.clearVisualisation = function()
 {
-    LOGGER_.logDebug("ThreadVis.clearVisualisation()", {"clear" : this.clear_});
+    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "ThreadVis.clearVisualisation()", {"clear" : this.clear_});
 
     if (! THREADVIS_ENABLED_ )
     {
@@ -610,7 +610,7 @@ ThreadVis.prototype.doThreading = function()
         return
 
 
-    LOGGER_.logDebug("ThreadVis.doThreading()", {});
+    LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "ThreadVis.doThreading()", {});
     if (! this.threading_ && ! this.threaded_)
     {
         this.threading_ = true;
@@ -644,7 +644,7 @@ ThreadVis.prototype.getAllFolders = function(folder)
         return
 
 
-    LOGGER_.logDebug("ThreadVis.getAllFolders()",
+    LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "ThreadVis.getAllFolders()",
                         {"folder" : folder.URI});
     var folder_enumerator = folder.GetSubFolders();
     var current_folder = null;
@@ -708,7 +708,7 @@ ThreadVis.prototype.initMessages = function()
         return
 
 
-    LOGGER_.logDebug("ThreadVis.initMessages()", {});
+    LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "ThreadVis.initMessages()", {});
     if (! this.loaded_ && ! this.loading_)
     {
         this.loading_ = true;
@@ -884,7 +884,7 @@ ThreadVis.prototype.setSelectedMessage = function()
     }
 
 
-    LOGGER_.logDebug("ThreadVis.setSelectedMessage()", {});
+    LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "ThreadVis.setSelectedMessage()", {});
     if (! this.loaded_ || ! this.threaded_)
     {
         var ref = this;
@@ -950,7 +950,7 @@ ThreadVis.prototype.visualise = function(container)
     if (! this.checkEnabledAccountOrFolder())
         return
 
-    LOGGER_.logDebug("ThreadVis.visualise()",
+    LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "ThreadVis.visualise()",
                         {"container" : container});
 
     var msgkey = container.isDummy() ? 
@@ -985,7 +985,7 @@ ThreadVis.prototype.visualiseMsgId = function(message_id)
         return
 
 
-    LOGGER_.logDebug("ThreadVis.visualiseMsgId()",
+    LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "ThreadVis.visualiseMsgId()",
                         {"message-id" : message_id});
 
     var container = this.threader_.findContainer(message_id);
@@ -1047,7 +1047,7 @@ ThreadVis.prototype.waitForAddMessages = function()
 
     // look at next folder
     var folder = this.folders_.shift();
-    LOGGER_.logDebug("ThreadVis.waitForAddMessages()",
+    LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "ThreadVis.waitForAddMessages()",
                         {"action" : "next folder",
                          "folder" : folder});
 
@@ -1081,7 +1081,7 @@ ThreadVis.prototype.waitForThreading = function()
         return
 
 
-    LOGGER_.logDebug("ThreadVis.waitForThreading()", {});
+    LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "ThreadVis.waitForThreading()", {});
 
     if (this.loaded_ &&
         ! this.threaded_ &&
@@ -1122,7 +1122,7 @@ function displayVisualisationWindow()
 window.onerror = logJavaScriptErrors;
 function logJavaScriptErrors(message, file, line)
 {
-    LOGGER_.logDebug("threadvis-jserror", {"message": message,
-                                           "file" : file,
-                                           "line" : line});
+    LOGGER_.log("threadvis-jserror", {"message": message,
+                                      "file" : file,
+                                      "line" : line});
 }

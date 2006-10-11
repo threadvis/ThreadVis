@@ -12,6 +12,7 @@ pref("extensions.threadvis.enabled", true);
 pref("extensions.threadvis.disabledaccounts", "");
 pref("extensions.threadvis.disabledfolders", "");
 pref("extensions.threadvis.logging.debug", false);
+pref("extensions.threadvis.logging.debug.level", 0);
 pref("extensions.threadvis.logging.enabled", false);
 pref("extensions.threadvis.timescaling.enabled", true);
 pref("extensions.threadvis.timeline.enabled", true);

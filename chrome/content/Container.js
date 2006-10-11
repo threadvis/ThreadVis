@@ -72,6 +72,19 @@ Container.prototype.addChild = function(child)
     if (child.getParent == this)
         return;
     
+    /* check to see if this container is a child of child
+     * this should never happen, because we would create a loop
+     * that's why we don't allow it
+     */
+    if (child.findChild(this))
+    {
+        alert("Error: Loop detected in message structure.");
+        LOGGER_.logDebug(LOGGER_.LEVEL_ERROR_, "Container.addChild()" , {"error" : "tried to create loop",
+                                                                        "child container" : child.toString(),
+                                                                        "parent container" : this.toString()});
+        return;
+    }
+
     /* remove it from old chain
      * child.hasPrevious means that it's not the first in chain,
      * so take it out of old chain by juggling the pointers

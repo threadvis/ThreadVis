@@ -61,6 +61,9 @@
             <preference id="extensions.threadvis.logging.debug"
                         name="extensions.threadvis.logging.debug"
                         type="bool" />
+            <preference id="extensions.threadvis.logging.debug.level"
+                        name="extensions.threadvis.logging.debug.level"
+                        type="int" />
         </preferences>
 
         <tabbox flex="1" id="ThreadVisTabBox">
@@ -130,7 +133,7 @@
                             </label>
                         </vbox>
                     </radiogroup>
-                    <separator />
+                    <separator class="thin" />
                     <checkbox id="enabletimeline"
                               label="&visualisation.timeline.enable;"
                               preference="extensions.threadvis.timeline.enabled" />
@@ -221,21 +224,24 @@
                               preference="extensions.threadvis.logging.enabled"/>
                     <label class="indent detaileddescription">
                         &logfiles.enable.description.whatlogged;
-                    </label>
-                    <label class="indent detaileddescription">
                         &logfiles.enable.description.sending;
                     </label>
                     <separator class="thin" />
                     <checkbox id="dologgingdebug"
                               label="&logfiles.debug.checkbox;"
                               preference="extensions.threadvis.logging.debug" />
+                    <hbox>
+                        <label class="indent detaileddescription" 
+                               control="logdebuglevel"
+                               value="&logfiles.debug.level;" />
+                        <textbox class="indent detaileddescription"
+                                 id="logdebuglevel"
+                                 preference="extensions.threadvis.logging.debug.level"
+                                 size="2" />
+                    </hbox>
                     <label class="indent detaileddescription">
                         &logfiles.debug.description.general;
-                    </label>
-                    <label class="indent detaileddescription">
                         &logfiles.debug.description.personalinfo;
-                    </label>
-                    <label class="indent detaileddescription">
                         &logfiles.debug.description.size;
                     </label>
                     <separator class="thin" />

@@ -38,7 +38,8 @@
                        "visualisationcolour",
                        "visualisationhighlight",
                        "dologging",
-                       "dologgingdebug"];
+                       "dologgingdebug",
+                       "dologgingdebuglevel"];
     ]]>
     </script>
 
@@ -253,8 +254,6 @@
                               preftype="bool"/>
                     <label class="indent">
                         &logfiles.enable.description.whatlogged;
-                    </label>
-                    <label class="indent">
                         &logfiles.enable.description.sending;
                     </label>
                     <separator class="thin" />
@@ -263,13 +262,20 @@
                               prefstring="extensions.threadvis.logging.debug"
                               prefdefval="false"
                               preftype="bool"/>
+                    <hbox>
+                        <label class="indent detaileddescription" 
+                               control="logdebuglevel"
+                               value="Debug Level:" />
+                        <textbox class="indent detaileddescription"
+                                 id="logdebuglevel"
+                                 prefstring="extensions.threadvis.logging.debug.level"
+                                 prefdefval="0"
+                                 preftype="int"
+                                 size="2" />
+                    </hbox>
                     <label class="indent">
                         &logfiles.debug.description.general;
-                     </label>
-                     <label class="indent">
                         &logfiles.debug.description.personalinfo;
-                     </label>
-                     <label class="indent">
                         &logfiles.debug.description.size;
                     </label>
                 </groupbox>

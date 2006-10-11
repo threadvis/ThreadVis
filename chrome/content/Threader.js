@@ -17,7 +17,7 @@
  ******************************************************************************/
 function Threader()
 {
-    LOGGER_.logDebug("Threader()", {});
+    LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "Threader()", {});
     /**
      * Link message ids to container objects
      */
@@ -90,7 +90,7 @@ function Threader()
  ******************************************************************************/
 Threader.prototype.addMessage = function(message)
 {
-    LOGGER_.logDebug("Threader.addMessage()",
+    LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.addMessage()",
                         {"message" : message});
     this.messages_.push(message);
 }
@@ -138,7 +138,7 @@ Threader.prototype.closeCopyCut = function()
  ******************************************************************************/
 Threader.prototype.findContainer = function(message_id)
 {
-    LOGGER_.logDebug("Threader.findContainer()",
+    LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.findContainer()",
                         {"message_id" : message_id,
                          "return" : this.id_table_[message_id]});
     return this.id_table_[message_id];
@@ -151,7 +151,7 @@ Threader.prototype.findContainer = function(message_id)
  ******************************************************************************/
 Threader.prototype.getRoot = function()
 {
-    LOGGER_.logDebug("Threader.getRoot()", {});
+    LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "Threader.getRoot()", {});
     return this.root_set_;
 }
 
@@ -167,7 +167,7 @@ Threader.prototype.topPutMessagesInContainer = function()
     {
         this.put_messages_in_container_top_doing_ = true;
         this.put_messages_in_container_counter_ = 0;
-        LOGGER_.logDebug("Threader.topPutMessagesInContainer()",
+        LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "Threader.topPutMessagesInContainer()",
                             {"action" : "start"});
         this.put_messages_in_container_start_ = (new Date()).getTime();
         var ref = this;
@@ -177,7 +177,7 @@ Threader.prototype.topPutMessagesInContainer = function()
     {
         this.put_messages_in_container_end_ = (new Date()).getTime();
         this.put_messages_in_container_top_doing_ = false;
-        LOGGER_.logDebug("Threader.topPutMessagesInContainer()",
+        LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "Threader.topPutMessagesInContainer()",
                             {"action" : "end"});
         return;
     }
@@ -207,7 +207,7 @@ Threader.prototype.putMessagesInContainer = function()
     var counter = 0;
     var maxcounter = this.put_messages_in_container_increment_;
 
-    LOGGER_.logDebug("Threader.putMessagesInContainer()",
+    LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "Threader.putMessagesInContainer()",
                         {"action" : "loop over all messages",
                          "startcounter" : counter,
                          "endcounter" : maxcounter,
@@ -243,7 +243,7 @@ Threader.prototype.putMessagesInContainer = function()
  ******************************************************************************/
 Threader.prototype.putMessageInContainer = function(message)
 {
-    LOGGER_.logDebug("Threader.putMessageInContainer()",
+    LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.putMessageInContainer()",
                         {"looking at" : message});
 
     // try to get message container
@@ -251,7 +251,7 @@ Threader.prototype.putMessageInContainer = function(message)
 
     if (message_container != null)
     {
-        LOGGER_.logDebug("Threader.putMessageInContainer()",
+        LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.putMessageInContainer()",
                             {"action" : "found dummy container with message id",
                              "dummy" : message_container.isDummy(),
                              "sent" : message_container.isDummy() ? "false" : message_container.getMessage().isSent()});
@@ -288,7 +288,7 @@ Threader.prototype.putMessageInContainer = function(message)
 
     if (message_container == null)
     {
-        LOGGER_.logDebug("Threader.putMessageInContainer()",
+        LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.putMessageInContainer()",
                             {"action" : "no container found, create new one"});
         // no suitable container found, create new one
         message_container = new Container();
@@ -297,7 +297,7 @@ Threader.prototype.putMessageInContainer = function(message)
         this.id_table_[message.getId()] = message_container;
     }
 
-    LOGGER_.logDebug("Threader.putMessageInContainer()",
+    LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.putMessageInContainer()",
                         {"action" : "loop over references"});
     // for each element in references field of message
     var parent_reference_container = null;
@@ -308,13 +308,13 @@ Threader.prototype.putMessageInContainer = function(message)
     {
         var reference_id = references[referencekey];
 
-        LOGGER_.logDebug("Threader.putMessageInContainer()",
+        LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.putMessageInContainer()",
                             {"reference" : reference_id});
         // try to find container for referenced message
         var reference_container = this.id_table_[reference_id];
         if (reference_container == null)
         {
-            LOGGER_.logDebug("Threader.putMessageInContainer()",
+            LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.putMessageInContainer()",
                                 {"action" : "no container found, create new one"});
             // no container found, create new one
             reference_container = new Container();
@@ -323,7 +323,7 @@ Threader.prototype.putMessageInContainer = function(message)
         }
         
         // 1.B. link reference container together
-        LOGGER_.logDebug("Threader.putMessageInContainer()",
+        LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.putMessageInContainer()",
                             {"action" : "link references together"});
         if (parent_reference_container != null &&                           // if we have a parent container
             ! reference_container.hasParent() &&                            // and current container does not have a parent
@@ -334,12 +334,12 @@ Threader.prototype.putMessageInContainer = function(message)
             // (i.e. thread is split by user)
             if (this.copycut_.getCut(reference_id) == parent_reference_id)
             {
-                LOGGER_.logDebug("Threader.putMessageInContainer()",
+                LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.putMessageInContainer()",
                                  {"action" : "message cut, do not add us to parent"});
             }
             else
             {
-                LOGGER_.logDebug("Threader.putMessageInContainer()",
+                LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.putMessageInContainer()",
                                     {"action" : "add us to parent reference container"});
                 parent_reference_container.addChild(reference_container);
             }
@@ -356,7 +356,7 @@ Threader.prototype.putMessageInContainer = function(message)
         (parent_reference_container == message_container ||
         message_container.findChild(parent_reference_container)))
     {
-        LOGGER_.logDebug("Threader.putMessageInContainer()",
+        LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.putMessageInContainer()",
                             {"action" : "set parent reference container to null"});
         parent_reference_container = null;
     }
@@ -366,7 +366,7 @@ Threader.prototype.putMessageInContainer = function(message)
         parent_reference_container != null)
     {
         // remove us from this parent
-        LOGGER_.logDebug("Threader.putMessageInContainer()",
+        LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.putMessageInContainer()",
                             {"action" : "remove us from parent"});
         message_container.getParent().removeChild(message_container);
     }
@@ -377,14 +377,14 @@ Threader.prototype.putMessageInContainer = function(message)
     var copy_id = this.copycut_.getCopy(message.getId());
     if (copy_id)
     {
-        LOGGER_.logDebug("Threader.putMessageInContainer()",
+        LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.putMessageInContainer()",
                             {"action" : "message copied",
                              "copy_id" : copy_id});
         
         var parent_container = this.id_table_[copy_id];
         if (parent_container == null)
         {
-            LOGGER_.logDebug("Threader.putMessageInContainer()",
+            LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.putMessageInContainer()",
                                 {"action" : "no container found, create new one"});
             // no container found, create new one
             parent_container = new Container();
@@ -402,13 +402,13 @@ Threader.prototype.putMessageInContainer = function(message)
             // and this container wasn't cut
             if (this.copycut_.getCut(message.getId()) == parent_reference_id)
             {
-                LOGGER_.logDebug("Threader.putMessageInContainer()",
+                LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.putMessageInContainer()",
                                  {"action" : "message cut, do not add us to parent"});
             }
             else
             {
                 // add us as child
-                LOGGER_.logDebug("Threader.putMessageInContainer()",
+                LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.putMessageInContainer()",
                                     {"action" : "add us as child to parent reference container"});
                 parent_reference_container.addChild(message_container);
             }
@@ -428,7 +428,7 @@ Threader.prototype.topFindRootSet = function()
         this.put_messages_in_container_done_)
     {
         this.find_rootset_top_doing_ = true;
-        LOGGER_.logDebug("Threader.topFindRootSet()",
+        LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "Threader.topFindRootSet()",
                             {"action" : "start"});
         this.find_rootset_start_ = (new Date()).getTime();
         var ref = this;
@@ -438,7 +438,7 @@ Threader.prototype.topFindRootSet = function()
     {
         this.find_rootset_end_ = (new Date()).getTime();
         this.find_rootset_top_doing_ = false;
-        LOGGER_.logDebug("Threader.topFindRootSet()",
+        LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "Threader.topFindRootSet()",
                             {"action" : "end"});
         return;
     }
@@ -462,7 +462,7 @@ Threader.prototype.findRootSet = function()
     this.find_rootset_doing_ = true;
 
     var rootkey = null;
-    LOGGER_.logDebug("Threader.findRootSet()",
+    LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "Threader.findRootSet()",
                         {"action" : "find root set"});
     for (rootkey in this.id_table_)
     {
@@ -491,7 +491,7 @@ Threader.prototype.topPruneEmptyContainers = function()
         this.find_rootset_done_)
     {
         this.prune_empty_containers_top_doing_ = true;
-        LOGGER_.logDebug("Threader.topPruneEmptyContainers()",
+        LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "Threader.topPruneEmptyContainers()",
                             {"action" : "start"});
         this.prune_empty_containers_start_ = (new Date()).getTime();
         var ref = this;
@@ -501,7 +501,7 @@ Threader.prototype.topPruneEmptyContainers = function()
     {
         this.prune_empty_containers_end_ = (new Date()).getTime();
         this.prune_empty_containers_doing_ = false;
-        LOGGER_.logDebug("Threader.topPruneEmptyContainers()",
+        LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "Threader.topPruneEmptyContainers()",
                             {"action" : "end"});
         return;
     }
@@ -524,20 +524,20 @@ Threader.prototype.pruneEmptyContainers = function()
 
     this.prune_empty_containers_doing_ = true;
 
-    LOGGER_.logDebug("Threader.pruneEmptyContainers()",
+    LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.pruneEmptyContainers()",
                         {"action" : "loop over root set"});
     var container = null;
     for (container = this.root_set_.getChild();
          container != null;
          container = container.getNext())
     {
-        LOGGER_.logDebug("Threader.pruneEmptyContainers()",
+        LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.pruneEmptyContainers()",
                             {"container" : container});
         // if container is empty and has no children
         if (container.isDummy() &&
             ! container.hasChild())
         {
-            LOGGER_.logDebug("Threader.pruneEmptyContainers()",
+            LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.pruneEmptyContainers()",
                                 {"action" : "container does not belong to root set"});
             // remove from root_set_
             if (container.hasPrevious())
@@ -606,7 +606,7 @@ Threader.prototype.topPutContainersInSubjectTable = function()
         this.prune_empty_containers_done_)
     {
         this.put_containers_in_subject_table_top_doing_ = true;
-        LOGGER_.logDebug("Threader.topPutContainersInSubjectTable()",
+        LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "Threader.topPutContainersInSubjectTable()",
                             {"action" : "start"});
         this.put_containers_in_subject_table_start_ = (new Date()).getTime();
         var ref = this;
@@ -617,7 +617,7 @@ Threader.prototype.topPutContainersInSubjectTable = function()
         this.put_containers_in_subject_table_end_ = (new Date()).getTime();
         this.end_ = (new Date()).getTime();
         this.put_containers_in_subject_table_top_doing_ = false;
-        LOGGER_.logDebug("Threader.topPutContainersInSubjectTable()",
+        LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "Threader.topPutContainersInSubjectTable()",
                             {"action" : "end"});
         this.done_threading_ = true;
         var ref = this;
@@ -644,14 +644,14 @@ Threader.prototype.putContainersInSubjectTable = function()
 
     this.put_containers_in_subject_table_doing_ = true;
 
-    LOGGER_.logDebug("Threader.putContainersInSubjectTable()",
+    LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.putContainersInSubjectTable()",
                         {"action" : "loop over root set"});
     var container = null;
     for (container = this.root_set_.getChild();
          container != null;
          container = container.getNext())
     {
-        LOGGER_.logDebug("Threader.putContainersInSubjectTable()",
+        LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.putContainersInSubjectTable()",
                             {"container" : container});
         // 5.B. find subject of subtree
         var subject = "";
@@ -670,7 +670,7 @@ Threader.prototype.putContainersInSubjectTable = function()
            (subject_container.isDummy() && ! container.isDummy()) ||           // if found one is empty, but this one is not OR
            (subject_container.getReplyCount() > container.getReplyCount()))    // if current is less reply than subject container
         {
-            LOGGER_.logDebug("Threader.putContainersInSubjectTable()",
+            LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.putContainersInSubjectTable()",
                                 {"action" : "putting container in subject table"});
             this.subject_table_[subject] = container;
         }
@@ -692,7 +692,7 @@ Threader.prototype.topGroupBySubject = function()
         this.put_containers_in_subject_table_done_)
     {
         this.group_by_subject_top_doing_ = true;
-        LOGGER_.logDebug("Threader.topGroupBySubject()",
+        LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "Threader.topGroupBySubject()",
                             {"action" : "start"});
         this.group_by_subject_top_start_ = (new Date()).getTime();
         var ref = this;
@@ -703,7 +703,7 @@ Threader.prototype.topGroupBySubject = function()
         this.group_by_subject_end_ = (new Date()).getTime();
         this.end_ = (new Date()).getTime();
         this.group_by_subject_top_doing_ = false;
-        LOGGER_.logDebug("Threader.topGroupBySubject()",
+        LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "Threader.topGroupBySubject()",
                             {"action" : "end"});
         var ref = this;
         setTimeout(function(){ref.logInfo();}, 10);
@@ -727,14 +727,14 @@ Threader.prototype.groupBySubject = function()
 
     this.group_by_subject_doing_ = true;
 
-    LOGGER_.logDebug("Threader.groupBySubject()",
+    LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.groupBySubject()",
                         {"action" : "loop over root set"});
     var container = null;
     for (container = this.root_set_.getChild();
          container != null;
          container = container.getNext())
     {
-        LOGGER_.logDebug("Threader.groupBySubject()",
+        LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.groupBySubject()",
                             {"container" : container});
         // get subject of this container
         var subject = "";
@@ -746,7 +746,7 @@ Threader.prototype.groupBySubject = function()
             subject_container == container)
         {
             // if no container found, or found ourselfs
-            LOGGER_.logDebug("Threader.groupBySubject()",
+            LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.groupBySubject()",
                                 {"action" : "no container in subject table or found ourselves"});
             continue;
         }
@@ -755,7 +755,7 @@ Threader.prototype.groupBySubject = function()
             subject_container.isDummy())
         {
             // append children of subject_container to container
-            LOGGER_.logDebug("Threader.groupBySubject()",
+            LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.groupBySubject()",
                                 {"action" : "both dummies"});
             container.addChild(subject_container.getChild());
         }
@@ -764,7 +764,7 @@ Threader.prototype.groupBySubject = function()
                  ! subject_container.isDummy())
         {
             // add non empty container as child of empty container
-            LOGGER_.logDebug("Threader.groupBySubject()",
+            LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.groupBySubject()",
                                 {"action" : "container dummy, subject_container not"});
             container.addChild(subject_container);
         }
@@ -773,7 +773,7 @@ Threader.prototype.groupBySubject = function()
                  subject_container.isDummy())
         {
             // add non empty container as child of empty container
-            LOGGER_.logDebug("Threader.groupBySubject()",
+            LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.groupBySubject()",
                                 {"action" : "container not dummy, subject_container dummy"});
             subject_container.addChild(container);
         }
@@ -781,7 +781,7 @@ Threader.prototype.groupBySubject = function()
         else if (! subject_container.isDummy() &&
                  subject_container.getReplyCount() < container.getReplyCount())
         {
-            LOGGER_.logDebug("Threader.groupBySubject()",
+            LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.groupBySubject()",
                                 {"action" : "misordered 1"});
             // calculate difference between the messages
             var difference = container.getReplyCount() - subject_container.getReplyCount();
@@ -831,7 +831,7 @@ Threader.prototype.groupBySubject = function()
         else if (! subject_container.isDummy() &&
                  subject_container.getReplyCount() > container.getReplyCount())
         {
-            LOGGER_.logDebug("Threader.groupBySubject()", {"action" : "misordered 2"});
+            LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "Threader.groupBySubject()", {"action" : "misordered 2"});
             // calculate difference between the messages
             var difference = subject_container.getReplyCount() - container.getReplyCount();
             var top = container;
@@ -1044,7 +1044,7 @@ Threader.prototype.logInfo = function()
  ******************************************************************************/
 Threader.prototype.getThreadDistribution = function()
 {
-    LOGGER_.logDebug("Threader.getThreadDistribution()", {});
+    LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "Threader.getThreadDistribution()", {});
     var distribution = new Array();
     var container = null;
     for (container = this.root_set_.getChild();

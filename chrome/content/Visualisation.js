@@ -232,7 +232,7 @@ Visualisation.prototype.checkSize = function()
  ******************************************************************************/
 Visualisation.prototype.clearStack = function()
 {
-    LOGGER_.logDebug("Visualisation.clearStack()", {});
+    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.clearStack()", {});
     while(this.stack_.firstChild != null)
         this.stack_.removeChild(this.stack_.firstChild);
     
@@ -385,7 +385,7 @@ Visualisation.prototype.createLegendBox = function(colour, name, count)
  ******************************************************************************/
 Visualisation.prototype.createStack = function()
 {
-    LOGGER_.logDebug("Visualisation.createStack()", {});
+    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.createStack()", {});
     this.box_ = document.getElementById("ThreadVisBox");
     this.stack_ = document.getElementById("ThreadVisStack");
     this.strings_ = document.getElementById("ThreadVisStrings");
@@ -393,7 +393,7 @@ Visualisation.prototype.createStack = function()
     var ref = this;
     if (! this.stack_)
     {
-        LOGGER_.logDebug("Visualisation.createStack()", {"action" : "create stack"});
+        LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.createStack()", {"action" : "create stack"});
         this.stack_ = document.createElementNS(XUL_NAMESPACE_, "stack");
         this.stack_.setAttribute("id", "ThreadVisStack");
         this.stack_.style.position = "relative";
@@ -405,7 +405,7 @@ Visualisation.prototype.createStack = function()
     }
     else
     {
-        LOGGER_.logDebug("Visualisation.createStack()", {"action" : "clear stack"});
+        LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.createStack()", {"action" : "clear stack"});
         this.clearStack();
     }
 
@@ -528,7 +528,7 @@ Visualisation.prototype.getResize = function(xcount,
                                              sizex,
                                              sizey)
 {
-    LOGGER_.logDebug("Visualisation.getResize()",
+    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.getResize()",
                         {"action" : "start",
                          "xcount" : xcount,
                          "ycount" : ycount,
@@ -553,7 +553,7 @@ Visualisation.prototype.getResize = function(xcount,
     if (resize > 1)
         resize = 1;
 
-    LOGGER_.logDebug("Visualisation.getResize()",
+    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.getResize()",
                         {"action" : "end",
                         "resize" : resize,
                         "resizex" : resizex,
@@ -636,7 +636,7 @@ Visualisation.prototype.observe = function(subject, topic, data)
  ******************************************************************************/
 Visualisation.prototype.onMouseClick = function(event)
 {
-    LOGGER_.logDebug("Visualisation.onMouseClick()", {});
+    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.onMouseClick()", {});
     var container = event.target.container;
     if (container && ! container.isDummy())
         THREADVIS_.callback(container.getMessage().getKey(), 
@@ -842,7 +842,7 @@ Visualisation.prototype.preferenceReload = function()
  ******************************************************************************/
 Visualisation.prototype.resetStack = function()
 {
-    LOGGER_.logDebug("Visualisation.resetStack()", {});
+    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.resetStack()", {});
     this.stack_.style.marginLeft = "0px";
     this.stack_.style.marginTop = "0px";
 }
@@ -858,7 +858,7 @@ Visualisation.prototype.timeScaling = function(containers,
                                                minimaltimedifference,
                                                width)
 {
-    LOGGER_.logDebug("Visualisation.timeScaling()",
+    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.timeScaling()",
                         {"action" : "start",
                          "containers" : containers.toString(),
                          "minimaltimedifference" : minimaltimedifference,
@@ -901,7 +901,7 @@ Visualisation.prototype.timeScaling = function(containers,
     // fit 2, since we want some spacing between the messages and the border
     var max_count_x = (width / this.spacing_) - 1;
 
-    LOGGER_.logDebug("Visualisation.timeScaling()", 
+    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.timeScaling()", 
                         {"action" : "first pass done",
                          "total_time_scale" : total_time_scale,
                          "max_count_x" : max_count_x});
@@ -929,7 +929,7 @@ Visualisation.prototype.timeScaling = function(containers,
             break;
     }
 
-    LOGGER_.logDebug("Visualisation.timeScaling()",
+    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.timeScaling()",
                         {"action" : "second pass done", 
                          "total_time_scale" : total_time_scale});
 
@@ -946,7 +946,7 @@ Visualisation.prototype.visualise = function(container)
     if (container == null)
         container = this.currentcontainer_;
 
-    LOGGER_.logDebug("Visualisation.visualise()",
+    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.visualise()",
                         {"action" : "start",
                          "container" : container.toString()});
 
@@ -1206,7 +1206,7 @@ Visualisation.prototype.visualiseExisting = function(container)
         // if thread has changed and we don't have all container visualisations
         if (this.containervisualisations_[thiscontainer] == null)
         {
-            LOGGER_.logDebug("Visualisation.visualiseExisting()", {"action" : "cached visualisation does not contain this message, redraw"});
+            LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.visualiseExisting()", {"action" : "cached visualisation does not contain this message, redraw"});
             // do a full redraw
             this.currentcontainer_ = null;
             this.visualise(container);

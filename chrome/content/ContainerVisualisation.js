@@ -53,7 +53,7 @@ function ContainerVisualisation(stack,
     if (this.container_.isDummy())
         this.style_ ="dummy";
 
-    LOGGER_.logDebug("ContainerVisualisation()",
+    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "ContainerVisualisation()",
                         {"action" : "start",
                          "container" : this.container_.toString(),
                          "colour" : this.colour_,
@@ -170,7 +170,7 @@ ContainerVisualisation.prototype.createToolTip = function()
 
     if (! this.container_.isDummy())
     {
-        LOGGER_.logDebug("Visualisation.drawDot()",
+        LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.drawDot()",
                             {"action" : "create tooltip start"});
 
         // if container container message, view details
@@ -211,12 +211,12 @@ ContainerVisualisation.prototype.createToolTip = function()
         tooltip.appendChild(date);
         tooltip.appendChild(subject);
 
-        LOGGER_.logDebug("Visualisation.drawDot()",
+        LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.drawDot()",
                             {"action" : "create tooltip end"});
     }
     else
     {
-        LOGGER_.logDebug("Visualisation.drawDot()",
+        LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.drawDot()",
                             {"action" : "create missing tooltip start"});
 
         // otherwise we display info about missing message
@@ -228,7 +228,7 @@ ContainerVisualisation.prototype.createToolTip = function()
                            this.strings_.getString("tooltip.missingmessagedetail"));
         tooltip.appendChild(desc1);
         tooltip.appendChild(desc2);
-        LOGGER_.logDebug("Visualisation.drawDot()",
+        LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.drawDot()",
                             {"action" : "create missing tooltip end"});
     }
     
@@ -402,7 +402,7 @@ ContainerVisualisation.prototype.onMouseClick = function(event)
     if (event.detail > 1)
         ThreadPaneDoubleClick();
 
-    LOGGER_.logDebug("Visualisation.onMouseClick()", {});
+    LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "Visualisation.onMouseClick()", {});
     var container = event.target.container;
     if (container && ! container.isDummy())
         THREADVIS_.callback(container.getMessage().getKey(), 
@@ -418,6 +418,12 @@ ContainerVisualisation.prototype.paste = function()
 {
     if (COPY_MESSAGE_)
     {
+        // check to see if user creates a loop
+        if (COPY_MESSAGE_.findChild(this.container_))
+        {
+            alert("Action not allowed. This would create a loop.");
+            return;
+        }
         var copy_parent = COPY_MESSAGE_.getParent();
         this.container_.addChild(COPY_MESSAGE_);
         
@@ -551,7 +557,7 @@ ContainerVisualisation.prototype.visualiseCircle = function(colour)
     style_border = (this.dotsize_ / 6 * this.resize_) + 
                        "px solid " + colour;
 
-    LOGGER_.logDebug("Visualisation.drawDot()",
+    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.drawDot()",
                         {"action" : "draw selection circle",
                          "top" : style_top,
                          "left" : style_left,
@@ -584,7 +590,7 @@ ContainerVisualisation.prototype.visualiseClick = function()
     var style_background = "";
     var style_border = "";
 
-    LOGGER_.logDebug("Visualisation.drawClick()",
+    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.drawClick()",
                         {"top" : style_top,
                          "left" : style_left,
                          "height" : style_height,
@@ -624,7 +630,7 @@ ContainerVisualisation.prototype.visualiseDot = function()
         style_border = (this.dotsize_ / 4 * this.resize_) + 
                            "px solid " + this.colour_;
 
-    LOGGER_.logDebug("Visualisation.drawDot()",
+    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.drawDot()",
                         {"top" : style_top,
                          "left" : style_left,
                          "height" : style_height,
