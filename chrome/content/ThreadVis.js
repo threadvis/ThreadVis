@@ -995,7 +995,7 @@ ThreadVis.prototype.visualiseMsgId = function(message_id)
         this.visualise(container);
         
         // visualise any popup windows that might exist
-        if (POPUP_WINDOW_)
+        if (POPUP_WINDOW_ && POPUP_WINDOW_.THREADVIS_)
             POPUP_WINDOW_.THREADVIS_.visualise(container);
     }
     else
@@ -1005,7 +1005,7 @@ ThreadVis.prototype.visualiseMsgId = function(message_id)
         // this means we somehow missed to thread this message
         // thus, thread the whole folder we are in
         this.clearVisualisation();
-        if (POPUP_WINDOW_)
+        if (POPUP_WINDOW_ && POPUP_WINDOW_.THREADVIS_)
             POPUP_WINDOW_.THREADVIS_.clearVisualisation();
         this.onFolderAdded(GetLoadedMsgFolder());
     }
