@@ -305,7 +305,7 @@ ThreadVis.prototype.addMessage = function(header)
                               header.messageId,
                               header.messageKey,
                               date,
-                              header.folder.URI ,
+                              header.folder.URI,
                               header.getStringProperty("references"),
                               false);
 

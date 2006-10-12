@@ -16,13 +16,11 @@
  ******************************************************************************/
 function References(references)
 {
-    /**
-     * Store message ids of references
-     */
+    // Store message ids of references
     this.references_ = new Array;
 
-    // javascript links to methods
     this.buildReferences(references);
+    this.cleanReferences();
 }
 
 
@@ -46,6 +44,28 @@ References.prototype.buildReferences = function(references)
             this.references_.push(reference);
         }
     }
+}
+
+
+
+/** ****************************************************************************
+ * kill dupes in references array
+ ******************************************************************************/
+References.prototype.cleanReferences = function()
+{
+    LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "REFERENCES", {"total references": this.references_.join(" ")});
+    var count = this.references_.length;
+    for (var i = count; i > 0; i--)
+    {
+        var outer = this.references_[i];
+        for (var j = i-1; j >= 0; j--)
+        {
+            var inner = this.references_[j];
+            if (outer == inner)
+                this.references_.splice(j, 1);
+        }
+    }
+    LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "REFERENCES", {"after references": this.references_.join(" ")});
 }
 
 
