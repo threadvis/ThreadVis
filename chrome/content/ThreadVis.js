@@ -9,20 +9,8 @@
  ******************************************************************************/
 
 
-var HTML_NAMESPACE_ =
-    "http://www.w3.org/1999/xhtml";
-var XUL_NAMESPACE_ =
-    "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
-var THREADVIS_ = null;
-var LOGGER_ = null;
-var PREFERENCE_OBSERVER_ = null;
-var THREADVIS_PARENT_ = null;
-var THREADVIS_ENABLED_ = false;
-var THREADVIS_DISABLEDACCOUNTS_ = "";
-var THREADVIS_DISABLEDFOLDERS_ = "";
-var COPY_MESSAGE_ = null;
-var POPUP_WINDOW_ = null;
+var THREADVIS = null;
 
 // add visualisation at startup
 addEventListener("load", createThreadVis, false);
@@ -34,60 +22,13 @@ addEventListener("load", createThreadVis, false);
  ******************************************************************************/
 function createThreadVis()
 {
-    // create preference observer
-    var preference_observer = checkForPreferenceObserver(window);
-    if (preference_observer)
+    var threadvis_parent = checkForThreadVis(window);
+    if (THREADVIS == null)
     {
-        PREFERENCE_OBSERVER_ = preference_observer;
+        THREADVIS = new ThreadVis(threadvis_parent);
+        THREADVIS.init();
+        window.onerror = THREADVIS.logJavaScriptErrors;
     }
-    else
-    {
-        PREFERENCE_OBSERVER_ = new PreferenceObserver();
-        PREFERENCE_OBSERVER_.registerCallback("enabled", preferenceEnabledChanged);
-        PREFERENCE_OBSERVER_.registerCallback("disabledaccounts", preferenceDisabledAccountsChanged);
-        PREFERENCE_OBSERVER_.registerCallback("disabledfolders", preferenceDisabledFoldersChanged);
-    }
-
-    THREADVIS_ENABLED_ = PREFERENCE_OBSERVER_.getPreference("enabled");
-    THREADVIS_DISABLEDACCOUNTS_ = PREFERENCE_OBSERVER_.getPreference("disabledaccounts");
-    THREADVIS_DISABLEDFOLDERS_ = PREFERENCE_OBSERVER_.getPreference("disabledfolders");
-
-    if (! THREADVIS_ENABLED_)
-    {
-        deleteBox();
-        return;
-    }
-
-    createBox();
-
-    // check for any opener and logger in that opener
-    var logger = checkForLogger(window);
-    if (logger)
-        LOGGER_ = logger;
-    else
-        LOGGER_ = new Logger();
-
-    THREADVIS_PARENT_ = checkForThreadVis(window);
-    if (THREADVIS_ == null)
-        THREADVIS_ = new ThreadVis();
-}
-
-
-
-/** ****************************************************************************
- * Check all openers for loggers
- ******************************************************************************/
-function checkForLogger(win)
-{
-    if (! win)
-        return null;
-
-    if (win.LOGGER_)
-        return win.LOGGER_;
-    if (win.opener)
-        return checkForLogger(win.opener);
-
-    return null;
 }
 
 
@@ -100,11 +41,8 @@ function checkForThreadVis(win)
     if (! win)
         return null;
 
-    if (win.THREADVIS_)
-        return win.THREADVIS_;
-
-    if (win.THREADVIS_PARENT_)
-        return win.THREADVIS_PARENT_;
+    if (win.THREADVIS)
+        return win.THREADVIS;
 
     if (win.opener)
         return checkForThreadVis(win.opener);
@@ -115,81 +53,13 @@ function checkForThreadVis(win)
 
 
 /** ****************************************************************************
- * Check all openers for preference observer
- ******************************************************************************/
-function checkForPreferenceObserver(win)
-{
-    if (! win)
-        return null;
-
-    if (win.PREFERENCE_OBSERVER_)
-        return win.PREFERENCE_OBSERVER_;
-    if (win.opener)
-        return checkForPreferenceObserver(win.opener);
-
-    return null;
-}
-
-
-
-/** ****************************************************************************
- * Open the options dialog for this extension
- ******************************************************************************/
-function openThreadVisOptionsDialog()
-{
-    if (typeof(openOptionsDialog) == "undefined")
-    {
-        // Mozilla doesn't know about openOptionsDialog, so we use goPreferences.
-        // Although Thunderbird also knows goPreferences, Thunderbird 1.5
-        // has some problems with it, so we use it only for Mozilla and use
-        // openOptionsDialog for Thunderbird. For details see comments below.
-        goPreferences('threadvis', 'chrome://threadvis/content/Settings.xul','threadvis');
-    }
-    else
-    {
-        // Thunderbird knows both goPreferences and openOptionsDialog
-        // but Thunderbird 1.5 (Beta) doesn't do well with goPreferences.
-        // It opens a window, but it has no content.
-        // 
-        // Also almost all calls to open the preferences window use
-        // openOptionsDialog in 1.5, so we might as well use it too.
-        //
-        // One problem remains:
-        //
-        // # In Thunderbird < 1.5, the function is defined as
-        //     function openOptionsDialog(containerID, paneURL, itemID)
-        // # whereas in Thunderbird 1.5, it is defined as
-        //     function openOptionsDialog(aPaneID, aTabID)
-        //
-        // And I don't know how to distinguish between those two.
-        // So let's do a bad hack and pass the aPaneID as the first
-        // parameter (which seems to do no harm to Thunderbird < 1.5) and
-        // pass the paneURL as the second parameter (which in turn seems to
-        // do no harm to Thunderbird 1.5).
-        //
-        // NOTE:
-        // Additionally, Thunderbird 1.5 uses a completely new layout and API 
-        // for the preferences window, which leads to the problem that we need to
-        // have two separate XUL files to edit the preferences for this extension.
-        //
-        // So we have Settings15.xul which gets used in Thunderbird 1.5 (and 
-        // which defines the paneThreadVis component which gets passed as
-        // aPaneID), and we have Settings.xul which gets used in Thunderbird < 1.5
-        // and Mozilla (which URL gets passed as paneURL).
-        openOptionsDialog('paneThreadVis', 'chrome://threadvis/content/Settings.xul');
-    }
-}
-
-
-
-/** ****************************************************************************
  * constructor
+ * threadvis_parent is link to parent object (if it exists)
  ******************************************************************************/
-function ThreadVis()
+function ThreadVis(threadvis_parent)
 {
-    LOGGER_.log("threadvis",
-                    {"action": "startup"});
-
+    this.XUL_NAMESPACE_ = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
+    
     // synchronization variables
     this.loaded_ = false;
     this.loading_ = false;
@@ -200,85 +70,9 @@ function ThreadVis()
     // store server to react to server switch
     this.server_ = null;
 
-    // visualisation object
-    this.visualisation_ = new Visualisation();
-    this.clearVisualisation();
+    // if parent object exists, reuse some of the internal objects
+    this.threadvis_parent_ = threadvis_parent;
 
-    // threader object
-    if (THREADVIS_PARENT_)
-    {
-        this.threader_ = THREADVIS_PARENT_.threader_;
-        this.loaded_ = THREADVIS_PARENT_.loaded_;
-        this.threaded_ = THREADVIS_PARENT_.threaded_;
-        this.server_ = THREADVIS_PARENT_.server_;
-        
-        // visualise selected message
-        this.visualise(THREADVIS_PARENT_.selected_container_);
-        return;
-    }
-    else
-        this.threader_= new Threader();
-
-    // remember msgkey of selected message
-    this.selected_msgkey_ = "";
-
-    // remember container of selected message
-    this.selected_container_ = null;
-
-    this.add_messages_from_folder_enumerator_maxcounter_ = 100;
-
-
-    // add messages when we display first header
-    // register this as event handler later
-    var ref = this;
-    this.doLoad = {
-        onStartHeaders: function()
-        {
-            ref.initMessages();
-            ref.waitForThreading();
-            ref.setSelectedMessage();
-        },
-        onEndHeaders: function()
-        {
-        }
-    }
-    gMessageListeners.push(this.doLoad);
-
-    // add folder listener, so that we can add newly received
-    // messages
-    this.folderListener =
-    {
-        OnItemAdded: function(parentItem, item, view)
-        {
-            // this is called
-            // POP:  - when new msgs arrive
-            //       - when moving messages from one folder to another
-            // IMAP: - only when new msgs arrive
-            //       - NOT when moving messages!!
-            ref.onItemAdded(parentItem, item, view);
-        },
-
-        OnItemRemoved: function(parentItem, item, view)
-        {
-            // removed item from folder
-            //ref.onItemRemoved(parentItem, item, view);
-        },
-
-        OnItemPropertyChanged: function(item, property, oldValue, newValue) {},
-        OnItemIntPropertyChanged: function(item, property, oldValue, newValue) {},
-        OnItemBoolPropertyChanged: function(item, property, oldValue, newValue) {},
-        OnItemUnicharPropertyChanged: function(item, property, oldValue, newValue) {},
-        OnItemPropertyFlagChanged: function(item, property, oldFlag, newFlag) {},
-        OnItemEvent: function(folder, event) {}
-    }
-    if (! this.gMailSession)
-        this.gMailSession = Components.classes["@mozilla.org/messenger/services/session;1"].getService(Components.interfaces.nsIMsgMailSession);
-    var notifyFlags = Components.interfaces.nsIFolderListener.all;
-    this.gMailSession.AddFolderListener(this.folderListener, notifyFlags);
-
-    addEventListener("unload",
-                     function() {ref.unloadHandler()},
-                     false);
 }
 
 
@@ -288,13 +82,15 @@ function ThreadVis()
  ******************************************************************************/
 ThreadVis.prototype.addMessage = function(header)
 {
-    if (! THREADVIS_ENABLED_)
+    if (! this.preferences_.getPreference(this.preferences_.PREF_ENABLED_))
         return;
     if (! this.checkEnabledAccountOrFolder())
         return
 
 
-    LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "ThreadVis.addMessage()", {});
+    this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
+                          "ThreadVis.addMessage()",
+                          {});
     var date = new Date();
     // PRTime is in microseconds, Javascript time is in milliseconds
     // so divide by 1000 when converting
@@ -326,12 +122,13 @@ ThreadVis.prototype.addMessage = function(header)
  ******************************************************************************/
 ThreadVis.prototype.addMessages = function()
 {
-    if (! THREADVIS_ENABLED_)
+    if (! this.preferences_.getPreference(this.preferences_.PREF_ENABLED_))
         return;
     if (! this.checkEnabledAccountOrFolder())
         return;
 
-    LOGGER_.log("addmessages", {"action" : "start"});
+    this.logger_.log("addmessages",
+                     {"action" : "start"});
     this.add_messages_start_time = new Date();
     this.loading_ = true;
     this.loaded_ = false;
@@ -360,7 +157,7 @@ ThreadVis.prototype.addMessages = function()
  ******************************************************************************/
 ThreadVis.prototype.addMessagesFromFolder = function(folder)
 {
-    if (! THREADVIS_ENABLED_)
+    if (! this.preferences_.getPreference(this.preferences_.PREF_ENABLED_))
         return;
 
     if (! this.checkEnabledAccountOrFolder(folder))
@@ -372,15 +169,17 @@ ThreadVis.prototype.addMessagesFromFolder = function(folder)
 
     if (this.add_messages_from_folder_done_)
     {
-        LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "ThreadVis.addMessagesFromFolder()",
-                            {"folder" : folder.URI,
-                             "action" : "end"});
+        this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
+                              "ThreadVis.addMessagesFromFolder()",
+                              {"folder" : folder.URI,
+                               "action" : "end"});
         return;
     }
 
-    LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "ThreadVis.addMessagesFromFolder()",
-                        {"folder" : folder.URI,
-                         "action" : "start"});
+    this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
+                          "ThreadVis.addMessagesFromFolder()",
+                          {"folder" : folder.URI,
+                           "action" : "start"});
 
     // get messages from current folder
     try
@@ -389,9 +188,10 @@ ThreadVis.prototype.addMessagesFromFolder = function(folder)
     }
     catch (exception)
     {
-        LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "ThreadVis.addMessagesFromFolder()",
-                            {"folder" : folder.URI,
-                             "action" : "caught exception " + exception});
+        this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
+                              "ThreadVis.addMessagesFromFolder()",
+                              {"folder" : folder.URI,
+                               "action" : "caught exception " + exception});
         this.add_messages_from_folder_done_ = true;
         this.add_messages_from_folder_doing_ = false;
         return;
@@ -412,20 +212,24 @@ ThreadVis.prototype.addMessagesFromFolder = function(folder)
  ******************************************************************************/
 ThreadVis.prototype.addMessagesFromFolderEnumerator = function(enumerator)
 {
-    if (! THREADVIS_ENABLED_)
+    if (! this.preferences_.getPreference(this.preferences_.PREF_ENABLED_))
         return;
     if (! this.checkEnabledAccountOrFolder())
         return
 
 
-    LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "ThreadVis.addMessagesFromFolderEnumerator()", {"action" : "start"});
+    this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
+                          "ThreadVis.addMessagesFromFolderEnumerator()",
+                          {"action" : "start"});
     var header = null;
     while (enumerator.hasMoreElements())
     {
         this.add_messages_from_folder_enumerator_counter_++;
         if (this.add_messages_from_folder_enumerator_counter_ >= this.add_messages_from_folder_enumerator_maxcounter_)
         {
-            LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "ThreadVis.addMessagesFromFolderEnumerator()", {"action" : "pause"});
+            this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
+                                  "ThreadVis.addMessagesFromFolderEnumerator()",
+                                  {"action" : "pause"});
             var ref = this;
             this.add_messages_from_folder_enumerator_counter_ = 0;
             setTimeout(function() {ref.addMessagesFromFolderEnumerator(enumerator);}, 10);
@@ -439,8 +243,9 @@ ThreadVis.prototype.addMessagesFromFolderEnumerator = function(enumerator)
         }
     }
 
-    LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "ThreadVis.addMessagesFromFolderEnumerator()",
-                        {"action" : "end"});
+    this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
+                          "ThreadVis.addMessagesFromFolderEnumerator()",
+                          {"action" : "end"});
     this.add_messages_from_folder_done_ = true;
     this.add_messages_from_folder_doing_ = false;
 }
@@ -455,15 +260,15 @@ ThreadVis.prototype.addMessagesFromFolderEnumerator = function(enumerator)
 ThreadVis.prototype.callback = function(msg_key,
                                          folder)
 {
-    if (! THREADVIS_ENABLED_)
+    if (! this.preferences_.getPreference(this.preferences_.PREF_ENABLED_))
         return;
     if (! this.checkEnabledAccountOrFolder())
         return
 
 
-    LOGGER_.log("msgselect",
-                    {"from" : "extension",
-                     "key" : msg_key});
+    this.logger_.log("msgselect",
+                     {"from" : "extension",
+                      "key" : msg_key});
 
     this.selected_msgkey_ = msg_key;
 
@@ -513,23 +318,25 @@ ThreadVis.prototype.checkEnabledAccountOrFolder = function(folder)
 
     var regexp_account = new RegExp(account.key);
 
-    if (THREADVIS_DISABLEDACCOUNTS_ != "" && 
-        THREADVIS_DISABLEDACCOUNTS_.match(regexp_account))
+    if (this.preferences_.getPreference(this.preferences_.PREF_DISABLED_ACCOUNTS_) != "" && 
+        this.preferences_.getPreference(this.preferences_.PREF_DISABLED_ACCOUNTS_).match(regexp_account))
     {
-        LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "accountdisabled",
-                            {"total_regexp" : THREADVIS_DISABLEDACCOUNTS_,
-                             "this_account" : account.key});
+        this.logger_.logDebug(this.logger_.LEVEL_INFORM_,
+                              "accountdisabled",
+                              {"total_regexp" : this.preferences_.getPreference(this.preferences_.PREF_DISABLED_ACCOUNTS_),
+                               "this_account" : account.key});
         return false;
     }
     else
     {
         var regexp_folder = new RegExp(folder.URI + " ");
-        if (THREADVIS_DISABLEDFOLDERS_ != "" && 
-            THREADVIS_DISABLEDFOLDERS_.match(regexp_folder))
+        if (this.preferences_.getPreference(this.preferences_.PREF_DISABLED_FOLDERS_) != "" && 
+            this.preferences_.getPreference(this.preferences_.PREF_DISABLED_FOLDERS_).match(regexp_folder))
         {
-            LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "folderdisabled",
-                                {"total_regexp" : THREADVIS_DISABLEDFOLDERS_,
-                                "this_folder" : folder.URI});
+            this.logger_.logDebug(this.logger_.LEVEL_INFORM_,
+                                  "folderdisabled",
+                                  {"total_regexp" : this.preferences_.getPreference(this.preferences_.PREF_DISABLED_FOLDERS_),
+                                   "this_folder" : folder.URI});
             return false;
         }
         else
@@ -546,9 +353,11 @@ ThreadVis.prototype.checkEnabledAccountOrFolder = function(folder)
  ******************************************************************************/
 ThreadVis.prototype.clearVisualisation = function()
 {
-    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "ThreadVis.clearVisualisation()", {"clear" : this.clear_});
+    this.logger_.logDebug(this.logger_.LEVEL_VIS_,
+                          "ThreadVis.clearVisualisation()",
+                          {"clear" : this.clear_});
 
-    if (! THREADVIS_ENABLED_ )
+    if (! this.preferences_.getPreference(this.preferences_.PREF_ENABLED_) )
     {
         return;
     }
@@ -565,21 +374,10 @@ ThreadVis.prototype.clearVisualisation = function()
 /** ****************************************************************************
  * create threadvis xul box
  ******************************************************************************/
-function createBox()
+ThreadVis.prototype.createBox = function()
 {
-    if (document.getElementById("ThreadVisBox"))
-        return;
-
-    var box = document.createElementNS(XUL_NAMESPACE_, "vbox");
-    box.setAttribute("id", "ThreadVisBox");
-    box.setAttribute("minheight", 50);
-    box.setAttribute("minwidth", 200);
-    box.setAttribute("flex", 2);
-    box.setAttribute("align", "right");
-    box.setAttribute("context", "ThreadVisPopUp");
-    
-    var headerbox = document.getElementById("expandedHeaderView");
-    headerbox.appendChild(box);
+    var elem = document.getElementById("ThreadVis");
+    elem.hidden = false;
 }
 
 
@@ -587,14 +385,33 @@ function createBox()
 /** ****************************************************************************
  * delete threadvis xul box
  ******************************************************************************/
-function deleteBox()
+ThreadVis.prototype.deleteBox = function()
 {
-    var box = document.getElementById("ThreadVisBox");
-    if (! box)
-        return;
+    var elem = document.getElementById("ThreadVis");
+    elem.hidden = true;
+}
 
-    var headerbox = document.getElementById("expandedHeaderView");
-    headerbox.removeChild(box);
+
+
+/** ****************************************************************************
+ * display a popup window for the visualisation
+ ******************************************************************************/
+ThreadVis.prototype.displayVisualisationWindow = function()
+{
+    this.logger_.log("popupvisualisation", {"action" : "open"});
+
+    if (this.popup_window_ != null && ! this.popup_window_.closed)
+    {
+        this.popup_window_.focus();
+        return;
+    }
+    var position_x = this.preferences_.getPreference(this.preferences_.PREF_POPUPWINDOW_POSITION_X_);
+    var position_y = this.preferences_.getPreference(this.preferences_.PREF_POPUPWINDOW_POSITION_Y_);
+    var size_x = this.preferences_.getPreference(this.preferences_.PREF_POPUPWINDOW_SIZE_X_);
+    var size_y = this.preferences_.getPreference(this.preferences_.PREF_POPUPWINDOW_SIZE_Y_);
+
+    var flags = "width=" + size_x + ", height=" + size_y + ", screenX=" + position_x + ", screenY=" + position_y + ", resizable=yes,dependent";
+    this.popup_window_ = window.openDialog("chrome://threadvis/content/ThreadVisPopup.xul", "chrome", flags);
 }
 
 
@@ -604,13 +421,15 @@ function deleteBox()
  ******************************************************************************/
 ThreadVis.prototype.doThreading = function()
 {
-    if (! THREADVIS_ENABLED_)
+    if (! this.preferences_.getPreference(this.preferences_.PREF_ENABLED_))
         return;
     if (! this.checkEnabledAccountOrFolder())
         return
 
 
-    LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "ThreadVis.doThreading()", {});
+    this.logger_.logDebug(this.logger_.LEVEL_INFORM_,
+                          "ThreadVis.doThreading()",
+                          {});
     if (! this.threading_ && ! this.threaded_)
     {
         this.threading_ = true;
@@ -638,14 +457,15 @@ ThreadVis.prototype.doThreading = function()
  ******************************************************************************/
 ThreadVis.prototype.getAllFolders = function(folder)
 {
-    if (! THREADVIS_ENABLED_)
+    if (! this.preferences_.getPreference(this.preferences_.PREF_ENABLED_))
         return;
     if (! this.checkEnabledAccountOrFolder())
         return
 
 
-    LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "ThreadVis.getAllFolders()",
-                        {"folder" : folder.URI});
+    this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
+                          "ThreadVis.getAllFolders()",
+                          {"folder" : folder.URI});
     var folder_enumerator = folder.GetSubFolders();
     var current_folder = null;
     while (true)
@@ -697,24 +517,168 @@ ThreadVis.prototype.getMainWindow = function()
 
 
 /** ****************************************************************************
+ * init object
+******************************************************************************/
+ThreadVis.prototype.init = function()
+{
+    if (this.threadvis_parent_)
+    {
+        this.logger_ = this.threadvis_parent_.logger_;
+        this.threader_ = this.threadvis_parent_.threader_;
+        this.loaded_ = this.threadvis_parent_.loaded_;
+        this.threaded_ = this.threadvis_parent_.threaded_;
+        this.server_ = this.threadvis_parent_.server_;
+        this.preferences_ = this.threadvis_parent_.preferences_;
+    }
+    else
+    {
+        var ref = this;
+        this.preferences_ = new PreferenceObserver();
+        this.preferences_.registerCallback("enabled", function(value) { ref.preferenceEnabledChanged(value); });
+        this.preferences_.registerCallback("disabledaccounts", function(value) { ref.preferenceDisabledAccountsChanged(value); });
+        this.preferences_.registerCallback("disabledfolders", function(value) { ref.preferenceDisabledFoldersChanged(value); });
+        
+        // only create logger object if extension is enabled
+        if (this.preferences_.getPreference(this.preferences_.PREF_ENABLED_))
+        {
+            this.logger_ = new Logger();
+        }
+    }
+    
+    if (! this.preferences_.getPreference(this.preferences_.PREF_ENABLED_))
+    {
+        this.deleteBox();
+        return;
+    }
+
+    this.logger_.log("threadvis",
+                     {"action": "startup"});
+
+    // create box object
+    this.createBox();
+
+    // visualisation object
+    if (! this.visualisation_)
+        this.visualisation_ = new Visualisation();
+    
+    this.clearVisualisation();
+
+    // check to see if parent threadvis object exists
+    if (this.threadvis_parent_)
+    {
+        // visualise selected message
+        this.visualise(this.threadvis_parent_.selected_container_);
+        return;
+    }
+    else
+    {
+        if (! this.threader_)
+            this.threader_= new Threader();
+    }
+
+    /* ************************************************************************
+     * code below only gets executed if no parent threadvis object was found
+     * ***********************************************************************/
+
+    // remember msgkey of selected message
+    this.selected_msgkey_ = "";
+
+    // remember container of selected message
+    this.selected_container_ = null;
+
+    this.add_messages_from_folder_enumerator_maxcounter_ = 100;
+
+    // add messages when we display first header
+    // register this as event handler later
+    var ref = this;
+    this.doLoad = {
+        onStartHeaders: function()
+        {
+            ref.initMessages();
+            ref.waitForThreading();
+            ref.setSelectedMessage();
+        },
+        onEndHeaders: function()
+        {
+        }
+    }
+    gMessageListeners.push(this.doLoad);
+
+    // add folder listener, so that we can add newly received
+    // messages
+    this.folderListener =
+    {
+        OnItemAdded: function(parentItem, item, view)
+        {
+            // this is called
+            // POP:  - when new msgs arrive
+            //       - when moving messages from one folder to another
+            // IMAP: - only when new msgs arrive
+            //       - NOT when moving messages!!
+            ref.onItemAdded(parentItem, item, view);
+        },
+
+        OnItemRemoved: function(parentItem, item, view)
+        {
+            // removed item from folder
+            //ref.onItemRemoved(parentItem, item, view);
+        },
+
+        OnItemPropertyChanged: function(item, property, oldValue, newValue) {},
+        OnItemIntPropertyChanged: function(item, property, oldValue, newValue) {},
+        OnItemBoolPropertyChanged: function(item, property, oldValue, newValue) {},
+        OnItemUnicharPropertyChanged: function(item, property, oldValue, newValue) {},
+        OnItemPropertyFlagChanged: function(item, property, oldFlag, newFlag) {},
+        OnItemEvent: function(folder, event) {}
+    }
+    
+    if (! this.gMailSession)
+        this.gMailSession = Components.classes["@mozilla.org/messenger/services/session;1"].getService(Components.interfaces.nsIMsgMailSession);
+    
+    var notifyFlags = Components.interfaces.nsIFolderListener.all;
+    this.gMailSession.AddFolderListener(this.folderListener, notifyFlags);
+
+    addEventListener("unload",
+                     function() {ref.unloadHandler()},
+                     false);
+}
+
+
+
+/** ****************************************************************************
  * add all messages
  * if not already done
  ******************************************************************************/
 ThreadVis.prototype.initMessages = function()
 {
-    if (! THREADVIS_ENABLED_)
+    if (! this.preferences_.getPreference(this.preferences_.PREF_ENABLED_))
         return;
     if (! this.checkEnabledAccountOrFolder())
         return
 
 
-    LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "ThreadVis.initMessages()", {});
+    this.logger_.logDebug(this.logger_.LEVEL_INFORM_,
+                          "ThreadVis.initMessages()",
+                          {});
     if (! this.loaded_ && ! this.loading_)
     {
         this.loading_ = true;
         var ref = this;
         setTimeout(function(){ref.addMessages();}, 100);
     }
+}
+
+
+
+/** ****************************************************************************
+ * log all JavaScript errors to logfile
+ ******************************************************************************/
+ThreadVis.prototype.logJavaScriptErrors = function(message, file, line)
+{
+    THREADVIS.logger_.log("threadvis-jserror",
+                          {"message": message,
+                           "file" : file,
+                           "line" : line});
 }
 
 
@@ -734,7 +698,7 @@ ThreadVis.prototype.onFolderAdded = function(folder)
         return;
     
     var start = new Date();
-    LOGGER_.log("addadditionalmessagesfolder", {"action" : "start"});
+    this.logger_.log("addadditionalmessagesfolder", {"action" : "start"});
     // added new message to folder
     if (folder instanceof Components.interfaces.nsIMsgFolder)
     {
@@ -745,7 +709,7 @@ ThreadVis.prototype.onFolderAdded = function(folder)
     }
     var end = new Date();
     var duration = end - start;
-    LOGGER_.log("addadditionalmessagesfolder", {"action" : "end", "time" : duration});
+    this.logger_.log("addadditionalmessagesfolder", {"action" : "end", "time" : duration});
 }
 
 
@@ -796,7 +760,7 @@ ThreadVis.prototype.onFolderAddedWaitForVisualisation = function()
 ThreadVis.prototype.onItemAdded = function(parentItem, item, view)
 {
     var start = new Date();
-    LOGGER_.log("addadditionalmessages", {"action" : "start"});
+    this.logger_.log("addadditionalmessages", {"action" : "start"});
     // added new message to folder
     if (item instanceof Components.interfaces.nsIMsgDBHdr)
     {
@@ -805,7 +769,7 @@ ThreadVis.prototype.onItemAdded = function(parentItem, item, view)
     }
     var end = new Date();
     var duration = end - start;
-    LOGGER_.log("addadditionalmessages", {"action" : "end", "time" : duration});
+    this.logger_.log("addadditionalmessages", {"action" : "end", "time" : duration});
 }
 
 
@@ -817,7 +781,7 @@ ThreadVis.prototype.onItemAdded = function(parentItem, item, view)
 ThreadVis.prototype.onItemRemoved = function(parentItem, item, view)
 {
     var start = new Date();
-    LOGGER_.log("deletemessage", {"action" : "start"});
+    this.logger_.log("deletemessage", {"action" : "start"});
     // added new message to folder
     if (item instanceof Components.interfaces.nsIMsgDBHdr)
     {
@@ -829,7 +793,87 @@ ThreadVis.prototype.onItemRemoved = function(parentItem, item, view)
     }
     var end = new Date();
     var duration = end - start;
-    LOGGER_.log("deletemessage", {"action" : "end", "time" : duration});
+    this.logger_.log("deletemessage", {"action" : "end", "time" : duration});
+}
+
+
+
+/** ****************************************************************************
+ * called when popup window gets resized
+ ******************************************************************************/
+ThreadVis.prototype.onVisualisationWindowClose = function()
+{
+    this.logger_.log("popupvisualisation", {"action" : "close"});
+
+    // remember window position and size
+    var position_x = window.screenX;
+    var position_y = window.screenY;
+    var size_x = window.outerWidth;
+    var size_y = window.outerHeight;
+    
+    this.preferences_.setPreference(this.preferences_.PREF_POPUPWINDOW_POSITION_X_,
+                                    position_x,
+                                    this.preferences_.PREF_INT_);
+    this.preferences_.setPreference(this.preferences_.PREF_POPUPWINDOW_POSITION_Y_,
+                                    position_y,
+                                    this.preferences_.PREF_INT_);
+    this.preferences_.setPreference(this.preferences_.PREF_POPUPWINDOW_SIZE_X_,
+                                    size_x,
+                                    this.preferences_.PREF_INT_);
+    this.preferences_.setPreference(this.preferences_.PREF_POPUPWINDOW_SIZE_Y_,
+                                    size_y,
+                                    this.preferences_.PREF_INT_);
+}
+
+
+
+/** ****************************************************************************
+ * Open the options dialog for this extension
+ ******************************************************************************/
+ThreadVis.prototype.openThreadVisOptionsDialog = function()
+{
+    alert(openOptionsDialog);
+    if (typeof(openOptionsDialog) == "undefined")
+    {
+        // Mozilla doesn't know about openOptionsDialog, so we use goPreferences.
+        // Although Thunderbird also knows goPreferences, Thunderbird 1.5
+        // has some problems with it, so we use it only for Mozilla and use
+        // openOptionsDialog for Thunderbird. For details see comments below.
+        goPreferences('threadvis', 'chrome://threadvis/content/Settings.xul','threadvis');
+    }
+    else
+    {
+        // Thunderbird knows both goPreferences and openOptionsDialog
+        // but Thunderbird 1.5 (Beta) doesn't do well with goPreferences.
+        // It opens a window, but it has no content.
+        // 
+        // Also almost all calls to open the preferences window use
+        // openOptionsDialog in 1.5, so we might as well use it too.
+        //
+        // One problem remains:
+        //
+        // # In Thunderbird < 1.5, the function is defined as
+        //     function openOptionsDialog(containerID, paneURL, itemID)
+        // # whereas in Thunderbird 1.5, it is defined as
+        //     function openOptionsDialog(aPaneID, aTabID)
+        //
+        // And I don't know how to distinguish between those two.
+        // So let's do a bad hack and pass the aPaneID as the first
+        // parameter (which seems to do no harm to Thunderbird < 1.5) and
+        // pass the paneURL as the second parameter (which in turn seems to
+        // do no harm to Thunderbird 1.5).
+        //
+        // NOTE:
+        // Additionally, Thunderbird 1.5 uses a completely new layout and API 
+        // for the preferences window, which leads to the problem that we need to
+        // have two separate XUL files to edit the preferences for this extension.
+        //
+        // So we have Settings15.xul which gets used in Thunderbird 1.5 (and 
+        // which defines the paneThreadVis component which gets passed as
+        // aPaneID), and we have Settings.xul which gets used in Thunderbird < 1.5
+        // and Mozilla (which URL gets passed as paneURL).
+        openOptionsDialog('paneThreadVis', 'chrome://threadvis/content/Settings.xul');
+    }
 }
 
 
@@ -837,11 +881,9 @@ ThreadVis.prototype.onItemRemoved = function(parentItem, item, view)
 /** ****************************************************************************
  * "enabledaccounts" preference changed
  ******************************************************************************/
-function preferenceDisabledAccountsChanged(value)
+ThreadVis.prototype.preferenceDisabledAccountsChanged = function(value)
 {
-    THREADVIS_ENABLEDACCOUNTS_ = value;
-    createThreadVis();
-    THREADVIS_.doLoad.onStartHeaders();
+    this.doLoad.onStartHeaders();
 }
 
 
@@ -849,10 +891,12 @@ function preferenceDisabledAccountsChanged(value)
 /** ****************************************************************************
  * "enabled" preference changed
  ******************************************************************************/
-function preferenceEnabledChanged(value)
+ThreadVis.prototype.preferenceEnabledChanged = function(enabled)
 {
-    THREADVIS_ENABLED_ = value;
-    createThreadVis();
+    if (enabled)
+        this.createBox();
+    else
+        this.deleteBox();
 }
 
 
@@ -860,11 +904,9 @@ function preferenceEnabledChanged(value)
 /** ****************************************************************************
  * "disabledfolders" preference changed
  ******************************************************************************/
-function preferenceDisabledFoldersChanged(value)
+ThreadVis.prototype.preferenceDisabledFoldersChanged = function(value)
 {
-    THREADVIS_DISABLEDFOLDERS_ = value;
-    createThreadVis();
-    THREADVIS_.doLoad.onStartHeaders();
+    this.doLoad.onStartHeaders();
 }
 
 
@@ -875,16 +917,17 @@ function preferenceDisabledFoldersChanged(value)
  ******************************************************************************/
 ThreadVis.prototype.setSelectedMessage = function()
 {
-    if (! THREADVIS_ENABLED_)
+    if (! this.preferences_.getPreference(this.preferences_.PREF_ENABLED_))
         return;
     if (! this.checkEnabledAccountOrFolder())
     {
-        this.clearVisualisation();
+        this.deleteBox();
         return;
     }
 
-
-    LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "ThreadVis.setSelectedMessage()", {});
+    this.logger_.logDebug(this.logger_.LEVEL_INFORM_,
+                          "ThreadVis.setSelectedMessage()",
+                          {});
     if (! this.loaded_ || ! this.threaded_)
     {
         var ref = this;
@@ -894,6 +937,8 @@ ThreadVis.prototype.setSelectedMessage = function()
     }
     this.clear_ = false;
 
+    this.createBox();
+    
     // get currently loaded message
     var msg_uri = GetLoadedMessage();
     var msg = messenger.messageServiceFromURI(msg_uri)
@@ -903,14 +948,14 @@ ThreadVis.prototype.setSelectedMessage = function()
     // selected by the extension
     if (this.selected_msgkey_ != msg.messageKey)
     {
-        LOGGER_.log("msgselect",
-                    {"from" : "user",
-                     "key" : msg.messageKey});
+        this.logger_.log("msgselect",
+                         {"from" : "user",
+                          "key" : msg.messageKey});
     }
 
     if (this.server_.key != msg.folder.server.key)
     {
-        LOGGER_.log("switchaccount", {});
+        this.logger_.log("switchaccount", {});
         // user just switched account
         this.loaded_ = false;
         this.threaded_ = false;
@@ -932,9 +977,9 @@ ThreadVis.prototype.setSelectedMessage = function()
  ******************************************************************************/
 ThreadVis.prototype.unloadHandler = function()
 {
-    LOGGER_.log("threadvis",
-        {"action": "unload"});
-    LOGGER_.close();
+    this.logger_.log("threadvis",
+                     {"action": "unload"});
+    this.logger_.close();
     this.threader_.closeCopyCut();
 }
 
@@ -945,13 +990,14 @@ ThreadVis.prototype.unloadHandler = function()
  ******************************************************************************/
 ThreadVis.prototype.visualise = function(container)
 {
-    if (! THREADVIS_ENABLED_)
+    if (! this.preferences_.getPreference(this.preferences_.PREF_ENABLED_))
         return;
     if (! this.checkEnabledAccountOrFolder())
         return
 
-    LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "ThreadVis.visualise()",
-                        {"container" : container});
+    this.logger_.logDebug(this.logger_.LEVEL_INFORM_,
+                          "ThreadVis.visualise()",
+                          {"container" : container});
 
     var msgkey = container.isDummy() ? 
                     "DUMMY" : 
@@ -961,10 +1007,10 @@ ThreadVis.prototype.visualise = function(container)
                                     container.getTopContainer().getMessage().getKey();
     var msgcount = container.getTopContainer().getCountRecursive();
 
-    LOGGER_.log("visualise",
-                    {"msgkey" : msgkey,
-                     "top container" : topcontainer_msgKey,
-                     "msgcount" : msgcount});
+    this.logger_.log("visualise",
+                     {"msgkey" : msgkey,
+                      "top container" : topcontainer_msgKey,
+                      "msgcount" : msgcount});
 
     this.visualisation_.visualise(container);
     this.selected_container_ = container;
@@ -979,14 +1025,16 @@ ThreadVis.prototype.visualise = function(container)
  ******************************************************************************/
 ThreadVis.prototype.visualiseMsgId = function(message_id)
 {
-    if (! THREADVIS_ENABLED_)
+    if (! this.preferences_.getPreference(this.preferences_.PREF_ENABLED_))
         return;
     if (! this.checkEnabledAccountOrFolder())
-        return
+        return;
 
+    this.logger_.logDebug(this.logger_.LEVEL_INFORM_,
+                          "ThreadVis.visualiseMsgId()",
+                          {"message-id" : message_id});
 
-    LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "ThreadVis.visualiseMsgId()",
-                        {"message-id" : message_id});
+    this.createBox();
 
     var container = this.threader_.findContainer(message_id);
 
@@ -995,8 +1043,8 @@ ThreadVis.prototype.visualiseMsgId = function(message_id)
         this.visualise(container);
         
         // visualise any popup windows that might exist
-        if (POPUP_WINDOW_ && POPUP_WINDOW_.THREADVIS_)
-            POPUP_WINDOW_.THREADVIS_.visualise(container);
+        if (this.popup_window_ && this.popup_window_.THREADVIS)
+            this.popup_window_.THREADVIS.visualise(container);
     }
     else
     {
@@ -1005,8 +1053,8 @@ ThreadVis.prototype.visualiseMsgId = function(message_id)
         // this means we somehow missed to thread this message
         // thus, thread the whole folder we are in
         this.clearVisualisation();
-        if (POPUP_WINDOW_ && POPUP_WINDOW_.THREADVIS_)
-            POPUP_WINDOW_.THREADVIS_.clearVisualisation();
+        if (this.popup_window_ && this.popup_window_.THREADVIS)
+            this.popup_window_.THREADVIS.clearVisualisation();
         this.onFolderAdded(GetLoadedMsgFolder());
     }
     container = null;
@@ -1019,7 +1067,7 @@ ThreadVis.prototype.visualiseMsgId = function(message_id)
  ******************************************************************************/
 ThreadVis.prototype.waitForAddMessages = function()
 {
-    if (! THREADVIS_ENABLED_)
+    if (! this.preferences_.getPreference(this.preferences_.PREF_ENABLED_))
         return;
     
     if (! this.checkEnabledAccountOrFolder())
@@ -1031,7 +1079,7 @@ ThreadVis.prototype.waitForAddMessages = function()
         this.loading_ = false;
         this.add_messages_end_time = new Date();
         var duration = this.add_messages_end_time - this.add_messages_start_time;
-        LOGGER_.log("addmessages", {"action" : "end", "time" : duration});
+        this.logger_.log("addmessages", {"action" : "end", "time" : duration});
         return;
     }
 
@@ -1047,9 +1095,10 @@ ThreadVis.prototype.waitForAddMessages = function()
 
     // look at next folder
     var folder = this.folders_.shift();
-    LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "ThreadVis.waitForAddMessages()",
-                        {"action" : "next folder",
-                         "folder" : folder});
+    this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
+                          "ThreadVis.waitForAddMessages()",
+                          {"action" : "next folder",
+                           "folder" : folder});
 
     // if folder == null, we don't have any folders left to look at
     if (folder == null)
@@ -1075,13 +1124,15 @@ ThreadVis.prototype.waitForAddMessages = function()
  ******************************************************************************/
 ThreadVis.prototype.waitForThreading = function()
 {
-    if (! THREADVIS_ENABLED_)
+    if (! this.preferences_.getPreference(this.preferences_.PREF_ENABLED_))
         return;
     if (! this.checkEnabledAccountOrFolder())
         return
 
 
-    LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "ThreadVis.waitForThreading()", {});
+    this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
+                          "ThreadVis.waitForThreading()",
+                          {});
 
     if (this.loaded_ &&
         ! this.threaded_ &&
@@ -1101,61 +1152,19 @@ ThreadVis.prototype.waitForThreading = function()
 
 
 /** ****************************************************************************
- * display a popup window for the visualisation
+ * Zoom function to call from user click
  ******************************************************************************/
-function displayVisualisationWindow()
+ThreadVis.prototype.zoomIn = function()
 {
-    LOGGER_.log("popupvisualisation", {"action" : "open"});
-
-    var position_x = PREFERENCE_OBSERVER_.getPreference(PREFERENCE_OBSERVER_.PREF_POPUPWINDOW_POSITION_X_);
-    var position_y = PREFERENCE_OBSERVER_.getPreference(PREFERENCE_OBSERVER_.PREF_POPUPWINDOW_POSITION_Y_);
-    var size_x = PREFERENCE_OBSERVER_.getPreference(PREFERENCE_OBSERVER_.PREF_POPUPWINDOW_SIZE_X_);
-    var size_y = PREFERENCE_OBSERVER_.getPreference(PREFERENCE_OBSERVER_.PREF_POPUPWINDOW_SIZE_Y_);
-
-    var flags = "width=" + size_x + ", height=" + size_y + ", screenX=" + position_x + ", screenY=" + position_y + ", resizable=yes";
-    POPUP_WINDOW_ = window.openDialog("chrome://threadvis/content/ThreadVisPopup.xul", "chrome", flags);
-
-    // get currently loaded message
-    var msg_uri = GetLoadedMessage();
-    var msg = messenger.messageServiceFromURI(msg_uri)
-              .messageURIToMsgHdr(msg_uri);
-
-    setTimeout(function() {POPUP_WINDOW_.THREADVIS_.visualiseMsgId(msg.messageId);}, 1000);
+    this.visualisation_.zoomIn();
 }
 
-
-function visualisationWindowClose()
-{
-    LOGGER_.log("popupvisualisation", {"action" : "close"});
-
-    // remember window position and size
-    var position_x = window.screenX;
-    var position_y = window.screenY;
-    var size_x = window.outerWidth;
-    var size_y = window.outerHeight;
-    
-    PREFERENCE_OBSERVER_.setPreference(PREFERENCE_OBSERVER_.PREF_POPUPWINDOW_POSITION_X_,
-                                       position_x,
-                                       PREFERENCE_OBSERVER_.PREF_INT_);
-    PREFERENCE_OBSERVER_.setPreference(PREFERENCE_OBSERVER_.PREF_POPUPWINDOW_POSITION_Y_,
-                                       position_y,
-                                       PREFERENCE_OBSERVER_.PREF_INT_);
-    PREFERENCE_OBSERVER_.setPreference(PREFERENCE_OBSERVER_.PREF_POPUPWINDOW_SIZE_X_,
-                                       size_x,
-                                       PREFERENCE_OBSERVER_.PREF_INT_);
-    PREFERENCE_OBSERVER_.setPreference(PREFERENCE_OBSERVER_.PREF_POPUPWINDOW_SIZE_Y_,
-                                       size_y,
-                                       PREFERENCE_OBSERVER_.PREF_INT_);
-}
 
 
 /** ****************************************************************************
- * log all JavaScript errors to logfile
+ * Zoom function to call from user click
  ******************************************************************************/
-window.onerror = logJavaScriptErrors;
-function logJavaScriptErrors(message, file, line)
+ThreadVis.prototype.zoomOut = function()
 {
-    LOGGER_.log("threadvis-jserror", {"message": message,
-                                      "file" : file,
-                                      "line" : line});
+    this.visualisation_.zoomOut();
 }

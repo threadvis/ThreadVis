@@ -10,18 +10,6 @@
 
 
 
-var LOGGER_EXTENSION_PATH_ = "extensions";
-var LOGGER_EXTENSION_GUID_ = "{A23E4120-431F-4753-AE53-5D028C42CFDC}";
-var LOGGER_LOGFILENAME_ = "threadvis.log.xml";
-var THREADVIS_PREF_BRANCH_ = "extensions.threadvis.";
-var LOGGER_PREF_DOLOGGING_ = "logging.enabled";
-var LOGGER_PREF_DOLOGGING_DEBUG_ = "logging.debug";
-var LOGGER_PREF_DOLOGGING_DEBUG_LEVEL_ = "logging.debug.level";
-var LOGGER_STARTTAG_ = '\n<log extensionversion="0.8pre">';
-var LOGGER_ENDTAG_ = "\n</log>";
-
-
-
 /** ****************************************************************************
  * constructor
  * read preferences
@@ -29,11 +17,11 @@ var LOGGER_ENDTAG_ = "\n</log>";
  ******************************************************************************/
 function Logger()
 {
-    // init class variables
-    this.pref_enablelogging_ = false;
-    this.pref_enablelogging_debug_ = false;
-    this.pref_logging_debug_level_ = 0;
-    this.strings_ = document.getElementById("ThreadVisStrings");
+    this.EXTENSION_PATH_ = "extensions";
+    this.EXTENSION_GUID_ = "{A23E4120-431F-4753-AE53-5D028C42CFDC}";
+    this.LOGFILENAME_ = "threadvis.log.xml";
+    this.STARTTAG_ = '\n<log extensionversion="0.8pre">';
+    this.ENDTAG_ = "\n</log>";
 
     this.LEVEL_ERROR_ = 0;
     this.LEVEL_INFORM_ = 1;
@@ -41,28 +29,28 @@ function Logger()
     this.LEVEL_EMAIL_ = 3;
     this.LEVEL_ALL_ = 4;
 
-    this.preferenceObserverRegister();
-    this.preferenceReload();
+    // init class variables
+    this.strings_ = document.getElementById("ThreadVisStrings");
 
     // try to create file
     this.file_ = Components.classes["@mozilla.org/file/directory_service;1"]
                  .getService(Components.interfaces.nsIProperties)
                  .get("ProfD", Components.interfaces.nsIFile);
 
-    this.file_.append(LOGGER_EXTENSION_PATH_);
+    this.file_.append(this.EXTENSION_PATH_);
     if (! this.file_.exists())
         this.file_.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
 
-    this.file_.append(LOGGER_EXTENSION_GUID_);
+    this.file_.append(this.EXTENSION_GUID_);
     if (! this.file_.exists())
         this.file_.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
 
-    this.file_.append(LOGGER_LOGFILENAME_);
+    this.file_.append(this.LOGFILENAME_);
 
     this.ready_ = false;
 
     // if logging is enabled, open file
-    if (this.pref_enablelogging_)
+    if (this.doLogging())
     {
         this.open();
     }
@@ -70,6 +58,9 @@ function Logger()
     {
         this.ready_ = false;
     }
+    
+    var ref = this;
+    THREADVIS.preferences_.registerCallback(THREADVIS.preferences_.PREF_LOGGING_, function(value) { ref.observe(value); });
 }
 
 
@@ -84,8 +75,8 @@ Logger.prototype.close = function()
     if (this.ready_)
     {
         this.ready_ = false;
-        this.file_output_stream_.write(LOGGER_ENDTAG_,
-                                       LOGGER_ENDTAG_.length);
+        this.file_output_stream_.write(this.ENDTAG_,
+                                       this.ENDTAG_.length);
         this.file_output_stream_.close();
     }
 }
@@ -138,7 +129,7 @@ Logger.prototype.decodeDebug = function(object)
  ******************************************************************************/
 Logger.prototype.doLogging = function()
 {
-    return this.pref_enablelogging_;
+    return THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_LOGGING_);
 }
 
 
@@ -180,8 +171,8 @@ Logger.prototype.logDebug = function(level,
                                      infos)
 {
     if (this.ready_ && 
-        this.pref_enablelogging_debug_ &&
-        this.pref_logging_debug_level_ >= level)
+        THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_LOGGING_DEBUG_) &&
+        THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_LOGGING_DEBUG_LEVEL_) >= level)
     {
         var date = new Date();
         var logtext = "";
@@ -197,24 +188,18 @@ Logger.prototype.logDebug = function(level,
 /** ****************************************************************************
  * observe preferences changes
  ******************************************************************************/
-Logger.prototype.observe = function(subject, topic, data)
+Logger.prototype.observe = function(enabled)
 {
-    if(topic != "nsPref:changed")
-        return;
-
-    // reload preferences
-    this.preferenceReload();
-
     // if logging is enabled, but not ready:
     // this means it was just enabled, so open logfile
-    if (this.pref_enablelogging_ && ! this.ready_)
+    if (enabled && ! this.ready_)
     {
         this.open();
     }
 
     // if logging is disabled, but ready
     // this means it was just disabled, so close logfile
-    if (!this.pref_enablelogging_ && this.ready_)
+    if (!enabled && this.ready_)
     {
         this.close();
     }
@@ -238,61 +223,10 @@ Logger.prototype.open = function()
                                    .createInstance(Components.interfaces.nsIFileOutputStream);
         var options = 0x2 | 0x8 | 0x10;
         this.file_output_stream_.init(this.file_, options, 0, 0);
-        this.file_output_stream_.write(LOGGER_STARTTAG_,
-                                       LOGGER_STARTTAG_.length);
+        this.file_output_stream_.write(this.STARTTAG_,
+                                       this.STARTTAG_.length);
         this.ready_ = true;
     }
-}
-
-
-
-/** ****************************************************************************
- * Preference changing observer
- ******************************************************************************/
-Logger.prototype.preferenceObserverRegister =  function()
-{
-    var prefService = Components.classes["@mozilla.org/preferences-service;1"]
-                      .getService(Components.interfaces.nsIPrefService);
-    this.pref_branch_ = prefService.getBranch(THREADVIS_PREF_BRANCH_);
-
-    var pbi = this.pref_branch_.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
-    pbi.addObserver("", this, false);
-}
-
-
-
-/** ****************************************************************************
- * unregister observer
- ******************************************************************************/
-Logger.prototype.preferenceObserverUnregister = function()
-{
-    if(!this.pref_branch_)
-        return;
-
-    var pbi = this.pref_branch_.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
-    pbi.removeObserver("", this);
-}
-
-
-
-/** ****************************************************************************
- * reload preferences
- ******************************************************************************/
-Logger.prototype.preferenceReload = function()
-{
-    var prefs = Components.classes["@mozilla.org/preferences-service;1"]
-                .getService(Components.interfaces.nsIPrefBranch);
-    this.pref_enablelogging_ = false;
-    if (prefs.getPrefType(THREADVIS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_) == prefs.PREF_BOOL)
-        this.pref_enablelogging_ = prefs.getBoolPref(THREADVIS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_);
-
-    this.pref_enablelogging_debug_ = false;
-    if (prefs.getPrefType(THREADVIS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_DEBUG_) == prefs.PREF_BOOL)
-        this.pref_enablelogging_debug_ = prefs.getBoolPref(THREADVIS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_DEBUG_);
-
-    this.pref_logging_debug_level_ = 0;
-    if (prefs.getPrefType(THREADVIS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_DEBUG_LEVEL_) == prefs.PREF_INT)
-        this.pref_logging_debug_level_ = prefs.getIntPref(THREADVIS_PREF_BRANCH_ + LOGGER_PREF_DOLOGGING_DEBUG_LEVEL_);
 }
 
 

@@ -1,17 +1,12 @@
 /** ****************************************************************************
  * Message.js
  *
- * (c) 2005 Alexander C. Hubmann
+ * (c) 2005-2006 Alexander C. Hubmann
  *
  * Wrap email message
  * Re-write from Java
  * Version: $Id$
  ******************************************************************************/
-
-
-
-var HEADER_PARSER_ = Components.classes["@mozilla.org/messenger/headerparser;1"]
-                     .getService(Components.interfaces.nsIMsgHeaderParser);
 
 
 
@@ -32,18 +27,21 @@ function Message(subject,
      */
     this.date_ = date;
 
-
     /**
      * Sender of message
      */
     this.from_ = from;
-
 
     /**
      * Folder message is in
      */
     this.folder_ = folder;
 
+    /**
+     * header parser service provided by mozilla
+     */
+    this.header_parser_ = Components.classes["@mozilla.org/messenger/headerparser;1"]
+                            .getService(Components.interfaces.nsIMsgHeaderParser);
 
     /**
      * if folder stores sent mails
@@ -55,24 +53,20 @@ function Message(subject,
      */
     this.message_id_ = message_id;
 
-
     /**
      * Message key, to identify the message in mozilla
      */
     this.message_key_ = message_key;
-
 
     /**
      * References of this message
      */
     this.references_ = new References(references);
 
-
     /**
      * Depth of reply of this message
      */
     this.reply_count_ = 0;
-
 
     /**
      * Simplified subject of message
@@ -82,7 +76,6 @@ function Message(subject,
      * fixxme nontheless
      */
     this.simplified_subject_ = subject;
-
 
     /**
      * Subject of message
@@ -129,7 +122,7 @@ Message.prototype.getFromEmail = function()
 {
     // parse email address
     var email = this.getFrom();
-    email = HEADER_PARSER_.extractHeaderAddressMailboxes(null, email);
+    email = this.header_parser_.extractHeaderAddressMailboxes(null, email);
     return email;
 }
 

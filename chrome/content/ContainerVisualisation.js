@@ -10,11 +10,6 @@
 
 
 
-var XUL_NAMESPACE_ =
-    "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
-
-
-
 /** ****************************************************************************
  * Constructor for visualisation class
  ******************************************************************************/
@@ -31,20 +26,75 @@ function ContainerVisualisation(stack,
                                 flash,
                                 spacing)
 {
+    /**
+     * XUL stack on which container gets drawn
+     */
     this.stack_ = stack;
+
+    /**
+     * the stringbundle element to access localised strings
+     */
     this.strings_ = strings;
+
+    /**
+     * the container which gets visualised
+     */
     this.container_ = container;
+
+    /**
+     * colour of container
+     */
     this.colour_ = colour;
+
+    /**
+     * left position of container in px
+     */
     this.left_ = left;
+
+    /**
+     * top position of container in px
+     */
     this.top_ = top;
+
+    /**
+     * is container selected (boolean)
+     */
     this.selected_ = selected;
+
+    /**
+     * size of the dot to draw in px
+     */
     this.dotsize_ = dotsize;
+
+    /**
+     * resize multiplicator
+     */
     this.resize_ = resize;
+
+    /**
+     * should be draw a circle around the dot to mark it as selected (boolean)
+     */
     this.draw_circle_ = circle;
+
+    /**
+     * number of times the circle flashes
+     */
     this.flashcount_ = 3;
+
+    /**
+     * should the circle be flashing (boolean)
+     */
     this.flash_ = flash;
+
+    /**
+     * the spacing between two messages in px
+     */
     this.spacing_ = spacing;
 
+    // calculate style
+    // full == received message
+    // half == sent message
+    // dummy == unknown message
     this.style_ = "full";
     if (! this.container_.isDummy() &&
           this.container_.getMessage().isSent())
@@ -53,13 +103,14 @@ function ContainerVisualisation(stack,
     if (this.container_.isDummy())
         this.style_ ="dummy";
 
-    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "ContainerVisualisation()",
-                        {"action" : "start",
-                         "container" : this.container_.toString(),
-                         "colour" : this.colour_,
-                         "style" : this.style_,
-                         "left" : this.left_,
-                         "top" : this.top_});
+    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+                               "ContainerVisualisation()",
+                               {"action" : "start",
+                                "container" : this.container_.toString(),
+                                "colour" : this.colour_,
+                                "style" : this.style_,
+                                "left" : this.left_,
+                                "top" : this.top_});
 
     this.drawDot();
 
@@ -85,11 +136,11 @@ function ContainerVisualisation(stack,
  ******************************************************************************/
 ContainerVisualisation.prototype.createMenu = function()
 {
-    var popupset = document.createElementNS(XUL_NAMESPACE_, "popupset");
-    var popup = document.createElementNS(XUL_NAMESPACE_, "popup");
-    var menuitem_delete = document.createElementNS(XUL_NAMESPACE_, "menuitem");
-    var menuitem_cut = document.createElementNS(XUL_NAMESPACE_, "menuitem");
-    var menuitem_paste = document.createElementNS(XUL_NAMESPACE_, "menuitem");
+    var popupset = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "popupset");
+    var popup = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "popup");
+    var menuitem_delete = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "menuitem");
+    var menuitem_cut = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "menuitem");
+    var menuitem_paste = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "menuitem");
     
     var menuname = "dot_popup_" + this.left_;
     
@@ -97,11 +148,11 @@ ContainerVisualisation.prototype.createMenu = function()
     
     // delete menu item
     menuitem_delete.setAttribute("label", this.strings_.getString("copycut.delete"));
-    var tooltip_delete = document.createElementNS(XUL_NAMESPACE_, "tooltip");
+    var tooltip_delete = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "tooltip");
     tooltip_delete.setAttribute("orient", "vertical");
     tooltip_delete.setAttribute("id", "dot_popup_tooltip_delete_" + this.left_);
     
-    var tooltiplabel_delete = document.createElementNS(XUL_NAMESPACE_, "description");
+    var tooltiplabel_delete = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "description");
     var tooltiptext_delete = document.createTextNode(this.strings_.getString("copycut.delete.tooltip"));
     tooltiplabel_delete.style.height = "50px";
     tooltiplabel_delete.appendChild(tooltiptext_delete);
@@ -113,11 +164,11 @@ ContainerVisualisation.prototype.createMenu = function()
     
     // cut menu item
     menuitem_cut.setAttribute("label", this.strings_.getString("copycut.cut"));
-    var tooltip_cut = document.createElementNS(XUL_NAMESPACE_, "tooltip");
+    var tooltip_cut = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "tooltip");
     tooltip_cut.setAttribute("orient", "vertical");
     tooltip_cut.setAttribute("id", "dot_popup_tooltip_cut_" + this.left_);
     
-    var tooltiplabel_cut = document.createElementNS(XUL_NAMESPACE_, "description");
+    var tooltiplabel_cut = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "description");
     var tooltiptext_cut = document.createTextNode(this.strings_.getString("copycut.cut.tooltip"));
     tooltiplabel_cut.style.height = "50px";
     tooltiplabel_cut.appendChild(tooltiptext_cut);
@@ -129,11 +180,11 @@ ContainerVisualisation.prototype.createMenu = function()
     
     // paste menu item
     menuitem_paste.setAttribute("label", this.strings_.getString("copycut.paste"));
-    var tooltip_paste = document.createElementNS(XUL_NAMESPACE_, "tooltip");
+    var tooltip_paste = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "tooltip");
     tooltip_paste.setAttribute("orient", "vertical");
     tooltip_paste.setAttribute("id", "dot_popup_tooltip_paste_" + this.left_);
     
-    var tooltiplabel_paste = document.createElementNS(XUL_NAMESPACE_, "description");
+    var tooltiplabel_paste = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "description");
     var tooltiptext_paste = document.createTextNode(this.strings_.getString("copycut.paste.tooltip"));
     tooltiplabel_paste.style.height = "50px";
     tooltiplabel_paste.appendChild(tooltiptext_paste);
@@ -164,19 +215,20 @@ ContainerVisualisation.prototype.createMenu = function()
  ******************************************************************************/
 ContainerVisualisation.prototype.createToolTip = function()
 {
-    var tooltip = document.createElementNS(XUL_NAMESPACE_, "tooltip");
+    var tooltip = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "tooltip");
     tooltip.setAttribute("orient", "vertical");
     tooltip.setAttribute("id", "ThreadVis_" + this.left_);
 
     if (! this.container_.isDummy())
     {
-        LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.drawDot()",
-                            {"action" : "create tooltip start"});
+        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+                                   "Visualisation.drawDot()",
+                                   {"action" : "create tooltip start"});
 
         // if container container message, view details
-        var authorlabel = document.createElementNS(XUL_NAMESPACE_, "label");
-        var authortext = document.createElementNS(XUL_NAMESPACE_, "label");
-        var author = document.createElementNS(XUL_NAMESPACE_, "hbox");
+        var authorlabel = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "label");
+        var authortext = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "label");
+        var author = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "hbox");
         author.appendChild(authorlabel);
         author.appendChild(authortext);
         authorlabel.setAttribute("value",
@@ -185,9 +237,9 @@ ContainerVisualisation.prototype.createToolTip = function()
         authortext.setAttribute("value",
                                 this.container_.getMessage().getFrom());
 
-        var datelabel = document.createElementNS(XUL_NAMESPACE_, "label");
-        var datetext = document.createElementNS(XUL_NAMESPACE_, "label");
-        var date = document.createElementNS(XUL_NAMESPACE_, "hbox");
+        var datelabel = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "label");
+        var datetext = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "label");
+        var date = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "hbox");
         date.appendChild(datelabel);
         date.appendChild(datetext);
         datelabel.setAttribute("value",
@@ -196,9 +248,9 @@ ContainerVisualisation.prototype.createToolTip = function()
         datetext.setAttribute("value",
                               this.container_.getMessage().getDate());
 
-        var subjectlabel = document.createElementNS(XUL_NAMESPACE_, "label");
-        var subjecttext = document.createElementNS(XUL_NAMESPACE_, "label");
-        var subject = document.createElementNS(XUL_NAMESPACE_, "hbox");
+        var subjectlabel = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "label");
+        var subjecttext = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "label");
+        var subject = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "hbox");
         subject.appendChild(subjectlabel);
         subject.appendChild(subjecttext);
         subjectlabel.setAttribute("value",
@@ -211,25 +263,28 @@ ContainerVisualisation.prototype.createToolTip = function()
         tooltip.appendChild(date);
         tooltip.appendChild(subject);
 
-        LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.drawDot()",
-                            {"action" : "create tooltip end"});
+        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+                                   "Visualisation.drawDot()",
+                                   {"action" : "create tooltip end"});
     }
     else
     {
-        LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.drawDot()",
-                            {"action" : "create missing tooltip start"});
+        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+                                   "Visualisation.drawDot()",
+                                   {"action" : "create missing tooltip start"});
 
         // otherwise we display info about missing message
-        var desc1 = document.createElementNS(XUL_NAMESPACE_, "description");
-        var desc2 = document.createElementNS(XUL_NAMESPACE_, "description");
+        var desc1 = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "description");
+        var desc2 = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "description");
         desc1.setAttribute("value",
                            this.strings_.getString("tooltip.missingmessage"));
         desc2.setAttribute("value",
                            this.strings_.getString("tooltip.missingmessagedetail"));
         tooltip.appendChild(desc1);
         tooltip.appendChild(desc2);
-        LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.drawDot()",
-                            {"action" : "create missing tooltip end"});
+        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+                                   "Visualisation.drawDot()",
+                                   {"action" : "create missing tooltip end"});
     }
     
     this.stack_.appendChild(tooltip);
@@ -244,12 +299,13 @@ ContainerVisualisation.prototype.createToolTip = function()
  ******************************************************************************/
 ContainerVisualisation.prototype.cut = function()
 {
-    COPY_MESSAGE_ = this.container_;
-    var msgkey = COPY_MESSAGE_.isDummy() ? 
+    THREADVIS.copy_message_ = this.container_;
+    var msgkey = THREADVIS.copy_message_.isDummy() ? 
                     "DUMMY" : 
-                    COPY_MESSAGE_.getMessage().getKey();
-    LOGGER_.log("copycut", {"action" : "cutmessage",
-                            "msgkey" : msgkey});
+                    THREADVIS.copy_message_.getMessage().getKey();
+    THREADVIS.logger_.log("copycut",
+                          {"action" : "cutmessage",
+                           "msgkey" : msgkey});
 }
 
 
@@ -268,11 +324,12 @@ ContainerVisualisation.prototype.deleteParent = function()
     var parentmsgid = ! parent.isDummy() ? parent.getMessage().getId() : "";
     if (msgid != "" && parentmsgid != "")
     {
-        THREADVIS_.threader_.copycut_.addCut(msgid + " " + parentmsgid);
-        THREADVIS_.setSelectedMessage();
+        THREADVIS.threader_.copycut_.addCut(msgid + " " + parentmsgid);
+        THREADVIS.setSelectedMessage();
         
-        LOGGER_.log("copycut", {"action" : "deletemessage",
-                                "msgkey" : msgkey});
+        THREADVIS.logger_.log("copycut",
+                              {"action" : "deletemessage",
+                               "msgkey" : msgkey});
     }
 }
 
@@ -284,7 +341,7 @@ ContainerVisualisation.prototype.deleteParent = function()
 ContainerVisualisation.prototype.drawCircle = function(colour)
 {
     if (! this.circle_)
-        this.circle_ = document.createElementNS(XUL_NAMESPACE_, "box");
+        this.circle_ = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "box");
 
     this.visualiseCircle(colour);
 
@@ -299,7 +356,7 @@ ContainerVisualisation.prototype.drawCircle = function(colour)
 ContainerVisualisation.prototype.drawClick = function()
 {
     if (! this.click_)
-        this.click_ = document.createElementNS(XUL_NAMESPACE_, "box");
+        this.click_ = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "box");
 
     this.visualiseClick();
 
@@ -326,7 +383,7 @@ ContainerVisualisation.prototype.drawClick = function()
  ******************************************************************************/
 ContainerVisualisation.prototype.drawDot = function()
 {
-    this.dot_ = document.createElementNS(XUL_NAMESPACE_, "box");
+    this.dot_ = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "box");
 
     this.visualiseDot();
 
@@ -402,11 +459,13 @@ ContainerVisualisation.prototype.onMouseClick = function(event)
     if (event.detail > 1)
         ThreadPaneDoubleClick();
 
-    LOGGER_.logDebug(LOGGER_.LEVEL_INFORM_, "Visualisation.onMouseClick()", {});
+    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
+                               "Visualisation.onMouseClick()",
+                               {});
     var container = event.target.container;
     if (container && ! container.isDummy())
-        THREADVIS_.callback(container.getMessage().getKey(), 
-                             container.getMessage().getFolder());
+        THREADVIS.callback(container.getMessage().getKey(), 
+                           container.getMessage().getFolder());
 }
 
 
@@ -416,33 +475,34 @@ ContainerVisualisation.prototype.onMouseClick = function(event)
  ******************************************************************************/
 ContainerVisualisation.prototype.paste = function()
 {
-    if (COPY_MESSAGE_)
+    if (THREADVIS.copy_message_)
     {
         // check to see if user creates a loop
-        if (COPY_MESSAGE_.findChild(this.container_))
+        if (THREADVIS.copy_message_.findChild(this.container_))
         {
             alert("Action not allowed. This would create a loop.");
             return;
         }
-        var copy_parent = COPY_MESSAGE_.getParent();
-        this.container_.addChild(COPY_MESSAGE_);
+        var copy_parent = THREADVIS.copy_message_.getParent();
+        this.container_.addChild(THREADVIS.copy_message_);
         
         var this_msgid = ! this.container_.isDummy() ? this.container_.getMessage().getId() : "";
         var this_msgkey = ! this.container_.isDummy() ? this.container_.getMessage().getKey() : "";
-        var copy_message_msgid = ! COPY_MESSAGE_.isDummy() ? COPY_MESSAGE_.getMessage().getId() : "";
-        var copy_message_msgkey = ! COPY_MESSAGE_.isDummy() ? COPY_MESSAGE_.getMessage().getKey() : "";
+        var copy_message_msgid = ! THREADVIS.copy_message_.isDummy() ? THREADVIS.copy_message_.getMessage().getId() : "";
+        var copy_message_msgkey = ! THREADVIS.copy_message_.isDummy() ? THREADVIS.copy_message_.getMessage().getKey() : "";
         var copy_message_parent_msgid = ! copy_parent.isDummy() ? copy_parent.getMessage().getId() : "";
         var copy_message_parent_msgkey = ! copy_parent.isDummy() ? copy_parent.getMessage().getKey() : "";
         
         if (this_msgid != "" && copy_message_msgid != "")
         {
-            THREADVIS_.threader_.copycut_.addCut(copy_message_msgid + " " + copy_message_parent_msgid);
-            THREADVIS_.threader_.copycut_.addCopy(copy_message_msgid + " " + this_msgid);
-            THREADVIS_.setSelectedMessage();
+            THREADVIS.threader_.copycut_.addCut(copy_message_msgid + " " + copy_message_parent_msgid);
+            THREADVIS.threader_.copycut_.addCopy(copy_message_msgid + " " + this_msgid);
+            THREADVIS.setSelectedMessage();
             
-            LOGGER_.log("copycut", {"action" : "pastemessage",
-                                    "copied-msgkey" : copy_message_msgkey,
-                                    "pasted-msgkey" : this_msgkey});
+            THREADVIS.logger_.log("copycut",
+                                  {"action" : "pastemessage",
+                                   "copied-msgkey" : copy_message_msgkey,
+                                   "pasted-msgkey" : this_msgkey});
         }
     }
 }
@@ -557,14 +617,15 @@ ContainerVisualisation.prototype.visualiseCircle = function(colour)
     style_border = (this.dotsize_ / 6 * this.resize_) + 
                        "px solid " + colour;
 
-    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.drawDot()",
-                        {"action" : "draw selection circle",
-                         "top" : style_top,
-                         "left" : style_left,
-                         "height" : style_height,
-                         "width" : style_width,
-                         "background" : style_background,
-                         "border" : style_border});
+    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+                               "Visualisation.drawDot()",
+                               {"action" : "draw selection circle",
+                                "top" : style_top,
+                                "left" : style_left,
+                                "height" : style_height,
+                                "width" : style_width,
+                                "background" : style_background,
+                                "border" : style_border});
 
     this.circle_.style.position = "relative";
     this.circle_.style.top = style_top;
@@ -590,13 +651,14 @@ ContainerVisualisation.prototype.visualiseClick = function()
     var style_background = "";
     var style_border = "";
 
-    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.drawClick()",
-                        {"top" : style_top,
-                         "left" : style_left,
-                         "height" : style_height,
-                         "width" : style_width,
-                         "background" : style_background,
-                         "border" : style_border});
+    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+                              "Visualisation.drawClick()",
+                              {"top" : style_top,
+                               "left" : style_left,
+                               "height" : style_height,
+                               "width" : style_width,
+                               "background" : style_background,
+                               "border" : style_border});
 
     this.click_.style.position = "relative";
     this.click_.style.top = style_top;
@@ -630,13 +692,14 @@ ContainerVisualisation.prototype.visualiseDot = function()
         style_border = (this.dotsize_ / 4 * this.resize_) + 
                            "px solid " + this.colour_;
 
-    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.drawDot()",
-                        {"top" : style_top,
-                         "left" : style_left,
-                         "height" : style_height,
-                         "width" : style_width,
-                         "background" : style_background,
-                         "border" : style_border});
+    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+                                "Visualisation.drawDot()",
+                                {"top" : style_top,
+                                 "left" : style_left,
+                                 "height" : style_height,
+                                 "width" : style_width,
+                                 "background" : style_background,
+                                 "border" : style_border});
 
     this.dot_.style.position = "relative";
     this.dot_.style.top = style_top;

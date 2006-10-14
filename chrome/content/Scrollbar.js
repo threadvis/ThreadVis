@@ -8,18 +8,24 @@
 
 
 
-var XUL_NAMESPACE_ =
-    "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
-
-
-
 /** ****************************************************************************
  * Constructor for scrollbar class
  ******************************************************************************/
 function Scrollbar(visualisation, stack, box)
 {
+    /**
+     * visualisation object
+     */
     this.visualisation_ = visualisation;
+
+    /**
+     * XUL stack on which visualisation gets drawn
+     */
     this.stack_ = stack;
+
+    /**
+     * XUL box containing visualisation
+     */
     this.box_ = box;
     
     this.init(box);

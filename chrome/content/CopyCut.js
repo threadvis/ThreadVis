@@ -10,33 +10,31 @@
 
 
 
-var COPYCUT_EXTENSION_PATH_ = "extensions";
-var COPYCUT_EXTENSION_GUID_ = "{A23E4120-431F-4753-AE53-5D028C42CFDC}";
-var COPYCUT_FILENAME_ = "threadvis.copycut";
-var COPYCUT_DIVIDER = "<<<<<<<<<<>>>>>>>>>>";
-
-
-
 /** ****************************************************************************
  * constructor
  * create new object, create file pointers
  ******************************************************************************/
 function CopyCut()
 {
+    this.EXTENSION_PATH_ = "extensions";
+    this.EXTENSION_GUID_ = "{A23E4120-431F-4753-AE53-5D028C42CFDC}";
+    this.FILENAME_ = "threadvis.copycut";
+    this.DIVIDER_ = "<<<<<<<<<<>>>>>>>>>>";
+
     // try to create file
     this.file_ = Components.classes["@mozilla.org/file/directory_service;1"]
                  .getService(Components.interfaces.nsIProperties)
                  .get("ProfD", Components.interfaces.nsIFile);
     
-    this.file_.append(COPYCUT_EXTENSION_PATH_);
+    this.file_.append(this.EXTENSION_PATH_);
     if (! this.file_.exists())
         this.file_.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
     
-    this.file_.append(COPYCUT_EXTENSION_GUID_);
+    this.file_.append(this.EXTENSION_GUID_);
     if (! this.file_.exists())
         this.file_.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
     
-    this.file_.append(COPYCUT_FILENAME_);
+    this.file_.append(this.FILENAME_);
     
     this.ready_ = false;
     
@@ -194,7 +192,7 @@ CopyCut.prototype.read = function()
     for (i; i < lines.length; i++)
     {
         // we use a simple format to divide the file into copies and cuts
-        if (lines[i] == COPYCUT_DIVIDER)
+        if (lines[i] == this.DIVIDER_)
             break;
         if (lines[i] != "")
             this.addCut(lines[i]);
@@ -250,7 +248,7 @@ CopyCut.prototype.write = function()
         this.file_output_stream_.write(line, line.length);
     }
     
-    var line = COPYCUT_DIVIDER + "\n";
+    var line = this.DIVIDER_ + "\n";
     this.file_output_stream_.write(line, line.length);
     
     for (var msg in this.copies_)

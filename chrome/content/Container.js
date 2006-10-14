@@ -1,7 +1,7 @@
 /** ****************************************************************************
  * Container.js
  *
- * (c) 2005 Alexander C. Hubmann
+ * (c) 2005-2006 Alexander C. Hubmann
  *
  * Implements container for messages
  * Re-write form Java
@@ -21,36 +21,30 @@ function Container(is_root)
      */
     this.child_ = null;
 
-
     /**
      * We are root container
      */
     this.is_root_ = is_root;
-
 
     /**
      * Store message in this container
      */
     this.message_ = null;
 
-
     /**
      * Next container in sibling list
      */
     this.next_ = null;
-
 
     /**
      * Parent of this container
      */
     this.parent_ = null;
 
-
     /**
      * Previous container in sibling list
      */
     this.previous_ = null;
-
 
     /**
      * save horizontal position of dot
@@ -79,9 +73,11 @@ Container.prototype.addChild = function(child)
     if (child.findChild(this))
     {
         alert("Error: Loop detected in message structure.");
-        LOGGER_.logDebug(LOGGER_.LEVEL_ERROR_, "Container.addChild()" , {"error" : "tried to create loop",
-                                                                        "child container" : child.toString(),
-                                                                        "parent container" : this.toString()});
+        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_ERROR_,
+                                   "Container.addChild()" ,
+                                   {"error" : "tried to create loop",
+                                    "child container" : child.toString(),
+                                    "parent container" : this.toString()});
         return;
     }
 

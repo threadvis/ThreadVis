@@ -13,6 +13,7 @@
 
 /** ****************************************************************************
  * Constructor
+ * references == string of references
  ******************************************************************************/
 function References(references)
 {
@@ -53,7 +54,10 @@ References.prototype.buildReferences = function(references)
  ******************************************************************************/
 References.prototype.cleanReferences = function()
 {
-    LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "REFERENCES", {"total references": this.references_.join(" ")});
+    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+                               "REFERENCES",
+                               {"total references": this.references_.join(" ")});
+    
     var count = this.references_.length;
     for (var i = count; i > 0; i--)
     {
@@ -65,7 +69,9 @@ References.prototype.cleanReferences = function()
                 this.references_.splice(j, 1);
         }
     }
-    LOGGER_.logDebug(LOGGER_.LEVEL_EMAIL_, "REFERENCES", {"after references": this.references_.join(" ")});
+    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+                               "REFERENCES",
+                               {"after references": this.references_.join(" ")});
 }
 
 

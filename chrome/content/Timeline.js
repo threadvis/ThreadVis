@@ -8,22 +8,50 @@
 
 
 
-var XUL_NAMESPACE_ =
-    "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
-
-
-
 /** ****************************************************************************
  * Constructor for timeline class
  ******************************************************************************/
-function Timeline(stack, strings, containers, resize, dotsize, top, top_delta)
+function Timeline(stack,
+                  strings,
+                  containers,
+                  resize,
+                  dotsize,
+                  top,
+                  top_delta)
 {
+    /**
+     * XUL stack to draw timeline on
+     */
     this.stack_ = stack;
+
+    /**
+     * XUL stringbundle to get localised strings
+     */
     this.strings_ = strings;
+
+    /**
+     * containers of current thread
+     */
     this.containers_ = containers;
+
+    /**
+     * resize multiplicator
+     */
     this.resize_ = resize;
+
+    /**
+     * size of messages in px
+     */
     this.dotsize_ = dotsize;
+
+    /**
+     * top position of center of visualisation in px
+     */
     this.top_ = top;
+
+    /**
+     * delta of timeline (moved to top by delta)
+     */
     this.top_delta_ = top_delta;
     
     this.times_ = Array();
@@ -71,7 +99,7 @@ Timeline.prototype.drawTime = function(container, left, right, string, tooltip)
         elem = this.times_[container];
     else
     {
-        elem = document.createElementNS(XUL_NAMESPACE_, "description");
+        elem = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "description");
         newelem = true;
         this.times_[container] = elem;
     }

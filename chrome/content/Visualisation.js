@@ -11,58 +11,20 @@
 
 
 
-var XUL_NAMESPACE_ =
-    "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
-
-var URL_ = "chrome://threadvis/content/images/";
-var THREADVIS_PREF_BRANCH_ = "extensions.threadvis.";
-var VISUALISATION_PREF_DOTIMESCALING_ = "timescaling.enabled";
-var VISUALISATION_PREF_DOTIMELINE_ = "timeline.enabled";
-var VISUALISATION_PREF_VISUALISATIONSIZE_ = "visualisation.size";
-var VISUALISATION_PREF_VISUALISATIONCOLOUR_ = "visualisation.colour";
-var VISUALISATION_PREF_VISUALISATIONHIGHLIGHT_ = "visualisation.highlight";
-var VISUALISATION_PREF_DEFAULTZOOM_HEIGHT_ = "defaultzoom.height";
-var VISUALISATION_PREF_DEFAULTZOOM_WIDTH_ = "defaultzoom.width";
-
-var ALPHA_ = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
-
-var COLOUR_DUMMY_ = "#75756D";
-var COLOUR_SINGLE_ = "blue";
-
-
-
-// =============================================================================
-// =============================================================================
-// =============================================================================
-// FIXXME
-// all container variables that are set here should be accessed by functions
-// in the container class
-// =============================================================================
-// =============================================================================
-// =============================================================================
-
-
-
 /** ****************************************************************************
  * Constructor for visualisation class
  ******************************************************************************/
 function Visualisation()
 {
+    this.COLOUR_DUMMY_ = "#75756D";
+    this.COLOUR_SINGLE_ = "blue";
+
     this.box_ = null;
     this.stack_ = null;
     this.strings_ = null;
     // set default resize parameter
     this.resize_ = 1;
-    this.pref_timescaling_ = false;
-    this.pref_timeline_ = false;
-    this.pref_colour = "single";
-    this.pref_highlight_ = false;
-    this.pref_defaultzoom_height_ = 1;
-    this.pref_defaultzoom_width_ = 1;
     this.zoom_ = 1;
-
-    this.preferenceObserverRegister();
-    this.preferenceReload();
 
     this.authors_ = null;
     this.containers_ = null;
@@ -232,7 +194,10 @@ Visualisation.prototype.checkSize = function()
  ******************************************************************************/
 Visualisation.prototype.clearStack = function()
 {
-    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.clearStack()", {});
+    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+                               "Visualisation.clearStack()",
+                               {});
+    
     while(this.stack_.firstChild != null)
         this.stack_.removeChild(this.stack_.firstChild);
     
@@ -249,6 +214,8 @@ Visualisation.prototype.clearStack = function()
  ******************************************************************************/
 Visualisation.prototype.colourAuthors = function(authors)
 {
+    var pref_highlight = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_HIGHLIGHT_);
+    
     // colour links
     var emailfields = new Array();
 
@@ -293,7 +260,7 @@ Visualisation.prototype.colourAuthors = function(authors)
         if (author)
             colour = author.colour;
         
-        if (colour && this.pref_highlight_)
+        if (colour && pref_highlight)
             emailfield.style.borderBottom = "2px solid " + this.getColour(colour, 1.0, 1.0);
         else
             emailfield.style.borderBottom = "";
@@ -362,14 +329,14 @@ Visualisation.prototype.createLegend = function(authors)
  ******************************************************************************/
 Visualisation.prototype.createLegendBox = function(colour, name, count)
 {
-    var box = document.createElementNS(XUL_NAMESPACE_, "hbox");
+    var box = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "hbox");
     
-    var colourbox = document.createElementNS(XUL_NAMESPACE_, "hbox");
+    var colourbox = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "hbox");
     colourbox.style.background = this.getColour(colour, 1.0, 1.0);
     colourbox.style.width = "20px";
     box.appendChild(colourbox);
     
-    var namebox = document.createElementNS(XUL_NAMESPACE_, "description");
+    var namebox = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "description");
     var nametext = document.createTextNode(name + " (" + count + ")");
     namebox.appendChild(nametext)
     
@@ -385,7 +352,10 @@ Visualisation.prototype.createLegendBox = function(colour, name, count)
  ******************************************************************************/
 Visualisation.prototype.createStack = function()
 {
-    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.createStack()", {});
+    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+                               "Visualisation.createStack()",
+                               {});
+    
     this.box_ = document.getElementById("ThreadVisBox");
     this.stack_ = document.getElementById("ThreadVisStack");
     this.strings_ = document.getElementById("ThreadVisStrings");
@@ -393,8 +363,11 @@ Visualisation.prototype.createStack = function()
     var ref = this;
     if (! this.stack_)
     {
-        LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.createStack()", {"action" : "create stack"});
-        this.stack_ = document.createElementNS(XUL_NAMESPACE_, "stack");
+        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+                                   "Visualisation.createStack()",
+                                   {"action" : "create stack"});
+        
+        this.stack_ = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "stack");
         this.stack_.setAttribute("id", "ThreadVisStack");
         this.stack_.style.position = "relative";
         this.box_.appendChild(this.stack_);
@@ -405,11 +378,13 @@ Visualisation.prototype.createStack = function()
     }
     else
     {
-        LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.createStack()", {"action" : "clear stack"});
+        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+                                   "Visualisation.createStack()",
+                                   {"action" : "clear stack"});
         this.clearStack();
     }
 
-    var loading = document.createElementNS(XUL_NAMESPACE_, "description");
+    var loading = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "description");
     loading.setAttribute("value", this.strings_.getString("visualisation.loading"));
     loading.style.position = "relative";
     loading.style.top = "20px"
@@ -425,9 +400,10 @@ Visualisation.prototype.createStack = function()
  ******************************************************************************/
 Visualisation.prototype.DECtoHEX = function(dec)
 {
+    var alpha = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
     var n_ = Math.floor(dec / 16)
     var _n = dec - n_*16;
-    return ALPHA_[n_] + ALPHA_[_n];
+    return alpha[n_] + alpha[_n];
 }
 
 
@@ -442,13 +418,19 @@ Visualisation.prototype.drawArc = function(colour,
                                            right,
                                            top)
 {
+    var pref_dotsize = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_DOTSIZE_);
+    var pref_arc_minheight = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_ARC_MINHEIGHT_);
+    var pref_arc_difference = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_ARC_DIFFERENCE_);
+    var pref_arc_radius = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_ARC_RADIUS_);
+    var pref_arc_width = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_ARC_WIDTH_);
+    
     var arc = new ArcVisualisation(this.stack_,
-                                   this.dotsize_,
+                                   pref_dotsize,
                                    this.resize_,
-                                   this.arc_min_height_,
-                                   this.arc_difference_,
-                                   this.arc_radius_,
-                                   this.arc_width_,
+                                   pref_arc_minheight,
+                                   pref_arc_difference,
+                                   pref_arc_radius,
+                                   pref_arc_width,
                                    colour,
                                    vposition,
                                    height,
@@ -471,6 +453,9 @@ Visualisation.prototype.drawDot = function(container,
                                            circle,
                                            flash)
 {
+    var pref_dotsize = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_DOTSIZE_);
+    var pref_spacing = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_SPACING_);
+    
     var msg = new ContainerVisualisation(this.stack_,
                                          this.strings_,
                                          container,
@@ -478,11 +463,11 @@ Visualisation.prototype.drawDot = function(container,
                                          left,
                                          top,
                                          selected,
-                                         this.dotsize_,
+                                         pref_dotsize,
                                          this.resize_,
                                          circle,
                                          flash,
-                                         this.spacing_);
+                                         pref_spacing);
     return msg;
 }
 
@@ -528,18 +513,24 @@ Visualisation.prototype.getResize = function(xcount,
                                              sizex,
                                              sizey)
 {
-    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.getResize()",
-                        {"action" : "start",
-                         "xcount" : xcount,
-                         "ycount" : ycount,
-                         "sizex" : sizex,
-                         "sizey" : sizey});
+    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+                               "Visualisation.getResize()",
+                               {"action" : "start",
+                                "xcount" : xcount,
+                                "ycount" : ycount,
+                                "sizex" : sizex,
+                                "sizey" : sizey});
+
+    var pref_arc_difference = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_ARC_DIFFERENCE_);
+    var pref_arc_minheight = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_ARC_MINHEIGHT_);
+    var pref_dotsize = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_DOTSIZE_);
+    var pref_spacing = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_SPACING_);
 
     var spaceperarcavailablex = sizex / xcount;
     var spaceperarcavailabley = sizey / 2;
-    var spaceperarcneededx = this.spacing_;
-    var spaceperarcneededy = (this.dotsize_ / 2) + this.arc_min_height_ + 
-                             (ycount + 1) * this.arc_difference_;
+    var spaceperarcneededx = pref_spacing;
+    var spaceperarcneededy = (pref_dotsize / 2) + pref_arc_minheight + 
+                             (ycount + 1) * pref_arc_difference;
 
     var resizex = (spaceperarcavailablex / spaceperarcneededx);
     var resizey = (spaceperarcavailabley / spaceperarcneededy);
@@ -553,15 +544,16 @@ Visualisation.prototype.getResize = function(xcount,
     if (resize > 1)
         resize = 1;
 
-    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.getResize()",
-                        {"action" : "end",
-                        "resize" : resize,
-                        "resizex" : resizex,
-                        "resizey" : resizey,
-                        "spaceperarcavailablex" : spaceperarcavailablex,
-                        "spaceperarcavailabley" : spaceperarcavailabley,
-                        "spaceperarcneededx" : spaceperarcneededx,
-                        "spaceperarcneededy" : spaceperarcneededy});
+    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+                               "Visualisation.getResize()",
+                               {"action" : "end",
+                                "resize" : resize,
+                                "resizex" : resizex,
+                                "resizey" : resizey,
+                                "spaceperarcavailablex" : spaceperarcavailablex,
+                                "spaceperarcavailabley" : spaceperarcavailabley,
+                                "spaceperarcneededx" : spaceperarcneededx,
+                                "spaceperarcneededy" : spaceperarcneededy});
     return resize;
 }
 
@@ -572,6 +564,9 @@ Visualisation.prototype.getResize = function(xcount,
  ******************************************************************************/
 Visualisation.prototype.moveVisualisation = function(container)
 {
+    var pref_spacing = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_SPACING);
+    var pref_default_zoom_height = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_ZOOM_HEIGHT_);
+
     // get current left margin
     var old_margin = this.stack_.style.marginLeft;
     old_margin = parseInt(old_margin.replace(/px/, ""));
@@ -579,13 +574,13 @@ Visualisation.prototype.moveVisualisation = function(container)
     
     var original_width = this.box_.boxObject.width;
     var original_height = this.box_.boxObject.height;
-    var height = original_height * this.zoom_ * this.pref_defaultzoom_height_;
+    var height = original_height * this.zoom_ * pref_default_zoom_height;
     
     if (container.x_position_ * this.resize_ + old_margin > original_width)
     {
         // calculate necessary margin
         new_margin = - (container.x_position_ * this.resize_ - original_width) 
-                     - (this.spacing_ * this.resize_);
+                     - (pref_spacing * this.resize_);
         
         // if we already see the selected message, don't move any further
         if (new_margin > old_margin)
@@ -593,10 +588,10 @@ Visualisation.prototype.moveVisualisation = function(container)
             new_margin = old_margin;
         }
     }
-    if (container.x_position_ * this.resize_ + old_margin < (this.spacing_ / 2) * this.resize_)
+    if (container.x_position_ * this.resize_ + old_margin < (pref_spacing / 2) * this.resize_)
     {
         // calculate necessary margin
-        new_margin = (- container.x_position_ + (this. spacing_ / 2))* this.resize_;
+        new_margin = (- container.x_position_ + (pref_spacing / 2))* this.resize_;
     }
     
     this.stack_.style.marginLeft = new_margin + "px";
@@ -618,29 +613,19 @@ Visualisation.prototype.moveVisualisationTo = function(position)
 
 
 /** ****************************************************************************
- * observe preferences change
- ******************************************************************************/
-Visualisation.prototype.observe = function(subject, topic, data)
-{
-    if(topic != "nsPref:changed")
-        return;
-    // subject is the nsIPrefBranch we're observing
-    this.preferenceReload();
-}
-
-
-
-/** ****************************************************************************
  * mouse click event handler
  * display message user clicked on
  ******************************************************************************/
 Visualisation.prototype.onMouseClick = function(event)
 {
-    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.onMouseClick()", {});
+    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+                               "Visualisation.onMouseClick()",
+                               {});
+    
     var container = event.target.container;
     if (container && ! container.isDummy())
-        THREADVIS_.callback(container.getMessage().getKey(), 
-                            container.getMessage().getFolder());
+        THREADVIS.callback(container.getMessage().getKey(), 
+                           container.getMessage().getFolder());
 }
 
 
@@ -760,89 +745,15 @@ Visualisation.prototype.onScroll = function(event)
 
 
 /** ****************************************************************************
- * Preference changing observer
- ******************************************************************************/
-Visualisation.prototype.preferenceObserverRegister =  function()
-{
-    var prefService = Components.classes["@mozilla.org/preferences-service;1"]
-                      .getService(Components.interfaces.nsIPrefService);
-    this.pref_branch_ = prefService.getBranch(THREADVIS_PREF_BRANCH_);
-
-    var pbi = this.pref_branch_.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
-    pbi.addObserver("", this, false);
-}
-
-
-
-/** ****************************************************************************
- * unregister observer
- ******************************************************************************/
-Visualisation.prototype.preferenceObserverUnregister = function()
-{
-    if(!this.pref_branch_)
-        return;
-
-    var pbi = this.pref_branch_.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
-    pbi.removeObserver("", this);
-}
-
-
-
-/** ****************************************************************************
- * reload all preferences
- ******************************************************************************/
-Visualisation.prototype.preferenceReload = function()
-{
-    var prefs = Components.classes["@mozilla.org/preferences-service;1"]
-                .getService(Components.interfaces.nsIPrefBranch);
-
-    this.pref_timescaling_ = false;
-    if (prefs.getPrefType(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_DOTIMESCALING_) == prefs.PREF_BOOL)
-        this.pref_timescaling_ = prefs.getBoolPref(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_DOTIMESCALING_);
-
-    this.pref_timeline_ = false;
-    if (prefs.getPrefType(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_DOTIMELINE_) == prefs.PREF_BOOL)
-        this.pref_timeline_ = prefs.getBoolPref(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_DOTIMELINE_);
-
-    this.pref_colour_ = "single";
-    if (prefs.getPrefType(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONCOLOUR_) == prefs.PREF_STRING)
-        this.pref_colour_ = prefs.getCharPref(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONCOLOUR_);
-
-    this.pref_highlight_ = false;
-    if (prefs.getPrefType(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONHIGHLIGHT_) == prefs.PREF_BOOL)
-        this.pref_highlight_ = prefs.getBoolPref(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONHIGHLIGHT_);
-
-    this.pref_defaultzoom_height_ = 1;
-    if (prefs.getPrefType(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_DEFAULTZOOM_HEIGHT_) == prefs.PREF_INT)
-        this.pref_defaultzoom_height_ = prefs.getIntPref(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_DEFAULTZOOM_HEIGHT_);
-
-    this.pref_defaultzoom_width_ = 1;
-    if (prefs.getPrefType(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_DEFAULTZOOM_WIDTH_) == prefs.PREF_INT)
-        this.pref_defaultzoom_width_ = prefs.getIntPref(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_DEFAULTZOOM_WIDTH_);
-
-    var todecode = "12x12,12,12,32,6,2,24";
-    if (prefs.getPrefType(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONSIZE_) == prefs.PREF_STRING)
-        todecode = prefs.getCharPref(THREADVIS_PREF_BRANCH_ + VISUALISATION_PREF_VISUALISATIONSIZE_);
-
-    todecode = todecode.split(",");
-    this.name_ = todecode[0] + "/";
-    this.dotsize_ = parseInt(todecode[1]);
-    this.arc_min_height_ = parseInt(todecode[2]);
-    this.arc_radius_ = parseInt(todecode[3]);
-    this.arc_difference_ = parseInt(todecode[4]);
-    this.arc_width_ = parseInt(todecode[5]);
-    this.spacing_ = parseInt(todecode[6]);
-}
-
-
-
-/** ****************************************************************************
  * Reset stack
  * set all margins to zero
  ******************************************************************************/
 Visualisation.prototype.resetStack = function()
 {
-    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.resetStack()", {});
+    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+                               "Visualisation.resetStack()",
+                               {});
+    
     this.stack_.style.marginLeft = "0px";
     this.stack_.style.marginTop = "0px";
 }
@@ -858,15 +769,19 @@ Visualisation.prototype.timeScaling = function(containers,
                                                minimaltimedifference,
                                                width)
 {
-    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.timeScaling()",
-                        {"action" : "start",
-                         "containers" : containers.toString(),
-                         "minimaltimedifference" : minimaltimedifference,
-                         "width" : width,
-                         "no. containers:" : containers.length});
+    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+                               "Visualisation.timeScaling()",
+                               {"action" : "start",
+                                "containers" : containers.toString(),
+                                "minimaltimedifference" : minimaltimedifference,
+                                "width" : width,
+                                "no. containers:" : containers.length});
+
+    var pref_spacing = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_SPACING_);
+    var pref_timescaling = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_TIMESCALING_);
 
     // if we do not want to do timescaling, reset all scaling info to 1
-    if (! this.pref_timescaling_)
+    if (! pref_timescaling)
     {
         for (var counter = 0; counter < containers.length - 1; counter++)
         {
@@ -897,14 +812,15 @@ Visualisation.prototype.timeScaling = function(containers,
     // laid out with the minimal horizontal spacing
     // e.g.
     // |---|---|---|
-    // width / this.spacing_ would lead to 3, but in effect we can only
+    // width / spacing would lead to 3, but in effect we can only
     // fit 2, since we want some spacing between the messages and the border
-    var max_count_x = (width / this.spacing_) - 1;
+    var max_count_x = (width / pref_spacing) - 1;
 
-    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.timeScaling()", 
-                        {"action" : "first pass done",
-                         "total_time_scale" : total_time_scale,
-                         "max_count_x" : max_count_x});
+    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+                               "Visualisation.timeScaling()", 
+                               {"action" : "first pass done",
+                                "total_time_scale" : total_time_scale,
+                                "max_count_x" : max_count_x});
 
     // if the time scaling factor is bigger than what we can display, we have 
     // a problem
@@ -929,9 +845,10 @@ Visualisation.prototype.timeScaling = function(containers,
             break;
     }
 
-    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.timeScaling()",
-                        {"action" : "second pass done", 
-                         "total_time_scale" : total_time_scale});
+    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+                               "Visualisation.timeScaling()",
+                               {"action" : "second pass done", 
+                                "total_time_scale" : total_time_scale});
 
     return containers;
 }
@@ -946,9 +863,20 @@ Visualisation.prototype.visualise = function(container)
     if (container == null)
         container = this.currentcontainer_;
 
-    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.visualise()",
-                        {"action" : "start",
-                         "container" : container.toString()});
+    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+                               "Visualisation.visualise()",
+                               {"action" : "start",
+                                "container" : container.toString()});
+
+    var pref_arc_difference = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_ARC_DIFFERENCE_);
+    var pref_arc_minheight = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_ARC_MINHEIGHT_);
+    var pref_arc_width = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_ARC_WIDTH_);
+    var pref_spacing = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_SPACING_);
+    var pref_dotsize = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_DOTSIZE_);
+    var pref_default_zoom_height = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_ZOOM_HEIGHT_);
+    var pref_default_zoom_width = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_ZOOM_WIDTH_);
+    var pref_colour = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_COLOUR_);
+    var pref_timeline = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_TIMELINE_);
 
     // check if we are still in the same thread as last time
     // if not, reset zoom level
@@ -989,22 +917,22 @@ Visualisation.prototype.visualise = function(container)
     // minmaltimedifference stores the minimal time between two messages
     var minimaltimedifference = presize.minimaltimedifference;
 
-    var topheight = this.dotsize_ / 2 + this.arc_min_height_ + presize.topheight * this.arc_difference_;
-    var bottomheight = this.dotsize_ / 2 + this.arc_min_height_ + presize.bottomheight * this.arc_difference_;
+    var topheight = pref_dotsize / 2 + pref_arc_minheight + presize.topheight * pref_arc_difference;
+    var bottomheight = pref_dotsize / 2 + pref_arc_minheight + presize.bottomheight * pref_arc_difference;
 
     // do time scaling
     var original_width = this.box_.boxObject.width;
     var original_height = this.box_.boxObject.height;
 
-    var width = original_width * this.zoom_ * this.pref_defaultzoom_width_;
-    var height = original_height * this.zoom_ * this.pref_defaultzoom_height_;
+    var width = original_width * this.zoom_ * pref_default_zoom_width;
+    var height = original_height * this.zoom_ * pref_default_zoom_height;
 
     this.containers_ = this.timeScaling(this.containers_,
                                         minimaltimedifference,
                                         width);
 
     // do final resizing
-    var x = this.spacing_ / 2;
+    var x = pref_spacing / 2;
     this.resize_ = this.getResize(this.containers_.length,
                                   totalmaxheight,
                                   width,
@@ -1028,15 +956,15 @@ Visualisation.prototype.visualise = function(container)
 
         var selected = thiscontainer == container;
 
-        var colour = COLOUR_DUMMY_;
+        var colour = this.COLOUR_DUMMY_;
         if (! thiscontainer.isDummy())
         {
-            if (this.pref_colour_ == "single")
+            if (pref_colour == "single")
             {
                 if (selected)
-                    colour = COLOUR_SINGLE_;
+                    colour = this.COLOUR_SINGLE_;
                 else
-                    colour = COLOUR_DUMMY_;
+                    colour = this.COLOUR_DUMMY_;
             }
             else
             {
@@ -1062,7 +990,7 @@ Visualisation.prototype.visualise = function(container)
 
         // only display black circle to highlight selected message
         // if we are using more than one colour
-        var circle = this.pref_colour_ == "single" ? false : true;
+        var circle = pref_colour == "single" ? false : true;
 
         // at the moment, don't flash
         // note: dot only flashes if circle == true
@@ -1090,7 +1018,7 @@ Visualisation.prototype.visualise = function(container)
             var arc_height = thiscontainer.arc_height_;
             // if we are using a single colour, display all arcs from
             // a selected message in this colour
-            if (this.pref_colour_ == "single")
+            if (pref_colour == "single")
                 colour = parent == container || selected ? COLOUR_SINGLE_ : COLOUR_DUMMY_;
 
             this.arcvisualisations_[thiscontainer] =
@@ -1101,7 +1029,7 @@ Visualisation.prototype.visualise = function(container)
                              x,
                              topheight);
         }
-        x = x + (thiscontainer.x_scaled_ * this.spacing_);
+        x = x + (thiscontainer.x_scaled_ * pref_spacing);
     }
     
     // underline authors if enabled
@@ -1114,7 +1042,7 @@ Visualisation.prototype.visualise = function(container)
     
     // create a new box and overlay over all other elements to catch
     // all clicks and drags
-    var popupbox = document.createElementNS(XUL_NAMESPACE_, "box");
+    var popupbox = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "box");
     popupbox.style.width = "100%";
     popupbox.style.height = "100%";
     popupbox.setAttribute("context", "ThreadVisPopUp");
@@ -1127,15 +1055,15 @@ Visualisation.prototype.visualise = function(container)
     clearInterval(this.check_resize_interval_);
     this.check_resize_interval_ = setInterval(function() {ref.checkSize();}, 100);
     
-    if (this.pref_timeline_)
+    if (pref_timeline)
     {
         this.timeline_ = new Timeline(this.stack_,
                                       this.strings_,
                                       this.containers_,
                                       this.resize_,
-                                      this.dotsize_,
+                                      pref_dotsize,
                                       topheight,
-                                      this.arc_min_height_ + this.dotsize_ - this.arc_width_ - 2);
+                                      pref_arc_minheight + pref_dotsize - pref_arc_width - 2);
         this.timeline_.draw();
     }
     
@@ -1154,6 +1082,16 @@ Visualisation.prototype.visualise = function(container)
  ******************************************************************************/
 Visualisation.prototype.visualiseExisting = function(container)
 {
+    var pref_arc_difference = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_ARC_DIFFERENCE_);
+    var pref_arc_minheight = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_ARC_MINHEIGHT_);
+    var pref_arc_width = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_ARC_WIDTH_);
+    var pref_dotsize = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_DOTSIZE_);
+    var pref_spacing = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_SPACING_);
+    var pref_default_zoom_height = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_ZOOM_HEIGHT_);
+    var pref_default_zoom_width = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_ZOOM_WIDTH_);
+    var pref_colour = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_COLOUR_);
+    var pref_timeline = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_TIMELINE_);
+
     // remember current container to redraw after zoom
     this.currentcontainer_ = container;
     
@@ -1165,20 +1103,20 @@ Visualisation.prototype.visualiseExisting = function(container)
     // minmaltimedifference stores the minimal time between two messages
     var minimaltimedifference = presize.minimaltimedifference;
 
-    var topheight = this.dotsize_ / 2 + this.arc_min_height_ + presize.topheight * this.arc_difference_;
-    var bottomheight = this.dotsize_ / 2 + this.arc_min_height_ + presize.bottomheight * this.arc_difference_;
+    var topheight = pref_dotsize / 2 + pref_arc_minheight + presize.topheight * pref_arc_difference;
+    var bottomheight = pref_dotsize / 2 + pref_arc_minheight + presize.bottomheight * pref_arc_difference;
 
     var original_width = this.box_.boxObject.width;
     var original_height = this.box_.boxObject.height;
-    var width = original_width * this.zoom_ * this.pref_defaultzoom_width_;
-    var height = original_height * this.zoom_ * this.pref_defaultzoom_height_;
+    var width = original_width * this.zoom_ * pref_default_zoom_width;
+    var height = original_height * this.zoom_ * pref_default_zoom_height;
     
     this.containers_ = this.timeScaling(this.containers_,
                                         minimaltimedifference,
                                         width);
     
     // do final resizing
-    var x = this.spacing_ / 2;
+    var x = pref_spacing / 2;
     this.resize_ = this.getResize(this.containers_.length,
                                   totalmaxheight,
                                   width,
@@ -1197,7 +1135,7 @@ Visualisation.prototype.visualiseExisting = function(container)
 
         // only display black circle to highlight selected message
         // if we are using more than one colour
-        var circle = this.pref_colour_ == "single" ? false : true;
+        var circle = pref_colour == "single" ? false : true;
 
         // at the moment, don't flash
         // note: dot only flashes if circle == true
@@ -1206,7 +1144,9 @@ Visualisation.prototype.visualiseExisting = function(container)
         // if thread has changed and we don't have all container visualisations
         if (this.containervisualisations_[thiscontainer] == null)
         {
-            LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.visualiseExisting()", {"action" : "cached visualisation does not contain this message, redraw"});
+            THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+                                       "Visualisation.visualiseExisting()",
+                                       {"action" : "cached visualisation does not contain this message, redraw"});
             // do a full redraw
             this.currentcontainer_ = null;
             this.visualise(container);
@@ -1223,7 +1163,7 @@ Visualisation.prototype.visualiseExisting = function(container)
             this.arcvisualisations_[thiscontainer].redrawArc(this.resize_, parent.x_position_, x, topheight)
         }
         
-        x = x + (thiscontainer.x_scaled_ * this.spacing_);
+        x = x + (thiscontainer.x_scaled_ * pref_spacing);
     }
     
     // calculate if we have to move the visualisation so that the
@@ -1234,10 +1174,10 @@ Visualisation.prototype.visualiseExisting = function(container)
     this.colourAuthors(this.authors_);
     this.createLegend(this.authors_);
     
-    if (this.pref_timeline_ && this.timeline_)
+    if (pref_timeline && this.timeline_)
         this.timeline_.redraw(this.resize_,
                               topheight,
-                              this.arc_min_height_ + this.dotsize_ - this.arc_width_ - 2);
+                              pref_arc_minheight + pref_dotsize - pref_arc_width - 2);
     
     this.scrollbar_.draw();
 }
@@ -1258,7 +1198,10 @@ Visualisation.prototype.zoomIn = function(amount)
     var ref = this;
     this.zoom_timeout_ = setTimeout(function() {ref.visualise();}, 500);
     
-    LOGGER_.log("zoom", {"action" : "in", "zoomlevel" : this.zoom_, "delta" : amount});
+    THREADVIS.logger_.log("zoom",
+                          {"action" : "in",
+                           "zoomlevel" : this.zoom_,
+                           "delta" : amount});
 }
 
 
@@ -1281,7 +1224,10 @@ Visualisation.prototype.zoomOut = function(amount)
     var ref = this;
     this.zoom_timeout_ = setTimeout(function() {ref.visualise();}, 500);
     
-    LOGGER_.log("zoom", {"action" : "out", "zoomlevel" : this.zoom_, "delta" : amount});
+    THREADVIS.logger_.log("zoom",
+                          {"action" : "out",
+                           "zoomlevel" : this.zoom_,
+                           "delta" : amount});
 }
 
 
@@ -1292,24 +1238,4 @@ Visualisation.prototype.zoomOut = function(amount)
 Visualisation.prototype.zoomReset = function()
 {
     this.zoom_ = 1.0;
-}
-
-
-
-/** ****************************************************************************
- * Zoom function to call from user click
- ******************************************************************************/
-function zoomIn()
-{
-    THREADVIS_.visualisation_.zoomIn();
-}
-
-
-
-/** ****************************************************************************
- * Zoom function to call from user click
- ******************************************************************************/
-function zoomOut()
-{
-    THREADVIS_.visualisation_.zoomOut();
 }

@@ -10,11 +10,6 @@
 
 
 
-var XUL_NAMESPACE_ =
-    "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
-
-
-
 /** ****************************************************************************
  * Constructor for visualisation class
  ******************************************************************************/
@@ -32,28 +27,81 @@ function ArcVisualisation(stack,
                           right,
                           top)
 {
+    /**
+     * XUL stack on which to draw
+     */
     this.stack_ = stack;
+
+    /**
+     * size of the dot representing a message in px
+     */
     this.dotsize_ = dotsize;
+
+    /**
+     * resize multiplicator
+     */
     this.resize_ = resize;
+
+    /**
+     * the minimum arc height in px
+     */
     this.arc_min_height_ = arc_min_height;
+
+    /**
+     * the (height) difference between two arcs in px
+     */
     this.arc_difference_ = arc_difference;
+
+    /**
+     * the corner radius for an arc in px
+     */
     this.arc_radius_ = arc_radius;
+
+    /**
+     * width of an arc in px
+     */
     this.arc_width_ = arc_width;
 
+    /**
+     * colour of the arc
+     */
     this.colour_ = colour;
+
+    /**
+     * vertical position of arc ("top" or "bottom")
+     */
     this.vposition_ = vposition;
+
+    /**
+     * height of arc (counting from 0)
+     * multiplied by arc_difference_ to get height in px
+     */
     this.height_ = height;
+
+    /**
+     * left edge of arc in px
+     */
     this.left_ = left;
+
+    /**
+     * right edge of arc in pc
+     */
     this.right_ = right;
+
+    /**
+     * top edge of arc in px
+     */
     this.top_ = top;
 
 
-    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "ArcVisualisation()", {"action" : "start",
-                                                                "colour" : this.colour_,
-                                                                "vposition" : this.vposition_,
-                                                                "height" : this.height_,
-                                                                "left" : this.left_,
-                                                                "right" : this.right_});
+    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_, 
+                               "ArcVisualisation()",
+                               {"action" : "start",
+                                "colour" : this.colour_,
+                                "vposition" : this.vposition_,
+                                "height" : this.height_,
+                                "left" : this.left_,
+                                "right" : this.right_});
 
     this.drawArc();
 }
@@ -65,7 +113,7 @@ function ArcVisualisation(stack,
  ******************************************************************************/
 ArcVisualisation.prototype.drawArc = function()
 {
-    this.arc_ = document.createElementNS(XUL_NAMESPACE_, "box");
+    this.arc_ = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "box");
     
     this.visualise();
     this.stack_.appendChild(this.arc_);
@@ -108,13 +156,14 @@ ArcVisualisation.prototype.visualise = function()
     var style_width = ((this.right_ - this.left_ + this.arc_width_) * this.resize_)+ "px";
     var style_background = this.colour_;
     
-    LOGGER_.logDebug(LOGGER_.LEVEL_VIS_, "Visualisation.drawArc()",
-                                         {"action" : "draw arc",
-                                          "top" : style_top,
-                                          "left" : style_left,
-                                          "height" : style_height,
-                                          "width" : style_width,
-                                          "background" : style_background});
+    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_, 
+                               "Visualisation.drawArc()",
+                               {"action" : "draw arc",
+                                "top" : style_top,
+                                "left" : style_left,
+                                "height" : style_height,
+                                "width" : style_width,
+                                "background" : style_background});
     
     
     this.arc_.style.position = "relative";

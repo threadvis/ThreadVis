@@ -8,16 +8,25 @@
  * Version: $Id$
  ********************************************************/
 
-pref("extensions.threadvis.enabled", true);
 pref("extensions.threadvis.disabledaccounts", "");
 pref("extensions.threadvis.disabledfolders", "");
+pref("extensions.threadvis.enabled", true);
 pref("extensions.threadvis.logging.debug", false);
 pref("extensions.threadvis.logging.debug.level", 0);
 pref("extensions.threadvis.logging.enabled", false);
-pref("extensions.threadvis.timescaling.enabled", true);
+pref("extensions.threadvis.popupwindow.position.x", 0);
+pref("extensions.threadvis.popupwindow.position.y", 0);
+pref("extensions.threadvis.popupwindow.size.x", 0);
+pref("extensions.threadvis.popupwindow.size.y", 0);
 pref("extensions.threadvis.timeline.enabled", true);
-pref("extensions.threadvis.visualisation.size", "12x12,12,12,32,6,2,24");
+pref("extensions.threadvis.timescaling.enabled", true);
+pref("extensions.threadvis.visualisation.arcminheight", 12);
+pref("extensions.threadvis.visualisation.arcradius", 32);
+pref("extensions.threadvis.visualisation.arcdifference", 6);
+pref("extensions.threadvis.visualisation.arcwidth", 2);
 pref("extensions.threadvis.visualisation.colour", "author");
+pref("extensions.threadvis.visualisation.dotsize", 12);
 pref("extensions.threadvis.visualisation.highlight", true);
-pref("extensions.threadvis.defaultzoom.height", 1);
-pref("extensions.threadvis.defaultzoom.width", 1);
+pref("extensions.threadvis.visualisation.spacing", 24);
+pref("extensions.threadvis.zoom.height", 1);
+pref("extensions.threadvis.zoom.width", 1);

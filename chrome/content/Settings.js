@@ -13,11 +13,6 @@
 var XUL_NAMESPACE_ =
     "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
-// preference branch for this extension
-var THREADVIS_PREF_BRANCH_ = "extensions.threadvis.";
-// name of preference for enabled accounts and folders
-var THREADVIS_PREF_ENABLEDACCOUNTS_ = "enabledaccounts";
-
 
 
 /** ****************************************************************************

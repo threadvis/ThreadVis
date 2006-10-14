@@ -16,13 +16,30 @@
 function PreferenceObserver()
 {
     this.PREF_BRANCH_ = "extensions.threadvis.";
+
+    this.PREF_DISABLED_ACCOUNTS_ = "disabledaccounts";
+    this.PREF_DISABLED_FOLDERS_ = "disabledfolders";
     this.PREF_ENABLED_ = "enabled";
-    this.PREF_DISABLEDACCOUNTS_ = "disabledaccounts";
-    this.PREF_DISABLEDFOLDERS_ = "disabledfolders";
+    this.PREF_ENABLEDACCOUNTS_ = "enabledaccounts";
+    this.PREF_LOGGING_ = "logging.enabled";
+    this.PREF_LOGGING_DEBUG_ = "logging.debug";
+    this.PREF_LOGGING_DEBUG_LEVEL_ = "logging.debug.level";
     this.PREF_POPUPWINDOW_POSITION_X_ = "popupwindow.position.x";
     this.PREF_POPUPWINDOW_POSITION_Y_ = "popupwindow.position.y";
     this.PREF_POPUPWINDOW_SIZE_X_ = "popupwindow.size.x";
     this.PREF_POPUPWINDOW_SIZE_Y_ = "popupwindow.size.y";
+    this.PREF_TIMELINE_ = "timeline.enabled";
+    this.PREF_TIMESCALING_ = "timescaling.enabled";
+    this.PREF_VIS_DOTSIZE_ = "visualisation.dotsize";
+    this.PREF_VIS_ARC_MINHEIGHT_ = "visualisation.arcminheight";
+    this.PREF_VIS_ARC_RADIUS_ = "visualisation.arcradius";
+    this.PREF_VIS_ARC_DIFFERENCE_ = "visualisation.arcdifference";
+    this.PREF_VIS_ARC_WIDTH_ = "visualisation.arcwidth";
+    this.PREF_VIS_SPACING_ = "visualisation.spacing";
+    this.PREF_VIS_COLOUR_ = "visualisation.colour";
+    this.PREF_VIS_HIGHLIGHT_ = "visualisation.highlight";
+    this.PREF_ZOOM_HEIGHT_ = "zoom.height";
+    this.PREF_ZOOM_WIDTH_ = "zoom.width";
 
     this.pref_branch_ = null;
     this.preferences_ = new Object();
@@ -122,13 +139,29 @@ PreferenceObserver.prototype.observe = function(subject, topic, data)
  ******************************************************************************/
 PreferenceObserver.prototype.preferenceReload = function()
 {
-    this.loadPreference(this.PREF_ENABLED_, this.pref_branch_.PREF_BOOL, false);
-    this.loadPreference(this.PREF_DISABLEDACCOUNTS_, this.pref_branch_.PREF_STRING, "");
-    this.loadPreference(this.PREF_DISABLEDFOLDERS_, this.pref_branch_.PREF_STRING, "");
+    this.loadPreference(this.PREF_DISABLED_ACCOUNTS_, this.pref_branch_.PREF_STRING, "");
+    this.loadPreference(this.PREF_DISABLED_FOLDERS_, this.pref_branch_.PREF_STRING, "");
+    this.loadPreference(this.PREF_ENABLED_, this.pref_branch_.PREF_BOOL, true);
+    this.loadPreference(this.PREF_ENABLEDACCOUNTS_, this.pref_branch_.PREF_STRING, "");
+    this.loadPreference(this.PREF_LOGGING_, this.pref_branch_.PREF_BOOL, false);
+    this.loadPreference(this.PREF_LOGGING_DEBUG_, this.pref_branch_.PREF_BOOL, false);
+    this.loadPreference(this.PREF_LOGGING_DEBUG_LEVEL_, this.pref_branch_.PREF_INT, 0);
     this.loadPreference(this.PREF_POPUPWINDOW_POSITION_X_, this.pref_branch_.PREF_INT, 0);
     this.loadPreference(this.PREF_POPUPWINDOW_POSITION_Y_, this.pref_branch_.PREF_INT, 0);
     this.loadPreference(this.PREF_POPUPWINDOW_SIZE_X_, this.pref_branch_.PREF_INT, 0);
     this.loadPreference(this.PREF_POPUPWINDOW_SIZE_Y_, this.pref_branch_.PREF_INT, 0);
+    this.loadPreference(this.PREF_TIMELINE_, this.pref_branch_.PREF_BOOL, true);
+    this.loadPreference(this.PREF_TIMESCALING_, this.pref_branch_.PREF_BOOL, true);
+    this.loadPreference(this.PREF_VIS_DOTSIZE_, this.pref_branch_.PREF_INT, 12);
+    this.loadPreference(this.PREF_VIS_ARC_MINHEIGHT_, this.pref_branch_.PREF_INT, 12);
+    this.loadPreference(this.PREF_VIS_ARC_RADIUS_, this.pref_branch_.PREF_INT, 32);
+    this.loadPreference(this.PREF_VIS_ARC_DIFFERENCE_, this.pref_branch_.PREF_INT, 6);
+    this.loadPreference(this.PREF_VIS_ARC_WIDTH_, this.pref_branch_.PREF_INT, 2);
+    this.loadPreference(this.PREF_VIS_SPACING_, this.pref_branch_.PREF_INT, 24);
+    this.loadPreference(this.PREF_VIS_COLOUR_, this.pref_branch_.PREF_STRING, "author");
+    this.loadPreference(this.PREF_VIS_HIGHLIGHT_, this.pref_branch_.PREF_BOOL, true);
+    this.loadPreference(this.PREF_ZOOM_HEIGHT_, this.pref_branch_.PREF_INT, 1);
+    this.loadPreference(this.PREF_ZOOM_WIDTH_, this.pref_branch_.PREF_INT, 1);
 }
 
 
@@ -175,19 +208,16 @@ PreferenceObserver.prototype.storePreference = function(pref, typ, val)
 {
     this.preferences_[pref]= val;
 
-    if (this.pref_branch_.getPrefType(pref) != typ)
-        return;
-
     switch (typ)
     {
         case this.pref_branch_.PREF_BOOL:
             this.pref_branch_.setBoolPref(pref, val);
             break;
         case this.pref_branch_.PREF_STRING:
-            this.pref_branch_.setCharPref(pref);
+            this.pref_branch_.setCharPref(pref, val);
             break;
         case this.pref_branch_.PREF_INT:
-            this.pref_branch_.setIntPref(pref);
+            this.pref_branch_.setIntPref(pref, val);
             break;
     }
 }
