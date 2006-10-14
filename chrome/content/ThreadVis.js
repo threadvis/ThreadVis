@@ -20,7 +20,7 @@ var PREFERENCE_OBSERVER_ = null;
 var THREADVIS_PARENT_ = null;
 var THREADVIS_ENABLED_ = false;
 var THREADVIS_DISABLEDACCOUNTS_ = "";
-var THREADVIS_DISABLEDFOLDERS_ = new Array();
+var THREADVIS_DISABLEDFOLDERS_ = "";
 var COPY_MESSAGE_ = null;
 var POPUP_WINDOW_ = null;
 
@@ -1105,7 +1105,16 @@ ThreadVis.prototype.waitForThreading = function()
  ******************************************************************************/
 function displayVisualisationWindow()
 {
-    POPUP_WINDOW_ = window.openDialog("chrome://threadvis/content/ThreadVisPopup.xul");
+    LOGGER_.log("popupvisualisation", {"action" : "open"});
+
+    var position_x = PREFERENCE_OBSERVER_.getPreference(PREFERENCE_OBSERVER_.PREF_POPUPWINDOW_POSITION_X_);
+    var position_y = PREFERENCE_OBSERVER_.getPreference(PREFERENCE_OBSERVER_.PREF_POPUPWINDOW_POSITION_Y_);
+    var size_x = PREFERENCE_OBSERVER_.getPreference(PREFERENCE_OBSERVER_.PREF_POPUPWINDOW_SIZE_X_);
+    var size_y = PREFERENCE_OBSERVER_.getPreference(PREFERENCE_OBSERVER_.PREF_POPUPWINDOW_SIZE_Y_);
+
+    var flags = "width=" + size_x + ", height=" + size_y + ", screenX=" + position_x + ", screenY=" + position_y + ", resizable=yes";
+    POPUP_WINDOW_ = window.openDialog("chrome://threadvis/content/ThreadVisPopup.xul", "chrome", flags);
+
     // get currently loaded message
     var msg_uri = GetLoadedMessage();
     var msg = messenger.messageServiceFromURI(msg_uri)
@@ -1114,6 +1123,30 @@ function displayVisualisationWindow()
     setTimeout(function() {POPUP_WINDOW_.THREADVIS_.visualiseMsgId(msg.messageId);}, 1000);
 }
 
+
+function visualisationWindowClose()
+{
+    LOGGER_.log("popupvisualisation", {"action" : "close"});
+
+    // remember window position and size
+    var position_x = window.screenX;
+    var position_y = window.screenY;
+    var size_x = window.outerWidth;
+    var size_y = window.outerHeight;
+    
+    PREFERENCE_OBSERVER_.setPreference(PREFERENCE_OBSERVER_.PREF_POPUPWINDOW_POSITION_X_,
+                                       position_x,
+                                       PREFERENCE_OBSERVER_.PREF_INT_);
+    PREFERENCE_OBSERVER_.setPreference(PREFERENCE_OBSERVER_.PREF_POPUPWINDOW_POSITION_Y_,
+                                       position_y,
+                                       PREFERENCE_OBSERVER_.PREF_INT_);
+    PREFERENCE_OBSERVER_.setPreference(PREFERENCE_OBSERVER_.PREF_POPUPWINDOW_SIZE_X_,
+                                       size_x,
+                                       PREFERENCE_OBSERVER_.PREF_INT_);
+    PREFERENCE_OBSERVER_.setPreference(PREFERENCE_OBSERVER_.PREF_POPUPWINDOW_SIZE_Y_,
+                                       size_y,
+                                       PREFERENCE_OBSERVER_.PREF_INT_);
+}
 
 
 /** ****************************************************************************
