@@ -881,7 +881,9 @@ Visualisation.prototype.visualise = function(container)
     // check if we are still in the same thread as last time
     // if not, reset zoom level
     if (! this.currentcontainer_ || 
-        container.getTopContainer() != this.currentcontainer_.getTopContainer())
+        container.getTopContainer() != this.currentcontainer_.getTopContainer() ||
+        (this.timeline_ == null && pref_timeline == true) ||
+        (this.timeline_ != null && pref_timeline == false))
     {
         this.createStack();
         this.clearStack();
@@ -1051,6 +1053,7 @@ Visualisation.prototype.visualise = function(container)
     // check for resize of box
     
     this.box_height_ = this.box_.boxObject.height;
+    this.box_width_ = this.box_.boxObject.width;
     var ref = this;
     clearInterval(this.check_resize_interval_);
     this.check_resize_interval_ = setInterval(function() {ref.checkSize();}, 100);
@@ -1065,6 +1068,10 @@ Visualisation.prototype.visualise = function(container)
                                       topheight,
                                       pref_arc_minheight + pref_dotsize - pref_arc_width - 2);
         this.timeline_.draw();
+    }
+    else
+    {
+        this.timeline_ = null;
     }
     
     if (! this.scrollbar_)

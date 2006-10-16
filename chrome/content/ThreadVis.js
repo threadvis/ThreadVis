@@ -832,7 +832,6 @@ ThreadVis.prototype.onVisualisationWindowClose = function()
  ******************************************************************************/
 ThreadVis.prototype.openThreadVisOptionsDialog = function()
 {
-    alert(openOptionsDialog);
     if (typeof(openOptionsDialog) == "undefined")
     {
         // Mozilla doesn't know about openOptionsDialog, so we use goPreferences.
