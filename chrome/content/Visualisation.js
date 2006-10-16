@@ -1024,7 +1024,7 @@ Visualisation.prototype.visualise = function(container)
             // if we are using a single colour, display all arcs from
             // a selected message in this colour
             if (pref_colour == "single")
-                colour = parent == container || selected ? COLOUR_SINGLE_ : COLOUR_DUMMY_;
+                colour = parent == container || selected ? this.COLOUR_SINGLE_ : this.COLOUR_DUMMY_;
 
             this.arcvisualisations_[thiscontainer] =
                 this.drawArc(colour,
