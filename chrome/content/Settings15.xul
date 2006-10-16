@@ -24,6 +24,31 @@
         <script type="application/x-javascript"
                 src="chrome://threadvis/content/Settings.js" />
 
+<!-- FIXXME
+        <script type="application/x-javascript" 
+                src="chrome://threadvis/content/ArcVisualisation.js" />
+        <script type="application/x-javascript"
+                src="chrome://threadvis/content/Container.js" />
+        <script type="application/x-javascript"
+                src="chrome://threadvis/content/ContainerVisualisation.js" />
+        <script type="application/x-javascript"
+                src="chrome://threadvis/content/Message.js" />
+        <script type="application/x-javascript"
+                src="chrome://threadvis/content/PreferenceObserver.js" />
+        <script type="application/x-javascript"
+                src="chrome://threadvis/content/References.js" />
+        <script type="application/x-javascript"
+                src="chrome://threadvis/content/ThreadVis.js" />
+        <script type="application/x-javascript"
+                src="chrome://threadvis/content/Timeline.js" />
+        <script type="application/x-javascript"
+                src="chrome://threadvis/content/Visualisation.js" />
+
+        <stringbundleset>
+            <stringbundle id="ThreadVisStrings" 
+                          src="chrome://threadvis/locale/ThreadVis.properties" />
+        </stringbundleset>
+-->
         <preferences>
             <preference id="extensions.threadvis.enabled"
                         name="extensions.threadvis.enabled"
@@ -40,14 +65,29 @@
             <preference id="extensions.threadvis.timeline.enabled"
                         name="extensions.threadvis.timeline.enabled"
                         type="bool" />
-            <preference id="extensions.threadvis.visualisation.size"
-                        name="extensions.threadvis.visualisation.size"
-                        type="string" />
-            <preference id="extensions.threadvis.defaultzoom.height"
-                        name="extensions.threadvis.defaultzoom.height"
+            <preference id="extensions.threadvis.visualisation.dotsize"
+                        name="extensions.threadvis.visualisation.dotsize"
                         type="int" />
-            <preference id="extensions.threadvis.defaultzoom.width"
-                        name="extensions.threadvis.defaultzoom.width"
+            <preference id="extensions.threadvis.visualisation.arcminheight"
+                        name="extensions.threadvis.visualisation.arcminheight"
+                        type="int" />
+            <preference id="extensions.threadvis.visualisation.arcradius"
+                        name="extensions.threadvis.visualisation.arcradius"
+                        type="int" />
+            <preference id="extensions.threadvis.visualisation.arcdifference"
+                        name="extensions.threadvis.visualisation.arcdifference"
+                        type="int" />
+            <preference id="extensions.threadvis.visualisation.arcwidth"
+                        name="extensions.threadvis.visualisation.arcwidth"
+                        type="int" />
+            <preference id="extensions.threadvis.visualisation.spacing"
+                        name="extensions.threadvis.visualisation.spacing"
+                        type="int" />
+            <preference id="extensions.threadvis.zoom.height"
+                        name="extensions.threadvis.zoom.height"
+                        type="int" />
+            <preference id="extensions.threadvis.zoom.width"
+                        name="extensions.threadvis.zoom.width"
                         type="int" />
             <preference id="extensions.threadvis.visualisation.colour"
                         name="extensions.threadvis.visualisation.colour"
@@ -140,38 +180,121 @@
                 </tabpanel>
 
                 <tabpanel id="visualisation.size" orient="vertical" flex="1">
-                    <radiogroup id="visualisationsize"
-                                preference="extensions.threadvis.visualisation.size">
-                        <hbox>
-                            <radio value="8x8,8,8,24,4,1,16"
-                                   label="&visualisation.size.small;" />
-                            <image src="chrome://threadvis/content/images/size_8.png" />
-                        </hbox>
-                        <separator class="thin" />
-                        <hbox>
-                            <radio value="12x12,12,12,32,6,2,24"
-                                   label="&visualisation.size.medium;" />
-                            <image src="chrome://threadvis/content/images/size_12.png" />
-                        </hbox>
-                        <separator class="thin" />
-                        <hbox>
-                            <radio value="16x16,16,16,40,8,3,32"
-                                   label="&visualisation.size.large;" />
-                            <image src="chrome://threadvis/content/images/size_16.png" />
-                        </hbox>
-                    </radiogroup>
+                    <grid>
+                        <columns>
+                            <column />
+                            <column />
+                            <column />
+                            <!-- FIXXME
+                            <hbox id="ThreadVis"
+                                  style="border: 1px solid #cccccc;"
+                                  flex="1">
+                                <vbox id="ThreadVisBox" 
+                                      style='overflow: hidden;'
+                                      flex="1" />
+                            </hbox>
+                            -->
+                        </columns>
+                        <rows>
+                            <row>
+                                <label control="visualisation.dotsize"
+                                       value="&visualisation.size.dotsize;" />
+                                <menulist id="visualisation.dotsize"
+                                          preference="extensions.threadvis.visualisation.dotsize">
+                                    <menupopup>
+                                        <menuitem label="8" value="8" />
+                                        <menuitem label="12" value="12" />
+                                        <menuitem label="16" value="16" />
+                                    </menupopup>
+                                </menulist>
+                                <label value="(12)" />
+                            </row>
+                            <row>
+                                <label control="visualisation.arcminheight"
+                                       value="&visualisation.size.arcminheight;" />
+                                <menulist id="visualisation.arcminheight"
+                                          preference="extensions.threadvis.visualisation.arcminheight">
+                                    <menupopup>
+                                        <menuitem label="8" value="8" />
+                                        <menuitem label="12" value="12" />
+                                        <menuitem label="16" value="16" />
+                                    </menupopup>
+                                </menulist>
+                                <label value="(12)" />
+                            </row>
+                            <row>
+                                <label control="visualisation.arcradius"
+                                       value="&visualisation.size.arcradius;" />
+                                <menulist id="visualisation.arcradius"
+                                          preference="extensions.threadvis.visualisation.arcradius">
+                                    <menupopup>
+                                        <menuitem label="0" value="0" />
+                                        <menuitem label="8" value="8" />
+                                        <menuitem label="16" value="16" />
+                                        <menuitem label="24" value="24" />
+                                        <menuitem label="32" value="32" />
+                                        <menuitem label="40" value="40" />
+                                    </menupopup>
+                                </menulist>
+                                <label value="(32)" />
+                            </row>
+                            <row>
+                                <label control="visualisation.arcdifference"
+                                       value="&visualisation.size.arcdifference;" />
+                                <menulist id="visualisation.arcdifference"
+                                          preference="extensions.threadvis.visualisation.arcdifference">
+                                    <menupopup>
+                                        <menuitem label="2" value="2" />
+                                        <menuitem label="4" value="4" />
+                                        <menuitem label="6" value="6" />
+                                        <menuitem label="8" value="8" />
+                                        <menuitem label="10" value="10" />
+                                        <menuitem label="12" value="12" />
+                                    </menupopup>
+                                </menulist>
+                                <label value="(6)" />
+                            </row>
+                            <row>
+                                <label control="visualisation.arcwidth"
+                                       value="&visualisation.size.arcwidth;" />
+                                <menulist id="visualisation.arcwidth"
+                                          preference="extensions.threadvis.visualisation.arcwidth">
+                                    <menupopup>
+                                        <menuitem label="1" value="1" />
+                                        <menuitem label="2" value="2" />
+                                        <menuitem label="3" value="3" />
+                                        <menuitem label="4" value="4" />
+                                    </menupopup>
+                                </menulist>
+                                <label value="(2)" />
+                            </row>
+                            <row>
+                                <label control="visualisation.spacing"
+                                       value="&visualisation.size.spacing;" />
+                                <menulist id="visualisation.spacing"
+                                          preference="extensions.threadvis.visualisation.spacing">
+                                    <menupopup>
+                                        <menuitem label="16" value="16" />
+                                        <menuitem label="24" value="24" />
+                                        <menuitem label="32" value="32" />
+                                    </menupopup>
+                                </menulist>
+                                <label value="(24)" />
+                            </row>
+                        </rows>
+                    </grid>
                     <separator />
                     <groupbox>
                         <caption label="&visualisation.defaultzoom.caption;" />
                         <hbox>
-                            <textbox id="defaultzoomwidth"
-                                     preference="extensions.threadvis.defaultzoom.width"
+                            <textbox id="zoomwidth"
+                                     preference="extensions.threadvis.zoom.width"
                                      size="2" />
                             <label value="&visualisation.defaultzoom.width;" />
                         </hbox>
                         <hbox>
-                            <textbox id="defaultzoomheight"
-                                     preference="extensions.threadvis.defaultzoom.height"
+                            <textbox id="zoomheight"
+                                     preference="extensions.threadvis.zoom.height"
                                      size="2" />
                             <label value="&visualisation.defaultzoom.height;" />
                         </hbox>

@@ -32,7 +32,12 @@
                        "hidden_disabledfolders",
                        "dotimescaling",
                        "enabletimeline",
-                       "visualisationsize",
+                       "visualisation.dotsize",
+                       "visualisation.arcminheight",
+                       "visualisation.arcradius",
+                       "visualisation.arcdifference",
+                       "visualisation.arcwidth",
+                       "visualisation.spacing",
                        "defaultzoomwidth",
                        "defaultzoomheight",
                        "visualisationcolour",
@@ -140,34 +145,99 @@
                               open="true"
                               persist="open"
                               clearhidden="true">
-                        <radiogroup id="visualisationsize"
-                                    prefstring="extensions.threadvis.visualisation.size"
-                                    prefdefval="12x12,12,12,12,6,-1,1,24"
-                                    preftype="string">
-                            <hbox>
-                                <radio value="8x8,8,8,24,4,1,16"
-                                       label="&visualisation.size.small;" />
-                                <image src="images/size_8.png" />
-                            </hbox>
-                            <separator class="thin" />
-                            <hbox>
-                                <radio value="12x12,12,12,32,6,2,24"
-                                       label="&visualisation.size.medium;" />
-                                <image src="images/size_12.png" />
-                            </hbox>
-                            <separator class="thin" />
-                            <hbox>
-                                <radio value="16x16,16,16,40,8,3,32"
-                                       label="&visualisation.size.large;" />
-                                <image src="images/size_16.png" />
-                            </hbox>
-                        </radiogroup>
+                        <grid flex="1">
+                            <columns>
+                                <column flex="1" />
+                                <column flex="1" />
+                            </columns>
+                            <rows>
+                                <row>
+                                    <label control="visualisation.dotsize"
+                                           value="Dotsize:" />
+                                    <menulist id="visualisation.dotsize"
+                                              preference="extensions.threadvis.visualisation.dotsize">
+                                        <menupopup>
+                                            <menuitem label="8" value="8" />
+                                            <menuitem label="12" value="12" />
+                                            <menuitem label="16" value="16" />
+                                        </menupopup>
+                                    </menulist>
+                                </row>
+                                <row>
+                                    <label control="visualisation.arcminheight"
+                                           value="Minimum Arc-Height:" />
+                                    <menulist id="visualisation.arcminheight"
+                                              preference="extensions.threadvis.visualisation.arcminheight">
+                                        <menupopup>
+                                            <menuitem label="8" value="8" />
+                                            <menuitem label="12" value="12" />
+                                            <menuitem label="16" value="16" />
+                                        </menupopup>
+                                    </menulist>
+                                </row>
+                                <row>
+                                    <label control="visualisation.arcradius"
+                                           value="Arc-Radius:" />
+                                    <menulist id="visualisation.arcradius"
+                                              preference="extensions.threadvis.visualisation.arcradius">
+                                        <menupopup>
+                                            <menuitem label="0" value="0" />
+                                            <menuitem label="8" value="8" />
+                                            <menuitem label="16" value="16" />
+                                            <menuitem label="24" value="24" />
+                                            <menuitem label="32" value="32" />
+                                            <menuitem label="40" value="40" />
+                                        </menupopup>
+                                    </menulist>
+                                </row>
+                                <row>
+                                    <label control="visualisation.arcdifference"
+                                           value="Arc-Difference:" />
+                                    <menulist id="visualisation.arcdifference"
+                                              preference="extensions.threadvis.visualisation.arcdifference">
+                                        <menupopup>
+                                            <menuitem label="2" value="2" />
+                                            <menuitem label="4" value="4" />
+                                            <menuitem label="6" value="6" />
+                                            <menuitem label="8" value="8" />
+                                            <menuitem label="10" value="10" />
+                                            <menuitem label="12" value="12" />
+                                        </menupopup>
+                                    </menulist>
+                                </row>
+                                <row>
+                                    <label control="visualisation.arcwidth"
+                                           value="Arc-Width:" />
+                                    <menulist id="visualisation.arcwidth"
+                                              preference="extensions.threadvis.visualisation.arcwidth">
+                                        <menupopup>
+                                            <menuitem label="1" value="1" />
+                                            <menuitem label="2" value="2" />
+                                            <menuitem label="3" value="3" />
+                                            <menuitem label="4" value="4" />
+                                        </menupopup>
+                                    </menulist>
+                                </row>
+                                <row>
+                                    <label control="visualisation.spacing"
+                                           value="Spacing:" />
+                                    <menulist id="visualisation.spacing"
+                                              preference="extensions.threadvis.visualisation.spacing">
+                                        <menupopup>
+                                            <menuitem label="16" value="16" />
+                                            <menuitem label="24" value="24" />
+                                            <menuitem label="32" value="32" />
+                                        </menupopup>
+                                    </menulist>
+                                </row>
+                            </rows>
+                        </grid>
                         <separator />
                         <groupbox>
                             <caption label="&visualisation.defaultzoom.caption;" />
                             <hbox>
                                 <textbox id="defaultzoomwidth"
-                                         prefstring="extensions.threadvis.defaultzoom.width"
+                                         prefstring="extensions.threadvis.zoom.width"
                                          prefdefval="1"
                                          preftype="int"
                                          size="2" />
@@ -175,7 +245,7 @@
                             </hbox>
                             <hbox>
                                 <textbox id="defaultzoomheight"
-                                         prefstring="extensions.threadvis.defaultzoom.height"
+                                         prefstring="extensions.threadvis.zoom.height"
                                          prefdefval="1"
                                          preftype="int"
                                          size="2" />

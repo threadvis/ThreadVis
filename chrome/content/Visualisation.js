@@ -310,6 +310,9 @@ Visualisation.prototype.convertHSVtoRGB = function(hue,
 Visualisation.prototype.createLegend = function(authors)
 {
     var legend = document.getElementById("ThreadVisLegendPopUp");
+    if (! legend)
+        return;
+    
     while(legend.firstChild != null)
         legend.removeChild(legend.firstChild);
     

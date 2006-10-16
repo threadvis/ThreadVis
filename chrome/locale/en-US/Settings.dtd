@@ -41,6 +41,12 @@
 <!ENTITY visualisation.size.small                           "small">
 <!ENTITY visualisation.size.medium                          "medium">
 <!ENTITY visualisation.size.large                           "large">
+<!ENTITY visualisation.size.dotsize                         "Size of Messages">
+<!ENTITY visualisation.size.arcminheight                    "Minimum Arc Height">
+<!ENTITY visualisation.size.arcradius                       "Arc Radius">
+<!ENTITY visualisation.size.arcdifference                   "Spacing between Arcs">
+<!ENTITY visualisation.size.arcwidth                        "Arc Width">
+<!ENTITY visualisation.size.spacing                         "Spacing between Messages">
 <!ENTITY visualisation.colour.caption                       "Colours">
 <!ENTITY visualisation.colour.single.caption                "Single colour">
 <!ENTITY visualisation.colour.single.description            "Only use a single colour in the visualisation. The selected message is displayed in blue, other messages are displayed in grey.">
