@@ -20,7 +20,6 @@ function PreferenceObserver()
     this.PREF_DISABLED_ACCOUNTS_ = "disabledaccounts";
     this.PREF_DISABLED_FOLDERS_ = "disabledfolders";
     this.PREF_ENABLED_ = "enabled";
-    this.PREF_ENABLEDACCOUNTS_ = "enabledaccounts";
     this.PREF_LOGGING_ = "logging.enabled";
     this.PREF_LOGGING_DEBUG_ = "logging.debug";
     this.PREF_LOGGING_DEBUG_LEVEL_ = "logging.debug.level";
@@ -43,8 +42,6 @@ function PreferenceObserver()
 
     this.pref_branch_ = null;
     this.preferences_ = new Object();
-    this.preferences_["enabled"] = false;
-
     this.callback_ = new Object();
 
     var prefService = Components.classes["@mozilla.org/preferences-service;1"]
@@ -142,7 +139,6 @@ PreferenceObserver.prototype.preferenceReload = function()
     this.loadPreference(this.PREF_DISABLED_ACCOUNTS_, this.pref_branch_.PREF_STRING, "");
     this.loadPreference(this.PREF_DISABLED_FOLDERS_, this.pref_branch_.PREF_STRING, "");
     this.loadPreference(this.PREF_ENABLED_, this.pref_branch_.PREF_BOOL, true);
-    this.loadPreference(this.PREF_ENABLEDACCOUNTS_, this.pref_branch_.PREF_STRING, "");
     this.loadPreference(this.PREF_LOGGING_, this.pref_branch_.PREF_BOOL, false);
     this.loadPreference(this.PREF_LOGGING_DEBUG_, this.pref_branch_.PREF_BOOL, false);
     this.loadPreference(this.PREF_LOGGING_DEBUG_LEVEL_, this.pref_branch_.PREF_INT, 0);
