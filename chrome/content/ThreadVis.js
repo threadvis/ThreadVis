@@ -44,6 +44,9 @@ function checkForThreadVis(win)
     if (win.THREADVIS)
         return win.THREADVIS;
 
+    if (win.parent && win != win.parent)
+        return checkForThreadVis(win.parent);
+
     if (win.opener)
         return checkForThreadVis(win.opener);
 
@@ -405,12 +408,8 @@ ThreadVis.prototype.displayVisualisationWindow = function()
         this.popup_window_.focus();
         return;
     }
-    var position_x = this.preferences_.getPreference(this.preferences_.PREF_POPUPWINDOW_POSITION_X_);
-    var position_y = this.preferences_.getPreference(this.preferences_.PREF_POPUPWINDOW_POSITION_Y_);
-    var size_x = this.preferences_.getPreference(this.preferences_.PREF_POPUPWINDOW_SIZE_X_);
-    var size_y = this.preferences_.getPreference(this.preferences_.PREF_POPUPWINDOW_SIZE_Y_);
 
-    var flags = "width=" + size_x + ", height=" + size_y + ", screenX=" + position_x + ", screenY=" + position_y + ", resizable=yes,dependent";
+    var flags = "resizable=yes,alwaysRaised=yes,dependent=yes";
     this.popup_window_ = window.openDialog("chrome://threadvis/content/ThreadVisPopup.xul", "chrome", flags);
 }
 
@@ -534,9 +533,20 @@ ThreadVis.prototype.init = function()
     {
         var ref = this;
         this.preferences_ = new PreferenceObserver();
-        this.preferences_.registerCallback("enabled", function(value) { ref.preferenceEnabledChanged(value); });
-        this.preferences_.registerCallback("disabledaccounts", function(value) { ref.preferenceDisabledAccountsChanged(value); });
-        this.preferences_.registerCallback("disabledfolders", function(value) { ref.preferenceDisabledFoldersChanged(value); });
+        this.preferences_.registerCallback(this.preferences_.PREF_DISABLED_ACCOUNTS_, function(value) { ref.preferenceChanged(value); });
+        this.preferences_.registerCallback(this.preferences_.PREF_DISABLED_FOLDERS_, function(value) { ref.preferenceChanged(value); });
+        this.preferences_.registerCallback(this.preferences_.PREF_ENABLED_, function(value) { ref.preferenceChanged(value); });
+        this.preferences_.registerCallback(this.preferences_.PREF_TIMELINE_, function(value) { ref.preferenceChanged(value); });
+        this.preferences_.registerCallback(this.preferences_.PREF_TIMESCALING_, function(value) { ref.preferenceChanged(value); });
+        this.preferences_.registerCallback(this.preferences_.PREF_VIS_DOTSIZE_, function(value) { ref.preferenceChanged(value); });
+        this.preferences_.registerCallback(this.preferences_.PREF_VIS_ARC_MINHEIGHT_, function(value) { ref.preferenceChanged(value); });
+        this.preferences_.registerCallback(this.preferences_.PREF_VIS_RADIUS_, function(value) { ref.preferenceChanged(value); });
+        this.preferences_.registerCallback(this.preferences_.PREF_VIS_DIFFERENCE_, function(value) { ref.preferenceChanged(value); });
+        this.preferences_.registerCallback(this.preferences_.PREF_VIS_ARC_WIDTH_, function(value) { ref.preferenceChanged(value); });
+        this.preferences_.registerCallback(this.preferences_.PREF_VIS_SPACING_, function(value) { ref.preferenceChanged(value); });
+        this.preferences_.registerCallback(this.preferences_.PREF_VIS_COLOUR_, function(value) { ref.preferenceChanged(value); });
+        this.preferences_.registerCallback(this.preferences_.PREF_ZOOM_HEIGHT_, function(value) { ref.preferenceChanged(value); });
+        this.preferences_.registerCallback(this.preferences_.PREF_ZOOM_WIDTH_, function(value) { ref.preferenceChanged(value); });
         
         // only create logger object if extension is enabled
         if (this.preferences_.getPreference(this.preferences_.PREF_ENABLED_))
@@ -804,25 +814,6 @@ ThreadVis.prototype.onItemRemoved = function(parentItem, item, view)
 ThreadVis.prototype.onVisualisationWindowClose = function()
 {
     this.logger_.log("popupvisualisation", {"action" : "close"});
-
-    // remember window position and size
-    var position_x = window.screenX;
-    var position_y = window.screenY;
-    var size_x = window.outerWidth;
-    var size_y = window.outerHeight;
-    
-    this.preferences_.setPreference(this.preferences_.PREF_POPUPWINDOW_POSITION_X_,
-                                    position_x,
-                                    this.preferences_.PREF_INT_);
-    this.preferences_.setPreference(this.preferences_.PREF_POPUPWINDOW_POSITION_Y_,
-                                    position_y,
-                                    this.preferences_.PREF_INT_);
-    this.preferences_.setPreference(this.preferences_.PREF_POPUPWINDOW_SIZE_X_,
-                                    size_x,
-                                    this.preferences_.PREF_INT_);
-    this.preferences_.setPreference(this.preferences_.PREF_POPUPWINDOW_SIZE_Y_,
-                                    size_y,
-                                    this.preferences_.PREF_INT_);
 }
 
 
@@ -878,33 +869,11 @@ ThreadVis.prototype.openThreadVisOptionsDialog = function()
 
 
 /** ****************************************************************************
- * "enabledaccounts" preference changed
+ * preference changed
  ******************************************************************************/
-ThreadVis.prototype.preferenceDisabledAccountsChanged = function(value)
+ThreadVis.prototype.preferenceChanged = function(enabled)
 {
-    this.doLoad.onStartHeaders();
-}
-
-
-
-/** ****************************************************************************
- * "enabled" preference changed
- ******************************************************************************/
-ThreadVis.prototype.preferenceEnabledChanged = function(enabled)
-{
-    if (enabled)
-        this.createBox();
-    else
-        this.deleteBox();
-}
-
-
-
-/** ****************************************************************************
- * "disabledfolders" preference changed
- ******************************************************************************/
-ThreadVis.prototype.preferenceDisabledFoldersChanged = function(value)
-{
+    this.visualisation_.changed_ = true;
     this.doLoad.onStartHeaders();
 }
 
@@ -917,13 +886,16 @@ ThreadVis.prototype.preferenceDisabledFoldersChanged = function(value)
 ThreadVis.prototype.setSelectedMessage = function()
 {
     if (! this.preferences_.getPreference(this.preferences_.PREF_ENABLED_))
+    {
+        this.deleteBox();
         return;
+    }
     if (! this.checkEnabledAccountOrFolder())
     {
         this.deleteBox();
         return;
     }
-
+    
     this.logger_.logDebug(this.logger_.LEVEL_INFORM_,
                           "ThreadVis.setSelectedMessage()",
                           {});

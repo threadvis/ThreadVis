@@ -23,10 +23,6 @@ function PreferenceObserver()
     this.PREF_LOGGING_ = "logging.enabled";
     this.PREF_LOGGING_DEBUG_ = "logging.debug";
     this.PREF_LOGGING_DEBUG_LEVEL_ = "logging.debug.level";
-    this.PREF_POPUPWINDOW_POSITION_X_ = "popupwindow.position.x";
-    this.PREF_POPUPWINDOW_POSITION_Y_ = "popupwindow.position.y";
-    this.PREF_POPUPWINDOW_SIZE_X_ = "popupwindow.size.x";
-    this.PREF_POPUPWINDOW_SIZE_Y_ = "popupwindow.size.y";
     this.PREF_TIMELINE_ = "timeline.enabled";
     this.PREF_TIMESCALING_ = "timescaling.enabled";
     this.PREF_VIS_DOTSIZE_ = "visualisation.dotsize";
@@ -61,19 +57,16 @@ function PreferenceObserver()
 /** ****************************************************************************
  * do callbacks after preference change
  ******************************************************************************/
-PreferenceObserver.prototype.doCallback = function()
+PreferenceObserver.prototype.doCallback = function(pref)
 {
-    for (var pref in this.preferences_)
+    var value = this.preferences_[pref];
+    var array = this.callback_[pref];
+    if (array)
     {
-        var value = this.preferences_[pref];
-        var array = this.callback_[pref];
-        if (array)
+        for (var key in array)
         {
-            for (var key in array)
-            {
-                var func = array[key];
-                func(value);
-            }
+            var func = array[key];
+            func(value);
         }
     }
 }
@@ -126,7 +119,7 @@ PreferenceObserver.prototype.observe = function(subject, topic, data)
 
     // reload preferences
     this.preferenceReload();
-    this.doCallback();
+    this.doCallback(data);
 }
 
 
@@ -142,10 +135,6 @@ PreferenceObserver.prototype.preferenceReload = function()
     this.loadPreference(this.PREF_LOGGING_, this.pref_branch_.PREF_BOOL, false);
     this.loadPreference(this.PREF_LOGGING_DEBUG_, this.pref_branch_.PREF_BOOL, false);
     this.loadPreference(this.PREF_LOGGING_DEBUG_LEVEL_, this.pref_branch_.PREF_INT, 0);
-    this.loadPreference(this.PREF_POPUPWINDOW_POSITION_X_, this.pref_branch_.PREF_INT, 0);
-    this.loadPreference(this.PREF_POPUPWINDOW_POSITION_Y_, this.pref_branch_.PREF_INT, 0);
-    this.loadPreference(this.PREF_POPUPWINDOW_SIZE_X_, this.pref_branch_.PREF_INT, 0);
-    this.loadPreference(this.PREF_POPUPWINDOW_SIZE_Y_, this.pref_branch_.PREF_INT, 0);
     this.loadPreference(this.PREF_TIMELINE_, this.pref_branch_.PREF_BOOL, true);
     this.loadPreference(this.PREF_TIMESCALING_, this.pref_branch_.PREF_BOOL, true);
     this.loadPreference(this.PREF_VIS_DOTSIZE_, this.pref_branch_.PREF_INT, 12);

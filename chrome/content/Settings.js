@@ -327,8 +327,8 @@ function getLogger(object)
         object = window;
 
     // check for logger object
-    if (object.LOGGER_)
-        return object.LOGGER_;
+    if (object.THREADVIS && object.THREADVIS.logger_)
+        return object.THREADVIS.logger_;
 
     // go to top parent window
     if (object.parent && object != object.parent)
@@ -370,7 +370,7 @@ function resetLogfiles()
     if (logger)
         logger.reset(true);
     else
-        alert(parent.getElementById("ThreadVisStrings").getString("logger.couldnotdeletefile"));
+        alert(parent.document.getElementById("ThreadVisStrings").getString("logger.couldnotdeletefile"));
 }
 
 

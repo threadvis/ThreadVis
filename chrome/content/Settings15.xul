@@ -43,12 +43,12 @@
                 src="chrome://threadvis/content/Timeline.js" />
         <script type="application/x-javascript"
                 src="chrome://threadvis/content/Visualisation.js" />
-
+-->
         <stringbundleset>
             <stringbundle id="ThreadVisStrings" 
                           src="chrome://threadvis/locale/ThreadVis.properties" />
         </stringbundleset>
--->
+
         <preferences>
             <preference id="extensions.threadvis.enabled"
                         name="extensions.threadvis.enabled"
@@ -350,11 +350,11 @@
                         &logfiles.enable.description.sending;
                     </label>
                     <separator class="thin" />
-                    <checkbox id="dologgingdebug"
-                              label="&logfiles.debug.checkbox;"
-                              preference="extensions.threadvis.logging.debug" />
                     <hbox>
-                        <label class="indent detaileddescription" 
+                        <checkbox id="dologgingdebug"
+                                  label="&logfiles.debug.checkbox;"
+                                  preference="extensions.threadvis.logging.debug" />
+                        <label class="indent detaileddescription"
                                control="logdebuglevel"
                                value="&logfiles.debug.level;" />
                         <textbox class="indent detaileddescription"

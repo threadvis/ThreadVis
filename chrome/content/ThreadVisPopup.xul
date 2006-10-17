@@ -19,6 +19,7 @@
 <window id="ThreadVisPopup"
         title="&popupwindow.title;"
         onclose="THREADVIS.onVisualisationWindowClose();"
+        persist="width height screenX screenY"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
     <script src="chrome://threadvis/content/ArcVisualisation.js" />

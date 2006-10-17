@@ -32,6 +32,7 @@ function Visualisation()
     this.arcvisualisations_ = null;
     this.timeline_ = null;
     this.scrollbar_ = null;
+    this.changed_ = false;
 }
 
 
@@ -882,11 +883,11 @@ Visualisation.prototype.visualise = function(container)
     var pref_timeline = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_TIMELINE_);
 
     // check if we are still in the same thread as last time
+    // check if visualisation parameters changed
     // if not, reset zoom level
     if (! this.currentcontainer_ || 
         container.getTopContainer() != this.currentcontainer_.getTopContainer() ||
-        (this.timeline_ == null && pref_timeline == true) ||
-        (this.timeline_ != null && pref_timeline == false))
+        this.changed_)
     {
         this.createStack();
         this.clearStack();
@@ -1083,6 +1084,8 @@ Visualisation.prototype.visualise = function(container)
                                         this.box_);
     this.scrollbar_.init(this.box_);
     this.scrollbar_.draw();
+    
+    this.changed_ = false;
 }
 
 
