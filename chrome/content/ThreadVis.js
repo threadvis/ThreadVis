@@ -411,6 +411,7 @@ ThreadVis.prototype.displayVisualisationWindow = function()
 
     var flags = "resizable=yes,alwaysRaised=yes,dependent=yes";
     this.popup_window_ = window.openDialog("chrome://threadvis/content/ThreadVisPopup.xul", "chrome", flags);
+    this.deleteBox();
 }
 
 
@@ -540,8 +541,8 @@ ThreadVis.prototype.init = function()
         this.preferences_.registerCallback(this.preferences_.PREF_TIMESCALING_, function(value) { ref.preferenceChanged(value); });
         this.preferences_.registerCallback(this.preferences_.PREF_VIS_DOTSIZE_, function(value) { ref.preferenceChanged(value); });
         this.preferences_.registerCallback(this.preferences_.PREF_VIS_ARC_MINHEIGHT_, function(value) { ref.preferenceChanged(value); });
-        this.preferences_.registerCallback(this.preferences_.PREF_VIS_RADIUS_, function(value) { ref.preferenceChanged(value); });
-        this.preferences_.registerCallback(this.preferences_.PREF_VIS_DIFFERENCE_, function(value) { ref.preferenceChanged(value); });
+        this.preferences_.registerCallback(this.preferences_.PREF_VIS_ARC_RADIUS_, function(value) { ref.preferenceChanged(value); });
+        this.preferences_.registerCallback(this.preferences_.PREF_VIS_ARC_DIFFERENCE_, function(value) { ref.preferenceChanged(value); });
         this.preferences_.registerCallback(this.preferences_.PREF_VIS_ARC_WIDTH_, function(value) { ref.preferenceChanged(value); });
         this.preferences_.registerCallback(this.preferences_.PREF_VIS_SPACING_, function(value) { ref.preferenceChanged(value); });
         this.preferences_.registerCallback(this.preferences_.PREF_VIS_COLOUR_, function(value) { ref.preferenceChanged(value); });
@@ -809,11 +810,12 @@ ThreadVis.prototype.onItemRemoved = function(parentItem, item, view)
 
 
 /** ****************************************************************************
- * called when popup window gets resized
+ * called when popup window gets closed
  ******************************************************************************/
 ThreadVis.prototype.onVisualisationWindowClose = function()
 {
     this.logger_.log("popupvisualisation", {"action" : "close"});
+    this.threadvis_parent_.setSelectedMessage();
 }
 
 
@@ -908,8 +910,6 @@ ThreadVis.prototype.setSelectedMessage = function()
     }
     this.clear_ = false;
 
-    this.createBox();
-    
     // get currently loaded message
     var msg_uri = GetLoadedMessage();
     var msg = messenger.messageServiceFromURI(msg_uri)
@@ -928,6 +928,7 @@ ThreadVis.prototype.setSelectedMessage = function()
     {
         this.logger_.log("switchaccount", {});
         // user just switched account
+        this.clearVisualisation();
         this.loaded_ = false;
         this.threaded_ = false;
         this.threader_ = new Threader();
@@ -983,6 +984,7 @@ ThreadVis.prototype.visualise = function(container)
                       "top container" : topcontainer_msgKey,
                       "msgcount" : msgcount});
 
+    this.createBox();
     this.visualisation_.visualise(container);
     this.selected_container_ = container;
 }
@@ -1005,17 +1007,15 @@ ThreadVis.prototype.visualiseMsgId = function(message_id)
                           "ThreadVis.visualiseMsgId()",
                           {"message-id" : message_id});
 
-    this.createBox();
-
     var container = this.threader_.findContainer(message_id);
 
     if (container != null && ! container.isDummy())
     {
-        this.visualise(container);
-        
         // visualise any popup windows that might exist
         if (this.popup_window_ && this.popup_window_.THREADVIS)
             this.popup_window_.THREADVIS.visualise(container);
+        else
+            this.visualise(container);
     }
     else
     {
@@ -1023,9 +1023,10 @@ ThreadVis.prototype.visualiseMsgId = function(message_id)
         // - container with id was dummy
         // this means we somehow missed to thread this message
         // thus, thread the whole folder we are in
-        this.clearVisualisation();
         if (this.popup_window_ && this.popup_window_.THREADVIS)
             this.popup_window_.THREADVIS.clearVisualisation();
+        else
+            this.clearVisualisation();
         this.onFolderAdded(GetLoadedMsgFolder());
     }
     container = null;
