@@ -14,6 +14,7 @@ pref("extensions.threadvis.enabled", true);
 pref("extensions.threadvis.logging.debug", false);
 pref("extensions.threadvis.logging.debug.level", 0);
 pref("extensions.threadvis.logging.enabled", false);
+pref("extensions.threadvis.notes", 0);
 pref("extensions.threadvis.timeline.enabled", true);
 pref("extensions.threadvis.timescaling.enabled", true);
 pref("extensions.threadvis.visualisation.arcminheight", 12);
