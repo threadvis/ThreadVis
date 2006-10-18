@@ -9,10 +9,10 @@
  * Version: $Id$
  ********************************************************/
 -->
-<!ENTITY popup.legendin "Display Legend">
-<!ENTITY popup.legendout "Hide Legend">
-<!ENTITY popup.popupwindow "Display in Separate Window">
-<!ENTITY popup.settings "Settings...">
-<!ENTITY popupwindow.title "ThreadVis">
-<!ENTITY zoomin.tooltip "Zoom In">
-<!ENTITY zoomout.tooltip "Zoom Out">
+<!ENTITY popup.legend               "Display Legend">
+<!ENTITY popup.popupwindow          "Display in Separate Window">
+<!ENTITY popup.settings             "Settings...">
+<!ENTITY popupwindow.title          "ThreadVis Visualisation">
+<!ENTITY zoomin.tooltip             "Zoom In">
+<!ENTITY zoomout.tooltip            "Zoom Out">
+<!ENTITY legend.title               "ThreadVis Legend">

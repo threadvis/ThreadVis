@@ -397,6 +397,47 @@ ThreadVis.prototype.deleteBox = function()
 
 
 /** ****************************************************************************
+ * Display legend popup
+ ******************************************************************************/
+ThreadVis.prototype.displayLegend = function()
+{
+    if (window.opener && window.opener.THREADVIS)
+        window.opener.THREADVIS.displayLegend();
+
+    if (this.legend_window_ != null && ! this.legend_window_.closed)
+    {
+        this.legend_window_.displayLegend();
+    }
+}
+
+
+
+/** ****************************************************************************
+ * Display legend popup
+ ******************************************************************************/
+ThreadVis.prototype.displayLegendWindow = function()
+{
+    if (window.opener && window.opener.THREADVIS)
+    {
+        window.opener.THREADVIS.displayLegendWindow();
+        return;
+    }
+
+    this.logger_.log("legend", {"action" : "open"});
+
+    if (this.legend_window_ != null && ! this.legend_window_.closed)
+    {
+        this.legend_window_.focus();
+        return;
+    }
+
+    var flags = "chrome=yes,resizable=no,alwaysRaised=yes,dependent=yes,dialog=yes";
+    this.legend_window_ = window.openDialog("chrome://threadvis/content/Legend.xul", "ThreadVisLegend", flags);
+}
+
+
+
+/** ****************************************************************************
  * display a popup window for the visualisation
  ******************************************************************************/
 ThreadVis.prototype.displayVisualisationWindow = function()
@@ -409,8 +450,8 @@ ThreadVis.prototype.displayVisualisationWindow = function()
         return;
     }
 
-    var flags = "resizable=yes,alwaysRaised=yes,dependent=yes";
-    this.popup_window_ = window.openDialog("chrome://threadvis/content/ThreadVisPopup.xul", "chrome", flags);
+    var flags = "chrome=yes,resizable=yes,alwaysRaised=yes,dependent=yes";
+    this.popup_window_ = window.openDialog("chrome://threadvis/content/ThreadVisPopup.xul", "ThreadVisPopup", flags);
     this.deleteBox();
 }
 
@@ -494,6 +535,20 @@ ThreadVis.prototype.getAllFolders = function(folder)
             break;
         }
     }
+}
+
+
+
+/** ****************************************************************************
+ * Get legend object
+ ******************************************************************************/
+ThreadVis.prototype.getLegend = function()
+{
+    if (this.popup_window_ && this.popup_window_.THREADVIS)
+        return this.popup_window_.THREADVIS.visualisation_.legend_;
+    else
+        return this.visualisation_.legend_;
+
 }
 
 

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+
+<!--
+/** ****************************************************************************
+ * Legend.xul
+ *
+ * (c) 2006 Alexander C. Hubmann
+ *
+ * XUL file to display ThreadVis Legend
+ *
+ * Version: $Id$
+ ******************************************************************************/
+-->
+
+
+
+<!DOCTYPE overlay SYSTEM "chrome://threadvis/locale/ThreadVis.dtd">
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<window id="ThreadVisLegend"
+        title="&legend.title;"
+        onload="displayLegend();"
+        persist="screenX screenY"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+    <script src="chrome://threadvis/content/Legend.js" />
+
+    <vbox id="LegendBox">
+        <vbox id="LegendContent" />
+    </vbox>
+</window>

@@ -310,19 +310,14 @@ Visualisation.prototype.convertHSVtoRGB = function(hue,
  ******************************************************************************/
 Visualisation.prototype.createLegend = function(authors)
 {
-    var legend = document.getElementById("ThreadVisLegendPopUp");
-    if (! legend)
-        return;
-    
-    while(legend.firstChild != null)
-        legend.removeChild(legend.firstChild);
+    this.legend_ = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "vbox");
     
     for (var email in authors)
     {
         var colour = authors[email].colour;
         var name = authors[email].name;
         var count = authors[email].count;
-        legend.appendChild(this.createLegendBox(colour, name, count));
+        this.legend_.appendChild(this.createLegendBox(colour, name, count));
     }
 }
 
@@ -1040,6 +1035,7 @@ Visualisation.prototype.visualise = function(container)
     // underline authors if enabled
     this.colourAuthors(this.authors_);
     this.createLegend(this.authors_);
+    THREADVIS.displayLegend();
     
     // calculate if we have to move the visualisation so that the
     // selected message is visible

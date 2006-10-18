@@ -40,10 +40,6 @@
         <stringbundle id="ThreadVisStrings" 
                       src="chrome://threadvis/locale/ThreadVis.properties" />
     </stringbundleset>
-    <popupset>
-        <popup id="ThreadVisLegendPopUp">
-        </popup>
-    </popupset>
     <hbox id="ThreadVis"
           style="border: 1px solid #cccccc;"
           flex="1">
@@ -89,10 +85,10 @@
                            tooltiptext="&zoomout.tooltip;" />
                 </hbox>
                 <hbox id="ThreadVisLegend"
-                      popup="ThreadVisLegendPopUp">
+                      onclick="THREADVIS.displayLegendWindow();">
                     <image src="chrome://threadvis/content/images/legend.png"
                            style="width: 16px; height: 16px; padding: 1px;"
-                           tooltiptext="&popup.legendin;" />
+                           tooltiptext="&popup.legend;" />
                 </hbox>
         </vbox>
     </hbox>

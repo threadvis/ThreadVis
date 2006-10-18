@@ -5,6 +5,8 @@ content/contents.rdf
 content/CopyCut.js
 content/Expander.css
 content/Expander.xml
+content/Legend.js
+content/Legend.xul
 content/Logger.js
 content/Message.js
 content/Preferences.xul
