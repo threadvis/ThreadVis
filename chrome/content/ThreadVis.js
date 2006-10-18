@@ -370,6 +370,10 @@ ThreadVis.prototype.clearVisualisation = function()
 
     this.visualisation_.createStack();
     this.clear_ = true;
+
+    // also clear legend
+    if (this.legend_window_ && ! this.legend_window_.closed)
+        this.legend_window_.clearLegend();
 }
 
 
@@ -931,6 +935,10 @@ ThreadVis.prototype.openThreadVisOptionsDialog = function()
 ThreadVis.prototype.preferenceChanged = function(enabled)
 {
     this.visualisation_.changed_ = true;
+
+    if (this.popup_window_ && this.popup_window_.THREADVIS)
+        this.popup_window_.THREADVIS.visualisation_.changed_ = true;
+
     this.doLoad.onStartHeaders();
 }
 
