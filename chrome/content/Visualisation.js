@@ -885,20 +885,20 @@ Visualisation.prototype.visualise = function(container)
     // check if we are still in the same thread as last time
     // check if visualisation parameters changed
     // if not, reset zoom level
-    if (! this.currentcontainer_ || 
-        container.getTopContainer() != this.currentcontainer_.getTopContainer() ||
-        this.changed_)
-    {
-        this.createStack();
-        this.clearStack();
-        this.zoomReset();
-        this.resetStack();
-    }
-    else
+    if (this.currentcontainer_ &&
+        container.getTopContainer() == this.currentcontainer_.getTopContainer() &&
+        ! this.changed_)
     {
         this.visualiseExisting(container);
         return;
     }
+
+    // clear stack before drawing
+    this.createStack();
+    this.zoomReset();
+    this.resetStack();
+    this.clearStack();
+
 
     // remember current container to redraw after zoom
     this.currentcontainer_ = container;
@@ -913,7 +913,6 @@ Visualisation.prototype.visualise = function(container)
 
     // sort containers by date
     this.containers_.sort(Container_sortFunction);
-
 
     // pre-calculate size
     var presize = this.calculateSize(this.containers_);
