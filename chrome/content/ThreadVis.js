@@ -371,6 +371,10 @@ ThreadVis.prototype.clearVisualisation = function()
     this.visualisation_.createStack();
     this.clear_ = true;
 
+    // also clear popup
+    if (this.popup_window_ && ! this.popup_window_.closed)
+        this.popup_window_.THREADVIS.clearVisualisation();
+
     // also clear legend
     if (this.legend_window_ && ! this.legend_window_.closed)
         this.legend_window_.clearLegend();
@@ -971,7 +975,6 @@ ThreadVis.prototype.setSelectedMessage = function()
         this.clearVisualisation();
         return;
     }
-    this.clear_ = false;
 
     // get currently loaded message
     var msg_uri = GetLoadedMessage();
@@ -1047,6 +1050,7 @@ ThreadVis.prototype.visualise = function(container)
                       "top container" : topcontainer_msgKey,
                       "msgcount" : msgcount});
 
+    this.clear_ = false;
     this.createBox();
     this.visualisation_.visualise(container);
     this.selected_container_ = container;
