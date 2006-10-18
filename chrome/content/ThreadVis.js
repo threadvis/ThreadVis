@@ -28,6 +28,7 @@ function createThreadVis()
         THREADVIS = new ThreadVis(threadvis_parent);
         THREADVIS.init();
         window.onerror = THREADVIS.logJavaScriptErrors;
+        setTimeout(function() { THREADVIS.displayNotes(); }, 5000);
     }
 }
 
@@ -62,6 +63,7 @@ function checkForThreadVis(win)
 function ThreadVis(threadvis_parent)
 {
     this.XUL_NAMESPACE_ = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
+    this.NOTES_ = 3;
     
     // synchronization variables
     this.loaded_ = false;
@@ -75,7 +77,6 @@ function ThreadVis(threadvis_parent)
 
     // if parent object exists, reuse some of the internal objects
     this.threadvis_parent_ = threadvis_parent;
-
 }
 
 
@@ -441,6 +442,25 @@ ThreadVis.prototype.displayLegendWindow = function()
 
     var flags = "chrome=yes,resizable=no,alwaysRaised=yes,dependent=yes,dialog=yes";
     this.legend_window_ = window.openDialog("chrome://threadvis/content/Legend.xul", "ThreadVisLegend", flags);
+}
+
+
+
+/** ****************************************************************************
+ * Display notes
+ ******************************************************************************/
+ThreadVis.prototype.displayNotes = function()
+{
+    var showed_notes = this.preferences_.getPreference(this.preferences_.PREF_NOTES_);
+    for (var i = showed_notes + 1; i <= this.NOTES_; i++)
+    {
+        this.strings_ = document.getElementById("ThreadVisStrings");
+        var note = this.strings_.getString("notes." + i);
+        alert(note);
+    }
+    this.preferences_.setPreference(this.preferences_.PREF_NOTES_,
+                                    this.NOTES_,
+                                    this.preferences_.PREF_INT_);
 }
 
 

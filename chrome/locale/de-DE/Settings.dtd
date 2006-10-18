@@ -38,9 +38,6 @@
 <!ENTITY visualisation.timescaling.description.enabled      "Wenn Time Scaling aktiviert ist, ist der horizontale Abstand zwischen benachbarten Nachrichten proportional zum zeitlichen Abstand dieser Nachrichten.">
 <!ENTITY visualisation.timeline.enable                      "Die vergangene Zeit zwischen den einzelnen Nachrichten in der Visualisierung einblenden.">
 <!ENTITY visualisation.size.caption                         "Gr&#xF6;&#xDF;e">
-<!ENTITY visualisation.size.small                           "klein">
-<!ENTITY visualisation.size.medium                          "mittel">
-<!ENTITY visualisation.size.large                           "gro&#xDF;">
 <!ENTITY visualisation.size.dotsize                         "Nachrichtengr&#xF6;&#xDF;e">
 <!ENTITY visualisation.size.arcminheight                    "Minimale Bogenh&#xF6;he">
 <!ENTITY visualisation.size.arcradius                       "Bogenradius">

@@ -23,6 +23,7 @@ function PreferenceObserver()
     this.PREF_LOGGING_ = "logging.enabled";
     this.PREF_LOGGING_DEBUG_ = "logging.debug";
     this.PREF_LOGGING_DEBUG_LEVEL_ = "logging.debug.level";
+    this.PREF_NOTES_ = "notes";
     this.PREF_TIMELINE_ = "timeline.enabled";
     this.PREF_TIMESCALING_ = "timescaling.enabled";
     this.PREF_VIS_DOTSIZE_ = "visualisation.dotsize";
@@ -135,6 +136,7 @@ PreferenceObserver.prototype.preferenceReload = function()
     this.loadPreference(this.PREF_LOGGING_, this.pref_branch_.PREF_BOOL, false);
     this.loadPreference(this.PREF_LOGGING_DEBUG_, this.pref_branch_.PREF_BOOL, false);
     this.loadPreference(this.PREF_LOGGING_DEBUG_LEVEL_, this.pref_branch_.PREF_INT, 0);
+    this.loadPreference(this.PREF_NOTES_, this.pref_branch_.PREF_INT, 0);
     this.loadPreference(this.PREF_TIMELINE_, this.pref_branch_.PREF_BOOL, true);
     this.loadPreference(this.PREF_TIMESCALING_, this.pref_branch_.PREF_BOOL, true);
     this.loadPreference(this.PREF_VIS_DOTSIZE_, this.pref_branch_.PREF_INT, 12);
