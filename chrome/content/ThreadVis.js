@@ -379,6 +379,10 @@ ThreadVis.prototype.clearVisualisation = function()
     // also clear legend
     if (this.legend_window_ && ! this.legend_window_.closed)
         this.legend_window_.clearLegend();
+
+    // also clear legend in opener
+    if (opener && opener.THREADVIS && opener.THREADVIS.legend_window_ && ! opener.THREADVIS.legend_window_.closed)
+        opener.THREADVIS.legend_window_.clearLegend();
 }
 
 
