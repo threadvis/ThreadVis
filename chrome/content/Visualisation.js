@@ -17,7 +17,7 @@
 function Visualisation()
 {
     this.COLOUR_DUMMY_ = "#75756D";
-    this.COLOUR_SINGLE_ = "blue";
+    this.COLOUR_SINGLE_ = "#0000FF";
 
     this.box_ = null;
     this.stack_ = null;
@@ -257,12 +257,12 @@ Visualisation.prototype.colourAuthors = function(authors)
     while (emailfield = emailfields.pop())
     {
         var author = authors[emailfield.attributes["emailAddress"].value];
-        var colour = null;
+        var hsv = null;
         if (author)
-            colour = author.colour;
+            hsv = author.hsv;
         
-        if (colour && pref_highlight)
-            emailfield.style.borderBottom = "2px solid " + this.getColour(colour, 1.0, 1.0);
+        if (hsv && pref_highlight)
+            emailfield.style.borderBottom = "2px solid " + this.getColour(hsv.hue, 0, hsv.value);
         else
             emailfield.style.borderBottom = "";
     }
@@ -277,29 +277,55 @@ Visualisation.prototype.convertHSVtoRGB = function(hue,
                                                    saturation,
                                                    value)
 {
-    // hue in [0..6]
-    // saturation, value in [0..1]
-    var i = Math.floor(hue);
-    var f = hue - i;
-    if (! i % 2 == 1)
-        f = 1 - f;
-    var m = value * (1 - saturation);
-    var n = value * (1 - saturation * f);
-    switch(i)
+    var h = hue / 360;
+    var s = saturation / 100;
+    var v = value / 100;
+    
+    if (s == 0)
     {
-        case 6:
-        case 0:
-            return {"r" : value, "g" : n, "b" : m};
-        case 1:
-            return {"r" : n, "g" : value, "b" : m};
-        case 2:
-            return {"r" : m, "g" : value, "b" : n};
-        case 3:
-            return {"r" : m, "g" : n, "b" : value};
-        case 4:
-            return {"r" : n, "g" : m, "b" : value};
-        case 5:
-            return {"r" : value, "g" : m, "b" : n};
+        return {"r" : value * 255, "g" : value * 255, "b" : value * 255};
+    }
+    else
+    {
+        var var_h = h * 6;
+        var var_i = Math.floor(var_h);
+        var var_1 = v * (1 - s);
+        var var_2 = v * (1 - s * (var_h - var_i));
+        var var_3 = v * (1 - s * (1 - (var_h - var_i)));
+        
+        switch(var_i)
+        {
+            case 0:
+                var var_r = v;
+                var var_g = var_3;
+                var var_b = var_1;
+                break;
+            case 1:
+                var var_r = var_2;
+                var var_g = v;
+                var var_b = var_1;
+                break;
+            case 2:
+                var var_r = var_1;
+                var var_g = v;
+                var var_b = var_3;
+                break;
+            case 3:
+                var var_r = var_1;
+                var var_g = var_2;
+                var var_b = v;
+                break;
+            case 4:
+                var var_r = var_3;
+                var var_g = var_1;
+                var var_b = v;
+            default:
+                var var_r = v;
+                var var_g = var_1;
+                var var_b = var_2;
+        }
+        
+        return {"r" : var_r * 255, "g" : var_g * 255, "b" : var_b * 255};
     }
 }
 
@@ -314,10 +340,10 @@ Visualisation.prototype.createLegend = function(authors)
     
     for (var email in authors)
     {
-        var colour = authors[email].colour;
+        var hsv = authors[email].hsv;
         var name = authors[email].name;
         var count = authors[email].count;
-        this.legend_.appendChild(this.createLegendBox(colour, name, count));
+        this.legend_.appendChild(this.createLegendBox(hsv, name, count));
     }
 }
 
@@ -326,12 +352,12 @@ Visualisation.prototype.createLegend = function(authors)
 /** ****************************************************************************
  * Build one row for legend
  ******************************************************************************/
-Visualisation.prototype.createLegendBox = function(colour, name, count)
+Visualisation.prototype.createLegendBox = function(hsv, name, count)
 {
     var box = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "hbox");
     
     var colourbox = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "hbox");
-    colourbox.style.background = this.getColour(colour, 1.0, 1.0);
+    colourbox.style.background = this.getColour(hsv.hue, 0, hsv.value);
     colourbox.style.width = "20px";
     box.appendChild(colourbox);
     
@@ -478,15 +504,15 @@ Visualisation.prototype.drawDot = function(container,
 Visualisation.prototype.getColour = function(hue, saturation, value)
 {
     if (! value)
-        value = 1.0;
+        value = 100;
     if (! saturation)
-        saturation = 1.0;
+        saturation = 100;
 
     rgb = this.convertHSVtoRGB(hue, saturation, value);
 
-    return "#" + this.DECtoHEX(Math.floor(rgb.r * 255)) + 
-                 this.DECtoHEX(Math.floor(rgb.g * 255)) + 
-                 this.DECtoHEX(Math.floor(rgb.b * 255));
+    return "#" + this.DECtoHEX(Math.floor(rgb.r)) + 
+                 this.DECtoHEX(Math.floor(rgb.g)) + 
+                 this.DECtoHEX(Math.floor(rgb.b));
 }
 
 
@@ -496,8 +522,11 @@ Visualisation.prototype.getColour = function(hue, saturation, value)
  ******************************************************************************/
 Visualisation.prototype.getNewColour = function()
 {
-    this.lastcolour_ = (this.lastcolour_ + 1.3) % 6;
-    return this.lastcolour_
+    var hues = new Array(0,90,180,270,45,135,225,315,0,90,180,270,45,135,225,315,0,90,180,270,45,135,225,315,0,90,180,270,45,135,225,315);
+    var values = new Array(100,100,100,100,60,60,60,60,60,60,60,60,100,100,100,100,80,80,80,80,40,40,40,40,40,40,40,40,80,80,80,80);
+    this.lastcolour_ = (this.lastcolour_ + 1) % hues.length;
+    
+    return {"hue" : hues[this.lastcolour_], "value" : values[this.lastcolour_]};
 }
 
 
@@ -943,7 +972,7 @@ Visualisation.prototype.visualise = function(container)
 
     // pre-calculate colours for different authors
     this.authors_ = new Object();
-    this.lastcolour_ = 2;
+    this.lastcolour_ = -1;
 
     this.containervisualisations_ = new Array();
     this.arcvisualisations_ = new Array();
@@ -970,21 +999,21 @@ Visualisation.prototype.visualise = function(container)
             {
                 if (this.authors_[thiscontainer.getMessage().getFromEmail()] != null)
                 {
-                    colour = this.authors_[thiscontainer.getMessage().getFromEmail()].colour;
+                    var hsv = this.authors_[thiscontainer.getMessage().getFromEmail()].hsv;
                     this.authors_[thiscontainer.getMessage().getFromEmail()].count = 
                     this.authors_[thiscontainer.getMessage().getFromEmail()].count + 1;
                 }
                 else
                 {
-                    colour = this.getNewColour();
-                    this.authors_[thiscontainer.getMessage().getFromEmail()] = {"colour" : colour, 
+                    var hsv = this.getNewColour();
+                    this.authors_[thiscontainer.getMessage().getFromEmail()] = {"hsv" : hsv,
                                                                                 "name" : thiscontainer.getMessage().getFrom(),
                                                                                 "count" : 1};
                 }
                 if (selected)
-                    colour = this.getColour(colour, 1, 0.8);
+                    colour = this.getColour(hsv.hue, 0, hsv.value);
                 else
-                    colour = this.getColour(colour, 0.8, 0.8);
+                    colour = this.getColour(hsv.hue, 75, hsv.value);
             }
         }
 
@@ -1020,6 +1049,14 @@ Visualisation.prototype.visualise = function(container)
             // a selected message in this colour
             if (pref_colour == "single")
                 colour = parent == container || selected ? this.COLOUR_SINGLE_ : this.COLOUR_DUMMY_;
+            else
+            {
+                // get colour for arc
+                if (selected || parent == container)
+                    colour = this.getColour(hsv.hue, 0, hsv.value);
+                else
+                    colour = this.getColour(hsv.hue, 75, hsv.value);
+            }
 
             this.arcvisualisations_[thiscontainer] =
                 this.drawArc(colour,
@@ -1161,14 +1198,39 @@ Visualisation.prototype.visualiseExisting = function(container)
             return;
         }
 
-        this.containervisualisations_[thiscontainer].redraw(this.resize_, x, topheight, selected, flash);
+        // get colour for dot
+        if (pref_colour == "single")
+            colour = selected ? this.COLOUR_SINGLE_ : this.COLOUR_DUMMY_;
+        else
+        {
+            var hsv = this.authors_[thiscontainer.getMessage().getFromEmail()].hsv;
+            if (selected)
+                var colour = this.getColour(hsv.hue, 0, hsv.value);
+            else
+                var colour = this.getColour(hsv.hue, 75, hsv.value);
+        }
+
+        // draw dot
+        this.containervisualisations_[thiscontainer].redraw(this.resize_, x, topheight, selected, flash, colour);
 
         thiscontainer.x_position_ = x;
-        
+
+        // get colour for arc
+        if (pref_colour == "single")
+            colour = thiscontainer.getParent() == container || selected ? this.COLOUR_SINGLE_ : this.COLOUR_DUMMY_;
+        else
+        {
+            if (selected || thiscontainer.getParent() == container)
+                colour = this.getColour(hsv.hue, 0, hsv.value);
+            else
+                colour = this.getColour(hsv.hue, 75, hsv.value);
+        }
+
+        // draw arc
         var parent = thiscontainer.getParent()
         if (parent != null && ! parent.isRoot())
         {
-            this.arcvisualisations_[thiscontainer].redrawArc(this.resize_, parent.x_position_, x, topheight)
+            this.arcvisualisations_[thiscontainer].redrawArc(this.resize_, parent.x_position_, x, topheight, colour)
         }
         
         x = x + (thiscontainer.x_scaled_ * pref_spacing);

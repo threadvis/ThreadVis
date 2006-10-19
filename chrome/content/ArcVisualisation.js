@@ -124,12 +124,13 @@ ArcVisualisation.prototype.drawArc = function()
 /** ****************************************************************************
  * Re-Draw arc
  ******************************************************************************/
-ArcVisualisation.prototype.redrawArc = function(resize, left, right, top)
+ArcVisualisation.prototype.redrawArc = function(resize, left, right, top, colour)
 {
     this.resize_ = resize;
     this.left_ = left;
     this.top_ = top;
     this.right_ = right;
+    this.colour_ = colour;
     
     this.visualise();
 }

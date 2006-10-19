@@ -516,13 +516,15 @@ ContainerVisualisation.prototype.redraw = function(resize,
                                                    left,
                                                    top,
                                                    selected,
-                                                   flash)
+                                                   flash,
+                                                   colour)
 {
     this.resize_ = resize;
     this.left_ = left;
     this.top_ = top;
     this.selected_ = selected;
     this.flash_ = flash;
+    this.colour_ = colour;
     
     this.redrawDot();
     this.redrawCircle("black");
