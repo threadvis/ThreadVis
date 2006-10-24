@@ -57,4 +57,4 @@
 <!ENTITY extension.homepage                                 "http://www.sbox.tugraz.at/home/x/xpert/threadvis/">
 <!ENTITY extension.email                                    "xpert@sbox.tugraz.at">
 <!ENTITY extension.name                                     "ThreadVis">
-<!ENTITY extension.version                                  "0.8pre">
+<!ENTITY extension.version                                  "0.8">
