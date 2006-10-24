@@ -1198,16 +1198,20 @@ Visualisation.prototype.visualiseExisting = function(container)
             return;
         }
 
-        // get colour for dot
-        if (pref_colour == "single")
-            colour = selected ? this.COLOUR_SINGLE_ : this.COLOUR_DUMMY_;
-        else
+        var colour = this.COLOUR_DUMMY_;
+        if (! thiscontainer.isDummy())
         {
-            var hsv = this.authors_[thiscontainer.getMessage().getFromEmail()].hsv;
-            if (selected)
-                var colour = this.getColour(hsv.hue, 0, hsv.value);
+            // get colour for dot
+            if (pref_colour == "single")
+                colour = selected ? this.COLOUR_SINGLE_ : this.COLOUR_DUMMY_;
             else
-                var colour = this.getColour(hsv.hue, 75, hsv.value);
+            {
+                var hsv = this.authors_[thiscontainer.getMessage().getFromEmail()].hsv;
+                if (selected)
+                    var colour = this.getColour(hsv.hue, 0, hsv.value);
+                else
+                    var colour = this.getColour(hsv.hue, 75, hsv.value);
+            }
         }
 
         // draw dot
