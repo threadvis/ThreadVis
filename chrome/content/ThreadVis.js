@@ -918,12 +918,41 @@ ThreadVis.prototype.openThreadVisOptionsDialog = function()
         // Mozilla doesn't know about openOptionsDialog, so we use goPreferences.
         // Although Thunderbird also knows goPreferences, Thunderbird 1.5
         // has some problems with it, so we use it only for Mozilla and use
-        // openOptionsDialog for Thunderbird.
+        // openOptionsDialog for Thunderbird. For details see comments below.
         goPreferences('threadvis', 'chrome://threadvis/content/Settings.xul','threadvis');
     }
     else
     {
-        openOptionsDialog('paneThreadVis');
+        // Thunderbird knows both goPreferences and openOptionsDialog
+        // but Thunderbird 1.5 doesn't do well with goPreferences.
+        // It opens a window, but it has no content.
+        // 
+        // Also almost all calls to open the preferences window use
+        // openOptionsDialog in 1.5, so we might as well use it too.
+        //
+        // One problem remains:
+        //
+        // # In Thunderbird < 1.5, the function is defined as
+        //     function openOptionsDialog(containerID, paneURL, itemID)
+        // # whereas in Thunderbird 1.5, it is defined as
+        //     function openOptionsDialog(aPaneID, aTabID)
+        //
+        // And I don't know how to distinguish between those two.
+        // So let's do a bad hack and pass the aPaneID as the first
+        // parameter (which seems to do no harm to Thunderbird < 1.5) and
+        // pass the paneURL as the second parameter (which in turn seems to
+        // do no harm to Thunderbird 1.5).
+        //
+        // NOTE:
+        // Additionally, Thunderbird 1.5 uses a completely new layout and API 
+        // for the preferences window, which leads to the problem that we need to
+        // have two separate XUL files to edit the preferences for this extension.
+        //
+        // So we have Settings15.xul which gets used in Thunderbird 1.5 (and 
+        // which defines the paneThreadVis component which gets passed as
+        // aPaneID), and we have Settings.xul which gets used in Thunderbird < 1.5
+        // and Mozilla (which URL gets passed as paneURL).
+        openOptionsDialog('paneThreadVis', 'chrome://threadvis/content/Settings.xul');
     }
 }
 
