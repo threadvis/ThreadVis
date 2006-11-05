@@ -35,6 +35,15 @@
      </Description>
     </em:targetApplication>
     
+    <!-- Target Application - Mozilla -->
+    <em:targetApplication>
+     <Description>
+       <em:id>{86c18b42-e466-45a9-ae7a-9b95ba6f5640}</em:id>
+       <em:minVersion>1.7</em:minVersion>
+       <em:maxVersion>1.7.13/em:maxVersion>
+     </Description>
+    </em:targetApplication>
+    
     <!-- Front End MetaData -->
     <em:id>{A23E4120-431F-4753-AE53-5D028C42CFDC}</em:id>
     <em:version>0.8</em:version>
