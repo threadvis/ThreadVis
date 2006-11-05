@@ -33,6 +33,18 @@
         </treeitem>
     </treechildren>
 
+    <!-- This is for Thunderbird < 1.5 -->
+    <vbox id="prefsCategories">
+        <button id="threadvis"
+                orient="vertical"
+                class="buttonBoxButton"
+                type="radio"
+                label="&settings.title;"
+                group="categories"
+                url="chrome://threadvis/content/Settings.xul"
+                style="list-style-image: url(chrome://threadvis/content/images/icon.png);" />
+    </vbox>
+
     <!-- This is for Thunderbird 1.5 -->
     <prefwindow id="MailPreferences">
         <prefpane id="paneThreadVis"
