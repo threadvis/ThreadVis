@@ -42,327 +42,343 @@
                        "defaultzoomheight",
                        "visualisationcolour",
                        "visualisationhighlight",
+                       "visualisation.opacity",
                        "dologging",
                        "dologgingdebug",
                        "dologgingdebuglevel"];
     ]]>
     </script>
 
+        <stringbundleset>
+            <stringbundle id="ThreadVisStrings" 
+                          src="chrome://threadvis/locale/ThreadVis.properties" />
+        </stringbundleset>
 
-    <tabbox flex="1">
-        <tabs id="settingstabs">
-            <tab label="&about.tab;" />
-            <tab label="&visualisation.tab;" />
-            <tab label="&logfiles.tab;" />
-        </tabs>
+        <tabbox flex="1" id="ThreadVisTabBox">
+            <tabs id="settingstabs">
+                <tab label="&about.tab;" />
+                <tab label="&visualisation.timescaling.caption;" />
+                <tab label="&visualisation.size.caption;" />
+                <tab label="&visualisation.colour.caption;" />
+                <tab label="&visualisation.enabledaccounts.caption;" />
+                <tab label="&logfiles.tab;" />
+            </tabs>
 
-        <tabpanels id="settingstabpanels" flex="1">
+            <tabpanels id="settingstabpanels" flex="1">
 
-            <tabpanel id="about" orient="vertical" flex="1" class="overflow">
-                <label value="&extension.name;"
-                       id="extension-name" />
-                <separator class="thin" />
-                <hbox>
-                    <image src="images/about.png" />
-                </hbox>
-                <separator class="thin" />
-                <label value="&about.version; &extension.version;"
-                       id="about-version" />
-                <separator class="thin" />
-                <description id="about-description">
-                    &extension.description;
-                </description>
-                <separator class="thin" />
-                <label id="about-copyright">
-                    &extension.copyright;
-                </label>
-                <separator class="thin" />
-                <label value="&extension.email;"
-                       onclick="writeEmail();"
-                       id="about-email" />
-                <separator class="thin" />
-                <label href="&extension.homepage;"
-                       value="&extension.homepage;"
-                       onclick="openURL(event.target.getAttribute('href'));"
-                       id="about-homepage" />
-
-                <separator />
-                <groupbox>
-                    <checkbox id="enablethreadvis"
-                              label="&extension.enabled;"
-                              prefstring="extensions.threadvis.enabled"
-                              prefdefval="true"
-                              preftype="bool" />
-                </groupbox>
-            </tabpanel>
-
-            <tabpanel id="visualisation" orient="vertical" flex="1" class="overflow">
-                <groupbox>
-                    <expander id="timescaling"
-                              label="&visualisation.timescaling.caption;"
-                              open="true"
-                              persist="open"
-                              clearhidden="true">
-                        <radiogroup id="dotimescaling"
-                                    prefstring="extensions.threadvis.timescaling.enabled"
-                                    prefdefval="true"
-                                    preftype="bool">
-                            <vbox>
-                                <radio value="false"
-                                       label="&visualisation.timescaling.disable;" />
-                                <hbox class="indent">
-                                    <image src="images/timescaling_disabled.png" />
-                                </hbox>
-                                <separator class="thin" />
-                                <label class="indent">
-                                    &visualisation.timescaling.description.disabled;
-                                </label>
-                            </vbox>
-                            <separator />
-                            <vbox>
-                                <radio value="true" label="&visualisation.timescaling.enable;" />
-                                <hbox class="indent">
-                                    <image src="images/timescaling_enabled.png" />
-                                </hbox>
-                                <separator class="thin" />
-                                <label class="indent">
-                                    &visualisation.timescaling.description.enabled;
-                                </label>
-                            </vbox>
-                        </radiogroup>
-                        <separator />
-                            <checkbox id="enabletimeline"
-                                      label="&visualisation.timeline.enable;"
-                                      prefstring="extensions.threadvis.timeline.enabled"
-                                      prefdefval="true"
-                                      preftype="bool" />
-                    </expander>
-                </groupbox>
-
-                <groupbox>
-                    <expander id="size"
-                              label="&visualisation.size.caption;"
-                              open="true"
-                              persist="open"
-                              clearhidden="true">
-                        <grid flex="1">
-                            <columns>
-                                <column flex="1" />
-                                <column flex="1" />
-                            </columns>
-                            <rows>
-                                <row>
-                                    <label control="visualisation.dotsize"
-                                           value="Dotsize:" />
-                                    <menulist id="visualisation.dotsize"
-                                              preference="extensions.threadvis.visualisation.dotsize">
-                                        <menupopup>
-                                            <menuitem label="8" value="8" />
-                                            <menuitem label="12" value="12" />
-                                            <menuitem label="16" value="16" />
-                                        </menupopup>
-                                    </menulist>
-                                </row>
-                                <row>
-                                    <label control="visualisation.arcminheight"
-                                           value="Minimum Arc-Height:" />
-                                    <menulist id="visualisation.arcminheight"
-                                              preference="extensions.threadvis.visualisation.arcminheight">
-                                        <menupopup>
-                                            <menuitem label="8" value="8" />
-                                            <menuitem label="12" value="12" />
-                                            <menuitem label="16" value="16" />
-                                        </menupopup>
-                                    </menulist>
-                                </row>
-                                <row>
-                                    <label control="visualisation.arcradius"
-                                           value="Arc-Radius:" />
-                                    <menulist id="visualisation.arcradius"
-                                              preference="extensions.threadvis.visualisation.arcradius">
-                                        <menupopup>
-                                            <menuitem label="0" value="0" />
-                                            <menuitem label="8" value="8" />
-                                            <menuitem label="16" value="16" />
-                                            <menuitem label="24" value="24" />
-                                            <menuitem label="32" value="32" />
-                                            <menuitem label="40" value="40" />
-                                        </menupopup>
-                                    </menulist>
-                                </row>
-                                <row>
-                                    <label control="visualisation.arcdifference"
-                                           value="Arc-Difference:" />
-                                    <menulist id="visualisation.arcdifference"
-                                              preference="extensions.threadvis.visualisation.arcdifference">
-                                        <menupopup>
-                                            <menuitem label="2" value="2" />
-                                            <menuitem label="4" value="4" />
-                                            <menuitem label="6" value="6" />
-                                            <menuitem label="8" value="8" />
-                                            <menuitem label="10" value="10" />
-                                            <menuitem label="12" value="12" />
-                                        </menupopup>
-                                    </menulist>
-                                </row>
-                                <row>
-                                    <label control="visualisation.arcwidth"
-                                           value="Arc-Width:" />
-                                    <menulist id="visualisation.arcwidth"
-                                              preference="extensions.threadvis.visualisation.arcwidth">
-                                        <menupopup>
-                                            <menuitem label="1" value="1" />
-                                            <menuitem label="2" value="2" />
-                                            <menuitem label="3" value="3" />
-                                            <menuitem label="4" value="4" />
-                                        </menupopup>
-                                    </menulist>
-                                </row>
-                                <row>
-                                    <label control="visualisation.spacing"
-                                           value="Spacing:" />
-                                    <menulist id="visualisation.spacing"
-                                              preference="extensions.threadvis.visualisation.spacing">
-                                        <menupopup>
-                                            <menuitem label="16" value="16" />
-                                            <menuitem label="24" value="24" />
-                                            <menuitem label="32" value="32" />
-                                        </menupopup>
-                                    </menulist>
-                                </row>
-                            </rows>
-                        </grid>
-                        <separator />
-                        <groupbox>
-                            <caption label="&visualisation.defaultzoom.caption;" />
-                            <hbox>
-                                <textbox id="defaultzoomwidth"
-                                         prefstring="extensions.threadvis.zoom.width"
-                                         prefdefval="1"
-                                         preftype="int"
-                                         size="2" />
-                                <label value="&visualisation.defaultzoom.width;" />
-                            </hbox>
-                            <hbox>
-                                <textbox id="defaultzoomheight"
-                                         prefstring="extensions.threadvis.zoom.height"
-                                         prefdefval="1"
-                                         preftype="int"
-                                         size="2" />
-                                <label value="&visualisation.defaultzoom.height;" />
-                            </hbox>
-                        </groupbox>
-                    </expander>
-                </groupbox>
-
-                <groupbox>
-                    <expander id="colour"
-                              label="&visualisation.colour.caption;"
-                              open="true"
-                              persist="open"
-                              clearhidden="true">
-                        <radiogroup id="visualisationcolour"
-                                    prefstring="extensions.threadvis.visualisation.colour"
-                                    prefdefval="author"
-                                    preftype="string"
-                                    oncommand="toggleHighlight();">
-                            <radio value="single"
-                                   label="&visualisation.colour.single.caption;" />
-                            <label class="indent">
-                                &visualisation.colour.single.description;
-                            </label>
-                            <radio value="author"
-                                   label="&visualisation.colour.author.caption;"
-                                   id="visualisationcolourauthor" />
-                            <label class="indent">
-                                &visualisation.colour.author.description;
-                            </label>
-                        </radiogroup>
-                        <checkbox id="visualisationhighlight"
-                                  label="&visualisation.colour.highlight;"
-                                  prefstring="extensions.threadvis.visualisation.highlight"
-                                  prefdefval="true"
+                <tabpanel id="about" orient="vertical" flex="1">
+                    <label value="&extension.name;"
+                           id="extension-name" />
+                    <hbox>
+                        <image src="chrome://threadvis/content/images/about.png" />
+                    </hbox>
+                    <label value="&about.version; &extension.version;"
+                           id="about-version" />
+                    <description id="about-description">
+                        &extension.description;
+                    </description>
+                    <label id="about-copyright">
+                        &extension.copyright;
+                    </label>
+                    <label value="&extension.email;"
+                           onclick="writeEmail();"
+                           id="about-email" />
+                    <label href="&extension.homepage;"
+                           value="&extension.homepage;"
+                           onclick="openURL(event.target.getAttribute('href'));"
+                           id="about-homepage" />
+                    <separator class="thin" />
+                    <groupbox>
+                        <checkbox id="enablethreadvis"
+                                  label="&extension.enabled;"
+                                  preference="extensions.threadvis.enabled"
+                                  prefstring="extensions.threadvis.enabled"
                                   preftype="bool" />
-                    </expander>
-                </groupbox>
+                    </groupbox>
+                </tabpanel>
 
-                <groupbox>
-                    <expander id="enableaccount"
-                              label="&visualisation.enabledaccounts.caption;"
-                              open="true"
-                              persist="open"
-                              clearhidden="true">
-                        <textbox id="hidden_disabledaccounts"
-                               prefstring="extensions.threadvis.disabledaccounts"
-                               prefdefval="*"
-                               preftype="string"
-                               hidden="true" />
-                        <label class="indent">
-                            &visualisation.enabledaccounts.description;
-                        </label>
+                <tabpanel id="visualisation.timescaling" orient="vertical" flex="1">
+                    <radiogroup id="dotimescaling"
+                                preference="extensions.threadvis.timescaling.enabled"
+                                prefstring="extensions.threadvis.timescaling.enabled"
+                                preftype="bool">
+                        <vbox>
+                            <radio value="false"
+                                   label="&visualisation.timescaling.disable;" />
+                            <hbox class="indent">
+                                <image src="chrome://threadvis/content/images/timescaling_disabled.png" />
+                            </hbox>
+                            <separator class="thin" />
+                            <label class="indent">
+                                &visualisation.timescaling.description.disabled;
+                            </label>
+                        </vbox>
                         <separator />
-                        <vbox id="enableaccounts"
-                              style="overflow: auto;" 
-                              class="indent" />
-                        <textbox id="hidden_disabledfolders"
-                                 prefstring="extensions.threadvis.disabledfolders"
-                                 prefdefval=""
-                                 preftype="string" 
-                                 hidden="true" />
-                    </expander>
-               </groupbox>
-            </tabpanel>
+                        <vbox>
+                            <radio value="true" label="&visualisation.timescaling.enable;" />
+                            <hbox class="indent">
+                                <image src="chrome://threadvis/content/images/timescaling_enabled.png"/>
+                            </hbox>
+                            <separator class="thin" />
+                            <label class="indent">
+                                &visualisation.timescaling.description.enabled;
+                            </label>
+                        </vbox>
+                    </radiogroup>
+                    <separator class="thin" />
+                    <checkbox id="enabletimeline"
+                              label="&visualisation.timeline.enable;"
+                              preference="extensions.threadvis.timeline.enabled"
+                              prefstring="extensions.threadvis.timeline.enabled"
+                              preftype="bool" />
+                </tabpanel>
 
-            <tabpanel id="logfiles" orient="vertical" flex="1" class="overflow">
-                <groupbox>
-                    <caption label="&logfiles.caption;" />
+                <tabpanel id="visualisation.size" orient="vertical" flex="1">
+                    <grid>
+                        <columns>
+                            <column />
+                            <column />
+                            <column />
+                        </columns>
+                        <rows>
+                            <row>
+                                <label control="visualisation.dotsize"
+                                       value="&visualisation.size.dotsize;" />
+                                <menulist id="visualisation.dotsize"
+                                          preference="extensions.threadvis.visualisation.dotsize"
+                                          prefstring="extensions.threadvis.visualisation.dotsize"
+                                          preftype="int">
+                                    <menupopup>
+                                        <menuitem label="8" value="8" />
+                                        <menuitem label="12" value="12" />
+                                        <menuitem label="16" value="16" />
+                                    </menupopup>
+                                </menulist>
+                                <label value="(12)" />
+                            </row>
+                            <row>
+                                <label control="visualisation.arcminheight"
+                                       value="&visualisation.size.arcminheight;" />
+                                <menulist id="visualisation.arcminheight"
+                                          preference="extensions.threadvis.visualisation.arcminheight"
+                                          prefstring="extensions.threadvis.visualisation.arcminheight"
+                                          preftype="int">
+                                    <menupopup>
+                                        <menuitem label="8" value="8" />
+                                        <menuitem label="12" value="12" />
+                                        <menuitem label="16" value="16" />
+                                    </menupopup>
+                                </menulist>
+                                <label value="(12)" />
+                            </row>
+                            <row>
+                                <label control="visualisation.arcradius"
+                                       value="&visualisation.size.arcradius;" />
+                                <menulist id="visualisation.arcradius"
+                                          preference="extensions.threadvis.visualisation.arcradius"
+                                          prefstring="extensions.threadvis.visualisation.arcradius"
+                                          preftype="int">
+                                    <menupopup>
+                                        <menuitem label="0" value="0" />
+                                        <menuitem label="8" value="8" />
+                                        <menuitem label="16" value="16" />
+                                        <menuitem label="24" value="24" />
+                                        <menuitem label="32" value="32" />
+                                        <menuitem label="40" value="40" />
+                                    </menupopup>
+                                </menulist>
+                                <label value="(32)" />
+                            </row>
+                            <row>
+                                <label control="visualisation.arcdifference"
+                                       value="&visualisation.size.arcdifference;" />
+                                <menulist id="visualisation.arcdifference"
+                                          preference="extensions.threadvis.visualisation.arcdifference"
+                                          prefstring="extensions.threadvis.visualisation.arcdifference"
+                                          preftype="int">
+                                    <menupopup>
+                                        <menuitem label="2" value="2" />
+                                        <menuitem label="4" value="4" />
+                                        <menuitem label="6" value="6" />
+                                        <menuitem label="8" value="8" />
+                                        <menuitem label="10" value="10" />
+                                        <menuitem label="12" value="12" />
+                                    </menupopup>
+                                </menulist>
+                                <label value="(6)" />
+                            </row>
+                            <row>
+                                <label control="visualisation.arcwidth"
+                                       value="&visualisation.size.arcwidth;" />
+                                <menulist id="visualisation.arcwidth"
+                                          preference="extensions.threadvis.visualisation.arcwidth"
+                                          prefstring="extensions.threadvis.visualisation.arcwidth"
+                                          preftype="int">
+                                    <menupopup>
+                                        <menuitem label="1" value="1" />
+                                        <menuitem label="2" value="2" />
+                                        <menuitem label="3" value="3" />
+                                        <menuitem label="4" value="4" />
+                                    </menupopup>
+                                </menulist>
+                                <label value="(2)" />
+                            </row>
+                            <row>
+                                <label control="visualisation.spacing"
+                                       value="&visualisation.size.spacing;" />
+                                <menulist id="visualisation.spacing"
+                                          preference="extensions.threadvis.visualisation.spacing"
+                                          prefstring="extensions.threadvis.visualisation.spacing"
+                                          preftype="int">
+                                    <menupopup>
+                                        <menuitem label="16" value="16" />
+                                        <menuitem label="24" value="24" />
+                                        <menuitem label="32" value="32" />
+                                    </menupopup>
+                                </menulist>
+                                <label value="(24)" />
+                            </row>
+                        </rows>
+                    </grid>
+                    <separator />
+                    <groupbox>
+                        <caption label="&visualisation.defaultzoom.caption;" />
+                        <hbox>
+                            <textbox id="zoomwidth"
+                                     preference="extensions.threadvis.zoom.width"
+                                     prefstring="extensions.threadvis.zoom.width"
+                                     preftype="int"
+                                     size="2" />
+                            <label value="&visualisation.defaultzoom.width;" />
+                        </hbox>
+                        <hbox>
+                            <textbox id="zoomheight"
+                                     preference="extensions.threadvis.zoom.height"
+                                     prefstring="extensions.threadvis.zoom.height"
+                                     preftype="int"
+                                     size="2" />
+                            <label value="&visualisation.defaultzoom.height;" />
+                        </hbox>
+                    </groupbox>
+                </tabpanel>
+
+                <tabpanel id="visualisation.colour" orient="vertical" flex="1">
+                    <radiogroup id="visualisationcolour"
+                                preference="extensions.threadvis.visualisation.colour"
+                                prefstring="extensions.threadvis.visualisation.colour"
+                                preftype="string"
+                                oncommand="toggleHighlight();">
+                       <radio value="single"
+                              label="&visualisation.colour.single.caption;" />
+                       <label class="indent">
+                           &visualisation.colour.single.description;
+                       </label>
+                       <radio value="author"
+                              label="&visualisation.colour.author.caption;"
+                              id="visualisationcolourauthor" />
+                        <label class="indent">
+                           &visualisation.colour.author.description;
+                        </label>
+                    </radiogroup>
+                    <checkbox id="visualisationhighlight"
+                              label="&visualisation.colour.highlight;"
+                              class="indent"
+                              preference="extensions.threadvis.visualisation.highlight"
+                              prefstring="extensions.threadvis.visualisation.highlight"
+                              preftype="bool" />
+                    <separator />
+                    <hbox>
+                        <label control="visualisation.opacity"
+                               value="&visualisation.opacity;" />
+                        <menulist id="visualisation.opacity"
+                                  preference="extensions.threadvis.visualisation.opacity"
+                                  prefstring="extensions.threadvis.visualisation.opacity"
+                                  preftype="int">
+                            <menupopup>
+                                <menuitem label="10%" value="10" />
+                                <menuitem label="20%" value="20" />
+                                <menuitem label="30%" value="30" />
+                                <menuitem label="40%" value="40" />
+                                <menuitem label="50%" value="50" />
+                                <menuitem label="60%" value="60" />
+                                <menuitem label="70%" value="70" />
+                                <menuitem label="80%" value="80" />
+                                <menuitem label="90%" value="90" />
+                                <menuitem label="100%" value="100" />
+                            </menupopup>
+                        </menulist>
+                        <label value="(100%)" />
+                    </hbox>
+                </tabpanel>
+
+                <tabpanel id="visualisation.accountsfolders" orient="vertical" flex="1">
+                    <textbox id="hidden_disabledaccounts"
+                             preference="extensions.threadvis.disabledaccounts"
+                             prefstring="extensions.threadvis.disabledaccounts"
+                             preftype="string"
+                             hidden="true" />
+                    <label class="indent">
+                        &visualisation.enabledaccounts.description;
+                    </label>
+                    <groupbox>
+                            <vbox id="enableaccounts"
+                                style="overflow: auto;"
+                                class="indent" />
+                            <textbox id="hidden_disabledfolders"
+                                     preference="extensions.threadvis.disabledfolders"
+                                     prefstring="extensions.threadvis.disabledfolders"
+                                     preftype="string"
+                                     hidden="true" />
+                        </groupbox>
+                </tabpanel>
+
+                <tabpanel id="logfiles" orient="vertical" flex="1">
                     <checkbox id="dologging"
                               oncommand="toggleLogging();"
                               label="&logfiles.enable.checkbox;"
+                              preference="extensions.threadvis.logging.enabled"
                               prefstring="extensions.threadvis.logging.enabled"
-                              prefdefval="false"
-                              preftype="bool"/>
-                    <label class="indent">
+                              preftype="bool" />
+                    <label class="indent detaileddescription">
                         &logfiles.enable.description.whatlogged;
                         &logfiles.enable.description.sending;
                     </label>
                     <separator class="thin" />
-                    <checkbox id="dologgingdebug"
-                              label="&logfiles.debug.checkbox;"
-                              prefstring="extensions.threadvis.logging.debug"
-                              prefdefval="false"
-                              preftype="bool"/>
                     <hbox>
-                        <label class="indent detaileddescription" 
+                        <checkbox id="dologgingdebug"
+                                  label="&logfiles.debug.checkbox;"
+                                  preference="extensions.threadvis.logging.debug"
+                                  prefstring="extensions.threadvis.logging.debug"
+                                  preftype="bool" />
+                        <label class="indent detaileddescription"
                                control="logdebuglevel"
-                               value="Debug Level:" />
+                               value="&logfiles.debug.level;" />
                         <textbox class="indent detaileddescription"
-                                 id="logdebuglevel"
+                                 id="dologgingdebuglevel"
+                                 preference="extensions.threadvis.logging.debug.level"
                                  prefstring="extensions.threadvis.logging.debug.level"
-                                 prefdefval="0"
                                  preftype="int"
                                  size="2" />
                     </hbox>
-                    <label class="indent">
+                    <label class="indent detaileddescription">
                         &logfiles.debug.description.general;
                         &logfiles.debug.description.personalinfo;
                         &logfiles.debug.description.size;
                     </label>
-                </groupbox>
-                <separator class="thin" />
-                <button id="sendlog"
-                        label="&logfiles.send.button;"
-                        oncommand="sendLogfiles();"
-                        tooltiptext="&logfiles.send.tooltip;" />
-                <separator class="thin" />
-                <button id="resetlog"
-                        label="&logfiles.reset.button;"
-                        oncommand="resetLogfiles();"
-                        tooltiptext="&logfiles.reset.tooltip;" />
-            </tabpanel>
+                    <separator class="thin" />
+                    <button id="sendlog"
+                            label="&logfiles.send.button;"
+                            oncommand="sendLogfiles();"
+                            tooltiptext="&logfiles.send.tooltip;" />
+                    <separator class="thin" />
+                    <button id="resetlog"
+                            label="&logfiles.reset.button;"
+                            oncommand="resetLogfiles();"
+                            tooltiptext="&logfiles.reset.tooltip;" />
+                </tabpanel>
 
-        </tabpanels>
+            </tabpanels>
 
-    </tabbox>
+        </tabbox>
 
 </page>

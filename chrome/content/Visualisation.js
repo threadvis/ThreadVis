@@ -78,6 +78,16 @@ Visualisation.prototype.calculateArcHeights = function(containers)
                      innercounter++)
                 {
                     var lookatcontainer = containers[innercounter];
+                    
+                    /*
+                    if (lookatcontainer.getParent() == parent &&
+                        lookatcontainer.x_index_ == thiscontainer.x_index_ - 1)
+                    {
+                        free_height = lookatcontainer.arc_height_;
+                        break;
+                    }
+                    */
+                    
                     if (lookatcontainer.odd_ == parent.odd_ && 
                         lookatcontainer.current_arc_height_outgoing_[free_height] == 1)
                     {
@@ -262,7 +272,7 @@ Visualisation.prototype.colourAuthors = function(authors)
             hsv = author.hsv;
         
         if (hsv && pref_highlight)
-            emailfield.style.borderBottom = "2px solid " + this.getColour(hsv.hue, 0, hsv.value);
+            emailfield.style.borderBottom = "2px solid " + this.getColour(hsv.hue, 100, hsv.value);
         else
             emailfield.style.borderBottom = "";
     }
@@ -283,7 +293,7 @@ Visualisation.prototype.convertHSVtoRGB = function(hue,
     
     if (s == 0)
     {
-        return {"r" : value * 255, "g" : value * 255, "b" : value * 255};
+        return {"r" : v * 255, "g" : v * 255, "b" : v * 255};
     }
     else
     {
@@ -357,7 +367,7 @@ Visualisation.prototype.createLegendBox = function(hsv, name, count)
     var box = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "hbox");
     
     var colourbox = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "hbox");
-    colourbox.style.background = this.getColour(hsv.hue, 0, hsv.value);
+    colourbox.style.background = this.getColour(hsv.hue, 100, hsv.value);
     colourbox.style.width = "20px";
     box.appendChild(colourbox);
     
@@ -441,7 +451,8 @@ Visualisation.prototype.drawArc = function(colour,
                                            height,
                                            left,
                                            right,
-                                           top)
+                                           top,
+                                           opacity)
 {
     var pref_dotsize = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_DOTSIZE_);
     var pref_arc_minheight = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_ARC_MINHEIGHT_);
@@ -461,7 +472,8 @@ Visualisation.prototype.drawArc = function(colour,
                                    height,
                                    left,
                                    right,
-                                   top);
+                                   top,
+                                   opacity);
     return arc;
 }
 
@@ -476,7 +488,8 @@ Visualisation.prototype.drawDot = function(container,
                                            top,
                                            selected,
                                            circle,
-                                           flash)
+                                           flash,
+                                           opacity)
 {
     var pref_dotsize = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_DOTSIZE_);
     var pref_spacing = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_SPACING_);
@@ -492,7 +505,8 @@ Visualisation.prototype.drawDot = function(container,
                                          this.resize_,
                                          circle,
                                          flash,
-                                         pref_spacing);
+                                         pref_spacing,
+                                         opacity);
     return msg;
 }
 
@@ -503,11 +517,12 @@ Visualisation.prototype.drawDot = function(container,
  ******************************************************************************/
 Visualisation.prototype.getColour = function(hue, saturation, value)
 {
+    /*
     if (! value)
         value = 100;
     if (! saturation)
         saturation = 100;
-
+    */
     rgb = this.convertHSVtoRGB(hue, saturation, value);
 
     return "#" + this.DECtoHEX(Math.floor(rgb.r)) + 
@@ -905,6 +920,7 @@ Visualisation.prototype.visualise = function(container)
     var pref_default_zoom_width = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_ZOOM_WIDTH_);
     var pref_colour = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_COLOUR_);
     var pref_timeline = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_TIMELINE_);
+    var pref_opacity = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_OPACITY_) / 100;
 
     // check if we are still in the same thread as last time
     // check if visualisation parameters changed
@@ -986,6 +1002,8 @@ Visualisation.prototype.visualise = function(container)
         var selected = thiscontainer == container;
 
         var colour = this.COLOUR_DUMMY_;
+        var opacity = 1;
+        var hsv = {"hue" : 60, "saturation" : 6.8, "value" : 45.9};
         if (! thiscontainer.isDummy())
         {
             if (pref_colour == "single")
@@ -999,21 +1017,22 @@ Visualisation.prototype.visualise = function(container)
             {
                 if (this.authors_[thiscontainer.getMessage().getFromEmail()] != null)
                 {
-                    var hsv = this.authors_[thiscontainer.getMessage().getFromEmail()].hsv;
+                    hsv = this.authors_[thiscontainer.getMessage().getFromEmail()].hsv;
                     this.authors_[thiscontainer.getMessage().getFromEmail()].count = 
                     this.authors_[thiscontainer.getMessage().getFromEmail()].count + 1;
                 }
                 else
                 {
-                    var hsv = this.getNewColour();
+                    hsv = this.getNewColour();
                     this.authors_[thiscontainer.getMessage().getFromEmail()] = {"hsv" : hsv,
                                                                                 "name" : thiscontainer.getMessage().getFrom(),
                                                                                 "count" : 1};
                 }
-                if (selected)
-                    colour = this.getColour(hsv.hue, 0, hsv.value);
+                colour = this.getColour(hsv.hue, 100, hsv.value);
+                if (selected || thiscontainer.findChild(container) || container.findChild(thiscontainer))
+                    opacity = 1;
                 else
-                    colour = this.getColour(hsv.hue, 75, hsv.value);
+                    opacity = pref_opacity;
             }
         }
 
@@ -1032,7 +1051,8 @@ Visualisation.prototype.visualise = function(container)
                          topheight,
                          selected,
                          circle,
-                         flash);
+                         flash,
+                         opacity);
 
         thiscontainer.x_position_ = x;
 
@@ -1048,14 +1068,20 @@ Visualisation.prototype.visualise = function(container)
             // if we are using a single colour, display all arcs from
             // a selected message in this colour
             if (pref_colour == "single")
-                colour = parent == container || selected ? this.COLOUR_SINGLE_ : this.COLOUR_DUMMY_;
+            {
+                if (selected || thiscontainer.findChild(container) || container.findChild(thiscontainer))
+                    colour = this.COLOUR_SINGLE_;
+                else
+                    colour = this.COLOUR_DUMMY_;
+            }
             else
             {
                 // get colour for arc
-                if (selected || parent == container)
-                    colour = this.getColour(hsv.hue, 0, hsv.value);
+                colour = this.getColour(hsv.hue, 100, hsv.value);
+                if (selected || thiscontainer.findChild(container) || container.findChild(thiscontainer))
+                    opacity = 1;
                 else
-                    colour = this.getColour(hsv.hue, 75, hsv.value);
+                    opacity = pref_opacity;
             }
 
             this.arcvisualisations_[thiscontainer] =
@@ -1064,7 +1090,8 @@ Visualisation.prototype.visualise = function(container)
                              arc_height,
                              parent.x_position_,
                              x,
-                             topheight);
+                             topheight,
+                             opacity);
         }
         x = x + (thiscontainer.x_scaled_ * pref_spacing);
     }
@@ -1136,6 +1163,7 @@ Visualisation.prototype.visualiseExisting = function(container)
     var pref_default_zoom_width = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_ZOOM_WIDTH_);
     var pref_colour = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_COLOUR_);
     var pref_timeline = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_TIMELINE_);
+    var pref_opacity = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_OPACITY_) / 100;
 
     // remember current container to redraw after zoom
     this.currentcontainer_ = container;
@@ -1199,42 +1227,67 @@ Visualisation.prototype.visualiseExisting = function(container)
         }
 
         var colour = this.COLOUR_DUMMY_;
+        var opacity = 1;
+        var hsv = {"hue" : 60, "saturation" : 6.8, "value" : 45.9};
         if (! thiscontainer.isDummy())
         {
             // get colour for dot
             if (pref_colour == "single")
-                colour = selected ? this.COLOUR_SINGLE_ : this.COLOUR_DUMMY_;
+            {
+                if (selected)
+                    colour = this.COLOUR_SINGLE_;
+                else
+                    colour = this.COLOUR_DUMMY_;
+            }
             else
             {
-                var hsv = this.authors_[thiscontainer.getMessage().getFromEmail()].hsv;
-                if (selected)
-                    var colour = this.getColour(hsv.hue, 0, hsv.value);
+                hsv = this.authors_[thiscontainer.getMessage().getFromEmail()].hsv;
+                colour = this.getColour(hsv.hue, 100, hsv.value);
+                if (selected || container.findChild(thiscontainer) || thiscontainer.findChild(container))
+                    opacity = 1;
                 else
-                    var colour = this.getColour(hsv.hue, 75, hsv.value);
+                    opacity = pref_opacity;
             }
         }
 
         // draw dot
-        this.containervisualisations_[thiscontainer].redraw(this.resize_, x, topheight, selected, flash, colour);
+        this.containervisualisations_[thiscontainer].redraw(this.resize_,
+                                                            x,
+                                                            topheight,
+                                                            selected,
+                                                            flash,
+                                                            colour,
+                                                            opacity);
 
         thiscontainer.x_position_ = x;
 
         // get colour for arc
         if (pref_colour == "single")
-            colour = thiscontainer.getParent() == container || selected ? this.COLOUR_SINGLE_ : this.COLOUR_DUMMY_;
+        {
+            if (selected || thiscontainer.findChild(container) || container.findChild(thiscontainer))
+                colour = this.COLOUR_SINGLE_;
+            else
+                colour = this.COLOUR_DUMMY_;
+        }
         else
         {
-            if (selected || thiscontainer.getParent() == container)
-                colour = this.getColour(hsv.hue, 0, hsv.value);
+            colour = this.getColour(hsv.hue, 100, hsv.value);
+            if (selected || thiscontainer.findChild(container) || container.findChild(thiscontainer))
+                opacity = 1;
             else
-                colour = this.getColour(hsv.hue, 75, hsv.value);
+                opacity = pref_opacity;
         }
 
         // draw arc
         var parent = thiscontainer.getParent()
         if (parent != null && ! parent.isRoot())
         {
-            this.arcvisualisations_[thiscontainer].redrawArc(this.resize_, parent.x_position_, x, topheight, colour)
+            this.arcvisualisations_[thiscontainer].redrawArc(this.resize_,
+                                                             parent.x_position_,
+                                                             x,
+                                                             topheight,
+                                                             colour,
+                                                             opacity)
         }
         
         x = x + (thiscontainer.x_scaled_ * pref_spacing);

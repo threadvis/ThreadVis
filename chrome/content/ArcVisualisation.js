@@ -25,7 +25,8 @@ function ArcVisualisation(stack,
                           height,
                           left,
                           right,
-                          top)
+                          top,
+                          opacity)
 {
     /**
      * XUL stack on which to draw
@@ -93,6 +94,11 @@ function ArcVisualisation(stack,
      */
     this.top_ = top;
 
+    /**
+     * opacity of item
+     */
+    this.opacity_ = opacity;
+
 
     THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_, 
                                "ArcVisualisation()",
@@ -124,13 +130,19 @@ ArcVisualisation.prototype.drawArc = function()
 /** ****************************************************************************
  * Re-Draw arc
  ******************************************************************************/
-ArcVisualisation.prototype.redrawArc = function(resize, left, right, top, colour)
+ArcVisualisation.prototype.redrawArc = function(resize,
+                                                left,
+                                                right,
+                                                top,
+                                                colour,
+                                                opacity)
 {
     this.resize_ = resize;
     this.left_ = left;
     this.top_ = top;
     this.right_ = right;
     this.colour_ = colour;
+    this.opacity_ = opacity;
     
     this.visualise();
 }
@@ -156,6 +168,7 @@ ArcVisualisation.prototype.visualise = function()
                        this.resize_) + "px";
     var style_width = ((this.right_ - this.left_ + this.arc_width_) * this.resize_)+ "px";
     var style_background = this.colour_;
+    var style_opacity = this.opacity_;
     
     THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_, 
                                "Visualisation.drawArc()",
@@ -173,6 +186,7 @@ ArcVisualisation.prototype.visualise = function()
     this.arc_.style.height = style_height;
     this.arc_.style.width = style_width;
     this.arc_.style.verticalAlign = "top";
+    this.arc_.style.opacity = style_opacity;
     if (this.vposition_ == "top")
     {
         this.arc_.style.MozBorderRadiusTopleft = this.arc_radius_ + "px";

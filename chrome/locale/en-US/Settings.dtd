@@ -50,6 +50,7 @@
 <!ENTITY visualisation.colour.author.caption                "Multiple Colours">
 <!ENTITY visualisation.colour.author.description            "Use different colours for different authors.">
 <!ENTITY visualisation.colour.highlight                     "Underline authors in header display with their colours.">
+<!ENTITY visualisation.opacity                              "Fade out nonrelevant conversation paths.">
 <!ENTITY about.tab                                          "About">
 <!ENTITY about.version                                      "Version">
 <!ENTITY extension.description                              "Displays a small graphic visualising the thread (context) of the currently selected email.">

@@ -24,7 +24,8 @@ function ContainerVisualisation(stack,
                                 resize,
                                 circle,
                                 flash,
-                                spacing)
+                                spacing,
+                                opacity)
 {
     /**
      * XUL stack on which container gets drawn
@@ -90,6 +91,11 @@ function ContainerVisualisation(stack,
      * the spacing between two messages in px
      */
     this.spacing_ = spacing;
+
+    /**
+     * the opacity of the item
+     */
+    this.opacity_ = opacity;
 
     // calculate style
     // full == received message
@@ -517,7 +523,8 @@ ContainerVisualisation.prototype.redraw = function(resize,
                                                    top,
                                                    selected,
                                                    flash,
-                                                   colour)
+                                                   colour,
+                                                   opacity)
 {
     this.resize_ = resize;
     this.left_ = left;
@@ -525,6 +532,7 @@ ContainerVisualisation.prototype.redraw = function(resize,
     this.selected_ = selected;
     this.flash_ = flash;
     this.colour_ = colour;
+    this.opacity_ = opacity;
     
     this.redrawDot();
     this.redrawCircle("black");
@@ -688,6 +696,7 @@ ContainerVisualisation.prototype.visualiseDot = function()
     var style_width = (this.dotsize_ * this.resize_) + "px";
     var style_background = "";
     var style_border = "";
+    var style_opacity = this.opacity_;
     if (this.style_ != "half")
         style_background = this.colour_;
     else
@@ -711,6 +720,7 @@ ContainerVisualisation.prototype.visualiseDot = function()
     this.dot_.style.verticalAlign = "top";
     this.dot_.style.background = style_background;
     this.dot_.style.border = style_border;
+    this.dot_.style.opacity = style_opacity;
     if (this.style_ != "dummy")
         this.dot_.style.MozBorderRadius = style_width;
     else

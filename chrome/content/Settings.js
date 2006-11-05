@@ -24,9 +24,6 @@ function init()
     toggleHighlight();
     buildAccountList();
     buildAccountPreference();
-    /** FIXXME
-    displayExample();
-    **/
 }
 
 
@@ -370,7 +367,7 @@ function resetLogfiles()
     if (logger)
         logger.reset(true);
     else
-        alert(parent.document.getElementById("ThreadVisStrings").getString("logger.couldnotdeletefile"));
+        alert(document.getElementById("ThreadVisStrings").getString("logger.couldnotdeletefile"));
 }
 
 
@@ -427,41 +424,3 @@ function writeEmail()
     composeEmail("xpert@sbox.tugraz.at",
                  "[ThreadVis] <insert subject here>", null)
 }
-
-/** FIXXME
-function displayExample()
-{
-    alert("vis");
-    var dotsize = document.getElementById("visualisation.dotsize").value;
-    THREADVIS.preferences_.setPreference(THREADVIS.preferences_.PREF_VIS_DOTSIZE_, dotsize, THREADVIS.preferences_.PREF_INT_);
-
-    var arcminheight = document.getElementById("visualisation.arcminheight").value;
-    THREADVIS.preferences_.setPreference(THREADVIS.preferences_.PREF_VIS_ARC_MINHEIGHT_, arcminheight, THREADVIS.preferences_.PREF_INT_);
-
-    var arcradius = document.getElementById("visualisation.arcradius").value;
-    THREADVIS.preferences_.setPreference(THREADVIS.preferences_.PREF_VIS_ARC_RADIUS_, arcradius, THREADVIS.preferences_.PREF_INT_);
-
-    var arcdifference = document.getElementById("visualisation.arcdifference").value;
-    THREADVIS.preferences_.setPreference(THREADVIS.preferences_.PREF_VIS_ARC_DIFFERENCE_, arcdifference, THREADVIS.preferences_.PREF_INT_);
-
-    var arcwidth = document.getElementById("visualisation.arcwidth").value;
-    THREADVIS.preferences_.setPreference(THREADVIS.preferences_.PREF_VIS_ARC_WIDTH_, arcwidth, THREADVIS.preferences_.PREF_INT_);
-
-    var spacing = document.getElementById("visualisation.spacing").value;
-    THREADVIS.preferences_.setPreference(THREADVIS.preferences_.PREF_VIS_SPACING_, spacing, THREADVIS.preferences_.PREF_INT_);
-
-    var cont1 = new Container(false);
-    cont1.setMessage(new Message("Message 1", "From", "msgid1", "1", new Date(2000,0,1,12,0,0), "folder", "", false));
-    var cont2 = new Container(false);
-    cont2.setMessage(new Message("Message 2", "From", "msgid2", "2", new Date(2000,0,1,13,0,0), "folder", "", false));
-    var cont3 = new Container(false);
-    cont3.setMessage(new Message("Message 3", "From", "msgid3", "3", new Date(2000,0,1,14,0,0),"folder", "", false));
-    var root = new Container(true);
-    cont1.addChild(cont2);
-    cont2.addChild(cont3);
-    
-    THREADVIS.visualisation_.currentcontainer_ = null;
-    THREADVIS.visualisation_.visualise(cont1);
-}
-
-*/
