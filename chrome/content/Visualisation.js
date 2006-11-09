@@ -1163,7 +1163,7 @@ Visualisation.prototype.visualiseExisting = function(container)
     var pref_default_zoom_width = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_ZOOM_WIDTH_);
     var pref_colour = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_COLOUR_);
     var pref_timeline = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_TIMELINE_);
-    var pref_opacity = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_OPACITY_) / 100;
+    var pref_opacity = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_OPACITY_) / 100;
 
     // remember current container to redraw after zoom
     this.currentcontainer_ = container;
