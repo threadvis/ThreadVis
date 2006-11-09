@@ -12,5 +12,5 @@
  ******************************************************************************/
 -->
 <dialog xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        onload="window.opener.opener.openOptionsDialog('threadvis', 'chrome://threadvis/content/Settings.xul','threadvis'); window.close();">
+        onload="window.opener.opener.THREADVIS.openThreadVisOptionsDialog(); window.close();">
 </dialog>

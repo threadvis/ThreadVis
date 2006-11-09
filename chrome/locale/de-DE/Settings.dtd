@@ -53,7 +53,7 @@
 <!ENTITY visualisation.opacity                              "Unwichtige Konversations-Teile ausblenden.">
 <!ENTITY about.tab                                          "Info">
 <!ENTITY about.version                                      "Version">
-<!ENTITY extension.description                              "Zeigt eine kleine Grafik, die den Kontext der aktuell angezeigten Nachricht visualisiert.">
+<!ENTITY extension.description                              "Zeigt eine kleine Grafik, die den Kontext (Thread) der aktuell angezeigten Nachricht visualisiert.">
 <!ENTITY extension.copyright                                "&#xA9; 2004-2006 Alexander C. Hubmann">
 <!ENTITY extension.homepage                                 "http://www.sbox.tugraz.at/home/x/xpert/threadvis/">
 <!ENTITY extension.email                                    "xpert@sbox.tugraz.at">

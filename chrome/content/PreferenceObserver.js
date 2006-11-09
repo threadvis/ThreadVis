@@ -148,7 +148,7 @@ PreferenceObserver.prototype.preferenceReload = function()
     this.loadPreference(this.PREF_VIS_SPACING_, this.pref_branch_.PREF_INT, 24);
     this.loadPreference(this.PREF_VIS_COLOUR_, this.pref_branch_.PREF_STRING, "author");
     this.loadPreference(this.PREF_VIS_HIGHLIGHT_, this.pref_branch_.PREF_BOOL, true);
-    this.loadPreference(this.PREF_VIS_OPACITY_, this.pref_branch_.PREF_INT, 20);
+    this.loadPreference(this.PREF_VIS_OPACITY_, this.pref_branch_.PREF_INT, 30);
     this.loadPreference(this.PREF_ZOOM_HEIGHT_, this.pref_branch_.PREF_INT, 1);
     this.loadPreference(this.PREF_ZOOM_WIDTH_, this.pref_branch_.PREF_INT, 1);
 }

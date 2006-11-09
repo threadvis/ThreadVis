@@ -25,6 +25,6 @@ pref("extensions.threadvis.visualisation.colour", "author");
 pref("extensions.threadvis.visualisation.dotsize", 12);
 pref("extensions.threadvis.visualisation.highlight", true);
 pref("extensions.threadvis.visualisation.spacing", 24);
-pref("extensions.threadvis.visualisation.opacity", 20);
+pref("extensions.threadvis.visualisation.opacity", 30);
 pref("extensions.threadvis.zoom.height", 1);
 pref("extensions.threadvis.zoom.width", 1);
