@@ -12,6 +12,7 @@
  ******************************************************************************/
 -->
 <!DOCTYPE overlay SYSTEM "chrome://threadvis/locale/Settings.dtd">
+<?xml-stylesheet href="chrome://threadvis/content/Settings.css" type="text/css"?>
 <overlay id="ThreadVisPreferences"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 

@@ -13,12 +13,11 @@
  ******************************************************************************/
 -->
 <?xml-stylesheet href="chrome://threadvis/content/Settings.css" type="text/css"?>
-<?xml-stylesheet href="chrome://threadvis/content/Expander.css" type="text/css"?>
 
 <!DOCTYPE overlay SYSTEM "chrome://threadvis/locale/Settings.dtd">
 <overlay id="ThreadVisPaneOverlay"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-           
+
     <prefpane id="paneThreadVis" onpaneload="init();">
 
         <script type="application/x-javascript"
