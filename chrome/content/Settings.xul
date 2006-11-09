@@ -13,7 +13,6 @@
 <?xml-stylesheet href="chrome://communicator/skin/pref/pref.css" type="text/css"?>
 <?xml-stylesheet href="chrome://communicator/skin/" type="text/css"?>
 <?xml-stylesheet href="chrome://threadvis/content/Settings.css" type="text/css"?>
-<?xml-stylesheet href="chrome://threadvis/content/Expander.css" type="text/css"?>
 
 <!DOCTYPE page SYSTEM "chrome://threadvis/locale/Settings.dtd">
 <page xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
