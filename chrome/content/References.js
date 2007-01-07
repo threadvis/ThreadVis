@@ -18,10 +18,9 @@
 function References(references)
 {
     // Store message ids of references
-    this.references_ = new Array;
+    this.references_ = new Object();
 
     this.buildReferences(references);
-    this.cleanReferences();
 }
 
 
@@ -33,45 +32,12 @@ References.prototype.buildReferences = function(references)
 {
     if (references != null && references != "")
     {
-        var splitted = references.split(/\s/);
-        for (key in splitted)
-        {
-            var reference = splitted[key];
-            reference = reference.replace(/\s/g, "");
-            reference = reference.replace(/</, "");
-            reference = reference.replace(/>/, "");
-            if (reference == "")
-                continue;
-            this.references_.push(reference);
-        }
+        var result = references.match(/[^<>\s]+/g);
+        
+        if (result)
+            for (var i = 0; i < result.length; i++)
+                this.references_[result[i]] = result[i];
     }
-}
-
-
-
-/** ****************************************************************************
- * kill dupes in references array
- ******************************************************************************/
-References.prototype.cleanReferences = function()
-{
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                               "REFERENCES",
-                               {"total references": this.references_.join(" ")});
-    
-    var count = this.references_.length;
-    for (var i = count; i > 0; i--)
-    {
-        var outer = this.references_[i];
-        for (var j = i-1; j >= 0; j--)
-        {
-            var inner = this.references_[j];
-            if (outer == inner)
-                this.references_.splice(j, 1);
-        }
-    }
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                               "REFERENCES",
-                               {"after references": this.references_.join(" ")});
 }
 
 

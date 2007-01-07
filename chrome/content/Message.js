@@ -38,12 +38,6 @@ function Message(subject,
     this.folder_ = folder;
 
     /**
-     * header parser service provided by mozilla
-     */
-    this.header_parser_ = Components.classes["@mozilla.org/messenger/headerparser;1"]
-                            .getService(Components.interfaces.nsIMsgHeaderParser);
-
-    /**
      * if folder stores sent mails
      */
     this.issent_ = issent;
@@ -122,7 +116,8 @@ Message.prototype.getFromEmail = function()
 {
     // parse email address
     var email = this.getFrom();
-    email = this.header_parser_.extractHeaderAddressMailboxes(null, email);
+    email = Components.classes["@mozilla.org/messenger/headerparser;1"]
+            .getService(Components.interfaces.nsIMsgHeaderParser).extractHeaderAddressMailboxes(null, email);
     return email;
 }
 
@@ -268,14 +263,14 @@ Message.prototype.setSent = function(sent)
  ******************************************************************************/
 Message.prototype.toString = function()
 {
-    return "Message: Subject: '" + this.getSubject() +
-                 "'. From: '" + this.getFrom() +
-                 "'. MsgId: '" + this.getId() +
-                 "'. MsgKey: '" + this.getKey() +
-                 "'. Date: '" + this.getDate() +
-                 "'. Folder: '" + this.getFolder() +
-                 "'. Refs: '" + this.getReferences() +
-                 "'. Sent: '" + this.isSent() + "'";
+    return "Message: Subject: '" + this.subject_ +
+                 "'. From: '" + this.from_ +
+                 "'. MsgId: '" + this.message_id_ +
+                 "'. MsgKey: '" + this.message_key_ +
+                 "'. Date: '" + this.date_ +
+                 "'. Folder: '" + this.folder_ +
+                 "'. Refs: '" + this.references_ +
+                 "'. Sent: '" + this.issent_ + "'";
 }
 
 

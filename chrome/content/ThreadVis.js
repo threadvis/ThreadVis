@@ -77,6 +77,10 @@ function ThreadVis(threadvis_parent)
 
     // if parent object exists, reuse some of the internal objects
     this.threadvis_parent_ = threadvis_parent;
+    
+    // cache enabled account/folder
+    this.cache_key_check_enabled_account_or_folder_ = null;
+    this.cache_value_check_enabled_account_or_folder_ = null;
 }
 
 
@@ -92,14 +96,14 @@ ThreadVis.prototype.addMessage = function(header)
         return
 
 
-    this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
-                          "ThreadVis.addMessage()",
-                          {});
+//    this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
+//                          "ThreadVis.addMessage()",
+//                          {});
     var date = new Date();
     // PRTime is in microseconds, Javascript time is in milliseconds
     // so divide by 1000 when converting
     date.setTime(header.date / 1000);
-
+    
     var message = new Message(header.mime2DecodedSubject,
                               header.mime2DecodedAuthor,
                               header.messageId,
@@ -173,17 +177,17 @@ ThreadVis.prototype.addMessagesFromFolder = function(folder)
 
     if (this.add_messages_from_folder_done_)
     {
-        this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
-                              "ThreadVis.addMessagesFromFolder()",
-                              {"folder" : folder.URI,
-                               "action" : "end"});
+//        this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
+//                              "ThreadVis.addMessagesFromFolder()",
+//                              {"folder" : folder.URI,
+//                               "action" : "end"});
         return;
     }
 
-    this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
-                          "ThreadVis.addMessagesFromFolder()",
-                          {"folder" : folder.URI,
-                           "action" : "start"});
+//    this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
+//                          "ThreadVis.addMessagesFromFolder()",
+//                          {"folder" : folder.URI,
+//                           "action" : "start"});
 
     // get messages from current folder
     try
@@ -192,10 +196,10 @@ ThreadVis.prototype.addMessagesFromFolder = function(folder)
     }
     catch (exception)
     {
-        this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
-                              "ThreadVis.addMessagesFromFolder()",
-                              {"folder" : folder.URI,
-                               "action" : "caught exception " + exception});
+//        this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
+//                              "ThreadVis.addMessagesFromFolder()",
+//                              {"folder" : folder.URI,
+//                               "action" : "caught exception " + exception});
         this.add_messages_from_folder_done_ = true;
         this.add_messages_from_folder_doing_ = false;
         return;
@@ -222,18 +226,18 @@ ThreadVis.prototype.addMessagesFromFolderEnumerator = function(enumerator)
         return
 
 
-    this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
-                          "ThreadVis.addMessagesFromFolderEnumerator()",
-                          {"action" : "start"});
+//    this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
+//                          "ThreadVis.addMessagesFromFolderEnumerator()",
+//                          {"action" : "start"});
     var header = null;
     while (enumerator.hasMoreElements())
     {
         this.add_messages_from_folder_enumerator_counter_++;
         if (this.add_messages_from_folder_enumerator_counter_ >= this.add_messages_from_folder_enumerator_maxcounter_)
         {
-            this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
-                                  "ThreadVis.addMessagesFromFolderEnumerator()",
-                                  {"action" : "pause"});
+//            this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
+//                                  "ThreadVis.addMessagesFromFolderEnumerator()",
+//                                  {"action" : "pause"});
             var ref = this;
             this.add_messages_from_folder_enumerator_counter_ = 0;
             setTimeout(function() {ref.addMessagesFromFolderEnumerator(enumerator);}, 10);
@@ -247,9 +251,9 @@ ThreadVis.prototype.addMessagesFromFolderEnumerator = function(enumerator)
         }
     }
 
-    this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
-                          "ThreadVis.addMessagesFromFolderEnumerator()",
-                          {"action" : "end"});
+//    this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
+//                          "ThreadVis.addMessagesFromFolderEnumerator()",
+//                          {"action" : "end"});
     this.add_messages_from_folder_done_ = true;
     this.add_messages_from_folder_doing_ = false;
 }
@@ -315,6 +319,10 @@ ThreadVis.prototype.checkEnabledAccountOrFolder = function(folder)
     if (! folder)
         return false;
 
+    // get from cache
+    if (this.cache_key_check_enabled_account_or_folder_ == folder)
+        return this.cache_value_check_enabled_account_or_folder_;
+
     var server = folder.server;
     var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
                    .getService(Components.interfaces.nsIMsgAccountManager))
@@ -325,10 +333,12 @@ ThreadVis.prototype.checkEnabledAccountOrFolder = function(folder)
     if (this.preferences_.getPreference(this.preferences_.PREF_DISABLED_ACCOUNTS_) != "" && 
         this.preferences_.getPreference(this.preferences_.PREF_DISABLED_ACCOUNTS_).match(regexp_account))
     {
-        this.logger_.logDebug(this.logger_.LEVEL_INFORM_,
-                              "accountdisabled",
-                              {"total_regexp" : this.preferences_.getPreference(this.preferences_.PREF_DISABLED_ACCOUNTS_),
-                               "this_account" : account.key});
+//        this.logger_.logDebug(this.logger_.LEVEL_INFORM_,
+//                              "accountdisabled",
+//                              {"total_regexp" : this.preferences_.getPreference(this.preferences_.PREF_DISABLED_ACCOUNTS_),
+//                               "this_account" : account.key});
+        this.cache_key_check_enabled_account_or_folder_ = folder;
+        this.cache_value_check_enabled_account_or_folder_ = false;
         return false;
     }
     else
@@ -337,14 +347,18 @@ ThreadVis.prototype.checkEnabledAccountOrFolder = function(folder)
         if (this.preferences_.getPreference(this.preferences_.PREF_DISABLED_FOLDERS_) != "" && 
             this.preferences_.getPreference(this.preferences_.PREF_DISABLED_FOLDERS_).match(regexp_folder))
         {
-            this.logger_.logDebug(this.logger_.LEVEL_INFORM_,
-                                  "folderdisabled",
-                                  {"total_regexp" : this.preferences_.getPreference(this.preferences_.PREF_DISABLED_FOLDERS_),
-                                   "this_folder" : folder.URI});
+//            this.logger_.logDebug(this.logger_.LEVEL_INFORM_,
+//                                  "folderdisabled",
+//                                  {"total_regexp" : this.preferences_.getPreference(this.preferences_.PREF_DISABLED_FOLDERS_),
+//                                   "this_folder" : folder.URI});
+            this.cache_key_check_enabled_account_or_folder_ = folder;
+            this.cache_value_check_enabled_account_or_folder_ = false;
             return false;
         }
         else
         {
+            this.cache_key_check_enabled_account_or_folder_ = folder;
+            this.cache_value_check_enabled_account_or_folder_ = true;
             return true;
         }
     }
@@ -357,9 +371,9 @@ ThreadVis.prototype.checkEnabledAccountOrFolder = function(folder)
  ******************************************************************************/
 ThreadVis.prototype.clearVisualisation = function()
 {
-    this.logger_.logDebug(this.logger_.LEVEL_VIS_,
-                          "ThreadVis.clearVisualisation()",
-                          {"clear" : this.clear_});
+//    this.logger_.logDebug(this.logger_.LEVEL_VIS_,
+//                          "ThreadVis.clearVisualisation()",
+//                          {"clear" : this.clear_});
 
     if (! this.preferences_.getPreference(this.preferences_.PREF_ENABLED_) )
     {
@@ -500,9 +514,9 @@ ThreadVis.prototype.doThreading = function()
         return
 
 
-    this.logger_.logDebug(this.logger_.LEVEL_INFORM_,
-                          "ThreadVis.doThreading()",
-                          {});
+//    this.logger_.logDebug(this.logger_.LEVEL_INFORM_,
+//                          "ThreadVis.doThreading()",
+//                          {});
     if (! this.threading_ && ! this.threaded_)
     {
         this.threading_ = true;
@@ -536,9 +550,9 @@ ThreadVis.prototype.getAllFolders = function(folder)
         return
 
 
-    this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
-                          "ThreadVis.getAllFolders()",
-                          {"folder" : folder.URI});
+//    this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
+//                          "ThreadVis.getAllFolders()",
+//                          {"folder" : folder.URI});
     var folder_enumerator = folder.GetSubFolders();
     var current_folder = null;
     while (true)
@@ -756,9 +770,9 @@ ThreadVis.prototype.initMessages = function()
         return
 
 
-    this.logger_.logDebug(this.logger_.LEVEL_INFORM_,
-                          "ThreadVis.initMessages()",
-                          {});
+//    this.logger_.logDebug(this.logger_.LEVEL_INFORM_,
+//                          "ThreadVis.initMessages()",
+//                          {});
     if (! this.loaded_ && ! this.loading_)
     {
         this.loading_ = true;
@@ -990,9 +1004,9 @@ ThreadVis.prototype.setSelectedMessage = function()
         return;
     }
     
-    this.logger_.logDebug(this.logger_.LEVEL_INFORM_,
-                          "ThreadVis.setSelectedMessage()",
-                          {});
+//    this.logger_.logDebug(this.logger_.LEVEL_INFORM_,
+//                          "ThreadVis.setSelectedMessage()",
+//                          {});
     if (! this.loaded_ || ! this.threaded_)
     {
         var ref = this;
@@ -1058,9 +1072,9 @@ ThreadVis.prototype.visualise = function(container)
     if (! this.checkEnabledAccountOrFolder())
         return
 
-    this.logger_.logDebug(this.logger_.LEVEL_INFORM_,
-                          "ThreadVis.visualise()",
-                          {"container" : container});
+//    this.logger_.logDebug(this.logger_.LEVEL_INFORM_,
+//                          "ThreadVis.visualise()",
+//                          {"container" : container});
 
     var msgkey = container.isDummy() ? 
                     "DUMMY" : 
@@ -1095,9 +1109,9 @@ ThreadVis.prototype.visualiseMsgId = function(message_id)
     if (! this.checkEnabledAccountOrFolder())
         return;
 
-    this.logger_.logDebug(this.logger_.LEVEL_INFORM_,
-                          "ThreadVis.visualiseMsgId()",
-                          {"message-id" : message_id});
+//    this.logger_.logDebug(this.logger_.LEVEL_INFORM_,
+//                          "ThreadVis.visualiseMsgId()",
+//                          {"message-id" : message_id});
 
     var container = this.threader_.findContainer(message_id);
 
@@ -1159,10 +1173,10 @@ ThreadVis.prototype.waitForAddMessages = function()
 
     // look at next folder
     var folder = this.folders_.shift();
-    this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
-                          "ThreadVis.waitForAddMessages()",
-                          {"action" : "next folder",
-                           "folder" : folder});
+//    this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
+//                          "ThreadVis.waitForAddMessages()",
+//                          {"action" : "next folder",
+//                           "folder" : folder});
 
     // if folder == null, we don't have any folders left to look at
     if (folder == null)
@@ -1194,9 +1208,9 @@ ThreadVis.prototype.waitForThreading = function()
         return
 
 
-    this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
-                          "ThreadVis.waitForThreading()",
-                          {});
+//    this.logger_.logDebug(this.logger_.LEVEL_EMAIL_,
+//                          "ThreadVis.waitForThreading()",
+//                          {});
 
     if (this.loaded_ &&
         ! this.threaded_ &&

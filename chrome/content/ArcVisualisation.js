@@ -100,14 +100,14 @@ function ArcVisualisation(stack,
     this.opacity_ = opacity;
 
 
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_, 
-                               "ArcVisualisation()",
-                               {"action" : "start",
-                                "colour" : this.colour_,
-                                "vposition" : this.vposition_,
-                                "height" : this.height_,
-                                "left" : this.left_,
-                                "right" : this.right_});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_, 
+//                               "ArcVisualisation()",
+//                               {"action" : "start",
+//                                "colour" : this.colour_,
+//                                "vposition" : this.vposition_,
+//                                "height" : this.height_,
+//                                "left" : this.left_,
+//                                "right" : this.right_});
 
     this.drawArc();
 }
@@ -170,14 +170,14 @@ ArcVisualisation.prototype.visualise = function()
     var style_background = this.colour_;
     var style_opacity = this.opacity_;
     
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_, 
-                               "Visualisation.drawArc()",
-                               {"action" : "draw arc",
-                                "top" : style_top,
-                                "left" : style_left,
-                                "height" : style_height,
-                                "width" : style_width,
-                                "background" : style_background});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_, 
+//                               "Visualisation.drawArc()",
+//                               {"action" : "draw arc",
+//                                "top" : style_top,
+//                                "left" : style_left,
+//                                "height" : style_height,
+//                                "width" : style_width,
+//                                "background" : style_background});
     
     
     this.arc_.style.position = "relative";

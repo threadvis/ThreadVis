@@ -102,21 +102,22 @@ function ContainerVisualisation(stack,
     // half == sent message
     // dummy == unknown message
     this.style_ = "full";
-    if (! this.container_.isDummy() &&
-          this.container_.getMessage().isSent())
-        this.style_ = "half";
-
-    if (this.container_.isDummy())
+    if (! this.container_.isDummy())
+    {
+        if (this.container_.getMessage().isSent())
+            this.style_ = "half";
+    }
+    else
         this.style_ ="dummy";
 
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
-                               "ContainerVisualisation()",
-                               {"action" : "start",
-                                "container" : this.container_.toString(),
-                                "colour" : this.colour_,
-                                "style" : this.style_,
-                                "left" : this.left_,
-                                "top" : this.top_});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+//                               "ContainerVisualisation()",
+//                               {"action" : "start",
+//                                "container" : this.container_.toString(),
+//                                "colour" : this.colour_,
+//                                "style" : this.style_,
+//                                "left" : this.left_,
+//                                "top" : this.top_});
 
     this.drawDot();
 
@@ -138,19 +139,41 @@ function ContainerVisualisation(stack,
 
 
 /** ****************************************************************************
- * create popup menu to delete, copy and cut messages
+* create popup menu to delete, copy and cut messages
+* just create stub menu
  ******************************************************************************/
 ContainerVisualisation.prototype.createMenu = function()
 {
+    var menuname = "dot_popup_" + this.left_;
+    this.click_.setAttribute("context", menuname);
+
     var popupset = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "popupset");
     var popup = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "popup");
+    popup.setAttribute("id", menuname);
+
+    this.popup_ = popup;
+
+    var ref = this;
+    popup.addEventListener("popupshowing", function() { ref.getMenu(); }, true);
+    
+    popupset.appendChild(popup);
+    this.stack_.appendChild(popupset);
+}
+
+
+
+/** ****************************************************************************
+* fill popup menu to delete, copy and cut messages
+ ******************************************************************************/
+ContainerVisualisation.prototype.getMenu = function()
+{
+    if (this.popup_.rendered_ == true)
+        return;
+    
     var menuitem_delete = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "menuitem");
     var menuitem_cut = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "menuitem");
     var menuitem_paste = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "menuitem");
     
-    var menuname = "dot_popup_" + this.left_;
-    
-    popup.setAttribute("id", menuname);
     
     // delete menu item
     menuitem_delete.setAttribute("label", this.strings_.getString("copycut.delete"));
@@ -164,7 +187,6 @@ ContainerVisualisation.prototype.createMenu = function()
     tooltiplabel_delete.appendChild(tooltiptext_delete);
     tooltip_delete.appendChild(tooltiplabel_delete);
     
-    popupset.appendChild(tooltip_delete);
     menuitem_delete.setAttribute("tooltip", "dot_popup_tooltip_delete_" + this.left_);
 
     
@@ -180,7 +202,6 @@ ContainerVisualisation.prototype.createMenu = function()
     tooltiplabel_cut.appendChild(tooltiptext_cut);
     tooltip_cut.appendChild(tooltiplabel_cut);
     
-    popupset.appendChild(tooltip_cut);
     menuitem_cut.setAttribute("tooltip", "dot_popup_tooltip_cut_" + this.left_);
     
     
@@ -196,28 +217,27 @@ ContainerVisualisation.prototype.createMenu = function()
     tooltiplabel_paste.appendChild(tooltiptext_paste);
     tooltip_paste.appendChild(tooltiplabel_paste);
     
-    popupset.appendChild(tooltip_paste);
     menuitem_paste.setAttribute("tooltip", "dot_popup_tooltip_paste_" + this.left_);
     
     
-    popup.appendChild(menuitem_delete);
-    popup.appendChild(menuitem_cut);
-    popup.appendChild(menuitem_paste);
+    this.popup_.appendChild(menuitem_delete);
+    this.popup_.appendChild(menuitem_cut);
+    this.popup_.appendChild(menuitem_paste);
     
-    popupset.appendChild(popup);
-    this.stack_.appendChild(popupset);
-    this.click_.setAttribute("context", menuname);
     
     var ref = this;
     menuitem_delete.addEventListener("command", function() {ref.deleteParent();}, true);
     menuitem_cut.addEventListener("command", function() {ref.cut();}, true);
     menuitem_paste.addEventListener("command", function() {ref.paste();}, true);
+    
+    this.popup_.rendered_ = true;
 }
 
 
 
 /** ****************************************************************************
  * Create tooltip for container containing information about container
+ * just create stub menu
  ******************************************************************************/
 ContainerVisualisation.prototype.createToolTip = function()
 {
@@ -225,11 +245,28 @@ ContainerVisualisation.prototype.createToolTip = function()
     tooltip.setAttribute("orient", "vertical");
     tooltip.setAttribute("id", "ThreadVis_" + this.left_);
 
+    this.tooltip_ = tooltip;
+    var ref = this;
+    tooltip.addEventListener("popupshowing", function() { ref.getToolTip(); }, true);
+    
+    this.stack_.appendChild(tooltip);
+}
+
+
+
+/** ****************************************************************************
+ * fill tooltip for container containing information about container
+ ******************************************************************************/
+ContainerVisualisation.prototype.getToolTip = function()
+{
+    if (this.tooltip_.rendered_ == true)
+        return;
+    
     if (! this.container_.isDummy())
     {
-        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
-                                   "Visualisation.drawDot()",
-                                   {"action" : "create tooltip start"});
+//        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+//                                   "Visualisation.drawDot()",
+//                                   {"action" : "create tooltip start"});
 
         // if container container message, view details
         var authorlabel = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "label");
@@ -265,19 +302,19 @@ ContainerVisualisation.prototype.createToolTip = function()
         subjecttext.setAttribute("value",
                                  this.container_.getMessage().getSubject());
 
-        tooltip.appendChild(author);
-        tooltip.appendChild(date);
-        tooltip.appendChild(subject);
+        this.tooltip_.appendChild(author);
+        this.tooltip_.appendChild(date);
+        this.tooltip_.appendChild(subject);
 
-        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
-                                   "Visualisation.drawDot()",
-                                   {"action" : "create tooltip end"});
+//        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+//                                   "Visualisation.drawDot()",
+//                                   {"action" : "create tooltip end"});
     }
     else
     {
-        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
-                                   "Visualisation.drawDot()",
-                                   {"action" : "create missing tooltip start"});
+//        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+//                                   "Visualisation.drawDot()",
+//                                   {"action" : "create missing tooltip start"});
 
         // otherwise we display info about missing message
         var desc1 = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "description");
@@ -286,16 +323,15 @@ ContainerVisualisation.prototype.createToolTip = function()
                            this.strings_.getString("tooltip.missingmessage"));
         desc2.setAttribute("value",
                            this.strings_.getString("tooltip.missingmessagedetail"));
-        tooltip.appendChild(desc1);
-        tooltip.appendChild(desc2);
-        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
-                                   "Visualisation.drawDot()",
-                                   {"action" : "create missing tooltip end"});
+        this.tooltip_.appendChild(desc1);
+        this.tooltip_.appendChild(desc2);
+//        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+//                                   "Visualisation.drawDot()",
+//                                   {"action" : "create missing tooltip end"});
     }
     
-    this.stack_.appendChild(tooltip);
+    this.tooltip_.rendered_ = true;
 }
-
 
 
 /** ****************************************************************************
@@ -465,9 +501,9 @@ ContainerVisualisation.prototype.onMouseClick = function(event)
     if (event.detail > 1)
         ThreadPaneDoubleClick();
 
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
-                               "Visualisation.onMouseClick()",
-                               {});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
+//                               "Visualisation.onMouseClick()",
+//                               {});
     var container = event.target.container;
     if (container && ! container.isDummy())
         THREADVIS.callback(container.getMessage().getKey(), 
@@ -627,15 +663,15 @@ ContainerVisualisation.prototype.visualiseCircle = function(colour)
     style_border = (this.dotsize_ / 6 * this.resize_) + 
                        "px solid " + colour;
 
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
-                               "Visualisation.drawDot()",
-                               {"action" : "draw selection circle",
-                                "top" : style_top,
-                                "left" : style_left,
-                                "height" : style_height,
-                                "width" : style_width,
-                                "background" : style_background,
-                                "border" : style_border});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+//                               "Visualisation.drawDot()",
+//                               {"action" : "draw selection circle",
+//                                "top" : style_top,
+//                                "left" : style_left,
+//                                "height" : style_height,
+//                                "width" : style_width,
+//                                "background" : style_background,
+//                                "border" : style_border});
 
     this.circle_.style.position = "relative";
     this.circle_.style.top = style_top;
@@ -661,14 +697,14 @@ ContainerVisualisation.prototype.visualiseClick = function()
     var style_background = "";
     var style_border = "";
 
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
-                              "Visualisation.drawClick()",
-                              {"top" : style_top,
-                               "left" : style_left,
-                               "height" : style_height,
-                               "width" : style_width,
-                               "background" : style_background,
-                               "border" : style_border});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+//                              "Visualisation.drawClick()",
+//                              {"top" : style_top,
+//                               "left" : style_left,
+//                               "height" : style_height,
+//                               "width" : style_width,
+//                               "background" : style_background,
+//                               "border" : style_border});
 
     this.click_.style.position = "relative";
     this.click_.style.top = style_top;
@@ -703,14 +739,14 @@ ContainerVisualisation.prototype.visualiseDot = function()
         style_border = (this.dotsize_ / 4 * this.resize_) + 
                            "px solid " + this.colour_;
 
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
-                                "Visualisation.drawDot()",
-                                {"top" : style_top,
-                                 "left" : style_left,
-                                 "height" : style_height,
-                                 "width" : style_width,
-                                 "background" : style_background,
-                                 "border" : style_border});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+//                                "Visualisation.drawDot()",
+//                                {"top" : style_top,
+//                                 "left" : style_left,
+//                                 "height" : style_height,
+//                                 "width" : style_width,
+//                                 "background" : style_background,
+//                                 "border" : style_border});
 
     this.dot_.style.position = "relative";
     this.dot_.style.top = style_top;

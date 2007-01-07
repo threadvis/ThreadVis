@@ -17,9 +17,9 @@
  ******************************************************************************/
 function Threader()
 {
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
-                               "Threader()",
-                               {});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
+//                               "Threader()",
+//                               {});
 
     /**
      * Link message ids to container objects
@@ -90,9 +90,9 @@ function Threader()
  ******************************************************************************/
 Threader.prototype.addMessage = function(message)
 {
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                               "Threader.addMessage()",
-                               {"message" : message});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                               "Threader.addMessage()",
+//                               {"message" : message});
     this.messages_.push(message);
 }
 
@@ -139,10 +139,10 @@ Threader.prototype.closeCopyCut = function()
  ******************************************************************************/
 Threader.prototype.findContainer = function(message_id)
 {
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                               "Threader.findContainer()",
-                               {"message_id" : message_id,
-                                "return" : this.id_table_[message_id]});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                               "Threader.findContainer()",
+//                               {"message_id" : message_id,
+//                                "return" : this.id_table_[message_id]});
     return this.id_table_[message_id];
 }
 
@@ -153,9 +153,9 @@ Threader.prototype.findContainer = function(message_id)
  ******************************************************************************/
 Threader.prototype.getRoot = function()
 {
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
-                               "Threader.getRoot()",
-                               {});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
+//                               "Threader.getRoot()",
+//                               {});
     return this.root_set_;
 }
 
@@ -172,9 +172,9 @@ Threader.prototype.topPutMessagesInContainer = function()
         this.put_messages_in_container_top_doing_ = true;
         this.put_messages_in_container_counter_ = 0;
         
-        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
-                                   "Threader.topPutMessagesInContainer()",
-                                   {"action" : "start"});
+//        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
+//                                   "Threader.topPutMessagesInContainer()",
+//                                   {"action" : "start"});
         
         this.put_messages_in_container_start_ = (new Date()).getTime();
         var ref = this;
@@ -185,9 +185,9 @@ Threader.prototype.topPutMessagesInContainer = function()
         this.put_messages_in_container_end_ = (new Date()).getTime();
         this.put_messages_in_container_top_doing_ = false;
         
-        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
-                                   "Threader.topPutMessagesInContainer()",
-                                   {"action" : "end"});
+//        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
+//                                   "Threader.topPutMessagesInContainer()",
+//                                   {"action" : "end"});
         
         return;
     }
@@ -217,12 +217,12 @@ Threader.prototype.putMessagesInContainer = function()
     var counter = 0;
     var maxcounter = this.put_messages_in_container_increment_;
 
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
-                               "Threader.putMessagesInContainer()",
-                               {"action" : "loop over all messages",
-                                "startcounter" : counter,
-                                "endcounter" : maxcounter,
-                                "messages.length" : this.messages_.length});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
+//                               "Threader.putMessagesInContainer()",
+//                               {"action" : "loop over all messages",
+//                                "startcounter" : counter,
+//                                "endcounter" : maxcounter,
+//                                "messages.length" : this.messages_.length});
 
     for (counter;
          counter < maxcounter;
@@ -254,20 +254,20 @@ Threader.prototype.putMessagesInContainer = function()
  ******************************************************************************/
 Threader.prototype.putMessageInContainer = function(message)
 {
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                               "Threader.putMessageInContainer()",
-                               {"looking at" : message});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                               "Threader.putMessageInContainer()",
+//                               {"looking at" : message});
 
     // try to get message container
     var message_container = this.id_table_[message.getId()];
 
     if (message_container != null)
     {
-        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                                   "Threader.putMessageInContainer()",
-                                   {"action" : "found dummy container with message id",
-                                    "dummy" : message_container.isDummy(),
-                                    "sent" : message_container.isDummy() ? "false" : message_container.getMessage().isSent()});
+//        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                                   "Threader.putMessageInContainer()",
+//                                   {"action" : "found dummy container with message id",
+//                                    "dummy" : message_container.message_ == null,
+//                                    "sent" : message_container.message_ == null ? "false" : message_container.message_.issent_});
         
         // if we found a container for this message id, either it's a dummy
         // or we have two mails with the same message-id
@@ -302,9 +302,9 @@ Threader.prototype.putMessageInContainer = function(message)
 
     if (message_container == null)
     {
-        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                                   "Threader.putMessageInContainer()",
-                                   {"action" : "no container found, create new one"});
+//        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                                   "Threader.putMessageInContainer()",
+//                                   {"action" : "no container found, create new one"});
         
         // no suitable container found, create new one
         message_container = new Container();
@@ -312,10 +312,10 @@ Threader.prototype.putMessageInContainer = function(message)
         // index container in hashtable
         this.id_table_[message.getId()] = message_container;
     }
-
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                               "Threader.putMessageInContainer()",
-                               {"action" : "loop over references"});
+//
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                               "Threader.putMessageInContainer()",
+//                               {"action" : "loop over references"});
     
     // for each element in references field of message
     var parent_reference_container = null;
@@ -326,17 +326,17 @@ Threader.prototype.putMessageInContainer = function(message)
     {
         var reference_id = references[referencekey];
 
-        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                                   "Threader.putMessageInContainer()",
-                                   {"reference" : reference_id});
+//        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                                   "Threader.putMessageInContainer()",
+//                                   {"reference" : reference_id});
         
         // try to find container for referenced message
         var reference_container = this.id_table_[reference_id];
         if (reference_container == null)
         {
-            THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                                       "Threader.putMessageInContainer()",
-                                       {"action" : "no container found, create new one"});
+//            THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                                       "Threader.putMessageInContainer()",
+//                                       {"action" : "no container found, create new one"});
             
             // no container found, create new one
             reference_container = new Container();
@@ -345,9 +345,9 @@ Threader.prototype.putMessageInContainer = function(message)
         }
         
         // 1.B. link reference container together
-        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                                   "Threader.putMessageInContainer()",
-                                   {"action" : "link references together"});
+//        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                                   "Threader.putMessageInContainer()",
+//                                   {"action" : "link references together"});
         
         if (parent_reference_container != null &&                           // if we have a parent container
             ! reference_container.hasParent() &&                            // and current container does not have a parent
@@ -358,15 +358,15 @@ Threader.prototype.putMessageInContainer = function(message)
             // (i.e. thread is split by user)
             if (this.copycut_.getCut(reference_id) == parent_reference_id)
             {
-                THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                                           "Threader.putMessageInContainer()",
-                                           {"action" : "message cut, do not add us to parent"});
+//                THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                                           "Threader.putMessageInContainer()",
+//                                           {"action" : "message cut, do not add us to parent"});
             }
             else
             {
-                THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                                           "Threader.putMessageInContainer()",
-                                           {"action" : "add us to parent reference container"});
+//                THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                                           "Threader.putMessageInContainer()",
+//                                           {"action" : "add us to parent reference container"});
                 
                 parent_reference_container.addChild(reference_container);
             }
@@ -383,9 +383,9 @@ Threader.prototype.putMessageInContainer = function(message)
         (parent_reference_container == message_container ||
         message_container.findChild(parent_reference_container)))
     {
-        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                                   "Threader.putMessageInContainer()",
-                                   {"action" : "set parent reference container to null"});
+//        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                                   "Threader.putMessageInContainer()",
+//                                   {"action" : "set parent reference container to null"});
         
         parent_reference_container = null;
     }
@@ -395,9 +395,9 @@ Threader.prototype.putMessageInContainer = function(message)
         parent_reference_container != null)
     {
         // remove us from this parent
-        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                                   "Threader.putMessageInContainer()",
-                                   {"action" : "remove us from parent"});
+//        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                                   "Threader.putMessageInContainer()",
+//                                   {"action" : "remove us from parent"});
         
         message_container.getParent().removeChild(message_container);
     }
@@ -408,17 +408,17 @@ Threader.prototype.putMessageInContainer = function(message)
     var copy_id = this.copycut_.getCopy(message.getId());
     if (copy_id)
     {
-        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                                   "Threader.putMessageInContainer()",
-                                   {"action" : "message copied",
-                                    "copy_id" : copy_id});
+//        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                                   "Threader.putMessageInContainer()",
+//                                   {"action" : "message copied",
+//                                    "copy_id" : copy_id});
         
         var parent_container = this.id_table_[copy_id];
         if (parent_container == null)
         {
-            THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                                       "Threader.putMessageInContainer()",
-                                       {"action" : "no container found, create new one"});
+//            THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                                       "Threader.putMessageInContainer()",
+//                                       {"action" : "no container found, create new one"});
             
             // no container found, create new one
             parent_container = new Container();
@@ -436,16 +436,16 @@ Threader.prototype.putMessageInContainer = function(message)
             // and this container wasn't cut
             if (this.copycut_.getCut(message.getId()) == parent_reference_id)
             {
-                THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                                           "Threader.putMessageInContainer()",
-                                           {"action" : "message cut, do not add us to parent"});
+//                THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                                           "Threader.putMessageInContainer()",
+//                                           {"action" : "message cut, do not add us to parent"});
             }
             else
             {
                 // add us as child
-                THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                                           "Threader.putMessageInContainer()",
-                                           {"action" : "add us as child to parent reference container"});
+//                THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                                           "Threader.putMessageInContainer()",
+//                                           {"action" : "add us as child to parent reference container"});
                 
                 parent_reference_container.addChild(message_container);
             }
@@ -465,9 +465,9 @@ Threader.prototype.topFindRootSet = function()
         this.put_messages_in_container_done_)
     {
         this.find_rootset_top_doing_ = true;
-        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
-                                   "Threader.topFindRootSet()",
-                                   {"action" : "start"});
+//        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
+//                                   "Threader.topFindRootSet()",
+//                                   {"action" : "start"});
         this.find_rootset_start_ = (new Date()).getTime();
         var ref = this;
         setTimeout(function(){ref.findRootSet();}, 10);
@@ -476,9 +476,9 @@ Threader.prototype.topFindRootSet = function()
     {
         this.find_rootset_end_ = (new Date()).getTime();
         this.find_rootset_top_doing_ = false;
-        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
-                                   "Threader.topFindRootSet()",
-                                   {"action" : "end"});
+//        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
+//                                   "Threader.topFindRootSet()",
+//                                   {"action" : "end"});
         return;
     }
     var ref = this;
@@ -501,9 +501,9 @@ Threader.prototype.findRootSet = function()
     this.find_rootset_doing_ = true;
 
     var rootkey = null;
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
-                               "Threader.findRootSet()",
-                               {"action" : "find root set"});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
+//                               "Threader.findRootSet()",
+//                               {"action" : "find root set"});
     for (rootkey in this.id_table_)
     {
         var container = this.id_table_[rootkey];
@@ -531,9 +531,9 @@ Threader.prototype.topPruneEmptyContainers = function()
         this.find_rootset_done_)
     {
         this.prune_empty_containers_top_doing_ = true;
-        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
-                                   "Threader.topPruneEmptyContainers()",
-                                   {"action" : "start"});
+//        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
+//                                   "Threader.topPruneEmptyContainers()",
+//                                   {"action" : "start"});
         this.prune_empty_containers_start_ = (new Date()).getTime();
         var ref = this;
         setTimeout(function(){ref.pruneEmptyContainers();}, 10);
@@ -542,9 +542,9 @@ Threader.prototype.topPruneEmptyContainers = function()
     {
         this.prune_empty_containers_end_ = (new Date()).getTime();
         this.prune_empty_containers_doing_ = false;
-        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
-                                   "Threader.topPruneEmptyContainers()",
-                                   {"action" : "end"});
+//        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
+//                                   "Threader.topPruneEmptyContainers()",
+//                                   {"action" : "end"});
         return;
     }
     var ref = this;
@@ -566,24 +566,24 @@ Threader.prototype.pruneEmptyContainers = function()
 
     this.prune_empty_containers_doing_ = true;
 
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                               "Threader.pruneEmptyContainers()",
-                               {"action" : "loop over root set"});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                               "Threader.pruneEmptyContainers()",
+//                               {"action" : "loop over root set"});
     var container = null;
     for (container = this.root_set_.getChild();
          container != null;
          container = container.getNext())
     {
-        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                                   "Threader.pruneEmptyContainers()",
-                                   {"container" : container});
+//        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                                   "Threader.pruneEmptyContainers()",
+//                                   {"container" : container});
         // if container is empty and has no children
         if (container.isDummy() &&
             ! container.hasChild())
         {
-            THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                                       "Threader.pruneEmptyContainers()",
-                                       {"action" : "container does not belong to root set"});
+//            THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                                       "Threader.pruneEmptyContainers()",
+//                                       {"action" : "container does not belong to root set"});
             // remove from root_set_
             if (container.hasPrevious())
                 container.getPrevious().setNext(container.getNext());
@@ -651,9 +651,9 @@ Threader.prototype.topPutContainersInSubjectTable = function()
         this.prune_empty_containers_done_)
     {
         this.put_containers_in_subject_table_top_doing_ = true;
-        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
-                                   "Threader.topPutContainersInSubjectTable()",
-                                   {"action" : "start"});
+//        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
+//                                   "Threader.topPutContainersInSubjectTable()",
+//                                   {"action" : "start"});
         this.put_containers_in_subject_table_start_ = (new Date()).getTime();
         var ref = this;
         setTimeout(function(){ref.putContainersInSubjectTable();}, 10);
@@ -663,9 +663,9 @@ Threader.prototype.topPutContainersInSubjectTable = function()
         this.put_containers_in_subject_table_end_ = (new Date()).getTime();
         this.end_ = (new Date()).getTime();
         this.put_containers_in_subject_table_top_doing_ = false;
-        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
-                                   "Threader.topPutContainersInSubjectTable()",
-                                   {"action" : "end"});
+//        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
+//                                   "Threader.topPutContainersInSubjectTable()",
+//                                   {"action" : "end"});
         this.done_threading_ = true;
         var ref = this;
         setTimeout(function(){ref.logInfo();}, 10);
@@ -691,17 +691,17 @@ Threader.prototype.putContainersInSubjectTable = function()
 
     this.put_containers_in_subject_table_doing_ = true;
 
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                               "Threader.putContainersInSubjectTable()",
-                               {"action" : "loop over root set"});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                               "Threader.putContainersInSubjectTable()",
+//                               {"action" : "loop over root set"});
     var container = null;
     for (container = this.root_set_.getChild();
          container != null;
          container = container.getNext())
     {
-        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                                   "Threader.putContainersInSubjectTable()",
-                                   {"container" : container});
+//        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                                   "Threader.putContainersInSubjectTable()",
+//                                   {"container" : container});
         // 5.B. find subject of subtree
         var subject = "";
         subject = container.getSimplifiedSubject();
@@ -715,13 +715,13 @@ Threader.prototype.putContainersInSubjectTable = function()
         // try to find existing container with same subject
         var subject_container = this.subject_table_[subject];
 
-        if (subject_container == null ||                                       // if we have to container with this subject OR
+        if (subject_container == null ||                                        // if we have to container with this subject OR
            (subject_container.isDummy() && ! container.isDummy()) ||           // if found one is empty, but this one is not OR
-           (subject_container.getReplyCount() > container.getReplyCount()))    // if current is less reply than subject container
+           (subject_container.getReplyCount() > container.getReplyCount()))     // if current is less reply than subject container
         {
-            THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                                       "Threader.putContainersInSubjectTable()",
-                                       {"action" : "putting container in subject table"});
+//            THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                                       "Threader.putContainersInSubjectTable()",
+//                                       {"action" : "putting container in subject table"});
             this.subject_table_[subject] = container;
         }
     }
@@ -742,9 +742,9 @@ Threader.prototype.topGroupBySubject = function()
         this.put_containers_in_subject_table_done_)
     {
         this.group_by_subject_top_doing_ = true;
-        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
-                                   "Threader.topGroupBySubject()",
-                                   {"action" : "start"});
+//        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
+//                                   "Threader.topGroupBySubject()",
+//                                   {"action" : "start"});
         this.group_by_subject_top_start_ = (new Date()).getTime();
         var ref = this;
         setTimeout(function(){ref.groupBySubject();}, 10);
@@ -754,9 +754,9 @@ Threader.prototype.topGroupBySubject = function()
         this.group_by_subject_end_ = (new Date()).getTime();
         this.end_ = (new Date()).getTime();
         this.group_by_subject_top_doing_ = false;
-        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
-                                   "Threader.topGroupBySubject()",
-                                   {"action" : "end"});
+//        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
+//                                   "Threader.topGroupBySubject()",
+//                                   {"action" : "end"});
         var ref = this;
         setTimeout(function(){ref.logInfo();}, 10);
         return;
@@ -779,17 +779,17 @@ Threader.prototype.groupBySubject = function()
 
     this.group_by_subject_doing_ = true;
 
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                               "Threader.groupBySubject()",
-                               {"action" : "loop over root set"});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                               "Threader.groupBySubject()",
+//                               {"action" : "loop over root set"});
     var container = null;
     for (container = this.root_set_.getChild();
          container != null;
          container = container.getNext())
     {
-        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                                   "Threader.groupBySubject()",
-                                   {"container" : container});
+//        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                                   "Threader.groupBySubject()",
+//                                   {"container" : container});
         // get subject of this container
         var subject = "";
         subject = container.getSimplifiedSubject();
@@ -800,9 +800,9 @@ Threader.prototype.groupBySubject = function()
             subject_container == container)
         {
             // if no container found, or found ourselfs
-            THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                                       "Threader.groupBySubject()",
-                                       {"action" : "no container in subject table or found ourselves"});
+//            THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                                       "Threader.groupBySubject()",
+//                                       {"action" : "no container in subject table or found ourselves"});
             continue;
         }
         // if both containers are dummies
@@ -810,9 +810,9 @@ Threader.prototype.groupBySubject = function()
             subject_container.isDummy())
         {
             // append children of subject_container to container
-            THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                                       "Threader.groupBySubject()",
-                                       {"action" : "both dummies"});
+//            THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                                       "Threader.groupBySubject()",
+//                                       {"action" : "both dummies"});
             container.addChild(subject_container.getChild());
         }
         // if container is dummy, subject container no dummy
@@ -820,9 +820,9 @@ Threader.prototype.groupBySubject = function()
                  ! subject_container.isDummy())
         {
             // add non empty container as child of empty container
-            THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                                       "Threader.groupBySubject()",
-                                       {"action" : "container dummy, subject_container not"});
+//            THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                                       "Threader.groupBySubject()",
+//                                       {"action" : "container dummy, subject_container not"});
             container.addChild(subject_container);
         }
         // if container is no dummy but subject container is dummy
@@ -830,18 +830,18 @@ Threader.prototype.groupBySubject = function()
                  subject_container.isDummy())
         {
             // add non empty container as child of empty container
-            THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                                       "Threader.groupBySubject()",
-                                       {"action" : "container not dummy, subject_container dummy"});
+//            THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                                       "Threader.groupBySubject()",
+//                                       {"action" : "container not dummy, subject_container dummy"});
             subject_container.addChild(container);
         }
         // if containers are misordered, change order
         else if (! subject_container.isDummy() &&
                  subject_container.getReplyCount() < container.getReplyCount())
         {
-            THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                                       "Threader.groupBySubject()",
-                                       {"action" : "misordered 1"});
+//            THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                                       "Threader.groupBySubject()",
+//                                       {"action" : "misordered 1"});
             // calculate difference between the messages
             var difference = container.getReplyCount() - subject_container.getReplyCount();
             var top = subject_container;
@@ -890,9 +890,9 @@ Threader.prototype.groupBySubject = function()
         else if (! subject_container.isDummy() &&
                  subject_container.getReplyCount() > container.getReplyCount())
         {
-            THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
-                                       "Threader.groupBySubject()",
-                                       {"action" : "misordered 2"});
+//            THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
+//                                       "Threader.groupBySubject()",
+//                                       {"action" : "misordered 2"});
             // calculate difference between the messages
             var difference = subject_container.getReplyCount() - container.getReplyCount();
             var top = container;
@@ -935,7 +935,7 @@ Threader.prototype.groupBySubject = function()
 
             var new_container = new Container();
 
-            var tmp = container.getPrevious();;
+            var tmp = container.getPrevious();
             new_container.addChild(container);
             new_container.addChild(subject_container);
             this.root_set_.addChild(new_container);
@@ -1105,9 +1105,9 @@ Threader.prototype.logInfo = function()
  ******************************************************************************/
 Threader.prototype.getThreadDistribution = function()
 {
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
-                               "Threader.getThreadDistribution()",
-                               {});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_INFORM_,
+//                               "Threader.getThreadDistribution()",
+//                               {});
     var distribution = new Array();
     var container = null;
     for (container = this.root_set_.getChild();

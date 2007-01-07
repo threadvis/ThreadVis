@@ -205,9 +205,9 @@ Visualisation.prototype.checkSize = function()
  ******************************************************************************/
 Visualisation.prototype.clearStack = function()
 {
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
-                               "Visualisation.clearStack()",
-                               {});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+//                               "Visualisation.clearStack()",
+//                               {});
     
     while(this.stack_.firstChild != null)
         this.stack_.removeChild(this.stack_.firstChild);
@@ -387,9 +387,9 @@ Visualisation.prototype.createLegendBox = function(hsv, name, count)
  ******************************************************************************/
 Visualisation.prototype.createStack = function()
 {
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
-                               "Visualisation.createStack()",
-                               {});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+//                               "Visualisation.createStack()",
+//                               {});
     
     this.box_ = document.getElementById("ThreadVisBox");
     this.stack_ = document.getElementById("ThreadVisStack");
@@ -398,9 +398,9 @@ Visualisation.prototype.createStack = function()
     var ref = this;
     if (! this.stack_)
     {
-        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
-                                   "Visualisation.createStack()",
-                                   {"action" : "create stack"});
+//        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+//                                   "Visualisation.createStack()",
+//                                   {"action" : "create stack"});
         
         this.stack_ = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "stack");
         this.stack_.setAttribute("id", "ThreadVisStack");
@@ -413,9 +413,9 @@ Visualisation.prototype.createStack = function()
     }
     else
     {
-        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
-                                   "Visualisation.createStack()",
-                                   {"action" : "clear stack"});
+//        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+//                                   "Visualisation.createStack()",
+//                                   {"action" : "clear stack"});
         this.clearStack();
     }
 
@@ -556,13 +556,13 @@ Visualisation.prototype.getResize = function(xcount,
                                              sizex,
                                              sizey)
 {
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
-                               "Visualisation.getResize()",
-                               {"action" : "start",
-                                "xcount" : xcount,
-                                "ycount" : ycount,
-                                "sizex" : sizex,
-                                "sizey" : sizey});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+//                               "Visualisation.getResize()",
+//                               {"action" : "start",
+//                                "xcount" : xcount,
+//                                "ycount" : ycount,
+//                                "sizex" : sizex,
+//                                "sizey" : sizey});
 
     var pref_arc_difference = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_ARC_DIFFERENCE_);
     var pref_arc_minheight = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_ARC_MINHEIGHT_);
@@ -587,16 +587,16 @@ Visualisation.prototype.getResize = function(xcount,
     if (resize > 1)
         resize = 1;
 
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
-                               "Visualisation.getResize()",
-                               {"action" : "end",
-                                "resize" : resize,
-                                "resizex" : resizex,
-                                "resizey" : resizey,
-                                "spaceperarcavailablex" : spaceperarcavailablex,
-                                "spaceperarcavailabley" : spaceperarcavailabley,
-                                "spaceperarcneededx" : spaceperarcneededx,
-                                "spaceperarcneededy" : spaceperarcneededy});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+//                               "Visualisation.getResize()",
+//                               {"action" : "end",
+//                                "resize" : resize,
+//                                "resizex" : resizex,
+//                                "resizey" : resizey,
+//                                "spaceperarcavailablex" : spaceperarcavailablex,
+//                                "spaceperarcavailabley" : spaceperarcavailabley,
+//                                "spaceperarcneededx" : spaceperarcneededx,
+//                                "spaceperarcneededy" : spaceperarcneededy});
     return resize;
 }
 
@@ -661,14 +661,14 @@ Visualisation.prototype.moveVisualisationTo = function(position)
  ******************************************************************************/
 Visualisation.prototype.onMouseClick = function(event)
 {
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
-                               "Visualisation.onMouseClick()",
-                               {});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+//                               "Visualisation.onMouseClick()",
+//                               {});
     
     var container = event.target.container;
     if (container && ! container.isDummy())
-        THREADVIS.callback(container.getMessage().getKey(), 
-                           container.getMessage().getFolder());
+        THREADVIS.callback(container.message_.getKey(), 
+                           container.message_.getFolder());
 }
 
 
@@ -793,9 +793,9 @@ Visualisation.prototype.onScroll = function(event)
  ******************************************************************************/
 Visualisation.prototype.resetStack = function()
 {
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
-                               "Visualisation.resetStack()",
-                               {});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+//                               "Visualisation.resetStack()",
+//                               {});
     
     this.stack_.style.marginLeft = "0px";
     this.stack_.style.marginTop = "0px";
@@ -812,13 +812,13 @@ Visualisation.prototype.timeScaling = function(containers,
                                                minimaltimedifference,
                                                width)
 {
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
-                               "Visualisation.timeScaling()",
-                               {"action" : "start",
-                                "containers" : containers.toString(),
-                                "minimaltimedifference" : minimaltimedifference,
-                                "width" : width,
-                                "no. containers:" : containers.length});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+//                               "Visualisation.timeScaling()",
+//                               {"action" : "start",
+//                                "containers" : containers.toString(),
+//                                "minimaltimedifference" : minimaltimedifference,
+//                                "width" : width,
+//                                "no. containers:" : containers.length});
 
     var pref_spacing = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_SPACING_);
     var pref_timescaling = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_TIMESCALING_);
@@ -859,11 +859,11 @@ Visualisation.prototype.timeScaling = function(containers,
     // fit 2, since we want some spacing between the messages and the border
     var max_count_x = (width / pref_spacing) - 1;
 
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
-                               "Visualisation.timeScaling()", 
-                               {"action" : "first pass done",
-                                "total_time_scale" : total_time_scale,
-                                "max_count_x" : max_count_x});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+//                               "Visualisation.timeScaling()", 
+//                               {"action" : "first pass done",
+//                                "total_time_scale" : total_time_scale,
+//                                "max_count_x" : max_count_x});
 
     // if the time scaling factor is bigger than what we can display, we have 
     // a problem
@@ -888,10 +888,10 @@ Visualisation.prototype.timeScaling = function(containers,
             break;
     }
 
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
-                               "Visualisation.timeScaling()",
-                               {"action" : "second pass done", 
-                                "total_time_scale" : total_time_scale});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+//                               "Visualisation.timeScaling()",
+//                               {"action" : "second pass done", 
+//                                "total_time_scale" : total_time_scale});
 
     return containers;
 }
@@ -906,10 +906,10 @@ Visualisation.prototype.visualise = function(container)
     if (container == null)
         container = this.currentcontainer_;
 
-    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
-                               "Visualisation.visualise()",
-                               {"action" : "start",
-                                "container" : container.toString()});
+//    THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+//                               "Visualisation.visualise()",
+//                               {"action" : "start",
+//                                "container" : container.toString()});
 
     var pref_arc_difference = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_ARC_DIFFERENCE_);
     var pref_arc_minheight = THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_VIS_ARC_MINHEIGHT_);
@@ -1025,7 +1025,7 @@ Visualisation.prototype.visualise = function(container)
                 {
                     hsv = this.getNewColour();
                     this.authors_[thiscontainer.getMessage().getFromEmail()] = {"hsv" : hsv,
-                                                                                "name" : thiscontainer.getMessage().getFrom(),
+                                                                                "name" : thiscontainer.message_.getFrom(),
                                                                                 "count" : 1};
                 }
                 colour = this.getColour(hsv.hue, 100, hsv.value);
@@ -1217,9 +1217,9 @@ Visualisation.prototype.visualiseExisting = function(container)
         // if thread has changed and we don't have all container visualisations
         if (this.containervisualisations_[thiscontainer] == null)
         {
-            THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
-                                       "Visualisation.visualiseExisting()",
-                                       {"action" : "cached visualisation does not contain this message, redraw"});
+//            THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_VIS_,
+//                                       "Visualisation.visualiseExisting()",
+//                                       {"action" : "cached visualisation does not contain this message, redraw"});
             // do a full redraw
             this.currentcontainer_ = null;
             this.visualise(container);
