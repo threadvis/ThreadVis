@@ -72,7 +72,7 @@ Container.prototype.addChild = function(child)
      */
     if (child.findChild(this))
     {
-        alert("Error: Loop detected in message structure.");
+        alert("Error: Loop detected in message structure.\nConflicting message:\n" + this.toString() + "\n" + child.toString());
 //        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_ERROR_,
 //                                   "Container.addChild()" ,
 //                                   {"error" : "tried to create loop",

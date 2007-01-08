@@ -34,9 +34,19 @@ References.prototype.buildReferences = function(references)
     {
         var result = references.match(/[^<>\s]+/g);
         
-        if (result)
-            for (var i = 0; i < result.length; i++)
-                this.references_[result[i]] = result[i];
+        var dupes = new Object();
+        var distinct = new Array();
+        
+        for (var i = result.length - 1; i >= 0; i--)
+        {
+            var msgid = result[i];
+            if (dupes[msgid])
+                continue;
+            dupes[msgid] = msgid;
+            distinct.push(msgid);
+        }
+        distinct.reverse();
+        this.references_ = distinct;
     }
 }
 
