@@ -1000,6 +1000,7 @@ Visualisation.prototype.visualise = function(container)
         var thiscontainer = this.containers_[counter];
 
         var selected = thiscontainer == container;
+        var inthread = container.findParent(thiscontainer) || thiscontainer.findParent(container);
 
         var colour = this.COLOUR_DUMMY_;
         var opacity = 1;
@@ -1029,7 +1030,7 @@ Visualisation.prototype.visualise = function(container)
                                                                                 "count" : 1};
                 }
                 colour = this.getColour(hsv.hue, 100, hsv.value);
-                if (selected || thiscontainer.findChild(container) || container.findChild(thiscontainer))
+                if (selected || inthread)
                     opacity = 1;
                 else
                     opacity = pref_opacity;
@@ -1069,7 +1070,7 @@ Visualisation.prototype.visualise = function(container)
             // a selected message in this colour
             if (pref_colour == "single")
             {
-                if (selected || thiscontainer.findChild(container) || container.findChild(thiscontainer))
+                if (selected || inthread)
                     colour = this.COLOUR_SINGLE_;
                 else
                     colour = this.COLOUR_DUMMY_;
@@ -1078,7 +1079,7 @@ Visualisation.prototype.visualise = function(container)
             {
                 // get colour for arc
                 colour = this.getColour(hsv.hue, 100, hsv.value);
-                if (selected || thiscontainer.findChild(container) || container.findChild(thiscontainer))
+                if (selected || inthread)
                     opacity = 1;
                 else
                     opacity = pref_opacity;
@@ -1205,6 +1206,7 @@ Visualisation.prototype.visualiseExisting = function(container)
         var thiscontainer = this.containers_[counter];
 
         var selected = thiscontainer == container;
+        var inthread = thiscontainer.findParent(container) || container.findParent(thiscontainer);
 
         // only display black circle to highlight selected message
         // if we are using more than one colour
@@ -1243,7 +1245,7 @@ Visualisation.prototype.visualiseExisting = function(container)
             {
                 hsv = this.authors_[thiscontainer.getMessage().getFromEmail()].hsv;
                 colour = this.getColour(hsv.hue, 100, hsv.value);
-                if (selected || container.findChild(thiscontainer) || thiscontainer.findChild(container))
+                if (selected || inthread)
                     opacity = 1;
                 else
                     opacity = pref_opacity;
@@ -1264,7 +1266,7 @@ Visualisation.prototype.visualiseExisting = function(container)
         // get colour for arc
         if (pref_colour == "single")
         {
-            if (selected || thiscontainer.findChild(container) || container.findChild(thiscontainer))
+            if (selected || inthread)
                 colour = this.COLOUR_SINGLE_;
             else
                 colour = this.COLOUR_DUMMY_;
@@ -1272,7 +1274,7 @@ Visualisation.prototype.visualiseExisting = function(container)
         else
         {
             colour = this.getColour(hsv.hue, 100, hsv.value);
-            if (selected || thiscontainer.findChild(container) || container.findChild(thiscontainer))
+            if (selected || inthread)
                 opacity = 1;
             else
                 opacity = pref_opacity;

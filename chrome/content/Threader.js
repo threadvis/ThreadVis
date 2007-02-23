@@ -352,7 +352,7 @@ Threader.prototype.putMessageInContainer = function(message)
         if (parent_reference_container != null &&                           // if we have a parent container
             ! reference_container.hasParent() &&                            // and current container does not have a parent
             parent_reference_container != reference_container &&            // and we are not looking at the same container
-            ! parent_reference_container.findChild(reference_container))    // see if we are already a child of parent
+            ! reference_container.findParent(parent_reference_container))   // see if we are already a child of parent
         {
             // check if this reference is overridden by a cut
             // (i.e. thread is split by user)
@@ -381,7 +381,7 @@ Threader.prototype.putMessageInContainer = function(message)
     // or the parent container is a child of the current container, discard it as parent
     if (parent_reference_container != null &&
         (parent_reference_container == message_container ||
-        message_container.findChild(parent_reference_container)))
+        parent_reference_container.findParent(message_container)))
     {
 //        THREADVIS.logger_.logDebug(THREADVIS.logger_.LEVEL_EMAIL_,
 //                                   "Threader.putMessageInContainer()",
