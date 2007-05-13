@@ -54,7 +54,7 @@
 <!ENTITY about.version                                      "Version">
 <!ENTITY extension.description                              "Displays a small graphic visualising the thread (context) of the currently selected email.">
 <!ENTITY extension.copyright                                "&#xA9; 2004-2006 Alexander C. Hubmann">
-<!ENTITY extension.homepage                                 "http://www.sbox.tugraz.at/home/x/xpert/threadvis/">
+<!ENTITY extension.homepage                                 "http://www.student.tugraz.at/ahubmann/threadvis/">
 <!ENTITY extension.email                                    "xpert@sbox.tugraz.at">
 <!ENTITY extension.name                                     "ThreadVis">
-<!ENTITY extension.version                                  "0.8">
+<!ENTITY extension.version                                  "0.8.1">
