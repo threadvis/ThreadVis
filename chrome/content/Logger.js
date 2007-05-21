@@ -1,11 +1,12 @@
 /* *****************************************************************************
  * Logger.js
  *
- * (c) 2005-2006 Alexander C. Hubmann
+ * (c) 2005-2007 Alexander C. Hubmann
+ * (c) 2007 Alexander C. Hubmann-Haidvogel
  *
  * JavaScript file to log events
  *
- * Version: $Id$
+ * $Id$
  ******************************************************************************/
 
 
@@ -15,52 +16,50 @@
  * read preferences
  * open file if necessary
  ******************************************************************************/
-function Logger()
-{
-    this.EXTENSION_PATH_ = "extensions";
-    this.EXTENSION_GUID_ = "{A23E4120-431F-4753-AE53-5D028C42CFDC}";
-    this.LOGFILENAME_ = "threadvis.log.xml";
-    this.STARTTAG_ = '\n<log extensionversion="0.8">';
-    this.ENDTAG_ = "\n</log>";
-
-    this.LEVEL_ERROR_ = 0;
-    this.LEVEL_INFORM_ = 1;
-    this.LEVEL_VIS_ = 2;
-    this.LEVEL_EMAIL_ = 3;
-    this.LEVEL_ALL_ = 4;
-
+function Logger() {
+    this.EXTENSION_PATH = "extensions";
+    this.EXTENSION_GUID = "{A23E4120-431F-4753-AE53-5D028C42CFDC}";
+    this.LOGFILENAME = "threadvis.log.xml";
+    this.STARTTAG = '\n<log extensionversion="0.9beta">';
+    this.ENDTAG = "\n</log>";
+    
+    this.LEVEL_ERROR = 0;
+    this.LEVEL_INFORM = 1;
+    this.LEVEL_VIS = 2;
+    this.LEVEL_EMAIL = 3;
+    this.LEVEL_ALL = 4;
+    
     // init class variables
-    this.strings_ = document.getElementById("ThreadVisStrings");
-
+    this.strings = document.getElementById("ThreadVisStrings");
+    
     // try to create file
-    this.file_ = Components.classes["@mozilla.org/file/directory_service;1"]
-                 .getService(Components.interfaces.nsIProperties)
-                 .get("ProfD", Components.interfaces.nsIFile);
-
-    this.file_.append(this.EXTENSION_PATH_);
-    if (! this.file_.exists())
-        this.file_.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
-
-    this.file_.append(this.EXTENSION_GUID_);
-    if (! this.file_.exists())
-        this.file_.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
-
-    this.file_.append(this.LOGFILENAME_);
-
-    this.ready_ = false;
-
-    // if logging is enabled, open file
-    if (this.doLogging())
-    {
-        this.open();
+    this.file = Components.classes["@mozilla.org/file/directory_service;1"]
+        .getService(Components.interfaces.nsIProperties)
+        .get("ProfD", Components.interfaces.nsIFile);
+    
+    this.file.append(this.EXTENSION_PATH);
+    if (! this.file.exists()) {
+        this.file.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
     }
-    else
-    {
-        this.ready_ = false;
+    
+    this.file.append(this.EXTENSION_GUID);
+    if (! this.file.exists()) {
+        this.file.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
+    }
+    
+    this.file.append(this.LOGFILENAME);
+    
+    this.ready = false;
+    
+    // if logging is enabled, open file
+    if (this.doLogging()) {
+        this.open();
+    } else {
+        this.ready = false;
     }
     
     var ref = this;
-    THREADVIS.preferences_.registerCallback(THREADVIS.preferences_.PREF_LOGGING_, function(value) { ref.observe(value); });
+    THREADVIS.preferences.registerCallback(THREADVIS.preferences.PREF_LOGGING, function(value) { ref.observe(value); });
 }
 
 
@@ -68,16 +67,13 @@ function Logger()
 /** ****************************************************************************
  * close the logfile
  ******************************************************************************/
-Logger.prototype.close = function()
-{
+Logger.prototype.close = function() {
     // if file is open, close it
     // but write end tag to log first
-    if (this.ready_)
-    {
-        this.ready_ = false;
-        this.file_output_stream_.write(this.ENDTAG_,
-                                       this.ENDTAG_.length);
-        this.file_output_stream_.close();
+    if (this.ready) {
+        this.ready = false;
+        this.fileOutputStream.write(this.ENDTAG, this.ENDTAG.length);
+        this.fileOutputStream.close();
     }
 }
 
@@ -86,16 +82,15 @@ Logger.prototype.close = function()
 /** ****************************************************************************
  * convert an object to xml
  ******************************************************************************/
-Logger.prototype.decode = function(object)
-{
+Logger.prototype.decode = function(object) {
     var logtext = "";
-    for (var key in object)
-    {
+    for (var key in object) {
         logtext += '<info key="' + key + '">';
-        if (typeof(object[key]) == "object")
+        if (typeof(object[key]) == "object") {
             logtext += this.decode(object[key]);
-        else
+        } else {
             logtext += object[key];
+        }
         logtext += "</info>";
     }
     return logtext;
@@ -108,11 +103,9 @@ Logger.prototype.decode = function(object)
  * this method is called in debug mode
  * so use CDATA blocks to escape
  ******************************************************************************/
-Logger.prototype.decodeDebug = function(object)
-{
+Logger.prototype.decodeDebug = function(object) {
     var logtext = "";
-    for (var key in object)
-    {
+    for (var key in object) {
         logtext += '<info key="' + key + '">';
         logtext += "<![CDATA[";
         logtext += object[key];
@@ -127,9 +120,8 @@ Logger.prototype.decodeDebug = function(object)
 /** ****************************************************************************
  * Return if we do logging
  ******************************************************************************/
-Logger.prototype.doLogging = function()
-{
-    return THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_LOGGING_);
+Logger.prototype.doLogging = function() {
+    return THREADVIS.preferences.getPreference(THREADVIS.preferences.PREF_LOGGING);
 }
 
 
@@ -137,9 +129,18 @@ Logger.prototype.doLogging = function()
 /** ****************************************************************************
  * return the logfile file object
  ******************************************************************************/
-Logger.prototype.getFile = function()
-{
-    return this.file_;
+Logger.prototype.getFile = function() {
+    return this.file;
+}
+
+
+
+/** ****************************************************************************
+ * check to see if debug logging is enabled
+ ******************************************************************************/
+Logger.prototype.isDebug = function(level) {
+    return (THREADVIS.preferences.getPreference(THREADVIS.preferences.PREF_LOGGING_DEBUG) &&
+        THREADVIS.preferences.getPreference(THREADVIS.preferences.PREF_LOGGING_DEBUG_LEVEL) >= level);
 }
 
 
@@ -147,17 +148,14 @@ Logger.prototype.getFile = function()
 /** ****************************************************************************
  * write a string to the file
  ******************************************************************************/
-Logger.prototype.log = function(item,
-                                infos)
-{
-    if (this.ready_)
-    {
+Logger.prototype.log = function(item, infos) {
+    if (this.ready) {
         var date = new Date();
         var logtext = "";
         logtext += '\n<logitem date="' + date + '" item="' + item + '">';
         logtext += this.decode(infos);
         logtext += "</logitem>";
-        this.file_output_stream_.write(logtext, logtext.length);
+        this.fileOutputStream.write(logtext, logtext.length);
     }
 }
 
@@ -166,14 +164,11 @@ Logger.prototype.log = function(item,
 /** ****************************************************************************
  * write a string to the file in debug mode
  ******************************************************************************/
-Logger.prototype.logDebug = function(level,
-                                     item,
-                                     infos)
-{
-    if (this.ready_ && 
-        THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_LOGGING_DEBUG_) &&
-        THREADVIS.preferences_.getPreference(THREADVIS.preferences_.PREF_LOGGING_DEBUG_LEVEL_) >= level)
-    {
+Logger.prototype.logDebug = function(level, item, infos) {
+    if (this.ready && 
+        THREADVIS.preferences.getPreference(THREADVIS.preferences.PREF_LOGGING_DEBUG) &&
+        THREADVIS.preferences.getPreference(THREADVIS.preferences.PREF_LOGGING_DEBUG_LEVEL) >= level) {
+        
         var date = new Date();
         var logtext = "";
         logtext += '\n<logitem date="' + date + '" item="' + item + '">';
@@ -188,19 +183,16 @@ Logger.prototype.logDebug = function(level,
 /** ****************************************************************************
  * observe preferences changes
  ******************************************************************************/
-Logger.prototype.observe = function(enabled)
-{
+Logger.prototype.observe = function(enabled) {
     // if logging is enabled, but not ready:
     // this means it was just enabled, so open logfile
-    if (enabled && ! this.ready_)
-    {
+    if (enabled && ! this.ready) {
         this.open();
     }
-
+    
     // if logging is disabled, but ready
     // this means it was just disabled, so close logfile
-    if (!enabled && this.ready_)
-    {
+    if (!enabled && this.ready) {
         this.close();
     }
 }
@@ -210,22 +202,19 @@ Logger.prototype.observe = function(enabled)
 /** ****************************************************************************
  * open the logfile
  ******************************************************************************/
-Logger.prototype.open = function()
-{
-    this.ready_ = false;
-
-    if (! this.file_.exists())
-        this.file_.create(Components.interfaces.nsIFile.NORMAL_FILE_TYPE, 0644);
-
-    if (this.file_.exists())
-    {
-        this.file_output_stream_ = Components.classes["@mozilla.org/network/file-output-stream;1"]
-                                   .createInstance(Components.interfaces.nsIFileOutputStream);
+Logger.prototype.open = function() {
+    this.ready = false;
+    
+    if (! this.file.exists())
+        this.file.create(Components.interfaces.nsIFile.NORMAL_FILE_TYPE, 0644);
+    
+    if (this.file.exists()) {
+        this.fileOutputStream = Components.classes["@mozilla.org/network/file-output-stream;1"]
+            .createInstance(Components.interfaces.nsIFileOutputStream);
         var options = 0x2 | 0x8 | 0x10;
-        this.file_output_stream_.init(this.file_, options, 0, 0);
-        this.file_output_stream_.write(this.STARTTAG_,
-                                       this.STARTTAG_.length);
-        this.ready_ = true;
+        this.fileOutputStream.init(this.file, options, 0, 0);
+        this.fileOutputStream.write(this.STARTTAG, this.STARTTAG.length);
+        this.ready = true;
     }
 }
 
@@ -234,23 +223,22 @@ Logger.prototype.open = function()
 /** ****************************************************************************
  * reset the logfile
  ******************************************************************************/
-Logger.prototype.reset = function(delete_file)
-{
-    if (this.ready_)
+Logger.prototype.reset = function(deleteFile) {
+    if (this.ready) {
         this.close();
-
-    try
-    {
-        if (delete_file && this.file_)
-            this.file_.remove(false);
-        alert(this.strings_.getString("logger.deletedfile"));
     }
-    catch (ex)
-    {
-        alert(this.strings_.getString("logger.couldnotdeletefile"));
+    
+    try {
+        if (deleteFile && this.file) {
+            this.file_.remove(false);
+        }
+        alert(this.strings.getString("logger.deletedfile"));
+    } catch (ex) {
+        alert(this.strings.getString("logger.couldnotdeletefile"));
         alert(ex);
     }
-
-    if (this.pref_enablelogging_)
+    
+    if (this.doLogging()) {
         this.open();
+    }
 }

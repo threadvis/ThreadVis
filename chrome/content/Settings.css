@@ -1,74 +1,64 @@
 /** ****************************************************************************
  * Settings.css
  *
- * (c) 2005 Alexander C. Hubmann
+ * (c) 2005-2007 Alexander C. Hubmann
+ * (c) 2007 Alexander C. Hubmann-Haidvogel
  *
  * CSS file to layout preferences dialog
  *
- * Version: $Id$
+ * $Id$
  ******************************************************************************/
 
-tabpanel.overflow
-{
+tabpanel.overflow {
     overflow: auto;
 }
 
-tab
-{
+tab {
     padding: 0.5em;
 }
 
-#extension-name
-{
+#extensionName {
     font-size: large;
     font-weight: bold;
 }
 
-#about-version
-{
+#aboutVersion {
     font-weight: bold;
     color: rgb(144,144,144);
 }
 
-#about-description
-{
+#aboutDescription {
     color: rgb(64,64,64);
 }
 
-#about-copyright
-{
+#aboutCopyright {
     border-top-style: solid;
     border-top-color: rgb(192,192,192);
     border-top-width: 1px;
     padding-top: 5px;
 }
 
-#about-homepage
-{
+#aboutHomepage {
     text-decoration: underline;
     color: rgb(0,0,255);
     cursor: pointer;
 }
 
-#about-email
-{
+#aboutEmail {
     text-decoration: underline;
     color: rgb(0,0,255);
     cursor: pointer;
 }
 
-radio[pane=paneThreadVis]
-{
+radio[pane=paneThreadVis] {
     list-style-image: url("chrome://threadvis/content/images/icon.png");
 }
 
-#enableaccounts
-{
+#enableAccounts {
     overflow: auto;
     height: 220px;
 }
 
-.detaileddescription
-{
+.detailedDescription {
     color: rgb(70,70,70);
 }

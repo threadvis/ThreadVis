@@ -4,7 +4,8 @@
 /* *******************************************************
  * install.rdf
  *
- * (c) 2005 Alexander C. Hubmann
+ * (c) 2005-2007 Alexander C. Hubmann
+ * (c) 2007 Alexander C. Hubmann-Haidvogel
  *
  * RDF meta-file for Mozilla / Thunderbird
  *
@@ -22,7 +23,7 @@
      <Description>
        <em:id>{3550f703-e582-4d05-9a08-453d09bdfdc6}</em:id>
        <em:minVersion>1.0</em:minVersion>
-       <em:maxVersion>1.5.*</em:maxVersion>
+       <em:maxVersion>2.0.*</em:maxVersion>
      </Description>
     </em:targetApplication>
     
@@ -46,13 +47,13 @@
     
     <!-- Front End MetaData -->
     <em:id>{A23E4120-431F-4753-AE53-5D028C42CFDC}</em:id>
-    <em:version>0.8</em:version>
+    <em:version>0.9beta</em:version>
     <em:name>ThreadVis</em:name>
     <em:description>Displays a small graphic visualising the context (thread) of the currently selected email.</em:description>
-    <em:creator>Alexander C. Hubmann</em:creator>
-    <em:homepageURL>http://www.sbox.tugraz.at/home/x/xpert/threadvis/</em:homepageURL>
+    <em:creator>Alexander C. Hubmann-Haidvogel</em:creator>
+    <em:homepageURL>http://www.student.tugraz.at/ahubmann/threadvis/</em:homepageURL>
     <em:optionsURL>chrome://threadvis/content/SettingsDialog.xul</em:optionsURL>
-    <em:updateURL>http://www.sbox.tugraz.at/home/x/xpert/threadvis/update.rdf</em:updateURL>
+    <em:updateURL>http://www.student.tugraz.at/ahubmann/threadvis/update.rdf</em:updateURL>
     <em:iconURL>chrome://threadvis/content/images/icon.png</em:iconURL>
 
     <!-- Packages, Skins and Locales that this extension registers -->

@@ -1,11 +1,12 @@
 /* *******************************************************
  * ThreadVisDefault.js
  *
- * (c) 2005-2006 Alexander C. Hubmann
+ * (c) 2005-2007 Alexander C. Hubmann
+ * (c) 2007 Alexander C. Hubmann-Haidvogel
  *
  * default preferences
  *
- * Version: $Id$
+ * $Id$
  ********************************************************/
 
 pref("extensions.threadvis.disabledaccounts", "");

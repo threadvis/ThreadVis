@@ -2,11 +2,12 @@
 /* *******************************************************
  * Settings.dtd
  *
- * (c) 2005-2006 Alexander C. Hubmann
+ * (c) 2005-2007 Alexander C. Hubmann
+ * (c) 2007 Alexander C. Hubmann-Haidvogel
  *
  * DTD file containing DE localisation of UI elements
  *
- * Version: $Id$
+ * $Id$
  ********************************************************/
 -->
 <!ENTITY settings.title                                     "ThreadVis">
@@ -26,6 +27,7 @@
 <!ENTITY logfiles.reset.button                              "Log-Dateien zur&#xFC;cksetzen">
 <!ENTITY logfiles.reset.tooltip                             "Setzt die Log-Dateien auf Gr&#xF6;&#xDF;e 0 zur&#xFC;ck. Sie k&#xF6;nnen dies tun, nachdem Sie die Log-Dateien abgeschickt haben, um Speicherplatz zu sparen.">
 <!ENTITY visualisation.tab                                  "Visualisierung">
+<!ENTITY visualisation.caching.caption                      "Caching">
 <!ENTITY visualisation.defaultzoom.caption                  "Maximale Gr&#xF6;&#xDF;e der Visualisierung">
 <!ENTITY visualisation.defaultzoom.width                    "x sichtbare Breite">
 <!ENTITY visualisation.defaultzoom.height                   "x sichtbare H&#xF6;he">
@@ -54,8 +56,8 @@
 <!ENTITY about.tab                                          "Info">
 <!ENTITY about.version                                      "Version">
 <!ENTITY extension.description                              "Zeigt eine kleine Grafik, die den Kontext (Thread) der aktuell angezeigten Nachricht visualisiert.">
-<!ENTITY extension.copyright                                "&#xA9; 2004-2006 Alexander C. Hubmann">
-<!ENTITY extension.homepage                                 "http://www.sbox.tugraz.at/home/x/xpert/threadvis/">
-<!ENTITY extension.email                                    "xpert@sbox.tugraz.at">
+<!ENTITY extension.copyright                                "&#xA9; 2004-2007 Alexander C. Hubmann &#xA9; 2007 Alexander C. Hubmann-Haidvogel">
+<!ENTITY extension.homepage                                 "http://www.student.tugraz.at/ahubmann/threadvis/">
+<!ENTITY extension.email                                    "ahubmann@gmail.com">
 <!ENTITY extension.name                                     "ThreadVis">
-<!ENTITY extension.version                                  "0.8">
+<!ENTITY extension.version                                  "0.9beta">

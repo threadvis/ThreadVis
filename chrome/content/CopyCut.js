@@ -1,11 +1,12 @@
 /* *****************************************************************************
  * CopyCut.js
  *
- * (c) 2005 Alexander C. Hubmann
+ * (c) 2005-2007 Alexander C. Hubmann
+ * (c) 2007 Alexander C. Hubmann-Haidvogel
  *
  * JavaScript file to copy and cut messages
  *
- * Version: $Id$
+ * $Id$
  ******************************************************************************/
 
 
@@ -14,32 +15,33 @@
  * constructor
  * create new object, create file pointers
  ******************************************************************************/
-function CopyCut()
-{
-    this.EXTENSION_PATH_ = "extensions";
-    this.EXTENSION_GUID_ = "{A23E4120-431F-4753-AE53-5D028C42CFDC}";
-    this.FILENAME_ = "threadvis.copycut";
-    this.DIVIDER_ = "<<<<<<<<<<>>>>>>>>>>";
-
+function CopyCut() {
+    this.EXTENSION_PATH = "extensions";
+    this.EXTENSION_GUID = "{A23E4120-431F-4753-AE53-5D028C42CFDC}";
+    this.FILENAME = "threadvis.copycut";
+    this.DIVIDER = "<<<<<<<<<<>>>>>>>>>>";
+    
     // try to create file
-    this.file_ = Components.classes["@mozilla.org/file/directory_service;1"]
-                 .getService(Components.interfaces.nsIProperties)
-                 .get("ProfD", Components.interfaces.nsIFile);
+    this.file = Components.classes["@mozilla.org/file/directory_service;1"]
+        .getService(Components.interfaces.nsIProperties)
+        .get("ProfD", Components.interfaces.nsIFile);
     
-    this.file_.append(this.EXTENSION_PATH_);
-    if (! this.file_.exists())
-        this.file_.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
+    this.file.append(this.EXTENSION_PATH);
+    if (! this.file.exists()) {
+        this.file.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
+    }
     
-    this.file_.append(this.EXTENSION_GUID_);
-    if (! this.file_.exists())
-        this.file_.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
+    this.file.append(this.EXTENSION_GUID);
+    if (! this.file.exists()) {
+        this.file.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
+    }
     
-    this.file_.append(this.FILENAME_);
+    this.file.append(this.FILENAME);
     
-    this.ready_ = false;
+    this.ready = false;
     
-    this.cuts_ = new Array();
-    this.copies_ = new Array();
+    this.cuts = new Array();
+    this.copies = new Array();
 }
 
 
@@ -50,18 +52,13 @@ function CopyCut()
  * if we are adding a copy for a pair that was previously cut,
  * just remove the cut
  ******************************************************************************/
-CopyCut.prototype.addCopy = function(msg_msg)
-{
-    var splits = msg_msg.split(" ");
-    if (splits[0] != "" && splits[1] != "")
-    {
-        if (this.cuts_[splits[0]] == splits[1])
-        {
-            delete this.cuts_[splits[0]];
-        }
-        else
-        {
-            this.copies_[splits[0]] = splits[1];
+CopyCut.prototype.addCopy = function(msgMsg) {
+    var splits = msgMsg.split(" ");
+    if (splits[0] != "" && splits[1] != "") {
+        if (this.cuts[splits[0]] == splits[1]) {
+            delete this.cuts[splits[0]];
+        } else {
+            this.copies[splits[0]] = splits[1];
         }
     }
 }
@@ -74,18 +71,13 @@ CopyCut.prototype.addCopy = function(msg_msg)
  * if we are adding a cut for a pair that was previously copied,
  * just remove the copy
  ******************************************************************************/
-CopyCut.prototype.addCut= function(msg_msg)
-{
-    var splits = msg_msg.split(" ");
-    if (splits[0] != "" && splits[1] != "")
-    {
-        if (this.copies_[splits[0]] == splits[1])
-        {
-            delete this.copies_[splits[0]];
-        }
-        else
-        {
-            this.cuts_[splits[0]] = splits[1];
+CopyCut.prototype.addCut= function(msgMsg) {
+    var splits = msgMsg.split(" ");
+    if (splits[0] != "" && splits[1] != "") {
+        if (this.copies[splits[0]] == splits[1]) {
+            delete this.copies[splits[0]];
+        } else {
+            this.cuts[splits[0]] = splits[1];
         }
     }
 }
@@ -95,15 +87,13 @@ CopyCut.prototype.addCut= function(msg_msg)
 /** ****************************************************************************
  * close the file
  ******************************************************************************/
-CopyCut.prototype.close = function()
-{
+CopyCut.prototype.close = function() {
     // if file is open, close it
-    if (this.ready_)
-    {
-        this.ready_ = false;
-        this.scriptable_input_stream_.close();
-        this.file_input_stream_.close();
-        this.file_output_stream_.close();
+    if (this.ready) {
+        this.ready = false;
+        this.scriptableInputStream.close();
+        this.fileInputStream.close();
+        this.fileOutputStream.close();
     }
 }
 
@@ -113,9 +103,8 @@ CopyCut.prototype.close = function()
  * get copy for message
  * (return msg_id of new parent)
  ******************************************************************************/
-CopyCut.prototype.getCopy = function(msg)
-{
-    return this.copies_[msg];
+CopyCut.prototype.getCopy = function(msg) {
+    return this.copies[msg];
 }
 
 
@@ -124,9 +113,8 @@ CopyCut.prototype.getCopy = function(msg)
  * get cut for message
  * (return msg_id of old parent)
  ******************************************************************************/
-CopyCut.prototype.getCut = function(msg)
-{
-    return this.cuts_[msg];
+CopyCut.prototype.getCut = function(msg) {
+    return this.cuts[msg];
 }
 
 
@@ -134,9 +122,8 @@ CopyCut.prototype.getCut = function(msg)
 /** ****************************************************************************
  * return the file object
  ******************************************************************************/
-CopyCut.prototype.getFile = function()
-{
-    return this.file_;
+CopyCut.prototype.getFile = function() {
+    return this.file;
 }
 
 
@@ -145,28 +132,27 @@ CopyCut.prototype.getFile = function()
  * open the file
  * create streams
  ******************************************************************************/
-CopyCut.prototype.open = function()
-{
-    this.ready_ = false;
-
-    if (! this.file_.exists())
-        this.file_.create(Components.interfaces.nsIFile.NORMAL_FILE_TYPE, 0644);
-
-    if (this.file_.exists())
-    {
-        this.file_output_stream_ = Components.classes["@mozilla.org/network/file-output-stream;1"]
-                                   .createInstance(Components.interfaces.nsIFileOutputStream);
-        this.file_input_stream_ = Components.classes["@mozilla.org/network/file-input-stream;1"]
-                                   .createInstance(Components.interfaces.nsIFileInputStream);
+CopyCut.prototype.open = function() {
+    this.ready = false;
+    
+    if (! this.file.exists()) {
+        this.file.create(Components.interfaces.nsIFile.NORMAL_FILE_TYPE, 0644);
+    }
+    
+    if (this.file.exists()) {
+        this.fileOutputStream = Components.classes["@mozilla.org/network/file-output-stream;1"]
+            .createInstance(Components.interfaces.nsIFileOutputStream);
+        this.fileInputStream = Components.classes["@mozilla.org/network/file-input-stream;1"]
+            .createInstance(Components.interfaces.nsIFileInputStream);
         var options = 0x2 | 0x8 | 0x10;
-        this.file_output_stream_.init(this.file_, options, 0, false);
-        this.file_input_stream_.init(this.file_, 1, 0, false);
+        this.fileOutputStream.init(this.file, options, 0, false);
+        this.fileInputStream.init(this.file, 1, 0, false);
 
-        this.scriptable_input_stream_ = Components.classes["@mozilla.org/scriptableinputstream;1"]
-                                           .createInstance(Components.interfaces.nsIScriptableInputStream);
-        this.scriptable_input_stream_.init(this.file_input_stream_);
+        this.scriptableInputStream = Components.classes["@mozilla.org/scriptableinputstream;1"]
+            .createInstance(Components.interfaces.nsIScriptableInputStream);
+        this.scriptableInputStream.init(this.fileInputStream);
 
-        this.ready_ = true;
+        this.ready = true;
     }
 }
 
@@ -175,34 +161,36 @@ CopyCut.prototype.open = function()
 /** ****************************************************************************
  * read copies and cuts from file
  ******************************************************************************/
-CopyCut.prototype.read = function()
-{
-    if (! this.ready_)
+CopyCut.prototype.read = function() {
+    if (! this.ready) {
         this.open();
+    }
     
-    if (! this.ready_)
+    if (! this.ready) {
         return;
+    }
     
-    var file_size = this.scriptable_input_stream_.available();
-    var file_contents = this.scriptable_input_stream_.read(file_size);
+    var fileSize = this.scriptableInputStream.available();
+    var fileContents = this.scriptableInputStream.read(fileSize);
     
     // format of file is one cut or copy per line
-    var lines = file_contents.split(/\n/);
+    var lines = fileContents.split(/\n/);
     var i = 0;
-    for (i; i < lines.length; i++)
-    {
+    for (i; i < lines.length; i++) {
         // we use a simple format to divide the file into copies and cuts
-        if (lines[i] == this.DIVIDER_)
+        if (lines[i] == this.DIVIDER) {
             break;
-        if (lines[i] != "")
+        }
+        if (lines[i] != "") {
             this.addCut(lines[i]);
+        }
     }
     // just assume that the rest after the divider is all copies
     i++;
-    for (i; i < lines.length; i++)
-    {
-        if (lines[i] != "")
+    for (i; i < lines.length; i++) {
+        if (lines[i] != "") {
             this.addCopy(lines[i]);
+        }
     }
 }
 
@@ -211,18 +199,16 @@ CopyCut.prototype.read = function()
 /** ****************************************************************************
  * reset the file (i.e. delete)
  ******************************************************************************/
-CopyCut.prototype.reset = function()
-{
-    if (this.ready_)
+CopyCut.prototype.reset = function() {
+    if (this.ready) {
         this.close();
-
-    try
-    {
-        if (this.file_)
-            this.file_.remove(false);
     }
-    catch (ex)
-    {
+    
+    try {
+        if (this.file) {
+            this.file.remove(false);
+        }
+    } catch (ex) {
     }
 }
 
@@ -232,28 +218,27 @@ CopyCut.prototype.reset = function()
  * write copies and cuts to file
  * write one per line
  ******************************************************************************/
-CopyCut.prototype.write = function()
-{
+CopyCut.prototype.write = function() {
     this.reset();
     
-    if (! this.ready_)
+    if (! this.ready) {
         this.open();
-    
-    if (! this.ready_)
-        return;
-    
-    for (var msg in this.cuts_)
-    {
-        var line = msg + " " + this.cuts_[msg] + "\n";
-        this.file_output_stream_.write(line, line.length);
     }
     
-    var line = this.DIVIDER_ + "\n";
-    this.file_output_stream_.write(line, line.length);
+    if (! this.ready) {
+        return;
+    }
     
-    for (var msg in this.copies_)
-    {
-        var line = msg + " " + this.copies_[msg] + "\n";
-        this.file_output_stream_.write(line, line.length);
+    for (var msg in this.cuts) {
+        var line = msg + " " + this.cuts[msg] + "\n";
+        this.fileOutputStream.write(line, line.length);
+    }
+    
+    var line = this.DIVIDER + "\n";
+    this.fileOutputStream.write(line, line.length);
+    
+    for (var msg in this.copies) {
+        var line = msg + " " + this.copies[msg] + "\n";
+        this.fileOutputStream.write(line, line.length);
     }
 }

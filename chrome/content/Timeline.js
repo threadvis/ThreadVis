@@ -1,9 +1,10 @@
 /** ****************************************************************************
  * Timeline.js
  *
- * (c) 2006 Alexander C. Hubmann
+ * (c) 2006-2007 Alexander C. Hubmann
+ * (c) 2007 Alexander C. Hubmann-Haidvogel
  *
- * Version: $Id$
+ * $Id$
  ******************************************************************************/
 
 
@@ -11,50 +12,43 @@
 /** ****************************************************************************
  * Constructor for timeline class
  ******************************************************************************/
-function Timeline(stack,
-                  strings,
-                  containers,
-                  resize,
-                  dotsize,
-                  top,
-                  top_delta)
-{
+function Timeline(stack, strings, containers, resize, dotSize, top, topDelta) {
     /**
      * XUL stack to draw timeline on
      */
-    this.stack_ = stack;
-
+    this.stack = stack;
+    
     /**
      * XUL stringbundle to get localised strings
      */
-    this.strings_ = strings;
-
+    this.strings = strings;
+    
     /**
      * containers of current thread
      */
-    this.containers_ = containers;
-
+    this.containers = containers;
+    
     /**
      * resize multiplicator
      */
-    this.resize_ = resize;
-
+    this.resize = resize;
+    
     /**
      * size of messages in px
      */
-    this.dotsize_ = dotsize;
-
+    this.dotSize = dotSize;
+    
     /**
      * top position of center of visualisation in px
      */
-    this.top_ = top;
-
+    this.top = top;
+    
     /**
      * delta of timeline (moved to top by delta)
      */
-    this.top_delta_ = top_delta;
+    this.topDelta = topDelta;
     
-    this.times_ = Array();
+    this.times = new Object();
 }
 
 
@@ -62,26 +56,26 @@ function Timeline(stack,
 /** ****************************************************************************
  * Draw the timeline
  ******************************************************************************/
-Timeline.prototype.draw = function()
-{
+Timeline.prototype.draw = function() {
     // start with second container
-    for (var i = 1; i < this.containers_.length; i++)
+    for (var i = 1; i < this.containers.length; i++)
     {
         // look at two adjacent containers
-        var first = this.containers_[i - 1];
-        var second = this.containers_[i];
+        var first = this.containers[i - 1];
+        var second = this.containers[i];
         
         // don't calculate time if one of them is a dummy
-        if (first.isDummy() || second.isDummy())
+        if (first.isDummy() || second.isDummy()) {
             continue;
+        }
         
-        var timedifference = first.timedifference_;
+        var timeDifference = first.timeDifference;
         
         // get the formatted strings
-        var formatted = this.formatTime(timedifference);
+        var formatted = this.formatTime(timeDifference);
         
         // draw the labels and tooltips
-        this.drawTime(first, first.x_position_, second.x_position_, formatted.string, formatted.tooltip);
+        this.drawTime(first, first.xPosition, second.xPosition, formatted.string, formatted.toolTip);
     }
 }
 
@@ -90,67 +84,62 @@ Timeline.prototype.draw = function()
 /** ****************************************************************************
  * Draw the label and the tooltip
  ******************************************************************************/
-Timeline.prototype.drawTime = function(container, left, right, string, tooltip)
-{
+Timeline.prototype.drawTime = function(container, left, right, string, toolTip) {
     // check to see if we already created the label and the tooltip
+    
     var elem = null;
-    var newelem = false;
-    if (this.times_[container])
-        elem = this.times_[container];
-    else
-    {
-        elem = document.createElementNS(THREADVIS.XUL_NAMESPACE_, "description");
-        newelem = true;
-        this.times_[container] = elem;
+    var newElem = false;
+    if (this.times[container]) {
+        elem = this.times[container];
+    } else {
+        elem = document.createElementNS(THREADVIS.XUL_NAMESPACE, "description");
+        newElem = true;
+        this.times[container] = elem;
     }
     
     // calculate style
-    var style_borderbottom = "";
-    var style_borderleft = "";
-    var style_borderright = "";
-    var style_bordertop = "";
-    var style_fontsize = "9px";
-    var style_left = ((left - this.dotsize_ / 2)* this.resize_) + "px";
-    var style_top = (this.top_ - this.top_delta_) * this.resize_ + "px";
-    var style_width = ((right - left) * this.resize_) + "px";
+    var styleBorderBottom = "";
+    var styleBorderLeft = "";
+    var styleBorderRight = "";
+    var styleBorderTop = "";
+    var styleFontSize = "9px";
+    var styleLeft = ((left - this.dotSize / 2)* this.resize) + "px";
+    var styleTop = (this.top - this.topDelta) * this.resize + "px";
+    var styleWidth = ((right - left) * this.resize) + "px";
     
     // set style
-    elem.style.borderBottom = style_borderbottom;
-    elem.style.borderLeft = style_borderleft;
-    elem.style.borderRight = style_borderright;
-    elem.style.borderTop = style_bordertop;
-    elem.style.fontSize = style_fontsize;
-    elem.style.left = style_left;
+    elem.style.borderBottom = styleBorderBottom;
+    elem.style.borderLeft = styleBorderLeft;
+    elem.style.borderRight = styleBorderRight;
+    elem.style.borderTop = styleBorderTop;
+    elem.style.fontSize = styleFontSize;
+    elem.style.left = styleLeft;
     elem.style.position = "relative";
     elem.style.textAlign = "center";
-    elem.style.top = style_top;
-    elem.style.width = style_width;
+    elem.style.top = styleTop;
+    elem.style.width = styleWidth;
     elem.style.zIndex = "1";
     //elem.style.cursor = "move";
     
     elem.setAttribute("value", string);
-    elem.setAttribute("tooltiptext", tooltip);
+    elem.setAttribute("tooltiptext", toolTip);
     
     // and add to stack only if we just created the element
-    if (newelem)
-    {
-        this.stack_.appendChild(elem);
+    if (newElem) {
+        this.stack.appendChild(elem);
         
         // prevent mousedown event from bubbling to box object
         // prevent dragging of visualisation by clicking on message
         elem.addEventListener("mousedown",
-            function(event)
-            {
-                event.stopPropagation();
-            },
-            true);
+            function(event) { event.stopPropagation(); }, true);
     }
     
     // hide if not enough space
-    if (((right - left) * this.resize_ < 20) || (this.top_delta_ * this.resize_ < 9))
+    if (((right - left) * this.resize < 20) || (this.topDelta * this.resize < 9)) {
         elem.hidden = true;
-    else
+    } else {
         elem.hidden = false;
+    }
 
 }
 
@@ -159,69 +148,76 @@ Timeline.prototype.drawTime = function(container, left, right, string, tooltip)
 /** ****************************************************************************
  * Format the time difference for the label and the tooltip
  ******************************************************************************/
-Timeline.prototype.formatTime = function(timedifference)
-{
+Timeline.prototype.formatTime = function(timeDifference) {
     // timedifference is in miliseconds
-    timedifference = timedifference - (timedifference % 1000);
-    timedifference = timedifference / 1000;
-    var seconds = timedifference % 60;
-    timedifference = timedifference - seconds;
-    timedifference = timedifference / 60;
-    var minutes = timedifference % 60;
-    timedifference = timedifference - minutes;
-    timedifference = timedifference / 60;
-    var hours = timedifference % 24;
-    timedifference = timedifference - hours;
-    timedifference = timedifference / 24;
-    var days = timedifference % 365;
-    timedifference = timedifference - days;
-    timedifference = timedifference / 365;
-    var years = timedifference;
+    timeDifference = timeDifference - (timeDifference % 1000);
+    timeDifference = timeDifference / 1000;
+    var seconds = timeDifference % 60;
+    timeDifference = timeDifference - seconds;
+    timeDifference = timeDifference / 60;
+    var minutes = timeDifference % 60;
+    timeDifference = timeDifference - minutes;
+    timeDifference = timeDifference / 60;
+    var hours = timeDifference % 24;
+    timeDifference = timeDifference - hours;
+    timeDifference = timeDifference / 24;
+    var days = timeDifference % 365;
+    timeDifference = timeDifference - days;
+    timeDifference = timeDifference / 365;
+    var years = timeDifference;
     
     var string = "";
-    var tooltip = "";
+    var toolTip = "";
     
     // label
     // only display years if >= 1
-    if (years >= 1)
-        string = years + this.strings_.getString("visualisation.timedifference.years.short");
+    if (years >= 1) {
+        string = years + this.strings.getString("visualisation.timedifference.years.short");
     // only display days if >= 1
-    else if (days >= 1)
-        string = days + this.strings_.getString("visualisation.timedifference.days.short");
+    } else if (days >= 1) {
+        string = days + this.strings.getString("visualisation.timedifference.days.short");
     // display hours if >= 1
-     else if (hours >= 1)
-        string = hours + this.strings_.getString("visualisation.timedifference.hours.short");
+     } else if (hours >= 1) {
+        string = hours + this.strings.getString("visualisation.timedifference.hours.short");
     // display minutes otherwise
-     else
-        string = minutes + this.strings_.getString("visualisation.timedifference.minutes.short");;
-     
+     } else {
+        string = minutes + this.strings.getString("visualisation.timedifference.minutes.short");;
+    }
      
      // tooltip
-    if (years == 1)
-        tooltip = years + " " + this.strings_.getString("visualisation.timedifference.year");;
-    if (years > 1)
-        tooltip = years + " " + this.strings_.getString("visualisation.timedifference.years");;
+    if (years == 1) {
+        toolTip = years + " " + this.strings.getString("visualisation.timedifference.year");;
+    }
+    if (years > 1) {
+        toolTip = years + " " + this.strings.getString("visualisation.timedifference.years");;
+    }
     
-    if (days == 1)
-        tooltip += " " + days + " " + this.strings_.getString("visualisation.timedifference.day");
-    if (days > 1)
-        tooltip += " " + days + " " + this.strings_.getString("visualisation.timedifference.days");
+    if (days == 1) {
+        toolTip += " " + days + " " + this.strings.getString("visualisation.timedifference.day");
+    }
+    if (days > 1) {
+        toolTip += " " + days + " " + this.strings.getString("visualisation.timedifference.days");
+    }
     
-    if (hours == 1)
-        tooltip += " " + hours + " " + this.strings_.getString("visualisation.timedifference.hour");;
-    if (hours > 1)
-        tooltip += " " + hours + " " + this.strings_.getString("visualisation.timedifference.hours");;
+    if (hours == 1) {
+        toolTip += " " + hours + " " + this.strings.getString("visualisation.timedifference.hour");;
+    }
+    if (hours > 1) {
+        toolTip += " " + hours + " " + this.strings.getString("visualisation.timedifference.hours");;
+    }
     
-    if (minutes == 1)
-        tooltip += " " + minutes + " " + this.strings_.getString("visualisation.timedifference.minute");;
-    if (minutes > 1)
-        tooltip += " " + minutes + " " + this.strings_.getString("visualisation.timedifference.minutes");;
+    if (minutes == 1) {
+        toolTip += " " + minutes + " " + this.strings.getString("visualisation.timedifference.minute");;
+    }
+    if (minutes > 1) {
+        toolTip += " " + minutes + " " + this.strings.getString("visualisation.timedifference.minutes");;
+    }
     
-    var returnobject = new Object();
-    returnobject.string = string;
-    returnobject.tooltip = tooltip;
+    var returnObject = new Object();
+    returnObject.string = string;
+    returnObject.toolTip = toolTip;
     
-    return returnobject;
+    return returnObject;
 }
 
 
@@ -229,9 +225,8 @@ Timeline.prototype.formatTime = function(timedifference)
 /** ****************************************************************************
  * Re-Draw the timeline
  ******************************************************************************/
-Timeline.prototype.redraw = function(resize, vertical)
-{
-    this.resize_ = resize;
-    this.vertical_ = vertical;
+Timeline.prototype.redraw = function(resize, vertical) {
+    this.resize = resize;
+    this.vertical = vertical;
     this.draw();
 }

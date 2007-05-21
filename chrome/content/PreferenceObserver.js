@@ -1,11 +1,12 @@
 /** ****************************************************************************
  * PreferenceObserver.js
  *
- * (c) 2005-2006 Alexander C. Hubmann
+ * (c) 2005-2007 Alexander C. Hubmann
+ * (c) 2007 Alexander C. Hubmann-Haidvogel
  *
  * JavaScript file to react to preference changing events
  *
- * Version: $Id$
+ * $Id$
  ******************************************************************************/
 
 
@@ -13,43 +14,42 @@
 /** ****************************************************************************
  * Preference observer
  ******************************************************************************/
-function PreferenceObserver()
-{
-    this.PREF_BRANCH_ = "extensions.threadvis.";
-
-    this.PREF_DISABLED_ACCOUNTS_ = "disabledaccounts";
-    this.PREF_DISABLED_FOLDERS_ = "disabledfolders";
-    this.PREF_ENABLED_ = "enabled";
-    this.PREF_LOGGING_ = "logging.enabled";
-    this.PREF_LOGGING_DEBUG_ = "logging.debug";
-    this.PREF_LOGGING_DEBUG_LEVEL_ = "logging.debug.level";
-    this.PREF_NOTES_ = "notes";
-    this.PREF_TIMELINE_ = "timeline.enabled";
-    this.PREF_TIMESCALING_ = "timescaling.enabled";
-    this.PREF_VIS_DOTSIZE_ = "visualisation.dotsize";
-    this.PREF_VIS_ARC_MINHEIGHT_ = "visualisation.arcminheight";
-    this.PREF_VIS_ARC_RADIUS_ = "visualisation.arcradius";
-    this.PREF_VIS_ARC_DIFFERENCE_ = "visualisation.arcdifference";
-    this.PREF_VIS_ARC_WIDTH_ = "visualisation.arcwidth";
-    this.PREF_VIS_SPACING_ = "visualisation.spacing";
-    this.PREF_VIS_COLOUR_ = "visualisation.colour";
-    this.PREF_VIS_HIGHLIGHT_ = "visualisation.highlight";
-    this.PREF_VIS_OPACITY_ = "visualisation.opacity";
-    this.PREF_ZOOM_HEIGHT_ = "zoom.height";
-    this.PREF_ZOOM_WIDTH_ = "zoom.width";
-
-    this.pref_branch_ = null;
-    this.preferences_ = new Object();
-    this.callback_ = new Object();
-
+function PreferenceObserver() {
+    this.PREF_BRANCH = "extensions.threadvis.";
+    
+    this.PREF_DISABLED_ACCOUNTS = "disabledaccounts";
+    this.PREF_DISABLED_FOLDERS = "disabledfolders";
+    this.PREF_ENABLED = "enabled";
+    this.PREF_LOGGING = "logging.enabled";
+    this.PREF_LOGGING_DEBUG = "logging.debug";
+    this.PREF_LOGGING_DEBUG_LEVEL = "logging.debug.level";
+    this.PREF_NOTES = "notes";
+    this.PREF_TIMELINE = "timeline.enabled";
+    this.PREF_TIMESCALING = "timescaling.enabled";
+    this.PREF_VIS_DOTSIZE = "visualisation.dotsize";
+    this.PREF_VIS_ARC_MINHEIGHT = "visualisation.arcminheight";
+    this.PREF_VIS_ARC_RADIUS = "visualisation.arcradius";
+    this.PREF_VIS_ARC_DIFFERENCE = "visualisation.arcdifference";
+    this.PREF_VIS_ARC_WIDTH = "visualisation.arcwidth";
+    this.PREF_VIS_SPACING = "visualisation.spacing";
+    this.PREF_VIS_COLOUR = "visualisation.colour";
+    this.PREF_VIS_HIGHLIGHT = "visualisation.highlight";
+    this.PREF_VIS_OPACITY = "visualisation.opacity";
+    this.PREF_ZOOM_HEIGHT = "zoom.height";
+    this.PREF_ZOOM_WIDTH = "zoom.width";
+    
+    this.prefBranch = null;
+    this.preferences = new Object();
+    this.callback = new Object();
+    
     var prefService = Components.classes["@mozilla.org/preferences-service;1"]
-                      .getService(Components.interfaces.nsIPrefService);
-    this.pref_branch_ = prefService.getBranch(this.PREF_BRANCH_);
-
-    this.PREF_BOOL_ = this.pref_branch_.PREF_BOOL;
-    this.PREF_INT_ = this.pref_branch_.PREF_INT;
-    this.PREF_STRING_ = this.pref_branch_.PREF_STRING;
-
+        .getService(Components.interfaces.nsIPrefService);
+    this.prefBranch = prefService.getBranch(this.PREF_BRANCH);
+    
+    this.PREF_BOOL = this.prefBranch.PREF_BOOL;
+    this.PREF_INT = this.prefBranch.PREF_INT;
+    this.PREF_STRING = this.prefBranch.PREF_STRING;
+    
     this.register();
     this.preferenceReload();
 }
@@ -59,14 +59,11 @@ function PreferenceObserver()
 /** ****************************************************************************
  * do callbacks after preference change
  ******************************************************************************/
-PreferenceObserver.prototype.doCallback = function(pref)
-{
-    var value = this.preferences_[pref];
-    var array = this.callback_[pref];
-    if (array)
-    {
-        for (var key in array)
-        {
+PreferenceObserver.prototype.doCallback = function(pref) {
+    var value = this.preferences[pref];
+    var array = this.callback[pref];
+    if (array) {
+        for (var key in array) {
             var func = array[key];
             func(value);
         }
@@ -78,9 +75,8 @@ PreferenceObserver.prototype.doCallback = function(pref)
 /** ****************************************************************************
  * get preference value for given preference
  ******************************************************************************/
-PreferenceObserver.prototype.getPreference = function(pref)
-{
-    return this.preferences_[pref];
+PreferenceObserver.prototype.getPreference = function(pref) {
+    return this.preferences[pref];
 }
 
 
@@ -88,23 +84,22 @@ PreferenceObserver.prototype.getPreference = function(pref)
 /** ****************************************************************************
  * load preference
  ******************************************************************************/
-PreferenceObserver.prototype.loadPreference = function(pref, typ, def)
-{
-    this.preferences_[pref]= def;
-
-    if (this.pref_branch_.getPrefType(pref) != typ)
+PreferenceObserver.prototype.loadPreference = function(pref, typ, def) {
+    this.preferences[pref]= def;
+    
+    if (this.prefBranch.getPrefType(pref) != typ) {
         return;
-
-    switch (typ)
-    {
-        case this.pref_branch_.PREF_BOOL:
-            this.preferences_[pref] = this.pref_branch_.getBoolPref(pref);
+    }
+    
+    switch (typ) {
+        case this.prefBranch.PREF_BOOL:
+            this.preferences[pref] = this.prefBranch.getBoolPref(pref);
             break;
-        case this.pref_branch_.PREF_STRING:
-            this.preferences_[pref] = this.pref_branch_.getCharPref(pref);
+        case this.prefBranch.PREF_STRING:
+            this.preferences[pref] = this.prefBranch.getCharPref(pref);
             break;
-        case this.pref_branch_.PREF_INT:
-            this.preferences_[pref] = this.pref_branch_.getIntPref(pref);
+        case this.prefBranch.PREF_INT:
+            this.preferences[pref] = this.prefBranch.getIntPref(pref);
             break;
     }
 }
@@ -114,11 +109,11 @@ PreferenceObserver.prototype.loadPreference = function(pref, typ, def)
 /** ****************************************************************************
  * observe preferences changes
  ******************************************************************************/
-PreferenceObserver.prototype.observe = function(subject, topic, data)
-{
-    if(topic != "nsPref:changed")
+PreferenceObserver.prototype.observe = function(subject, topic, data) {
+    if(topic != "nsPref:changed") {
         return;
-
+    }
+    
     // reload preferences
     this.preferenceReload();
     this.doCallback(data);
@@ -129,28 +124,27 @@ PreferenceObserver.prototype.observe = function(subject, topic, data)
 /** ****************************************************************************
  * reload preferences
  ******************************************************************************/
-PreferenceObserver.prototype.preferenceReload = function()
-{
-    this.loadPreference(this.PREF_DISABLED_ACCOUNTS_, this.pref_branch_.PREF_STRING, "");
-    this.loadPreference(this.PREF_DISABLED_FOLDERS_, this.pref_branch_.PREF_STRING, "");
-    this.loadPreference(this.PREF_ENABLED_, this.pref_branch_.PREF_BOOL, true);
-    this.loadPreference(this.PREF_LOGGING_, this.pref_branch_.PREF_BOOL, false);
-    this.loadPreference(this.PREF_LOGGING_DEBUG_, this.pref_branch_.PREF_BOOL, false);
-    this.loadPreference(this.PREF_LOGGING_DEBUG_LEVEL_, this.pref_branch_.PREF_INT, 0);
-    this.loadPreference(this.PREF_NOTES_, this.pref_branch_.PREF_INT, 0);
-    this.loadPreference(this.PREF_TIMELINE_, this.pref_branch_.PREF_BOOL, true);
-    this.loadPreference(this.PREF_TIMESCALING_, this.pref_branch_.PREF_BOOL, true);
-    this.loadPreference(this.PREF_VIS_DOTSIZE_, this.pref_branch_.PREF_INT, 12);
-    this.loadPreference(this.PREF_VIS_ARC_MINHEIGHT_, this.pref_branch_.PREF_INT, 12);
-    this.loadPreference(this.PREF_VIS_ARC_RADIUS_, this.pref_branch_.PREF_INT, 32);
-    this.loadPreference(this.PREF_VIS_ARC_DIFFERENCE_, this.pref_branch_.PREF_INT, 6);
-    this.loadPreference(this.PREF_VIS_ARC_WIDTH_, this.pref_branch_.PREF_INT, 2);
-    this.loadPreference(this.PREF_VIS_SPACING_, this.pref_branch_.PREF_INT, 24);
-    this.loadPreference(this.PREF_VIS_COLOUR_, this.pref_branch_.PREF_STRING, "author");
-    this.loadPreference(this.PREF_VIS_HIGHLIGHT_, this.pref_branch_.PREF_BOOL, true);
-    this.loadPreference(this.PREF_VIS_OPACITY_, this.pref_branch_.PREF_INT, 30);
-    this.loadPreference(this.PREF_ZOOM_HEIGHT_, this.pref_branch_.PREF_INT, 1);
-    this.loadPreference(this.PREF_ZOOM_WIDTH_, this.pref_branch_.PREF_INT, 1);
+PreferenceObserver.prototype.preferenceReload = function() {
+    this.loadPreference(this.PREF_DISABLED_ACCOUNTS, this.prefBranch.PREF_STRING, "");
+    this.loadPreference(this.PREF_DISABLED_FOLDERS, this.prefBranch.PREF_STRING, "");
+    this.loadPreference(this.PREF_ENABLED, this.prefBranch.PREF_BOOL, true);
+    this.loadPreference(this.PREF_LOGGING, this.prefBranch.PREF_BOOL, false);
+    this.loadPreference(this.PREF_LOGGING_DEBUG, this.prefBranch.PREF_BOOL, false);
+    this.loadPreference(this.PREF_LOGGING_DEBUG_LEVEL, this.prefBranch.PREF_INT, 0);
+    this.loadPreference(this.PREF_NOTES, this.prefBranch.PREF_INT, 0);
+    this.loadPreference(this.PREF_TIMELINE, this.prefBranch.PREF_BOOL, true);
+    this.loadPreference(this.PREF_TIMESCALING, this.prefBranch.PREF_BOOL, true);
+    this.loadPreference(this.PREF_VIS_DOTSIZE, this.prefBranch.PREF_INT, 12);
+    this.loadPreference(this.PREF_VIS_ARC_MINHEIGHT, this.prefBranch.PREF_INT, 12);
+    this.loadPreference(this.PREF_VIS_ARC_RADIUS, this.prefBranch.PREF_INT, 32);
+    this.loadPreference(this.PREF_VIS_ARC_DIFFERENCE, this.prefBranch.PREF_INT, 6);
+    this.loadPreference(this.PREF_VIS_ARC_WIDTH, this.prefBranch.PREF_INT, 2);
+    this.loadPreference(this.PREF_VIS_SPACING, this.prefBranch.PREF_INT, 24);
+    this.loadPreference(this.PREF_VIS_COLOUR, this.prefBranch.PREF_STRING, "author");
+    this.loadPreference(this.PREF_VIS_HIGHLIGHT, this.prefBranch.PREF_BOOL, true);
+    this.loadPreference(this.PREF_VIS_OPACITY, this.prefBranch.PREF_INT, 30);
+    this.loadPreference(this.PREF_ZOOM_HEIGHT, this.prefBranch.PREF_INT, 1);
+    this.loadPreference(this.PREF_ZOOM_WIDTH, this.prefBranch.PREF_INT, 1);
 }
 
 
@@ -158,9 +152,8 @@ PreferenceObserver.prototype.preferenceReload = function()
 /** ****************************************************************************
  * Preference changing observer
  ******************************************************************************/
-PreferenceObserver.prototype.register =  function()
-{
-    var pbi = this.pref_branch_.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
+PreferenceObserver.prototype.register =  function() {
+    var pbi = this.prefBranch.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
     pbi.addObserver("", this, false);
 }
 
@@ -169,12 +162,12 @@ PreferenceObserver.prototype.register =  function()
 /** ****************************************************************************
  * register a callback hook
  ******************************************************************************/
-PreferenceObserver.prototype.registerCallback = function(preference, func)
-{
-    if (this.callback_[preference])
-        this.callback_[preference].push(func)
-    else
-        this.callback_[preference] = new Array(func);
+PreferenceObserver.prototype.registerCallback = function(preference, func) {
+    if (this.callback[preference]) {
+        this.callback[preference].push(func);
+    } else {
+        this.callback[preference] = new Array(func);
+    }
 }
 
 
@@ -182,9 +175,8 @@ PreferenceObserver.prototype.registerCallback = function(preference, func)
 /** ****************************************************************************
  * set preference value for given preference
  ******************************************************************************/
-PreferenceObserver.prototype.setPreference = function(pref, val, typ)
-{
-    this.preferences_[pref] = val;
+PreferenceObserver.prototype.setPreference = function(pref, val, typ) {
+    this.preferences[pref] = val;
     this.storePreference(pref, typ, val);
 }
 
@@ -193,20 +185,18 @@ PreferenceObserver.prototype.setPreference = function(pref, val, typ)
 /** ****************************************************************************
  * load preferences
  ******************************************************************************/
-PreferenceObserver.prototype.storePreference = function(pref, typ, val)
-{
-    this.preferences_[pref]= val;
-
-    switch (typ)
-    {
-        case this.pref_branch_.PREF_BOOL:
-            this.pref_branch_.setBoolPref(pref, val);
+PreferenceObserver.prototype.storePreference = function(pref, typ, val) {
+    this.preferences[pref]= val;
+    
+    switch (typ) {
+        case this.prefBranch.PREF_BOOL:
+            this.prefBranch.setBoolPref(pref, val);
             break;
-        case this.pref_branch_.PREF_STRING:
-            this.pref_branch_.setCharPref(pref, val);
+        case this.prefBranch.PREF_STRING:
+            this.prefBranch.setCharPref(pref, val);
             break;
-        case this.pref_branch_.PREF_INT:
-            this.pref_branch_.setIntPref(pref, val);
+        case this.prefBranch.PREF_INT:
+            this.prefBranch.setIntPref(pref, val);
             break;
     }
 }
@@ -216,11 +206,11 @@ PreferenceObserver.prototype.storePreference = function(pref, typ, val)
 /** ****************************************************************************
  * unregister observer
  ******************************************************************************/
-PreferenceObserver.prototype.unregister = function()
-{
-    if(!this.pref_branch_)
+PreferenceObserver.prototype.unregister = function() {
+    if(!this.prefBranch) {
         return;
-
-    var pbi = this.pref_branch_.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
+    }
+    
+    var pbi = this.prefBranch.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
     pbi.removeObserver("", this);
 }

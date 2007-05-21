@@ -4,11 +4,12 @@
 /** ****************************************************************************
  * ThreadVisPopup.xul
  *
- * (c) 2006 Alexander C. Hubmann
+ * (c) 2006-2007 Alexander C. Hubmann
+ * (c) 2007 Alexander C. Hubmann-Haidvogel
  *
  * XUL file to display ThreadVis Popup Visualisation
  *
- * Version: $Id$
+ * $Id$
  ******************************************************************************/
 -->
 

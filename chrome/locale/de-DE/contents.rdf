@@ -3,11 +3,12 @@
 /* *******************************************************
  * contents.rdf
  *
- * (c) 2005 Alexander C. Hubmann
+ * (c) 2005-2007 Alexander C. Hubmann
+ * (c) 2007 Alexander C. Hubmann-Haidvogel
  *
  * RDF file describing DE localisation
  *
- * Version: $Id$
+ * $Id$
  ********************************************************/
 -->
 <RDF:RDF xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 

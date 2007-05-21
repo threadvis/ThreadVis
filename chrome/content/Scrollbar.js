@@ -1,9 +1,10 @@
 /** ****************************************************************************
  * Scrollbar.js
  *
- * (c) 2006 Alexander C. Hubmann
+ * (c) 2006-2007 Alexander C. Hubmann
+ * (c) 2007 Alexander C. Hubmann-Haidvogel
  *
- * Version: $Id: Timeline.js 267 2006-01-07 19:19:38Z sascha $
+ * $Id: Timeline.js 267 2006-01-07 19:19:38Z sascha $
  ******************************************************************************/
 
 
@@ -11,39 +12,39 @@
 /** ****************************************************************************
  * Constructor for scrollbar class
  ******************************************************************************/
-function Scrollbar(visualisation, stack, box)
-{
+function Scrollbar(visualisation, stack, box) {
+    
     /**
      * visualisation object
      */
-    this.visualisation_ = visualisation;
-
+    this.visualisation = visualisation;
+    
     /**
      * XUL stack on which visualisation gets drawn
      */
-    this.stack_ = stack;
-
+    this.stack = stack;
+    
     /**
      * XUL box containing visualisation
      */
-    this.box_ = box;
+    this.box = box;
     
     this.init(box);
     
-    this.box_horizontal_ = document.getElementById("ThreadVisScrollbarHorizontalBox");
-    this.horizontal_ = document.getElementById("ThreadVisScrollbarHorizontal");
+    this.boxHorizontal = document.getElementById("ThreadVisScrollbarHorizontalBox");
+    this.horizontal = document.getElementById("ThreadVisScrollbarHorizontal");
     
-    this.box_vertical_ = document.getElementById("ThreadVisScrollbarVerticalBox");
-    this.vertical_ = document.getElementById("ThreadVisScrollbarVertical");
+    this.boxVertical = document.getElementById("ThreadVisScrollbarVerticalBox");
+    this.vertical = document.getElementById("ThreadVisScrollbarVertical");
     
     var ref = this;
-    this.horizontal_.addEventListener("mousemove", function(event) {ref.onMouseMoveHorizontal(event);}, false);
-    this.horizontal_.addEventListener("mousedown", function(event) {ref.onMouseDownHorizontal(event);}, false);
-    this.horizontal_.addEventListener("mouseup", function(event) { ref.onMouseUpHorizontal(event); }, false);
+    this.horizontal.addEventListener("mousemove", function(event) {ref.onMouseMoveHorizontal(event);}, false);
+    this.horizontal.addEventListener("mousedown", function(event) {ref.onMouseDownHorizontal(event);}, false);
+    this.horizontal.addEventListener("mouseup", function(event) { ref.onMouseUpHorizontal(event); }, false);
     
-    this.vertical_.addEventListener("mousemove", function(event) {ref.onMouseMoveVertical(event);}, false);
-    this.vertical_.addEventListener("mousedown", function(event) {ref.onMouseDownVertical(event);}, false);
-    this.vertical_.addEventListener("mouseup", function(event) { ref.onMouseUpVertical(event); }, false);
+    this.vertical.addEventListener("mousemove", function(event) {ref.onMouseMoveVertical(event);}, false);
+    this.vertical.addEventListener("mousedown", function(event) {ref.onMouseDownVertical(event);}, false);
+    this.vertical.addEventListener("mouseup", function(event) { ref.onMouseUpVertical(event); }, false);
 }
 
 
@@ -51,31 +52,29 @@ function Scrollbar(visualisation, stack, box)
 /** ****************************************************************************
  * Init height of scrollbars
  ******************************************************************************/
-Scrollbar.prototype.init = function(box)
-{
-    this.box_ = box;
-    this.total_height_ = this.box_.boxObject.height - 4;
-    this.total_width_ = this.box_.boxObject.width - 4;
+Scrollbar.prototype.init = function(box) {
+    this.box = box;
+    this.totalHeight = this.box.boxObject.height - 4;
+    this.totalWidth = this.box.boxObject.width - 4;
 }
 
 
 /** ****************************************************************************
  * Draw the scrollbar
  ******************************************************************************/
-Scrollbar.prototype.draw = function()
-{
+Scrollbar.prototype.draw = function() {
     var size = this.calculateSize();
     var position = this.calculatePosition();
     
-    this.box_horizontal_.hidden = size.hidehorizontal;
-    this.horizontal_.style.position = "relative";
-    this.horizontal_.style.width = size.width + "px";
-    this.horizontal_.style.left = position.x + "px";
+    this.boxHorizontal.hidden = size.hideHorizontal;
+    this.horizontal.style.position = "relative";
+    this.horizontal.style.width = size.width + "px";
+    this.horizontal.style.left = position.x + "px";
     
-    this.box_vertical_.hidden = size.hidevertical;
-    this.vertical_.style.position = "relative";
-    this.vertical_.style.height = size.height + "px";
-    this.vertical_.style.top = position.y + "px";
+    this.boxVertical.hidden = size.hideVertical;
+    this.vertical.style.position = "relative";
+    this.vertical.style.height = size.height + "px";
+    this.vertical.style.top = position.y + "px";
 }
 
 
@@ -84,35 +83,38 @@ Scrollbar.prototype.draw = function()
  * Calculate size of scrollbars
  * Determine if scrollbars need to be drawn
  ******************************************************************************/
-Scrollbar.prototype.calculateSize = function()
-{
-    var boxwidth = this.box_.boxObject.width;
-    var boxheight = this.total_height_;
-    var stackwidth = this.stack_.boxObject.width;
-    var stackheight = this.stack_.boxObject.height;
+Scrollbar.prototype.calculateSize = function() {
+    var boxWidth = this.box.boxObject.width;
+    var boxHeight = this.totalHeight;
+    var stackWidth = this.stack.boxObject.width;
+    var stackHeight = this.stack.boxObject.height;
     
-    var width = (boxwidth / stackwidth) * boxwidth;
-    var height = (boxheight / stackheight) * boxheight;
+    var width = (boxWidth / stackWidth) * boxWidth;
+    var height = (boxHeight / stackHeight) * boxHeight;
     
-    if (width > boxwidth)
-        width = boxwidth;
+    if (width > boxWidth) {
+        width = boxWidth;
+    }
     
-    if (height > boxheight)
-        height = boxheight;
+    if (height > boxHeight) {
+        height = boxHeight;
+    }
     
-    var hidehorizontal = false;
-    if (Math.abs(width - boxwidth) < 2)
-        hidehorizontal = true;
+    var hideHorizontal = false;
+    if (Math.abs(width - boxWidth) < 2) {
+        hideHorizontal = true;
+    }
     
-    var hidevertical = false;
-    if (Math.abs(height - boxheight) < 2)
-        hidevertical = true;
+    var hideVertical = false;
+    if (Math.abs(height - boxHeight) < 2) {
+        hideVertical = true;
+    }
     
     var size = new Object();
     size.width = width;
-    size.hidehorizontal = hidehorizontal;
+    size.hideHorizontal = hideHorizontal;
     size.height = height;
-    size.hidevertical = hidevertical;
+    size.hideVertical = hideVertical;
     
     return size;
 }
@@ -122,18 +124,17 @@ Scrollbar.prototype.calculateSize = function()
 /** ****************************************************************************
  * Calculate positions of the scrollbars
  ******************************************************************************/
-Scrollbar.prototype.calculatePosition = function()
-{
-    var boxwidth = this.box_.boxObject.width;
-    var boxheight = this.total_height_;
-    var stackwidth = this.stack_.boxObject.width;
-    var stackheight = this.stack_.boxObject.height;
+Scrollbar.prototype.calculatePosition = function() {
+    var boxWidth = this.box.boxObject.width;
+    var boxHeight = this.totalHeight;
+    var stackWidth = this.stack.boxObject.width;
+    var stackHeight = this.stack.boxObject.height;
     
-    var movedx = Math.abs(this.stack_.style.marginLeft.replace(/px/, ""));
-    var movedy = Math.abs(this.stack_.style.marginTop.replace(/px/, ""));
+    var movedX = Math.abs(this.stack.style.marginLeft.replace(/px/, ""));
+    var movedY = Math.abs(this.stack.style.marginTop.replace(/px/, ""));
     
-    var x = (movedx / stackwidth) * boxwidth;
-    var y = (movedy / stackheight) * boxheight;
+    var x = (movedX / stackWidth) * boxWidth;
+    var y = (movedY / stackHeight) * boxHeight;
     
     var position = new Object()
     position.x = x;
@@ -148,38 +149,38 @@ Scrollbar.prototype.calculatePosition = function()
  * React to mousemovement over horizontal scrollbar
  * Do actual scrolling
  ******************************************************************************/
-Scrollbar.prototype.onMouseMoveHorizontal = function(event)
-{
-    if (this.panning_horizontal_)
-    {
+Scrollbar.prototype.onMouseMoveHorizontal = function(event) {
+    if (this.panningHorizontal) {
         var x = event.clientX;
-        var dx = x - this.startx_;
-        var currentx = this.horizontal_.style.left.replace(/px/, "");
-        if (currentx == "")
-            currentx = 0;
+        var dx = x - this.startX;
+        var currentX = this.horizontal.style.left.replace(/px/, "");
+        if (currentX == "") {
+            currentX = 0;
+        }
         dx = parseInt(currentx) + parseInt(dx);
-        this.startx_ = x;
+        this.startX = x;
         
-        var barwidth = this.horizontal_.boxObject.width;
-        var totalwidth = this.total_width_;
+        var barWidth = this.horizontal.boxObject.width;
+        var totalWidth = this.totalWidth;
         
-        if (dx < 0)
+        if (dx < 0) {
             dx = 0;
+        }
         
-        if (dx + barwidth > totalwidth)
-            dx = totalwidth - barwidth;
+        if (dx + barWidth > totalWidth) {
+            dx = totalWidth - barWidth;
+        }
         
-        this.horizontal_.style.left = dx + "px";
+        this.horizontal.style.left = dx + "px";
         
-        
-        var boxwidth = this.box_.boxObject.width;
-        var stackwidth = this.stack_.boxObject.width;
-        var multiplicator = -1 * stackwidth / boxwidth;
+        var boxWidth = this.box.boxObject.width;
+        var stackWidth = this.stack.boxObject.width;
+        var multiplicator = -1 * stackWidth / boxWidth;
         
         var position = new Object();
         position.x = dx * multiplicator;
         
-        this.visualisation_.moveVisualisationTo(position);
+        this.visualisation.moveVisualisationTo(position);
     }
 }
 
@@ -189,14 +190,14 @@ Scrollbar.prototype.onMouseMoveHorizontal = function(event)
  * React to mousedown event on horizontal scrollbar
  * Start scrolling
  ******************************************************************************/
-Scrollbar.prototype.onMouseDownHorizontal = function(event)
-{
+Scrollbar.prototype.onMouseDownHorizontal = function(event) {
     // only react to left mousebutton
-    if (event.button != 0)
+    if (event.button != 0) {
         return;
+    }
     
-    this.startx_ = event.clientX;
-    this.panning_horizontal_ = true;
+    this.startX = event.clientX;
+    this.panningHorizontal = true;
 }
 
 
@@ -205,9 +206,8 @@ Scrollbar.prototype.onMouseDownHorizontal = function(event)
  * React to mouseup event on horizontal scrollbar
  * Stop scrolling
  ******************************************************************************/
-Scrollbar.prototype.onMouseUpHorizontal = function(event)
-{
-    this.panning_horizontal_ = false;
+Scrollbar.prototype.onMouseUpHorizontal = function(event) {
+    this.panningHorizontal = false;
 }
 
 
@@ -216,38 +216,39 @@ Scrollbar.prototype.onMouseUpHorizontal = function(event)
  * React to mousemovement over vertical scrollbar
  * Do actual scrolling
  ******************************************************************************/
-Scrollbar.prototype.onMouseMoveVertical = function(event)
-{
-    if (this.panning_vertical_)
-    {
+Scrollbar.prototype.onMouseMoveVertical = function(event) {
+    if (this.panningVertical) {
         var y = event.clientY;
-        var dy = y - this.starty_;
-        var currenty = this.vertical_.style.top.replace(/px/, "");
-        if (currenty == "")
-            currenty = 0;
-        dy = parseInt(currenty) + parseInt(dy);
-        this.starty_ = y;
+        var dy = y - this.startY;
+        var currentY = this.vertical.style.top.replace(/px/, "");
+        if (currentY == "") {
+            currentY = 0;
+        }
+        dy = parseInt(currentY) + parseInt(dy);
+        this.startY = y;
         
-        var barheight = this.vertical_.boxObject.height;
-        var totalheight = this.total_height_;
+        var barHeight = this.vertical.boxObject.height;
+        var totalHeight = this.totalHeight;
         
-        if (dy < 0)
+        if (dy < 0) {
             dy = 0;
+        }
         
-        if (dy + barheight > totalheight)
-            dy = totalheight - barheight;
+        if (dy + baHeight > totalHeight) {
+            dy = totalHeight - barHeight;
+        }
         
-        this.vertical_.style.top = dy + "px";
+        this.vertical.style.top = dy + "px";
         
         
-        var boxheight = this.box_.boxObject.height;
-        var stackheight = this.stack_.boxObject.height;
-        var multiplicator = -1 * stackheight / boxheight;
+        var boxHeight = this.box.boxObject.height;
+        var stackHeight = this.stack.boxObject.height;
+        var multiplicator = -1 * stackHeight / boxHeight;
         
         var position = new Object();
         position.y = dy * multiplicator;
         
-        this.visualisation_.moveVisualisationTo(position);
+        this.visualisation.moveVisualisationTo(position);
     }
 }
 
@@ -257,13 +258,13 @@ Scrollbar.prototype.onMouseMoveVertical = function(event)
  * React to mousedown event on vertical scrollbar
  * Start scrolling
  ******************************************************************************/
-Scrollbar.prototype.onMouseDownVertical = function(event)
-{
-    if (event.button != 0)
+Scrollbar.prototype.onMouseDownVertical = function(event) {
+    if (event.button != 0) {
         return;
+    }
     
-    this.starty_ = event.clienty;
-    this.panning_vertical_ = true;
+    this.startY = event.clientY;
+    this.panningVertical = true;
 }
 
 
@@ -272,7 +273,6 @@ Scrollbar.prototype.onMouseDownVertical = function(event)
  * React to mouseup event on vertical scrollbar
  * Stop scrolling
  ******************************************************************************/
-Scrollbar.prototype.onMouseUpVertical = function(event)
-{
-    this.panning_vertical_ = false;
+Scrollbar.prototype.onMouseUpVertical = function(event) {
+    this.panningVertical = false;
 }

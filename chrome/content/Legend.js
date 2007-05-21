@@ -1,32 +1,32 @@
 /** ****************************************************************************
  * Legend.js
  *
- * (c) 2006 Alexander C. Hubmann
+ * (c) 2006-2007 Alexander C. Hubmann
+ * (c) 2007 Alexander C. Hubmann-Haidvogel
  *
  * JavaScript file to visualise legend
  *
- * Version: $Id$
+ * $Id$
  ******************************************************************************/
 
 
 
-function clearLegend()
-{
-    var legendbox = document.getElementById("LegendContent");
-    while(legendbox.firstChild != null)
-        legendbox.removeChild(legendbox.firstChild);
-
+function clearLegend() {
+    var legendBox = document.getElementById("LegendContent");
+    while(legendBox.firstChild != null) {
+        legendBox.removeChild(legendBox.firstChild);
+    }
+    
     //window.sizeToContent();
 }
 
 
 
-function displayLegend()
-{
+function displayLegend() {
     clearLegend();
-
-    var legendbox = document.getElementById("LegendContent");
+    
+    var legendBox = document.getElementById("LegendContent");
     var legend = opener.THREADVIS.getLegend();
-    legendbox.appendChild(legend);
+    legendBox.appendChild(legend);
     window.sizeToContent();
 }

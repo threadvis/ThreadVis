@@ -4,11 +4,12 @@
 /** ****************************************************************************
  * ThreadVis.xul
  *
- * (c) 2005-2006 Alexander C. Hubmann
+ * (c) 2005-2007 Alexander C. Hubmann
+ * (c) 2007 Alexander C. Hubmann-Haidvogel
  *
  * XUL file to display ThreadVis extension
  *
- * Version: $Id$
+ * $Id$
  ******************************************************************************/
 -->
 
@@ -19,6 +20,7 @@
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
     <script src="chrome://threadvis/content/ArcVisualisation.js" />
+    <script src="chrome://threadvis/content/Cache.js" />
     <script src="chrome://threadvis/content/Container.js" />
     <script src="chrome://threadvis/content/ContainerVisualisation.js" />
     <script src="chrome://threadvis/content/CopyCut.js" />
@@ -43,6 +45,8 @@
                           oncommand="THREADVIS.openThreadVisOptionsDialog();" />
                 <menuitem label="&popup.popupwindow;"
                           oncommand="THREADVIS.displayVisualisationWindow();" />
+                <menuitem label="&popup.legend;"
+                          oncommand="THREADVIS.displayLegendWindow();" />
             </popup>
         </popupset>
         <hbox id="ThreadVis"

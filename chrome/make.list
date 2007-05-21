@@ -1,4 +1,5 @@
 content/ArcVisualisation.js
+content/Cache.js
 content/Container.js
 content/ContainerVisualisation.js
 content/contents.rdf
