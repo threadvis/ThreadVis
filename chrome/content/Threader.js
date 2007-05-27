@@ -347,7 +347,7 @@ Threader.prototype.hasMessage = function(messageId) {
         return true;
     }
     
-    if (this.idTable[messageId]) {
+    if (this.idTable[messageId] && ! this.idTable[messageId].isDummy()) {
         return true;
     }
     

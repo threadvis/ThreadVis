@@ -706,7 +706,7 @@ ThreadVis.prototype.visualiseMessage = function(message) {
     
     var cache = "";
     // if not in threader, try to get from cache
-    if (container == null) {
+    if (container == null || container.isDummy()) {
         cache = this.cache.getCache(message);
         container = this.getThreader().findContainer(message.messageId);
     }
