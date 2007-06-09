@@ -18,7 +18,7 @@
 function References(references) {
     // Store message ids of references
     this.references = new Object();
-    
+
     this.buildReferences(references);
 }
 
@@ -30,10 +30,10 @@ function References(references) {
 References.prototype.buildReferences = function(references) {
     if (references != null && references != "") {
         var result = references.match(/[^<>\s]+/g);
-        
+
         var dupes = new Object();
         var distinct = new Array();
-        
+
         for (var i = result.length - 1; i >= 0; i--) {
             var msgid = result[i];
             if (dupes[msgid]) {
@@ -61,8 +61,7 @@ References.prototype.getReferences = function() {
 /** ****************************************************************************
  * get string representation of object
  ******************************************************************************/
-References.prototype.toString = function() {
-    //return this.references_;
+References.prototype.toString = function() {;
     var string = "";
     for (referenceskey in this.references) {
         string += ", " + this.references[referenceskey];

@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+
+<!--
+/** ****************************************************************************
+ * Status.xul
+ *
+ * (c) 2007 Alexander C. Hubmann-Haidvogel
+ *
+ * XUL file to display extension status
+ *
+ * $Id: ThreadVis.xul 376 2007-05-21 20:42:31Z sascha $
+ ******************************************************************************/
+-->
+
+
+
+<!DOCTYPE overlay SYSTEM "chrome://threadvis/locale/ThreadVis.dtd">
+<overlay id="ThreadVisStatus"
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+    <statusbar id="status-bar">
+        <statusbarpanel id="ThreadVisStatusText" label="" />
+    </statusbar> 
+
+</overlay>

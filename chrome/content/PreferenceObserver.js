@@ -16,7 +16,7 @@
  ******************************************************************************/
 function PreferenceObserver() {
     this.PREF_BRANCH = "extensions.threadvis.";
-    
+
     this.PREF_DISABLED_ACCOUNTS = "disabledaccounts";
     this.PREF_DISABLED_FOLDERS = "disabledfolders";
     this.PREF_ENABLED = "enabled";
@@ -37,19 +37,22 @@ function PreferenceObserver() {
     this.PREF_VIS_OPACITY = "visualisation.opacity";
     this.PREF_ZOOM_HEIGHT = "zoom.height";
     this.PREF_ZOOM_WIDTH = "zoom.width";
-    
+
+    // save cache update timestamps per account
+    this.PREF_CACHE_LASTUPDATETIMESTAMP = "cache.updatetimestamp";
+
     this.prefBranch = null;
     this.preferences = new Object();
     this.callback = new Object();
-    
+
     var prefService = Components.classes["@mozilla.org/preferences-service;1"]
         .getService(Components.interfaces.nsIPrefService);
     this.prefBranch = prefService.getBranch(this.PREF_BRANCH);
-    
+
     this.PREF_BOOL = this.prefBranch.PREF_BOOL;
     this.PREF_INT = this.prefBranch.PREF_INT;
     this.PREF_STRING = this.prefBranch.PREF_STRING;
-    
+
     this.register();
     this.preferenceReload();
 }
@@ -86,11 +89,11 @@ PreferenceObserver.prototype.getPreference = function(pref) {
  ******************************************************************************/
 PreferenceObserver.prototype.loadPreference = function(pref, typ, def) {
     this.preferences[pref]= def;
-    
+
     if (this.prefBranch.getPrefType(pref) != typ) {
         return;
     }
-    
+
     switch (typ) {
         case this.prefBranch.PREF_BOOL:
             this.preferences[pref] = this.prefBranch.getBoolPref(pref);
@@ -113,7 +116,7 @@ PreferenceObserver.prototype.observe = function(subject, topic, data) {
     if(topic != "nsPref:changed") {
         return;
     }
-    
+
     // reload preferences
     this.preferenceReload();
     this.doCallback(data);
@@ -125,26 +128,48 @@ PreferenceObserver.prototype.observe = function(subject, topic, data) {
  * reload preferences
  ******************************************************************************/
 PreferenceObserver.prototype.preferenceReload = function() {
-    this.loadPreference(this.PREF_DISABLED_ACCOUNTS, this.prefBranch.PREF_STRING, "");
-    this.loadPreference(this.PREF_DISABLED_FOLDERS, this.prefBranch.PREF_STRING, "");
-    this.loadPreference(this.PREF_ENABLED, this.prefBranch.PREF_BOOL, true);
-    this.loadPreference(this.PREF_LOGGING, this.prefBranch.PREF_BOOL, false);
-    this.loadPreference(this.PREF_LOGGING_DEBUG, this.prefBranch.PREF_BOOL, false);
-    this.loadPreference(this.PREF_LOGGING_DEBUG_LEVEL, this.prefBranch.PREF_INT, 0);
-    this.loadPreference(this.PREF_NOTES, this.prefBranch.PREF_INT, 0);
-    this.loadPreference(this.PREF_TIMELINE, this.prefBranch.PREF_BOOL, true);
-    this.loadPreference(this.PREF_TIMESCALING, this.prefBranch.PREF_BOOL, true);
-    this.loadPreference(this.PREF_VIS_DOTSIZE, this.prefBranch.PREF_INT, 12);
-    this.loadPreference(this.PREF_VIS_ARC_MINHEIGHT, this.prefBranch.PREF_INT, 12);
-    this.loadPreference(this.PREF_VIS_ARC_RADIUS, this.prefBranch.PREF_INT, 32);
-    this.loadPreference(this.PREF_VIS_ARC_DIFFERENCE, this.prefBranch.PREF_INT, 6);
-    this.loadPreference(this.PREF_VIS_ARC_WIDTH, this.prefBranch.PREF_INT, 2);
-    this.loadPreference(this.PREF_VIS_SPACING, this.prefBranch.PREF_INT, 24);
-    this.loadPreference(this.PREF_VIS_COLOUR, this.prefBranch.PREF_STRING, "author");
-    this.loadPreference(this.PREF_VIS_HIGHLIGHT, this.prefBranch.PREF_BOOL, true);
-    this.loadPreference(this.PREF_VIS_OPACITY, this.prefBranch.PREF_INT, 30);
-    this.loadPreference(this.PREF_ZOOM_HEIGHT, this.prefBranch.PREF_INT, 1);
-    this.loadPreference(this.PREF_ZOOM_WIDTH, this.prefBranch.PREF_INT, 1);
+    this.loadPreference(this.PREF_DISABLED_ACCOUNTS,
+        this.prefBranch.PREF_STRING, "");
+    this.loadPreference(this.PREF_DISABLED_FOLDERS,
+        this.prefBranch.PREF_STRING, "");
+    this.loadPreference(this.PREF_ENABLED,
+        this.prefBranch.PREF_BOOL, true);
+    this.loadPreference(this.PREF_LOGGING,
+        this.prefBranch.PREF_BOOL, false);
+    this.loadPreference(this.PREF_LOGGING_DEBUG,
+        this.prefBranch.PREF_BOOL, false);
+    this.loadPreference(this.PREF_LOGGING_DEBUG_LEVEL,
+        this.prefBranch.PREF_INT, 0);
+    this.loadPreference(this.PREF_NOTES,
+        this.prefBranch.PREF_INT, 0);
+    this.loadPreference(this.PREF_TIMELINE,
+        this.prefBranch.PREF_BOOL, true);
+    this.loadPreference(this.PREF_TIMESCALING,
+        this.prefBranch.PREF_BOOL, true);
+    this.loadPreference(this.PREF_VIS_DOTSIZE,
+        this.prefBranch.PREF_INT, 12);
+    this.loadPreference(this.PREF_VIS_ARC_MINHEIGHT,
+        this.prefBranch.PREF_INT, 12);
+    this.loadPreference(this.PREF_VIS_ARC_RADIUS,
+        this.prefBranch.PREF_INT, 32);
+    this.loadPreference(this.PREF_VIS_ARC_DIFFERENCE,
+        this.prefBranch.PREF_INT, 6);
+    this.loadPreference(this.PREF_VIS_ARC_WIDTH,
+        this.prefBranch.PREF_INT, 2);
+    this.loadPreference(this.PREF_VIS_SPACING,
+        this.prefBranch.PREF_INT, 24);
+    this.loadPreference(this.PREF_VIS_COLOUR,
+        this.prefBranch.PREF_STRING, "author");
+    this.loadPreference(this.PREF_VIS_HIGHLIGHT,
+        this.prefBranch.PREF_BOOL, true);
+    this.loadPreference(this.PREF_VIS_OPACITY,
+        this.prefBranch.PREF_INT, 30);
+    this.loadPreference(this.PREF_ZOOM_HEIGHT,
+        this.prefBranch.PREF_INT, 1);
+    this.loadPreference(this.PREF_ZOOM_WIDTH,
+        this.prefBranch.PREF_INT, 1);
+    this.loadPreference(this.PREF_CACHE_LASTUPDATETIMESTAMP,
+        this.prefBranch.PREF_STRING, "");
 }
 
 
@@ -153,7 +178,8 @@ PreferenceObserver.prototype.preferenceReload = function() {
  * Preference changing observer
  ******************************************************************************/
 PreferenceObserver.prototype.register =  function() {
-    var pbi = this.prefBranch.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
+    var pbi = this.prefBranch
+        .QueryInterface(Components.interfaces.nsIPrefBranchInternal);
     pbi.addObserver("", this, false);
 }
 
@@ -187,7 +213,7 @@ PreferenceObserver.prototype.setPreference = function(pref, val, typ) {
  ******************************************************************************/
 PreferenceObserver.prototype.storePreference = function(pref, typ, val) {
     this.preferences[pref]= val;
-    
+
     switch (typ) {
         case this.prefBranch.PREF_BOOL:
             this.prefBranch.setBoolPref(pref, val);
@@ -210,7 +236,8 @@ PreferenceObserver.prototype.unregister = function() {
     if(!this.prefBranch) {
         return;
     }
-    
-    var pbi = this.prefBranch.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
+
+    var pbi = this.prefBranch
+        .QueryInterface(Components.interfaces.nsIPrefBranchInternal);
     pbi.removeObserver("", this);
 }

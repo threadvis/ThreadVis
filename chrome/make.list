@@ -17,6 +17,7 @@ content/Settings.js
 content/Settings.xul
 content/Settings15.xul
 content/SettingsDialog.xul
+content/Status.xul
 content/Threader.js
 content/ThreadVis.js
 content/ThreadVis.xul

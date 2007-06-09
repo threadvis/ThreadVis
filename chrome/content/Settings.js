@@ -23,6 +23,7 @@ function init() {
     toggleHighlight();
     buildAccountList();
     buildAccountPreference();
+    buildCacheList();
 }
 
 
@@ -53,18 +54,18 @@ function addAttachments(composeFields, attachments) {
 function buildAccountList() {
     var accountBox = document.getElementById("enableAccounts");
     var pref = document.getElementById("hiddenDisabledAccounts").value;
-    
+
     var accountManager = Components.classes["@mozilla.org/messenger/account-manager;1"]
         .getService(Components.interfaces.nsIMsgAccountManager);
-    
+
     var accounts = accountManager.accounts;
     for (var i = 0; i < accounts.Count(); i++)  {
         var account = accounts.QueryElementAt(i, Components.interfaces.nsIMsgAccount);
-        
+
         // get folders
         var rootFolder = account.incomingServer.rootFolder;
         var folders = getAllFolders(rootFolder);
-        
+
         var checkbox = document.createElementNS(XUL_NAMESPACE, "checkbox");
         checkbox.setAttribute("label", account.incomingServer.prettyName);
         checkbox.setAttribute("oncommand", "buildAccountPreference();");
@@ -78,7 +79,7 @@ function buildAccountList() {
         }
         accountBox.appendChild(checkbox);
         buildFolderCheckboxes(accountBox, folders, account.key, 1);
-        
+
         var separator = document.createElementNS(XUL_NAMESPACE, "separator");
         separator.setAttribute("class", "groove");
         accountBox.appendChild(separator);
@@ -93,21 +94,23 @@ function buildAccountList() {
 function buildAccountPreference() {
     var accountBox = document.getElementById("enableAccounts");
     var pref = document.getElementById("hiddenDisabledAccounts");
-    
+
     var prefString = "";
-    
+
     var checkboxes = accountBox.getElementsByAttribute("checkboxtype", "account");
-    
+
     for (var i = 0; i < checkboxes.length; i++) {
         var checkbox = checkboxes.item(i);
         if (! checkbox.checked) {
             prefString += " " + checkbox.getAttribute("accountkey");
         }
-        
-        var folderCheckboxes = accountBox.getElementsByAttribute("checkboxtype", "folder");
+
+        var folderCheckboxes = accountBox
+            .getElementsByAttribute("checkboxtype", "folder");
         for (var j = 0; j < folderCheckboxes.length; j++) {
             var folderCheckbox = folderCheckboxes.item(j);
-            if (folderCheckbox.getAttribute("accountkey") == checkbox.getAttribute("accountkey")) {
+            if (folderCheckbox.getAttribute("accountkey") == 
+                checkbox.getAttribute("accountkey")) {
                 if (checkbox.checked) {
                     folderCheckbox.disabled = false;
                 } else {
@@ -118,10 +121,35 @@ function buildAccountPreference() {
         
     }
     pref.value = prefString;
-    // We need to call doCommand(), because otherwise Thunderbird 1.5 doesn't update
-    // the underlying preference upon closing the window (i.e. ignores the new
-    // value of the textbox).
+    // We need to call doCommand(), because otherwise Thunderbird 1.5 doesn't
+    // update the underlying preference upon closing the window (i.e. ignores
+    // the new value of the textbox).
     pref.doCommand();
+}
+
+
+
+/** ****************************************************************************
+ * build the cache list
+ * get all accounts
+ ******************************************************************************/
+function buildCacheList() {
+    var accountBox = document.getElementById("cacheSelectAccountMenuPopup");
+
+    var accountManager = Components.classes["@mozilla.org/messenger/account-manager;1"]
+        .getService(Components.interfaces.nsIMsgAccountManager);
+
+    var accounts = accountManager.accounts;
+    for (var i = 0; i < accounts.Count(); i++)  {
+        var account = accounts.QueryElementAt(i, Components.interfaces.nsIMsgAccount);
+
+        var menuitem = document.createElementNS(XUL_NAMESPACE, "menuitem");
+        menuitem.setAttribute("label", account.incomingServer.prettyName);
+        menuitem.setAttribute("value", account.key);
+        accountBox.appendChild(menuitem);
+    }
+
+    accountManager = null;
 }
 
 
@@ -131,15 +159,15 @@ function buildAccountPreference() {
  ******************************************************************************/
 function buildFolderCheckboxes(box, folders, account, indent) {
     var pref = document.getElementById("hiddenDisabledFolders").value;
-    
+
     for (var i = 0; i < folders.length; i++) {
         var folder = folders[i];
-        
+
         if (folder instanceof Array) {
             buildFolderCheckboxes(box, folder, account, indent + 1);
             continue;
         }
-        
+
         var checkbox = document.createElementNS(XUL_NAMESPACE, "checkbox");
         checkbox.setAttribute("label", folder.name);
         checkbox.setAttribute("oncommand", "buildFolderPreference();");
@@ -165,11 +193,11 @@ function buildFolderCheckboxes(box, folders, account, indent) {
 function buildFolderPreference() {
     var accountBox = document.getElementById("enableAccounts");
     var pref = document.getElementById("hiddenDisabledFolders");
-    
+
     var prefString = "";
-    
+
     var checkboxes = accountBox.getElementsByAttribute("checkboxtype", "folder");
-    
+
     for (var i = 0; i < checkboxes.length; i++) {
         var checkbox = checkboxes.item(i);
         if (! checkbox.checked) {
@@ -177,9 +205,9 @@ function buildFolderPreference() {
         }
     }
     pref.value = prefString;
-    // We need to call doCommand(), because otherwise Thunderbird 1.5 doesn't update
-    // the underlying preference upon closing the window (i.e. ignores the new
-    // value of the textbox).
+    // We need to call doCommand(), because otherwise Thunderbird 1.5 doesn't
+    // update the underlying preference upon closing the window (i.e. ignores
+    // the new value of the textbox).
     pref.doCommand();
 }
 
@@ -191,18 +219,20 @@ function buildFolderPreference() {
 function composeEmail(to, subject, body, attachments) {
     var msgComposeType = Components.interfaces.nsIMsgCompType;
     var msgComposFormat = Components.interfaces.nsIMsgCompFormat;
-    var msgComposeService = Components.classes["@mozilla.org/messengercompose;1"]
-        .getService();
+    var msgComposeService = Components
+        .classes["@mozilla.org/messengercompose;1"].getService();
     msgComposeService = msgComposeService
         .QueryInterface(Components.interfaces.nsIMsgComposeService);
     
-    var params = Components.classes["@mozilla.org/messengercompose/composeparams;1"]
+    var params = Components
+        .classes["@mozilla.org/messengercompose/composeparams;1"]
         .createInstance(Components.interfaces.nsIMsgComposeParams);
     
     if (params) {
         params.type = msgComposeType.New;
         params.format = msgComposFormat.Default;
-        var composeFields = Components.classes["@mozilla.org/messengercompose/composefields;1"]
+        var composeFields = Components
+            .classes["@mozilla.org/messengercompose/composefields;1"]
             .createInstance(Components.interfaces.nsIMsgCompFields);
         if (composeFields) {
             if (to) {
@@ -232,29 +262,29 @@ function getAllFolders(folder) {
     var folderEnumerator = folder.GetSubFolders();
     var currentFolder = null;
     var folders = new Array();
-    
+
     while (true) {
         try {
             currentFolder = folderEnumerator.currentItem();
         } catch (Exception) {
             break;
         }
-        
+
         if (currentFolder instanceof Components.interfaces.nsIMsgFolder) {
             folders.push(currentFolder);
         }
-        
+
         if (currentFolder.hasSubFolders) {
             folders.push(this.getAllFolders(currentFolder));
         }
-        
+
         try {
             folderEnumerator.next();
         } catch (Exception) {
             break;
         }
     }
-    
+
     return folders;
 }
 
@@ -266,18 +296,18 @@ function getAllFolders(folder) {
 function getLogfiles() {
     var logfiles = new Array();
     var logger = getLogger();
-    
+
     var file = null;
     if (logger) {
         file = logger.getFile();
     }
-    
+
     if (file) {
         if (file.exists()) {
             logfiles.push(file);
         }
     }
-    
+
     return logfiles;
 }
 
@@ -291,22 +321,53 @@ function getLogger(object) {
     if (! object) {
         object = window;
     }
-    
+
     // check for logger object
     if (object.THREADVIS && object.THREADVIS.logger) {
         return object.THREADVIS.logger;
     }
-    
+
     // go to top parent window
     if (object.parent && object != object.parent) {
         return getLogger(object.parent);
     }
-    
+
     // go to window opener, until logger found
     if (object.opener && object != object.opener) {
         return getLogger(object.opener);
     }
-    
+
+    // we have no logger, no parent and no opener
+    // this shouldn't happen
+    return null;
+}
+
+
+
+/** ****************************************************************************
+ * get the threadvis object
+ ******************************************************************************/
+function getThreadvis(object) {
+    // if no object given, assume this window
+    if (! object) {
+        object = window;
+    }
+
+    // check for logger object
+    if (object.THREADVIS) {
+        return object.THREADVIS;
+    }
+
+    // go to top parent window
+    if (object.parent && object != object.parent) {
+        return getThreadvis(object.parent);
+    }
+
+    // go to window opener, until logger found
+    if (object.opener && object != object.opener) {
+        return getThreadvis(object.opener);
+    }
+
     // we have no logger, no parent and no opener
     // this shouldn't happen
     return null;
@@ -321,7 +382,8 @@ function openURL(url) {
     var uri = Components.classes["@mozilla.org/network/standard-url;1"]
         .createInstance(Components.interfaces.nsIURI);
     uri.spec = url;
-    var protocolSvc = Components.classes["@mozilla.org/uriloader/external-protocol-service;1"]
+    var protocolSvc = Components
+        .classes["@mozilla.org/uriloader/external-protocol-service;1"]
         .getService(Components.interfaces.nsIExternalProtocolService);
     protocolSvc.loadUrl(uri);
 }
@@ -333,12 +395,13 @@ function openURL(url) {
  ******************************************************************************/
 function resetLogfiles() {
     var logger = getLogger();
-    
+
     if (logger) {
         logger.reset(true);
     }
     else {
-        alert(document.getElementById("threadVisStrings").getString("logger.couldnotdeletefile"));
+        alert(document.getElementById("threadVisStrings")
+            .getString("logger.couldnotdeletefile"));
     }
 }
 
@@ -351,6 +414,21 @@ function sendLogfiles() {
     var logfiles = getLogfiles();
     composeEmail("ahubmann@gmail.com", "[ThreadVis] Auto-Email-Logs",
         null, logfiles);
+}
+
+
+
+/** ****************************************************************************
+ * enable or disable the cache reset button
+ ******************************************************************************/
+function toggleCacheSelect() {
+    var menulist = document.getElementById("cacheSelectAccount");
+    var button = document.getElementById("resetCache");
+    if (menulist.value != "---") {
+        button.disabled = false;
+    } else {
+        button.disabled = true;
+    }
 }
 
 
@@ -390,4 +468,17 @@ function toggleLogging() {
  ******************************************************************************/
 function writeEmail() {
     composeEmail("ahubmann@gmail.com", "[ThreadVis] <insert subject here>", null)
+}
+
+
+
+/** ****************************************************************************
+ * Reset all caches
+ ******************************************************************************/
+function resetCache() {
+    var menulist = document.getElementById("cacheSelectAccount");
+    var accountKey = menulist.value;
+    getThreadvis().cache.reset(accountKey);
+    alert(document.getElementById("threadVisStrings")
+        .getString("cache.reset.done"));
 }

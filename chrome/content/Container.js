@@ -19,32 +19,32 @@ function Container(root) {
      * First container in child list
      */
     this.child = null;
-    
+
     /**
      * We are root container
      */
     this.root = root;
-    
+
     /**
      * Store message in this container
      */
     this.message = null;
-    
+
     /**
      * Next container in sibling list
      */
     this.next = null;
-    
+
     /**
      * Parent of this container
      */
     this.parent = null;
-    
+
     /**
      * Previous container in sibling list
      */
     this.previous = null;
-    
+
     /**
      * save horizontal position of dot
      */
@@ -63,7 +63,7 @@ Container.prototype.addChild = function(child) {
     // if so, do nothing
     if (child.getParent() == this)
         return;
-    
+
     /* check to see if this container is a child of child
      * this should never happen, because we would create a loop
      * that's why we don't allow it
@@ -79,7 +79,7 @@ Container.prototype.addChild = function(child) {
         }
         return;
     }
-    
+
     /* remove it from old chain
      * child.hasPrevious means that it's not the first in chain,
      * so take it out of old chain by juggling the pointers
@@ -102,7 +102,7 @@ Container.prototype.addChild = function(child) {
     child.removeNext();
     child.removePrevious();
     child.removeParent();
-    
+
     this.addChildren(child);
 }
 
@@ -118,7 +118,7 @@ Container.prototype.addChildren = function(child) {
         // fixxme
         alert("not happen");
     }
-    
+
     if (this.getChild() == null) {
         this.setChild(child);
         this.setParentForContainer(child, this);
@@ -136,9 +136,9 @@ Container.prototype.addSibling = function(sibling) {
     if (this.hasNext()) {
         this.getNext().setPrevious(sibling);
     }
-    
+
     this.setParentForContainer(sibling, this.getParent());
-    
+
     sibling.getLast().setNext(this.getNext());
     sibling.setPrevious(this);
     this.setNext(sibling);
@@ -159,7 +159,7 @@ Container.prototype.check = function() {
             alert("previous.getNext():" + this.getPrevious().getNext());
         }
     }
-    
+
     if (this.hasNext()) {
         if (this.getNext().getPrevious() != this) {
             alert("CHECK: getNext().getPrevious() did not return this");
@@ -169,7 +169,7 @@ Container.prototype.check = function() {
             alert("next.getPrevious():" + this.getNext().getPrevious());
         }
     }
-    
+
     // check if parent relationship holds
     if (this.hasParent()) {
         if (this.findParent(this.getParent()) != true) {
@@ -178,7 +178,7 @@ Container.prototype.check = function() {
             alert("parent: " + this.getParent());
         }
     }
-    
+
    // check children
    var child = this.getChild();
    while (child != null) {
@@ -195,15 +195,15 @@ Container.prototype.check = function() {
  ******************************************************************************/
 Container.prototype.findParent = function(target) {
     var container = this.getParent();
-    
+
     if (container == null) {
         return false;
     }
-    
+
     if (container == target) {
         return true;
     }
-    
+
     return container.findParent(target);
 }
 
@@ -224,7 +224,8 @@ Container.prototype.getChild = function() {
 Container.prototype.getChildCount = function() {
     var count = 0;
     var container = null;
-    for (container = this.getChild(); container != null; container = container.getNext()) {
+    for (container = this.getChild(); container != null;
+        container = container.getNext()) {
         count++;
     }
     return count;
@@ -238,7 +239,8 @@ Container.prototype.getChildCount = function() {
 Container.prototype.getChildPosition = function(child) {
     var count = 0;
     var container = 0;
-    for (container = this.getChild(); container != null; container = container.getNext()) {
+    for (container = this.getChild(); container != null;
+        container = container.getNext()) {
         if (container == child) {
             return count;
         }
@@ -255,7 +257,8 @@ Container.prototype.getChildPosition = function(child) {
 Container.prototype.getChildren = function() {
     var containers = new Array();
     var container = null;
-    for (container = this.getChild(); container != null; container = container.getNext()) {
+    for (container = this.getChild(); container != null;
+        container = container.getNext()) {
         containers.push(container);
         containers = containers.concat(container.getChildren());
     }
@@ -270,7 +273,8 @@ Container.prototype.getChildren = function() {
 Container.prototype.getCountRecursive = function() {
     var count = 1;
     var container = null;
-    for (container = this.getChild(); container != null; container = container.getNext()) {
+    for (container = this.getChild(); container != null;
+        container = container.getNext()) {
         count += container.getCountRecursive();
     }
     return count;
@@ -285,11 +289,11 @@ Container.prototype.getDate = function() {
     if (! this.isDummy()) {
         return this.getMessage().getDate();
     }
-    
+
     if (this.getChild() != null) {
         return this.getChild().getDate();
     }
-    
+
     // we are dummy
     // we have NO child
     // this shouldn't happen
@@ -320,7 +324,8 @@ Container.prototype.getDepth = function() {
  ******************************************************************************/
 Container.prototype.getDummy = function() {
     var container = null;
-    for (container = this.getChild(); container != null; container = container.getNext()) {
+    for (container = this.getChild(); container != null;
+        container = container.getNext()) {
         if (container.getMessage() == null) {
             return container;
         }
@@ -457,7 +462,8 @@ Container.prototype.hasChildren = function() {
  ******************************************************************************/
 Container.prototype.hasDummy = function() {
     var container = null;
-    for (container = this.getChild(); container != null; container = container.getNext()) {
+    for (container = this.getChild(); container != null;
+        container = container.getNext()) {
         if (container.isDummy()) {
             return true;
         }
@@ -567,9 +573,10 @@ Container.prototype.pruneEmptyContainers = function() {
      * then we lose information about missing messages
      *
      */
-    
+
     var container = null;
-    for (container = this.getChild(); container != null; container = container.getNext()) {
+    for (container = this.getChild(); container != null;
+        container = container.getNext()) {
         container.pruneEmptyContainers();
     }
 }
@@ -593,7 +600,7 @@ Container.prototype.removeChild = function(child) {
     if (child.getParent() != this) {
         return;
     }
-    
+
     /* if child is the first in list, we can remove it
      * by setting the next child in list as first
      */
@@ -603,7 +610,7 @@ Container.prototype.removeChild = function(child) {
         if (child.hasNext()) {
             child.getNext().removePrevious();
         }
-        
+
         child.removeParent();
         child.removePrevious();
         child.removeNext();
@@ -619,7 +626,7 @@ Container.prototype.removeChild = function(child) {
         if (child.hasNext()) {
             child.getNext().setPrevious(child.getPrevious());
         }
-        
+
         child.removeParent();
         child.removePrevious();
         child.removeNext();
@@ -696,7 +703,8 @@ Container.prototype.setParent = function(parent) {
  ******************************************************************************/
 Container.prototype.setParentForContainer = function(sibling, parent) {
     var container = null;
-    for (container = sibling; container != null; container = container.getNext()) {
+    for (container = sibling; container != null;
+        container = container.getNext()) {
         container.setParent(parent);
     }
 }
@@ -723,16 +731,16 @@ function Container_sortFunction(one, two) {
     if (two.findParent(one)) {
         return -1;
     }
-    
+
     if (one.findParent(two)) {
         return 1;
     }
-    
+
     // sort all others by date
     // if one of the containers is a dummy, getDate() returns the date
     // of its first child. this should be enough to ensure the timeline
     var difference = one.getDate().getTime() - two.getDate().getTime();
-    
+
     if (difference < 0) {
         return - 1;
     } else {
@@ -749,22 +757,23 @@ Container.prototype.toString = function(prefix) {
     if (prefix == null) {
         prefix = "\n";
     }
-    
+
     var string = "";
     string = prefix;
     
     if (this.isRoot()) {
         string += "ROOT ";
     }
-    
+
     if (this.isDummy()) {
         string += "DUMMY";
     } else {
         string += this.getMessage().toString();
     }
-    
+
     var container = null;
-    for (container = this.getChild(); container != null; container = container.getNext()) {
+    for (container = this.getChild(); container != null;
+        container = container.getNext()) {
         string += container.toString(prefix + "XXXX");
     }
     return string;
@@ -781,7 +790,7 @@ Container.prototype.toStringThread = function() {
             return this.getParent().toStringThread();
         }
     }
-    
+
     return this.toString("\n");
 }
 
@@ -791,17 +800,19 @@ Container.prototype.toStringThread = function() {
  * Get string cache
  ******************************************************************************/
 Container.prototype.getCache = function() {
-    var string = ! this.isDummy() ? "\"" + this.getMessage().getId() + "\"" : "\"DUMMY\"";
-    
+    var string = ! this.isDummy() ? "\"" + this.getMessage().getId()
+        + "\"" : "\"DUMMY\"";
+
     string += ",";
     if (this.hasChild()) {
         // get cache for all children
         var container = null;
-        for (container = this.getChild(); container != null; container = container.getNext()) {
+        for (container = this.getChild(); container != null;
+            container = container.getNext()) {
             string += container.getCache() + ",";
         }
     }
     string = string.substring(0, string.length - 1);
-    
+
     return string;
 }

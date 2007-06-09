@@ -20,26 +20,26 @@ function CopyCut() {
     this.EXTENSION_GUID = "{A23E4120-431F-4753-AE53-5D028C42CFDC}";
     this.FILENAME = "threadvis.copycut";
     this.DIVIDER = "<<<<<<<<<<>>>>>>>>>>";
-    
+
     // try to create file
     this.file = Components.classes["@mozilla.org/file/directory_service;1"]
         .getService(Components.interfaces.nsIProperties)
         .get("ProfD", Components.interfaces.nsIFile);
-    
+
     this.file.append(this.EXTENSION_PATH);
     if (! this.file.exists()) {
         this.file.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
     }
-    
+
     this.file.append(this.EXTENSION_GUID);
     if (! this.file.exists()) {
         this.file.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
     }
-    
+
     this.file.append(this.FILENAME);
-    
+
     this.ready = false;
-    
+
     this.cuts = new Array();
     this.copies = new Array();
 }
@@ -134,21 +134,24 @@ CopyCut.prototype.getFile = function() {
  ******************************************************************************/
 CopyCut.prototype.open = function() {
     this.ready = false;
-    
+
     if (! this.file.exists()) {
         this.file.create(Components.interfaces.nsIFile.NORMAL_FILE_TYPE, 0644);
     }
-    
+
     if (this.file.exists()) {
-        this.fileOutputStream = Components.classes["@mozilla.org/network/file-output-stream;1"]
+        this.fileOutputStream = Components
+            .classes["@mozilla.org/network/file-output-stream;1"]
             .createInstance(Components.interfaces.nsIFileOutputStream);
-        this.fileInputStream = Components.classes["@mozilla.org/network/file-input-stream;1"]
+        this.fileInputStream = Components
+            .classes["@mozilla.org/network/file-input-stream;1"]
             .createInstance(Components.interfaces.nsIFileInputStream);
         var options = 0x2 | 0x8 | 0x10;
         this.fileOutputStream.init(this.file, options, 0, false);
         this.fileInputStream.init(this.file, 1, 0, false);
 
-        this.scriptableInputStream = Components.classes["@mozilla.org/scriptableinputstream;1"]
+        this.scriptableInputStream = Components
+            .classes["@mozilla.org/scriptableinputstream;1"]
             .createInstance(Components.interfaces.nsIScriptableInputStream);
         this.scriptableInputStream.init(this.fileInputStream);
 
@@ -165,14 +168,14 @@ CopyCut.prototype.read = function() {
     if (! this.ready) {
         this.open();
     }
-    
+
     if (! this.ready) {
         return;
     }
-    
+
     var fileSize = this.scriptableInputStream.available();
     var fileContents = this.scriptableInputStream.read(fileSize);
-    
+
     // format of file is one cut or copy per line
     var lines = fileContents.split(/\n/);
     var i = 0;
@@ -203,7 +206,7 @@ CopyCut.prototype.reset = function() {
     if (this.ready) {
         this.close();
     }
-    
+
     try {
         if (this.file) {
             this.file.remove(false);
@@ -220,23 +223,23 @@ CopyCut.prototype.reset = function() {
  ******************************************************************************/
 CopyCut.prototype.write = function() {
     this.reset();
-    
+
     if (! this.ready) {
         this.open();
     }
-    
+
     if (! this.ready) {
         return;
     }
-    
+
     for (var msg in this.cuts) {
         var line = msg + " " + this.cuts[msg] + "\n";
         this.fileOutputStream.write(line, line.length);
     }
-    
+
     var line = this.DIVIDER + "\n";
     this.fileOutputStream.write(line, line.length);
-    
+
     for (var msg in this.copies) {
         var line = msg + " " + this.copies[msg] + "\n";
         this.fileOutputStream.write(line, line.length);

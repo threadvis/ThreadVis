@@ -14,49 +14,48 @@
 /** ****************************************************************************
  * Constructor
  ******************************************************************************/
-function Message(subject, from, messageId, messageKey, date, folder, 
-    references, sent) {
-    
+function Message(subject, from, messageId, messageKey, date, folder, references,
+    sent) {
     /**
      * Message date
      */
     this.date = date;
-    
+
     /**
      * Sender of message
      */
     this.from = from;
-    
+
     /**
      * Folder message is in
      */
     this.folder = folder;
-    
+
     /**
      * if folder stores sent mails
      */
     this.sent = sent;
-    
+
     /**
      * Message id
      */
     this.messageId = messageId;
-    
+
     /**
      * Message key, to identify the message in mozilla
      */
     this.messageKey = messageKey;
-    
+
     /**
      * References of this message
      */
     this.references = new References(references);
-    
+
     /**
      * Depth of reply of this message
      */
     this.replyCount = 0;
-    
+
     /**
      * Simplified subject of message
      * (RE: is stripped)
@@ -65,7 +64,7 @@ function Message(subject, from, messageId, messageKey, date, folder,
      * fixxme nontheless
      */
     this.simplifiedSubject = subject;
-    
+
     /**
      * Subject of message
      */
@@ -108,7 +107,8 @@ Message.prototype.getFromEmail = function() {
     // parse email address
     var email = this.getFrom();
     email = Components.classes["@mozilla.org/messenger/headerparser;1"]
-        .getService(Components.interfaces.nsIMsgHeaderParser).extractHeaderAddressMailboxes(null, email);
+        .getService(Components.interfaces.nsIMsgHeaderParser)
+        .extractHeaderAddressMailboxes(null, email);
     return email;
 }
 

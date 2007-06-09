@@ -29,3 +29,4 @@ pref("extensions.threadvis.visualisation.spacing", 24);
 pref("extensions.threadvis.visualisation.opacity", 30);
 pref("extensions.threadvis.zoom.height", 1);
 pref("extensions.threadvis.zoom.width", 1);
+pref("extensions.threadvis.cache.updatetimestamp", "");

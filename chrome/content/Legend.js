@@ -16,15 +16,13 @@ function clearLegend() {
     while(legendBox.firstChild != null) {
         legendBox.removeChild(legendBox.firstChild);
     }
-    
-    //window.sizeToContent();
 }
 
 
 
 function displayLegend() {
     clearLegend();
-    
+
     var legendBox = document.getElementById("LegendContent");
     var legend = opener.THREADVIS.getLegend();
     legendBox.appendChild(legend);
