@@ -546,6 +546,21 @@ Container.prototype.isRoot = function() {
 
 
 /** ****************************************************************************
+ * Return if this container is a top container
+ * (topmost container that is not the root container)
+ ******************************************************************************/
+Container.prototype.isTopContainer = function() {
+    if (this.hasParent()) {
+        if (this.getParent().isRoot()) {
+            return true
+        }
+    }
+    return false;
+}
+
+
+
+/** ****************************************************************************
  * Merge container into this container
  * add children as this children
  * set message as this message

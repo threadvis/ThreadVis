@@ -91,7 +91,7 @@ ThreadVis.prototype.addMessage = function(header) {
     if (! this.preferences.getPreference(this.preferences.PREF_ENABLED)) {
         return;
     }
-    if (! this.checkEnabledAccountOrFolder()) {
+    if (! this.checkEnabledAccountOrFolder(header.folder)) {
         return;
     }
 
@@ -113,9 +113,13 @@ ThreadVis.prototype.addMessage = function(header) {
         header.mime2DecodedAuthor, header.messageId, header.messageKey, date,
         header.folder.URI,  header.getStringProperty("references"), false);
 
+    var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
+        .getService(Components.interfaces.nsIMsgAccountManager))
+        .FindAccountForServer(header.folder.server);
+
     // see if msg is a sent mail
     var issent = IsSpecialFolder(header.folder, MSG_FOLDER_FLAG_SENTMAIL, true)
-        || this.account.defaultIdentity.email == message.getFromEmail();
+        || account.defaultIdentity.email == message.getFromEmail();
 
     message.setSent(issent);
     this.getThreader().addMessage(message);
@@ -132,7 +136,7 @@ ThreadVis.prototype.callback = function(msgKey, folder) {
     if (! this.preferences.getPreference(this.preferences.PREF_ENABLED)) {
         return;
     }
-    if (! this.checkEnabledAccountOrFolder()) {
+    if (! this.checkEnabledAccountOrFolder(folder)) {
         return;
     }
 
@@ -539,11 +543,8 @@ ThreadVis.prototype.logJavaScriptErrors = function(message, file, line) {
  * called when a new message is saved to a folder
  ******************************************************************************/
 ThreadVis.prototype.onItemAdded = function(parentItem, item, view) {
-    // FIXXME do caching by searching from last cache timestamp instead
     if (item instanceof Components.interfaces.nsIMsgDBHdr) {
-        //this.addMessage(item);
-        //this.getThreader().thread();
-        this.cache.updateNewMessage(item, false);
+        this.cache.updateNewMessages(item, false);
     }
 }
 

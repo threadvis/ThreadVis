@@ -13,6 +13,8 @@ function Cache(threadvis) {
     this.threadvis = threadvis;
     this.visitedMsgIds = new Object();
     this.cacheBuildCount = 0;
+    this.updatingCache = false;
+    this.newMessages = new Array();
 }
 
 
@@ -175,6 +177,34 @@ Cache.prototype.searchInSubFolder = function(folder, messageId) {
  * Periodically update cache with new messages
  ******************************************************************************/
 Cache.prototype.updateNewMessages = function(message, doVisualise) {
+    var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
+        .getService(Components.interfaces.nsIMsgAccountManager))
+        .FindAccountForServer(message.folder.server);
+
+    this.updateNewMessagesInternal(message, doVisualise, 
+        account.key, message.folder.rootFolder);
+}
+
+
+
+/** ****************************************************************************
+ * Periodically update cache with new messages
+ * FIXXME: also write cache for all messages!!
+ ******************************************************************************/
+Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
+    accountKey, rootFolder) {
+    // check for already running update
+    var ref = this;
+    if (this.updatingCache) {
+        setTimeout(function() {
+                ref.updateNewMessagesInternal(message, doVisualise, accountKey,
+                    rootFolder);
+            }, 1000);
+        return;
+    }
+
+    this.updatingCache = true;
+
     this.threadvis.setStatus(
         this.threadvis.strings.getString("cache.building.start"));
     var searchSession = 
@@ -188,12 +218,13 @@ Cache.prototype.updateNewMessages = function(message, doVisualise) {
     termValue.attrib = searchTerm.attrib;
 
     // get last update timestamp from preferences
-    var updateTimestamp = this.getLastUpdateTimestamp(this.threadvis.account);
+    var updateTimestamp = this.getLastUpdateTimestamp(accountKey);
+
     termValue.date = updateTimestamp;
     searchTerm.value = termValue;
 
     searchSession.appendTerm(searchTerm);
-    this.addSubFolders(searchSession, this.threadvis.rootFolder);
+    this.addSubFolders(searchSession, rootFolder);
 
     var newUpdateTimestamp = (new Date()).getTime() * 1000;
     var ref = this;
@@ -204,11 +235,9 @@ Cache.prototype.updateNewMessages = function(message, doVisualise) {
         },
         onSearchDone: function(status) {
             ref.threadvis.setStatus("");
-            ref.setLastUpdateTimestamp(ref.threadvis.account,
-                newUpdateTimestamp);
+            ref.setLastUpdateTimestamp(accountKey, newUpdateTimestamp);
 
             ref.threadvis.threader.thread();
-
             var container = ref.threadvis.getThreader()
                 .findContainer(message.messageId);
 
@@ -228,13 +257,19 @@ Cache.prototype.updateNewMessages = function(message, doVisualise) {
                     if (ref.cacheBuildCount > 1) {
                         messageUpdateTimestamp = 0;
                     }
-                    ref.setLastUpdateTimestamp(ref.threadvis.account,
+                    ref.setLastUpdateTimestamp(accountKey,
                         messageUpdateTimestamp);
 
-                    ref.updateNewMessages(message, doVisualise);
+                    ref.updatingCache = false;
+                    ref.updateNewMessagesInternal(message, doVisualise,
+                        accountKey, rootFolder);
                     return;
                 }
+
+                ref.updateNewMessagesWriteCache();
+
                 ref.cacheBuildCount = 0;
+                ref.updatingCache = false;
                 if (doVisualise) {
                     ref.threadvis.visualiseMessage(message);
                 }
@@ -254,9 +289,10 @@ Cache.prototype.updateNewMessages = function(message, doVisualise) {
                     messageUpdateTimestamp = 0;
                 }
 
-                ref.setLastUpdateTimestamp(ref.threadvis.account,
-                    messageUpdateTimestamp);
-                ref.updateNewMessages(message, doVisualise);
+                ref.updatingCache = false;
+                ref.setLastUpdateTimestamp(accountKey, messageUpdateTimestamp);
+                ref.updateNewMessagesInternal(message, doVisualise, accountKey,
+                    rootFolder);
             }
         },
         onSearchHit: function(header, folder) {
@@ -264,6 +300,7 @@ Cache.prototype.updateNewMessages = function(message, doVisualise) {
                 ref.threadvis.strings.getString("cache.building.status") + count);
             ref.threadvis.addMessage(header);
             count++;
+            ref.newMessages.push(header);
         }
     });
 
@@ -275,7 +312,7 @@ Cache.prototype.updateNewMessages = function(message, doVisualise) {
 /** ****************************************************************************
  * Get the last update timestamp for the given account
  ******************************************************************************/
-Cache.prototype.getLastUpdateTimestamp = function(account) {
+Cache.prototype.getLastUpdateTimestamp = function(accountKey) {
     var pref = this.threadvis.preferences.getPreference(
         this.threadvis.preferences.PREF_CACHE_LASTUPDATETIMESTAMP);
     var entries = pref.split(",");
@@ -287,8 +324,8 @@ Cache.prototype.getLastUpdateTimestamp = function(account) {
             timestamps[splits[0]] = splits[1];
         }
     }
-    if (timestamps[account.key]) {
-        return timestamps[account.key];
+    if (timestamps[accountKey]) {
+        return timestamps[accountKey];
     } else {
         return 0;
     }
@@ -299,7 +336,7 @@ Cache.prototype.getLastUpdateTimestamp = function(account) {
 /** ****************************************************************************
  * Set the last update timestamp for the given account
  ******************************************************************************/
-Cache.prototype.setLastUpdateTimestamp = function(account, timestamp) {
+Cache.prototype.setLastUpdateTimestamp = function(accountKey, timestamp) {
     var pref = this.threadvis.preferences.getPreference(
         this.threadvis.preferences.PREF_CACHE_LASTUPDATETIMESTAMP);
     var entries = pref.split(",");
@@ -309,7 +346,7 @@ Cache.prototype.setLastUpdateTimestamp = function(account, timestamp) {
         var splits = entry.split("=");
         timestamps[splits[0]] = splits[1];
     }
-    timestamps[account.key] = timestamp;
+    timestamps[accountKey] = timestamp;
 
     var output = "";
     for (var key in timestamps) {
@@ -378,7 +415,7 @@ Cache.prototype.reset = function(key) {
     var counter = 0;
     if (account instanceof Components.interfaces.nsIMsgAccount) {
         // reset update timestamp
-        this.setLastUpdateTimestamp(account, 0);
+        this.setLastUpdateTimestamp(account.key, 0);
 
         // reset all caches for all messages
         var rootFolder = account.incomingServer.rootFolder;
@@ -442,4 +479,51 @@ Cache.prototype.resetAllMessages = function(folder, counter) {
         }
     }
     return counter;
+}
+
+
+/** ****************************************************************************
+ * Write cache to disk for all new messages
+ ******************************************************************************/
+Cache.prototype.updateNewMessagesWriteCache = function() {
+    var util = new Util();
+    var ref = this;
+    util.registerListener({
+        onItem: function(item, count, remaining) {
+            var container = ref.threadvis.getThreader().findContainer(item.messageId);
+            ref.threadvis.setStatus(
+                ref.threadvis.strings.getString("cache.update.status") + count + " [" + remaining + "]");
+            if (container.isTopContainer()) {
+                ref.updateCache(container);
+            }
+        },
+        onFinished: function() {
+            ref.threadvis.setStatus("Cache done");
+        }
+    });
+    util.do(this.newMessages);
+}
+
+
+
+function Util() {
+    var listener = null;
+    this.count = 0;
+}
+
+Util.prototype.registerListener = function(listener) {
+    this.listener = listener;
+}
+
+Util.prototype.do = function(array) {
+    var elem = array.pop();
+    var remaining = array.length;
+    var ref = this;
+    if (elem) {
+        this.count++;
+        this.listener.onItem(elem, this.count, remaining);
+        setTimeout(function() {ref.do(array);}, 1);
+    } else {
+        this.listener.onFinished();
+    }
 }
