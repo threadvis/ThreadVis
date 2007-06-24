@@ -815,7 +815,7 @@ Container.prototype.toStringThread = function() {
  * Get string cache
  ******************************************************************************/
 Container.prototype.getCache = function() {
-    var string = ! this.isDummy() ? "\"" + this.getMessage().getId()
+    var string = ! this.isDummy() ? "\"" + this.getMessage().getKey()
         + "\"" : "\"DUMMY\"";
 
     string += ",";

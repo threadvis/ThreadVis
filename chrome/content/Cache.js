@@ -81,8 +81,8 @@ Cache.prototype.updateCache = function(container, rootFolder) {
  ******************************************************************************/
 Cache.prototype.putCache = function(container, cache, rootFolder) {
     if (! container.isDummy()) {
-        var msgid = container.getMessage().getId();
-        var msg = this.searchMessageByMsgId(msgid, rootFolder);
+        var msgKey = container.getMessage().getKey();
+        var msg = this.searchMessageByMsgKey(msgKey, rootFolder);
         if (msg) {
             msg.setStringProperty("X-ThreadVis-Cache", cache);
         }
@@ -103,8 +103,8 @@ Cache.prototype.addToThreaderFromCache = function(cache, rootFolder) {
     var elements = eval('(' + cache + ')');
 
     for (var i = 0; i < elements.length; i++) {
-        var msgid = elements[i];
-        var msg = this.searchMessageByMsgId(msgid, rootFolder);
+        var msgKey = elements[i];
+        var msg = this.searchMessageByMsgKey(msgKey, rootFolder);
         if (msg != null) {
             this.threadvis.addMessage(msg);
         }
@@ -114,57 +114,49 @@ Cache.prototype.addToThreaderFromCache = function(cache, rootFolder) {
 
 
 /** ****************************************************************************
- * Search for message id in current account
+ * Search for message key in current account
  ******************************************************************************/
-Cache.prototype.searchMessageByMsgId = function(messageId, rootFolder) {
-    return this.searchInSubFolder(rootFolder, messageId);
+Cache.prototype.searchMessageByMsgKey = function(messageKey, rootFolder) {
+    return this.searchInSubFolder(rootFolder, messageKey);
 }
 
 
 
 /** ****************************************************************************
- * Search for message id in subfolder
+ * Search for message key in subfolder
  ******************************************************************************/
-Cache.prototype.searchInSubFolder = function(folder, messageId) {
+Cache.prototype.searchInSubFolder = function(folder, messageKey) {
     if (folder.hasSubFolders) {
-        var subfolders = folder.GetSubFolders();
-        var subfolder = null;
-        var msgHdr = null;
-        var msgDB = null;
-        var currentFolderURI = "";
-
+        var subFolderEnumerator = folder.GetSubFolders();
         var done = false;
-        while(!done) {
-            currentFolderURI = subfolders.currentItem()
-                .QueryInterface(Components.interfaces.nsIRDFResource).Value;
-            subfolder = GetMsgFolderFromUri(currentFolderURI);
-
-            if (currentFolderURI.substring(1,7) != "news://") {
-                msgHdr = this.searchInSubFolder(subfolder, messageId);
-            }
-
-            if (!msgHdr) {
-                try {
-                    msgDB = subfolder.getMsgDatabase(msgWindow);
-                } catch (ex) {
-                    subfolder.updateFolder(msgWindow);
-                    msgDB = subfolder.getMsgDatabase(msgWindow);
+        while (! done) {
+            var next = subFolderEnumerator.currentItem();
+            if (next) {
+                var nextFolder = next.QueryInterface(
+                    Components.interfaces.nsIMsgFolder);
+                if (nextFolder && ! (nextFolder.flags 
+                    & MSG_FOLDER_FLAG_VIRTUAL)) {
+                    if (!nextFolder.noSelect &&
+                        this.threadvis.checkEnabledAccountOrFolder(nextFolder)) {
+                            var header = null;
+                            try {
+                                header = nextFolder.GetMessageHeader(messageKey);
+                            } catch (ex) {
+                            }
+                            if (header instanceof Components.interfaces.nsIMsgDBHdr) {
+                                return header;
+                            }
+                    }
+                    this.searchInSubFolder(nextFolder, messageKey);
                 }
-                msgHdr = msgDB.getMsgHdrForMessageID(messageId);
             }
-
-            if (msgHdr) {
-                return msgHdr;
-            }
-
             try {
-                subfolders.next();
-            } catch(e) {
+                subFolderEnumerator.next();
+            } catch (ex) {
                 done = true;
             }
         }
     }
-    return null;
 }
 
 
@@ -279,12 +271,18 @@ Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
                     ref.threadvis.strings.getString("cache.error"));
 
                 // set last update timestamp just before this message
-                var messageUpdateTimestamp = message.date - 1;
+                // -10 minutes
+                var messageUpdateTimestamp = message.date - 1000000 * 60;
 
                 // if we already tried to build cache for this message
                 // reset to 0 just in case
                 if (ref.cacheBuildCount > 1) {
                     messageUpdateTimestamp = 0;
+                }
+                if (ref.cacheBuildCount > 2) {
+                    ref.threadvis.setStatus(
+                        ref.threadvis.strings.getString("cache.error"));
+                    return;
                 }
 
                 ref.updatingCache = false;
