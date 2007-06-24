@@ -11,7 +11,6 @@
  ******************************************************************************/
 function Cache(threadvis) {
     this.threadvis = threadvis;
-    this.visitedMsgIds = new Object();
     this.cacheBuildCount = 0;
     this.updatingCache = false;
     this.newMessages = new Array();
@@ -24,7 +23,6 @@ function Cache(threadvis) {
  * Read X-ThreadVis-Cache
  ******************************************************************************/
 Cache.prototype.getCache = function(msg) {
-    this.visitedMsgIds = new Object();
     var cache = this.getCacheInternal(msg);
     this.threadvis.getThreader().thread();
     return cache;
@@ -36,14 +34,10 @@ Cache.prototype.getCache = function(msg) {
  * Get cache string for message (internal)
  ******************************************************************************/
 Cache.prototype.getCacheInternal = function(msg) {
-    if (this.visitedMsgIds[msg.messageId] == true) {
-        return;
-    }
-    this.visitedMsgIds[msg.messageId] = true;
     var cache = "";
     cache = msg.getStringProperty("X-ThreadVis-Cache");
     if (cache != "") {
-        this.addToThreaderFromCache(cache);
+        this.addToThreaderFromCache(cache, msg.folder.rootFolder);
     } else {
         //this.addToThreaderFromReferences(msg);
     }
@@ -55,29 +49,29 @@ Cache.prototype.getCacheInternal = function(msg) {
 /** ****************************************************************************
  * Add all messages from references to threader
  ******************************************************************************/
-Cache.prototype.addToThreaderFromReferences = function(msg) {
-    this.threadvis.addMessage(msg);
-    var references = (new References(msg.getStringProperty("references")))
-        .getReferences();
-    for (var i = 0; i < references.length; i++) {
-        var ref = references[i];
-        var refMessage = this.searchMessageByMsgId(ref);
-        if (refMessage) {
-            this.getCacheInternal(refMessage);
-        }
-    }
-}
+//Cache.prototype.addToThreaderFromReferences = function(msg) {
+//    this.threadvis.addMessage(msg);
+//    var references = (new References(msg.getStringProperty("references")))
+//        .getReferences();
+//    for (var i = 0; i < references.length; i++) {
+//        var ref = references[i];
+//        var refMessage = this.searchMessageByMsgId(ref);
+//        if (refMessage) {
+//            this.getCacheInternal(refMessage);
+//        }
+//    }
+//}
 
 
 
 /** ****************************************************************************
  * Get cache string for container, store for all messages in thread
  ******************************************************************************/
-Cache.prototype.updateCache = function(container) {
+Cache.prototype.updateCache = function(container, rootFolder) {
     var topcontainer = container.getTopContainer();
     var cache = topcontainer.getCache();
     cache = "[" + cache + "]";
-    this.putCache(topcontainer, cache);
+    this.putCache(topcontainer, cache, rootFolder);
 }
 
 
@@ -85,16 +79,18 @@ Cache.prototype.updateCache = function(container) {
 /** ****************************************************************************
  * Recursivly put cache string in all messages
  ******************************************************************************/
-Cache.prototype.putCache = function(container, cache) {
+Cache.prototype.putCache = function(container, cache, rootFolder) {
     if (! container.isDummy()) {
         var msgid = container.getMessage().getId();
-        var msg = this.searchMessageByMsgId(msgid);
-        msg.setStringProperty("X-ThreadVis-Cache", cache);
+        var msg = this.searchMessageByMsgId(msgid, rootFolder);
+        if (msg) {
+            msg.setStringProperty("X-ThreadVis-Cache", cache);
+        }
     }
 
     var child = null;
     for (child = container.getChild(); child != null; child = child.getNext()) {
-        this.putCache(child, cache);
+        this.putCache(child, cache, rootFolder);
     }
 }
 
@@ -103,12 +99,12 @@ Cache.prototype.putCache = function(container, cache) {
 /** ****************************************************************************
  * Add all messages from cache to threader
  ******************************************************************************/
-Cache.prototype.addToThreaderFromCache = function(cache) {
+Cache.prototype.addToThreaderFromCache = function(cache, rootFolder) {
     var elements = eval('(' + cache + ')');
 
     for (var i = 0; i < elements.length; i++) {
         var msgid = elements[i];
-        var msg = this.searchMessageByMsgId(msgid);
+        var msg = this.searchMessageByMsgId(msgid, rootFolder);
         if (msg != null) {
             this.threadvis.addMessage(msg);
         }
@@ -120,8 +116,8 @@ Cache.prototype.addToThreaderFromCache = function(cache) {
 /** ****************************************************************************
  * Search for message id in current account
  ******************************************************************************/
-Cache.prototype.searchMessageByMsgId = function(messageId) {
-    return this.searchInSubFolder(this.threadvis.rootFolder, messageId);
+Cache.prototype.searchMessageByMsgId = function(messageId, rootFolder) {
+    return this.searchInSubFolder(rootFolder, messageId);
 }
 
 
@@ -189,7 +185,6 @@ Cache.prototype.updateNewMessages = function(message, doVisualise) {
 
 /** ****************************************************************************
  * Periodically update cache with new messages
- * FIXXME: also write cache for all messages!!
  ******************************************************************************/
 Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
     accountKey, rootFolder) {
@@ -250,7 +245,8 @@ Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
                         ref.threadvis.strings.getString("cache.error"));
 
                     // set last update timestamp just before this message
-                    var messageUpdateTimestamp = message.date - 1;
+                    // set -10 minutes
+                    var messageUpdateTimestamp = message.date - 1000000*60*10;
 
                     // if we already tried to build cache for this message
                     // reset to 0 just in case
@@ -266,12 +262,13 @@ Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
                     return;
                 }
 
-                ref.updateNewMessagesWriteCache();
+                ref.updateNewMessagesWriteCache(rootFolder);
 
                 ref.cacheBuildCount = 0;
                 ref.updatingCache = false;
+
                 if (doVisualise) {
-                    ref.threadvis.visualiseMessage(message);
+                        ref.threadvis.visualiseMessage(message);
                 }
             } else {
                 // current message still not found
@@ -485,20 +482,24 @@ Cache.prototype.resetAllMessages = function(folder, counter) {
 /** ****************************************************************************
  * Write cache to disk for all new messages
  ******************************************************************************/
-Cache.prototype.updateNewMessagesWriteCache = function() {
+Cache.prototype.updateNewMessagesWriteCache = function(rootFolder) {
     var util = new Util();
     var ref = this;
+    this.updatedTopContainers = new Object();
     util.registerListener({
         onItem: function(item, count, remaining) {
             var container = ref.threadvis.getThreader().findContainer(item.messageId);
+            var topContainer = container.getTopContainer();
             ref.threadvis.setStatus(
                 ref.threadvis.strings.getString("cache.update.status") + count + " [" + remaining + "]");
-            if (container.isTopContainer()) {
-                ref.updateCache(container);
+            if (! ref.updatedTopContainers[topContainer]) {
+                ref.updatedTopContainers[topContainer] = true;
+                ref.updateCache(container, rootFolder);
             }
         },
         onFinished: function() {
             ref.threadvis.setStatus("Cache done");
+            delete ref.updatedTopContainers;
         }
     });
     util.do(this.newMessages);

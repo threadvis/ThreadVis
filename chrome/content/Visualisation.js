@@ -418,6 +418,41 @@ Visualisation.prototype.DECtoHEX = function(dec) {
 
 
 /** ****************************************************************************
+ * Display warning (too many messages)
+ ******************************************************************************/
+Visualisation.prototype.displayWarningCount = function(container) {
+    this.clearStack();
+    var warning = document.createElementNS(THREADVIS.XUL_NAMESPACE, "label");
+    warning.setAttribute("value",
+        this.strings.getString("visualisation.warningCount") + " [" +
+        container.getTopContainer().getCountRecursive() + "].");
+    warning.style.position = "relative";
+    warning.style.top = "10px"
+    warning.style.left = "20px"
+    warning.style.color = "#999999";
+    this.stack.appendChild(warning);
+
+    var link = document.createElementNS(THREADVIS.XUL_NAMESPACE, "label");
+    link.setAttribute("value", this.strings.getString("visualisation.warningCountLink"));
+    link.style.position = "relative";
+    link.style.top = "30px"
+    link.style.left = "20px"
+    link.style.color = "#0000ff";
+    link.style.textDecoration = "underline";
+    var ref = this;
+    link.addEventListener("click", function() {
+        ref.visualise(container, true);
+    }, true);
+    link.style.cursor = "pointer";
+    this.stack.appendChild(link);
+
+        // set cursor
+    this.box.style.cursor = "";
+}
+
+
+
+/** ****************************************************************************
  * Draw arc
  ******************************************************************************/
 Visualisation.prototype.drawArc = function(colour, vPosition, height, left, 
@@ -850,7 +885,11 @@ Visualisation.prototype.timeScaling = function(containers,
 /** ****************************************************************************
  * Visualise a new thread
  ******************************************************************************/
-Visualisation.prototype.visualise = function(container) {
+Visualisation.prototype.visualise = function(container, force) {
+    if (typeof force == "undefined") {
+        force = false;
+    }
+
     if (container == null) {
         container = this.currentContainer;
     }
@@ -898,11 +937,18 @@ Visualisation.prototype.visualise = function(container) {
     this.resetStack();
     this.clearStack();
 
-    // remember current container to redraw after zoom
-    this.currentContainer = container;
-
     // get topmost container
     var topContainer = container.getTopContainer();
+
+    // get number of containers
+    var count = topContainer.getCountRecursive();
+    if (count > 50 && ! force) {
+        this.displayWarningCount(container);
+        return;
+    }
+
+    // remember current container to redraw after zoom
+    this.currentContainer = container;
 
     // get all containers in thread as array
     this.containers = new Array();

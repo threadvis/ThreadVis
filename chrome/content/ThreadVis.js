@@ -111,7 +111,7 @@ ThreadVis.prototype.addMessage = function(header) {
 
     var message = new Message(header.mime2DecodedSubject,
         header.mime2DecodedAuthor, header.messageId, header.messageKey, date,
-        header.folder.URI,  header.getStringProperty("references"), false);
+        header.folder.URI, header.getStringProperty("references"), false);
 
     var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
         .getService(Components.interfaces.nsIMsgAccountManager))
@@ -134,9 +134,6 @@ ThreadVis.prototype.addMessage = function(header) {
  ******************************************************************************/
 ThreadVis.prototype.callback = function(msgKey, folder) {
     if (! this.preferences.getPreference(this.preferences.PREF_ENABLED)) {
-        return;
-    }
-    if (! this.checkEnabledAccountOrFolder(folder)) {
         return;
     }
 
@@ -481,6 +478,9 @@ ThreadVis.prototype.init = function() {
     // remember msgkey of selected message
     this.selectedMsgKey = "";
 
+    // remember msgkey of visualised message
+    this.visualisedMsgId = "";
+
     // remember container of selected message
     this.selectedContainer = null;
 
@@ -490,7 +490,7 @@ ThreadVis.prototype.init = function() {
     this.doLoad = {
         onStartHeaders: function() {ref.setSelectedMessage();},
         onEndHeaders: function() {}
-    }
+    };
     gMessageListeners.push(this.doLoad);
 
     // add folder listener, so that we can add newly received
@@ -720,6 +720,11 @@ ThreadVis.prototype.visualise = function(container) {
  * call method visualise(container)
  ******************************************************************************/
 ThreadVis.prototype.visualiseMessage = function(message) {
+    if (this.visualisedMsgId == message.messageId) {
+        return;
+    }
+    this.visualisedMsgId = message.messageId;
+
     if (! this.preferences.getPreference(this.preferences.PREF_ENABLED)) {
         return;
     }
@@ -750,7 +755,7 @@ ThreadVis.prototype.visualiseMessage = function(message) {
 
     var newCache = "[" + container.getTopContainer().getCache() + "]";
     if (cache != newCache) {
-        this.cache.updateCache(container);
+        this.cache.updateCache(container, message.folder.rootFolder);
     }
 
     if (container != null && ! container.isDummy()) {

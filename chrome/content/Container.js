@@ -552,7 +552,7 @@ Container.prototype.isRoot = function() {
 Container.prototype.isTopContainer = function() {
     if (this.hasParent()) {
         if (this.getParent().isRoot()) {
-            return true
+            return true;
         }
     }
     return false;

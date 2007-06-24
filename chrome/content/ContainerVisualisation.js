@@ -507,9 +507,10 @@ ContainerVisualisation.prototype.onMouseClick = function(event) {
     }
 
     var container = event.target.container;
-    if (container && ! container.isDummy())
+    if (container && ! container.isDummy()) {
         THREADVIS.callback(container.getMessage().getKey(),
             container.getMessage().getFolder());
+    }
 }
 
 
