@@ -92,7 +92,7 @@ Visualisation.prototype.calculateArcHeights = function(containers) {
             }
             parent.currentArcHeightOutgoing[freeHeight] = 1;
             thisContainer.currentArcHeightIncoming[freeHeight] = 1;
-            
+
             thisContainer.arcHeight = freeHeight;
         }
     }

@@ -723,7 +723,6 @@ ThreadVis.prototype.visualiseMessage = function(message) {
     if (this.visualisedMsgId == message.messageId) {
         return;
     }
-    this.visualisedMsgId = message.messageId;
 
     if (! this.preferences.getPreference(this.preferences.PREF_ENABLED)) {
         return;
@@ -757,6 +756,8 @@ ThreadVis.prototype.visualiseMessage = function(message) {
     if (cache != newCache) {
         this.cache.updateCache(container, message.folder.rootFolder);
     }
+
+    this.visualisedMsgId = message.messageId;
 
     if (container != null && ! container.isDummy()) {
         // visualise any popup windows that might exist

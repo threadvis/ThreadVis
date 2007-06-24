@@ -262,14 +262,15 @@ Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
                     return;
                 }
 
-                ref.updateNewMessagesWriteCache(rootFolder);
+                ref.updateNewMessagesWriteCache(rootFolder, function() {
+                    if (doVisualise) {
+                        ref.threadvis.visualiseMessage(message);
+                    }
+                });
 
                 ref.cacheBuildCount = 0;
                 ref.updatingCache = false;
 
-                if (doVisualise) {
-                        ref.threadvis.visualiseMessage(message);
-                }
             } else {
                 // current message still not found
                 // somehow it is not cached altough it should have been
@@ -482,7 +483,7 @@ Cache.prototype.resetAllMessages = function(folder, counter) {
 /** ****************************************************************************
  * Write cache to disk for all new messages
  ******************************************************************************/
-Cache.prototype.updateNewMessagesWriteCache = function(rootFolder) {
+Cache.prototype.updateNewMessagesWriteCache = function(rootFolder, callback) {
     var util = new Util();
     var ref = this;
     this.updatedTopContainers = new Object();
@@ -499,7 +500,7 @@ Cache.prototype.updateNewMessagesWriteCache = function(rootFolder) {
         },
         onFinished: function() {
             ref.threadvis.setStatus("Cache done");
-            delete ref.updatedTopContainers;
+            callback();
         }
     });
     util.do(this.newMessages);
