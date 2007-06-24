@@ -357,6 +357,7 @@ ThreadVis.prototype.displayVisualisationWindow = function() {
     this.popupWindow = window.openDialog("chrome://threadvis/content/ThreadVisPopup.xul",
         "ThreadVisPopup", flags);
     this.deleteBox();
+    this.visualisedMsgId = null;
 }
 
 
