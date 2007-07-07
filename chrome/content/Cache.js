@@ -127,36 +127,44 @@ Cache.prototype.searchMessageByMsgId = function(messageId, rootFolder) {
  ******************************************************************************/
 Cache.prototype.searchInSubFolder = function(folder, messageId) {
     if (folder.hasSubFolders) {
-        var subFolderEnumerator = folder.GetSubFolders();
+        var subfolders = folder.GetSubFolders();
+        var subfolder = null;
+        var msgHdr = null;
+        var msgDB = null;
+        var currentFolderURI = "";
+
         var done = false;
-        while (! done) {
-            var next = subFolderEnumerator.currentItem();
-            if (next) {
-                var nextFolder = next.QueryInterface(
-                    Components.interfaces.nsIMsgFolder);
-                if (nextFolder && ! (nextFolder.flags 
-                    & MSG_FOLDER_FLAG_VIRTUAL)) {
-                    if (!nextFolder.noSelect &&
-                        this.threadvis.checkEnabledAccountOrFolder(nextFolder)) {
-                            var header = null;
-                            try {
-                                header = nextFolder.getMsgDatabase(null).getMsgHdrForMessageID(messageId);
-                            } catch (ex) {
-                            }
-                            if (header instanceof Components.interfaces.nsIMsgDBHdr) {
-                                return header;
-                            }
-                    }
-                    this.searchInSubFolder(nextFolder, messageId);
-                }
+        while(!done) {
+            currentFolderURI = subfolders.currentItem()
+                .QueryInterface(Components.interfaces.nsIRDFResource).Value;
+            subfolder = GetMsgFolderFromUri(currentFolderURI);
+
+            if (currentFolderURI.substring(1,7) != "news://") {
+                msgHdr = this.searchInSubFolder(subfolder, messageId);
             }
+
+            if (!msgHdr) {
+                try {
+                    msgDB = subfolder.getMsgDatabase(msgWindow);
+                } catch (ex) {
+                    subfolder.updateFolder(msgWindow);
+                    msgDB = subfolder.getMsgDatabase(msgWindow);
+                }
+                msgHdr = msgDB.getMsgHdrForMessageID(messageId);
+            }
+
+            if (msgHdr) {
+                return msgHdr;
+            }
+
             try {
-                subFolderEnumerator.next();
-            } catch (ex) {
+                subfolders.next();
+            } catch(e) {
                 done = true;
             }
         }
     }
+    return null;
 }
 
 
