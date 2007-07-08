@@ -8,10 +8,11 @@
 
 
 ' ========================================================================
-' Create shell object
+' Create shell object and file system object
 ' ========================================================================
 
 Set shell = CreateObject("WScript.Shell")
+Set fso = CreateObject("Scripting.FileSystemObject")
 
 ' ========================================================================
 ' Get newest revision
@@ -23,25 +24,33 @@ position = InStr(1, svninfo, "Revision: ", 1)
 position = position + 10
 positionEnd = Instr(position, svninfo, vbNewLine, 1)
 length = positionEnd - position
-version = Mid(svninfo, position, length)
+revision = Mid(svninfo, position, length)
+
+' ========================================================================
+' Get newest version
+' ========================================================================
+
+Set versionFile = fso.OpenTextFile("..\version")
+version = versionFile.readAll
+versionFile.Close
 
 ' ========================================================================
 ' Delete old JAR file
 ' ========================================================================
 
-Set fso = CreateObject("Scripting.FileSystemObject")
 If fso.fileExists("threadvis.jar") Then
     Set jar = fso.GetFile("threadvis.jar")
     jar.Delete
 End If
 
 ' ========================================================================
-' Update about dialog with revision information
+' Update code with version and revision
 ' ========================================================================
 
 Set settingsDtd = fso.OpenTextFile("locale\de-DE\Settings.dtd")
 contentDe = settingsDtd.ReadAll
-contentDeNew = Replace(contentDe, "<<build>>", version)
+contentDeNew = Replace(contentDe, "<<build>>", revision)
+contentDeNew = Replace(contentDeNew, "<<version>>", version)
 settingsDtd.Close
 
 Set settingsDtd = fso.OpenTextFile("locale\de-DE\Settings.dtd", 2)
@@ -50,12 +59,23 @@ settingsDtd.Close
 
 Set settingsDtd = fso.OpenTextFile("locale\en-US\Settings.dtd")
 contentEn = settingsDtd.ReadAll
-contentEnNew = Replace(contentEn, "<<build>>", version)
+contentEnNew = Replace(contentEn, "<<build>>", revision)
+contentEnNew = Replace(contentEnNew, "<<version>>", version)
 settingsDtd.Close
 
 Set settingsDtd = fso.OpenTextFile("locale\de-DE\Settings.dtd", 2)
 settingsDtd.write(contentEnNew)
 settingsDtd.close
+
+Set logger = fso.OpenTextFile("content\Logger.js")
+loggerText = logger.ReadAll
+loggerTextNew = Replace(loggerText, "<<build>>", revision)
+loggerTextNew = Replace(loggerTextNew, "<<version>>", version)
+logger.Close
+
+Set logger = fso.OpenTextFile("content\Logger.js", 2)
+logger.write(loggerTextNew)
+logger.close
 
 WScript.Sleep 1000
 
@@ -68,7 +88,7 @@ shell.Run "c:\Programme\7-Zip\7z a -mx0 -tzip threadvis.jar @make.list"
 WScript.Sleep 1000
 
 ' ========================================================================
-' Reset about dialog
+' Reset source
 ' ========================================================================
 
 Set settingsDtd = fso.OpenTextFile("locale\de-DE\Settings.dtd", 2)
@@ -78,6 +98,10 @@ settingsDtd.Close
 Set settingsDtd = fso.OpenTextFile("locale\en-US\Settings.dtd", 2)
 settingsDtd.write(contentEn)
 settingsDtd.Close
+
+Set logger = fso.OpenTextFile("content\Logger.js", 2)
+logger.write(loggerText)
+logger.Close
 
 ' ========================================================================
 ' Copy JAR file
