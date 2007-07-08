@@ -123,6 +123,10 @@ ThreadVis.prototype.addMessage = function(header) {
 
     message.setSent(issent);
     this.getThreader().addMessage(message);
+
+    if (DEBUG_ENABLED) {
+        DEBUG.log("Added message to threader: " + message);
+    }
 }
 
 
@@ -262,6 +266,10 @@ ThreadVis.prototype.clearVisualisation = function() {
     if (opener && opener.THREADVIS && opener.THREADVIS.legendWindow
         && ! opener.THREADVIS.legendWindow.closed) {
         opener.THREADVIS.legendWindow.clearLegend();
+    }
+
+    if (DEBUG_ENABLED) {
+        DEBUG.log("Clear visualisation");
     }
 }
 
@@ -544,6 +552,9 @@ ThreadVis.prototype.logJavaScriptErrors = function(message, file, line) {
  * called when a new message is saved to a folder
  ******************************************************************************/
 ThreadVis.prototype.onItemAdded = function(parentItem, item, view) {
+    if (DEBUG_ENABLED) {
+        DEBUG.log("onItemAdded: " + item);
+    }
     if (item instanceof Components.interfaces.nsIMsgDBHdr) {
         this.cache.updateNewMessages(item, false);
     }
@@ -740,21 +751,39 @@ ThreadVis.prototype.visualiseMessage = function(message) {
     // try to find in threader
     var container = this.getThreader().findContainer(message.messageId);
 
+    if (DEBUG_ENABLED) {
+        DEBUG.log("Visualise: message from threader: " + container);
+    }
+
+    if (container != null && ! container.isDummy()) {
+        cache = container.getTopContainer().getCache();
+    }
+
     // if not in threader, try to get from cache
     var cache = "";
     if (container == null || container.isDummy()) {
+        if (DEBUG_ENABLED) {
+            DEBUG.log("Visualise: message not in threader, getting from cache");
+        }
         cache = this.cache.getCache(message);
         container = this.getThreader().findContainer(message.messageId);
     }
 
     // not in threader, not in cache. add to threader
     if (container == null || container.isDummy()) {
+        if (DEBUG_ENABLED) {
+            DEBUG.log("Visualise: message not in cache, update new messages");
+        }
         this.cache.updateNewMessages(message, true);
         return;
     }
 
     var newCache = "[" + container.getTopContainer().getCache() + "]";
     if (cache != newCache) {
+        if (DEBUG_ENABLED) {
+            DEBUG.log("Visualise: cache changed, writing new. old: "
+            + cache + "\nnew: " + newCache);
+        }
         this.cache.updateCache(container, message.folder.rootFolder);
     }
 

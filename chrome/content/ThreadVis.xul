@@ -24,6 +24,7 @@
     <script src="chrome://threadvis/content/Container.js" />
     <script src="chrome://threadvis/content/ContainerVisualisation.js" />
     <script src="chrome://threadvis/content/CopyCut.js" />
+    <script src="chrome://threadvis/content/Debug.js" />
     <script src="chrome://threadvis/content/Logger.js" />
     <script src="chrome://threadvis/content/Message.js" />
     <script src="chrome://threadvis/content/PreferenceObserver.js" />

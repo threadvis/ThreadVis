@@ -4,6 +4,7 @@ content/Container.js
 content/ContainerVisualisation.js
 content/contents.rdf
 content/CopyCut.js
+content/Debug.js
 content/Legend.js
 content/Legend.xul
 content/Logger.js

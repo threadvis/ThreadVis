@@ -25,6 +25,9 @@ function Cache(threadvis) {
 Cache.prototype.getCache = function(msg) {
     var cache = this.getCacheInternal(msg);
     this.threadvis.getThreader().thread();
+    if (DEBUG_ENABLED) {
+        DEBUG.log("Cache: getCache: " + cache);
+    }
     return cache;
 }
 
@@ -71,6 +74,9 @@ Cache.prototype.updateCache = function(container, rootFolder) {
     var topcontainer = container.getTopContainer();
     var cache = topcontainer.getCache();
     cache = "[" + cache + "]";
+    if (DEBUG_ENABLED) {
+        DEBUG.log("Cache: updateCache: " + cache);
+    }
     this.putCache(topcontainer, cache, rootFolder);
 }
 
@@ -84,7 +90,13 @@ Cache.prototype.putCache = function(container, cache, rootFolder) {
         var msgId = container.getMessage().getId();
         var msg = this.searchMessageByMsgId(msgId, rootFolder);
         if (msg) {
+            if (DEBUG_ENABLED) {
+                DEBUG.log("Cache: putCache: " + cache);
+            }
             msg.setStringProperty("X-ThreadVis-Cache", cache);
+            if (DEBUG_ENABLED) {
+                DEBUG.log("Cache: putCache: read: " + msg.getStringProperty("X-ThreadVis-Cache"));
+            }
         }
     }
 
@@ -290,6 +302,11 @@ Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
                 if (ref.cacheBuildCount > 2) {
                     ref.threadvis.setStatus(
                         ref.threadvis.strings.getString("cache.error"));
+                    if (DEBUG_ENABLED) {
+                        DEBUG.log("Cache: updateNewMessages. Cache error, message not found: "
+                            + message.mime2DecodedSubject + " "
+                            + header.mime2DecodedAuthor + " " + header.messageId);
+                    }
                     return;
                 }
 
@@ -308,6 +325,11 @@ Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
             ref.getCacheInternal(header);
             count++;
             ref.newMessages.push(header);
+            if (DEBUG_ENABLED) {
+                DEBUG.log("Cache: updateNewMessages: "
+                    + header.mime2DecodedSubject + " "
+                    + header.mime2DecodedAuthor + " " + header.messageId);
+            }
         }
     });
 
