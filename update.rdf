@@ -20,7 +20,7 @@
             <RDF:Seq>
                 <RDF:li>
                     <RDF:Description>
-                        <em:version><<version>><<build>></em:version>
+                        <em:version><<version>>.<<build>></em:version>
                         <!-- Target Application - Thunderbird -->
                         <em:targetApplication>
                             <Description>
@@ -52,7 +52,7 @@
                 </RDF:li>
             </RDF:Seq>
         </em:updates>
-        <em:version><<version>><<build>></em:version>
+        <em:version><<version>>.<<build>></em:version>
         <em:updateLink>http://www.student.tugraz.at/ahubmann/threadvis/ThreadVis.xpi</em:updateLink>
     </RDF:Description>
 

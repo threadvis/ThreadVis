@@ -20,7 +20,7 @@ function Logger() {
     this.EXTENSION_PATH = "extensions";
     this.EXTENSION_GUID = "{A23E4120-431F-4753-AE53-5D028C42CFDC}";
     this.LOGFILENAME = "threadvis.log.xml";
-    this.STARTTAG = '\n<log extensionversion="<<version>> [<<build>>]">';
+    this.STARTTAG = '\n<log extensionversion="<<version>>.<<build>>">';
     this.ENDTAG = "\n</log>";
 
     this.LEVEL_ERROR = 0;

@@ -62,4 +62,4 @@
 <!ENTITY extension.homepage                                 "http://www.student.tugraz.at/ahubmann/threadvis/">
 <!ENTITY extension.email                                    "ahubmann@gmail.com">
 <!ENTITY extension.name                                     "ThreadVis">
-<!ENTITY extension.version                                  "<<version>> [<<build>>]">
+<!ENTITY extension.version                                  "<<version>>.<<build>>">
