@@ -63,7 +63,7 @@ contentEnNew = Replace(contentEn, "<<build>>", revision)
 contentEnNew = Replace(contentEnNew, "<<version>>", version)
 settingsDtd.Close
 
-Set settingsDtd = fso.OpenTextFile("locale\de-DE\Settings.dtd", 2)
+Set settingsDtd = fso.OpenTextFile("locale\en-US\Settings.dtd", 2)
 settingsDtd.write(contentEnNew)
 settingsDtd.close
 
@@ -77,7 +77,7 @@ Set logger = fso.OpenTextFile("content\Logger.js", 2)
 logger.write(loggerTextNew)
 logger.close
 
-WScript.Sleep 1000
+WScript.Sleep 2000
 
 ' ========================================================================
 ' Create JAR file
@@ -85,7 +85,7 @@ WScript.Sleep 1000
 
 shell.Run "c:\Programme\7-Zip\7z a -mx0 -tzip threadvis.jar @make.list"
 
-WScript.Sleep 1000
+WScript.Sleep 2000
 
 ' ========================================================================
 ' Reset source
