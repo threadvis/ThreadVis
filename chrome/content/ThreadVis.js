@@ -124,8 +124,9 @@ ThreadVis.prototype.addMessage = function(header) {
     message.setSent(issent);
     this.getThreader().addMessage(message);
 
-    if (DEBUG_ENABLED) {
-        DEBUG.log("Added message to threader: " + message);
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_EMAIL)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_EMAIL,
+            "addMessageToThreader", {"message" : message});
     }
 }
 
@@ -266,10 +267,6 @@ ThreadVis.prototype.clearVisualisation = function() {
     if (opener && opener.THREADVIS && opener.THREADVIS.legendWindow
         && ! opener.THREADVIS.legendWindow.closed) {
         opener.THREADVIS.legendWindow.clearLegend();
-    }
-
-    if (DEBUG_ENABLED) {
-        DEBUG.log("Clear visualisation");
     }
 }
 
@@ -552,9 +549,11 @@ ThreadVis.prototype.logJavaScriptErrors = function(message, file, line) {
  * called when a new message is saved to a folder
  ******************************************************************************/
 ThreadVis.prototype.onItemAdded = function(parentItem, item, view) {
-    if (DEBUG_ENABLED) {
-        DEBUG.log("onItemAdded: " + item);
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_CACHE,
+            "onItemAdded", {});
     }
+
     if (item instanceof Components.interfaces.nsIMsgDBHdr) {
         this.cache.updateNewMessages(item, false);
     }
@@ -751,10 +750,6 @@ ThreadVis.prototype.visualiseMessage = function(message) {
     // try to find in threader
     var container = this.getThreader().findContainer(message.messageId);
 
-    if (DEBUG_ENABLED) {
-        DEBUG.log("Visualise: message from threader: " + container);
-    }
-
     if (container != null && ! container.isDummy()) {
         cache = container.getTopContainer().getCache();
     }
@@ -762,8 +757,9 @@ ThreadVis.prototype.visualiseMessage = function(message) {
     // if not in threader, try to get from cache
     var cache = "";
     if (container == null || container.isDummy()) {
-        if (DEBUG_ENABLED) {
-            DEBUG.log("Visualise: message not in threader, getting from cache");
+        if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_CACHE)) {
+            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_CACHE,
+                "visualise", {"action" : "message not in threader, getting from cache"});
         }
         cache = this.cache.getCache(message);
         container = this.getThreader().findContainer(message.messageId);
@@ -771,8 +767,9 @@ ThreadVis.prototype.visualiseMessage = function(message) {
 
     // not in threader, not in cache. add to threader
     if (container == null || container.isDummy()) {
-        if (DEBUG_ENABLED) {
-            DEBUG.log("Visualise: message not in cache, update new messages");
+        if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_CACHE)) {
+            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_CACHE,
+                "visualise", {"action" : "message not in cache, update new messages"});
         }
         this.cache.updateNewMessages(message, true);
         return;
@@ -780,9 +777,11 @@ ThreadVis.prototype.visualiseMessage = function(message) {
 
     var newCache = "[" + container.getTopContainer().getCache() + "]";
     if (cache != newCache) {
-        if (DEBUG_ENABLED) {
-            DEBUG.log("Visualise: cache changed, writing new. old: "
-            + cache + "\nnew: " + newCache);
+        if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_CACHE)) {
+            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_CACHE,
+                "visualise", {"action" : "cache changed, writing new",
+                    "old" : cache,
+                    "new" : newCache});
         }
         this.cache.updateCache(container, message.folder.rootFolder);
     }

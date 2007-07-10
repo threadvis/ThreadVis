@@ -32,7 +32,7 @@
         "visualisationArcWidth", "visualisationSpacing",
         "zoomWidth", "zoomHeight", "visualisationColour",
         "visualisationHighlight", "visualisationOpacity", "doLogging",
-        "doLoggingDebug", "doLoggingDebugLevel"];
+        "doLoggingDebug", "doLoggingDebugLevel", "doLoggingConsole"];
     ]]>
     </script>
 
@@ -356,8 +356,8 @@
                             id="doLoggingDebugLevel"
                             preference="extensions.threadvis.logging.debug.level"
                             prefstring="extensions.threadvis.logging.debug.level"
-                            preftype="int"
-                            size="2" />
+                            preftype="string"
+                            size="20" />
                     </hbox>
                     <label class="indent detailedDescription">
                         &logfiles.debug.description.general;
@@ -365,15 +365,21 @@
                         &logfiles.debug.description.size;
                     </label>
                     <separator class="thin" />
-                    <button id="sendLog"
-                        label="&logfiles.send.button;"
-                        oncommand="sendLogfiles();"
-                        tooltiptext="&logfiles.send.tooltip;" />
-                    <separator class="thin" />
-                    <button id="resetLog"
-                        label="&logfiles.reset.button;"
-                        oncommand="resetLogfiles();"
-                        tooltiptext="&logfiles.reset.tooltip;" />
+                    <hbox>
+                        <button id="sendLog"
+                            label="&logfiles.send.button;"
+                            oncommand="sendLogfiles();"
+                            tooltiptext="&logfiles.send.tooltip;" />
+                        <button id="resetLog"
+                            label="&logfiles.reset.button;"
+                            oncommand="resetLogfiles();"
+                            tooltiptext="&logfiles.reset.tooltip;" />
+                    </hbox>
+                    <checkbox id="doLoggingConsole"
+                        label="&logfiles.console;"
+                        preference="extensions.threadvis.logging.console"
+                        prefstring="extensions.threadvis.logging.console"
+                        preftype="string" />
                 </tabpanel>
 
             </tabpanels>

@@ -14,6 +14,7 @@
 <!ENTITY extension.enabled                                  "Erweiterung aktivieren">
 <!ENTITY logfiles.tab                                       "Log-Dateien">
 <!ENTITY logfiles.caption                                   "Logging aktivieren">
+<!ENTITY logfiles.console                                   "Nur in der Fehler-Konsole loggen">
 <!ENTITY logfiles.enable.checkbox                           "Logging aktivieren">
 <!ENTITY logfiles.enable.description.whatlogged             "Wenn Sie das Logging aktivieren, werden nur statistische Daten &#xFC;ber Ihre Mailbox, &#xFC;ber die Konversationen die Sie lesen und die Art mit der Sie die Erweiterung verwenden, gespeichert.">
 <!ENTITY logfiles.enable.description.sending                "Diese Information wird nie automatisch versendet. Sie k&#xF6;nnen diese Informationen versenden, indem Sie auf den Button &#x22;&logfiles.send.button;&#x22; klicken.">
@@ -21,7 +22,7 @@
 <!ENTITY logfiles.debug.description.general                 "Wenn Sie auf Probleme mit der Erweiterung sto&#xDF;en, k&#xF6;nnen Sie Debug-Informationen in den Log-Dateien inkludieren, um die Behebung der Probleme zu vereinfachen.">
 <!ENTITY logfiles.debug.description.personalinfo            "Achtung: Diese Informationen k&#xF6;nnen pers&#xF6;nliche Daten wie Message-IDs, die Struktur der Konversationen die Sie f&#xFC;hren und &#xE4;hnliche Informationen beinhalten.">
 <!ENTITY logfiles.debug.description.size                    "Bitte beachten Sie auch, dass durch das Aktivieren dieser Option die Gr&#xF6;&#xDF;e der Log-Dateien extrem anw&#xE4;chst und die Geschwindigkeit der Erweiterung verringert wird.">
-<!ENTITY logfiles.debug.level                               "Log-Level (0-4):">
+<!ENTITY logfiles.debug.level                               "Log-Level:">
 <!ENTITY logfiles.send.button                               "Log-Dateien senden">
 <!ENTITY logfiles.send.tooltip                              "Erstellt eine neue leere E-Mail und f&#xFC;gt die Log-Dateien als Anhang an.">
 <!ENTITY logfiles.reset.button                              "Log-Dateien zur&#xFC;cksetzen">

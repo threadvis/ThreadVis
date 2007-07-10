@@ -23,11 +23,12 @@ function Logger() {
     this.STARTTAG = '\n<log extensionversion="<<version>>.<<build>>">';
     this.ENDTAG = "\n</log>";
 
-    this.LEVEL_ERROR = 0;
-    this.LEVEL_INFORM = 1;
-    this.LEVEL_VIS = 2;
-    this.LEVEL_EMAIL = 3;
-    this.LEVEL_ALL = 4;
+    this.LEVEL_ERROR ="error";
+    this.LEVEL_INFORM = "info";
+    this.LEVEL_VIS = "vis";
+    this.LEVEL_EMAIL = "email";
+    this.LEVEL_ALL = "all";
+    this.LEVEL_CACHE = "cache";
 
     // init class variables
     this.strings = document.getElementById("ThreadVisStrings");
@@ -57,6 +58,9 @@ function Logger() {
     } else {
         this.ready = false;
     }
+
+    this.consoleService = Components.classes["@mozilla.org/consoleservice;1"]
+        .getService(Components.interfaces.nsIConsoleService);
 
     var ref = this;
     THREADVIS.preferences.registerCallback(THREADVIS.preferences.PREF_LOGGING,
@@ -138,13 +142,23 @@ Logger.prototype.getFile = function() {
 
 
 /** ****************************************************************************
+ * check to see if debug to console is enabled
+ ******************************************************************************/
+Logger.prototype.isConsole = function() {
+    return (THREADVIS.preferences.getPreference(
+            THREADVIS.preferences.PREF_LOGGING_CONSOLE));
+}
+
+
+
+/** ****************************************************************************
  * check to see if debug logging is enabled
  ******************************************************************************/
 Logger.prototype.isDebug = function(level) {
     return (THREADVIS.preferences.getPreference(
             THREADVIS.preferences.PREF_LOGGING_DEBUG)
         && THREADVIS.preferences.getPreference(
-            THREADVIS.preferences.PREF_LOGGING_DEBUG_LEVEL) >= level);
+            THREADVIS.preferences.PREF_LOGGING_DEBUG_LEVEL).search(level) != -1);
 }
 
 
@@ -153,13 +167,21 @@ Logger.prototype.isDebug = function(level) {
  * write a string to the file
  ******************************************************************************/
 Logger.prototype.log = function(item, infos) {
-    if (this.ready) {
-        var date = new Date();
-        var logtext = "";
-        logtext += '\n<logitem date="' + date + '" item="' + item + '">';
-        logtext += this.decode(infos);
-        logtext += "</logitem>";
-        this.fileOutputStream.write(logtext, logtext.length);
+    if (this.isConsole()) {
+        msg = item;
+        for (var i in infos) {
+            msg += "\n" + i + ": " + infos[i];
+        }
+        this.consoleService.logStringMessage(msg);
+    } else {
+        if (this.ready) {
+            var date = new Date();
+            var logtext = "";
+            logtext += '\n<logitem date="' + date + '" item="' + item + '">';
+            logtext += this.decode(infos);
+            logtext += "</logitem>";
+            this.fileOutputStream.write(logtext, logtext.length);
+        }
     }
 }
 
@@ -169,18 +191,21 @@ Logger.prototype.log = function(item, infos) {
  * write a string to the file in debug mode
  ******************************************************************************/
 Logger.prototype.logDebug = function(level, item, infos) {
-    if (this.ready && 
-        THREADVIS.preferences.getPreference(
-            THREADVIS.preferences.PREF_LOGGING_DEBUG)
-        && THREADVIS.preferences.getPreference(
-            THREADVIS.preferences.PREF_LOGGING_DEBUG_LEVEL) >= level) {
-
-        var date = new Date();
-        var logtext = "";
-        logtext += '\n<logitem date="' + date + '" item="' + item + '">';
-        logtext += this.decodeDebug(infos);
-        logtext += "</logitem>";
-        this.fileOutputStream.write(logtext, logtext.length);
+    if (this.isConsole()) {
+        msg = item;
+        for (var i in infos) {
+            msg += "\n" + i + ": " + infos[i];
+        }
+        this.consoleService.logStringMessage(msg);
+    } else {
+        if (this.ready) {
+            var date = new Date();
+            var logtext = "";
+            logtext += '\n<logitem date="' + date + '" item="' + item + '">';
+            logtext += this.decodeDebug(infos);
+            logtext += "</logitem>";
+            this.fileOutputStream.write(logtext, logtext.length);
+        }
     }
 }
 

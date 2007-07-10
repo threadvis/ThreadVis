@@ -797,7 +797,7 @@ Visualisation.prototype.timeScaling = function(containers,
             "containers" : containers.toString(),
             "minimaltimedifference" : minimalTimeDifference,
             "width" : width,
-            "no. containers:" : containers.length});
+            "no. containers" : containers.length});
     }
 
     var prefSpacing = THREADVIS.preferences.getPreference(

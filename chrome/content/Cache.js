@@ -25,8 +25,9 @@ function Cache(threadvis) {
 Cache.prototype.getCache = function(msg) {
     var cache = this.getCacheInternal(msg);
     this.threadvis.getThreader().thread();
-    if (DEBUG_ENABLED) {
-        DEBUG.log("Cache: getCache: " + cache);
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_CACHE,
+            "getCache", {"cache" : cache});
     }
     return cache;
 }
@@ -74,9 +75,12 @@ Cache.prototype.updateCache = function(container, rootFolder) {
     var topcontainer = container.getTopContainer();
     var cache = topcontainer.getCache();
     cache = "[" + cache + "]";
-    if (DEBUG_ENABLED) {
-        DEBUG.log("Cache: updateCache: " + cache);
+
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_CACHE,
+            "updateCache", {"cache" : cache});
     }
+
     this.putCache(topcontainer, cache, rootFolder);
 }
 
@@ -90,13 +94,11 @@ Cache.prototype.putCache = function(container, cache, rootFolder) {
         var msgId = container.getMessage().getId();
         var msg = this.searchMessageByMsgId(msgId, rootFolder);
         if (msg) {
-            if (DEBUG_ENABLED) {
-                DEBUG.log("Cache: putCache: " + cache);
+            if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_CACHE)) {
+                THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_CACHE,
+                    "putCache", {"cache" : cache});
             }
             msg.setStringProperty("X-ThreadVis-Cache", cache);
-            if (DEBUG_ENABLED) {
-                DEBUG.log("Cache: putCache: read: " + msg.getStringProperty("X-ThreadVis-Cache"));
-            }
         }
     }
 
@@ -250,6 +252,10 @@ Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
 
             if (container) {
                 if (container.isDummy()) {
+                    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_CACHE)) {
+                        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_CACHE,
+                        "updateNewMessages", {"action" : "dummy container found"});
+                    }
                     // current message still not found
                     // somehow it is not cached altough it should have been
                     // reset last update timestamp to date if this message
@@ -302,10 +308,14 @@ Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
                 if (ref.cacheBuildCount > 2) {
                     ref.threadvis.setStatus(
                         ref.threadvis.strings.getString("cache.error"));
-                    if (DEBUG_ENABLED) {
-                        DEBUG.log("Cache: updateNewMessages. Cache error, message not found: "
-                            + message.mime2DecodedSubject + " "
-                            + message.mime2DecodedAuthor + " " + message.messageId);
+                    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_CACHE)) {
+                        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_CACHE,
+                            "updateNewMessages", {
+                                "action" : "cache error, message not found",
+                                "subject" : message.mime2DecodedSubject,
+                                "autor" : message.mime2DecodedAutor,
+                                "messageId" : message.messageId
+                            });
                     }
                     return;
                 }
@@ -325,10 +335,12 @@ Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
             ref.getCacheInternal(header);
             count++;
             ref.newMessages.push(header);
-            if (DEBUG_ENABLED) {
-                DEBUG.log("Cache: updateNewMessages: "
-                    + header.mime2DecodedSubject + " "
-                    + header.mime2DecodedAuthor + " " + header.messageId);
+            if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_CACHE)) {
+                THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_CACHE,
+                    "updateNewMessages", {"action" : "hit",
+                        "subject" : header.mime2DecodedSubject,
+                        "author" : header.mime2DecodedAutor,
+                        "messageId" : header.messageId});
             }
         }
     });

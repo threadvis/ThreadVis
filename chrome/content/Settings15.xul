@@ -86,7 +86,10 @@
                 type="bool" />
             <preference id="extensions.threadvis.logging.debug.level"
                 name="extensions.threadvis.logging.debug.level"
-                type="int" />
+                type="string" />
+            <preference id="extensions.threadvis.logging.console"
+                name="extensions.threadvis.logging.console"
+                type="bool" />
         </preferences>
 
         <tabbox flex="1" id="threadVisTabBox">
@@ -370,9 +373,9 @@
                             control="logdebuglevel"
                             value="&logfiles.debug.level;" />
                         <textbox class="indent detailedDescription"
-                            id="logDebugLevel"
                             preference="extensions.threadvis.logging.debug.level"
-                            size="2" />
+                            id="logDebugLevel"
+                            size="20" />
                     </hbox>
                     <label class="indent detailedDescription">
                         &logfiles.debug.description.general;
@@ -380,14 +383,19 @@
                         &logfiles.debug.description.size;
                     </label>
                     <separator class="thin" />
-                    <button id="sendLog"
-                        label="&logfiles.send.button;"
-                        oncommand="sendLogfiles();"
-                        tooltiptext="&logfiles.send.tooltip;" />
-                    <separator class="thin" />
-                    <button id="resetLog" label="&logfiles.reset.button;"
-                        oncommand="resetLogfiles();"
-                        tooltiptext="&logfiles.reset.tooltip;" />
+                    <hbox>
+                        <button id="sendLog"
+                            label="&logfiles.send.button;"
+                            oncommand="sendLogfiles();"
+                            tooltiptext="&logfiles.send.tooltip;" />
+                        <separator class="thin" />
+                        <button id="resetLog" label="&logfiles.reset.button;"
+                            oncommand="resetLogfiles();"
+                            tooltiptext="&logfiles.reset.tooltip;" />
+                    </hbox>
+                    <checkbox id="doConsole"
+                        label="&logfiles.console;"
+                        preference="extensions.threadvis.logging.console" />
                 </tabpanel>
 
             </tabpanels>
