@@ -305,7 +305,7 @@ Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
                     if (DEBUG_ENABLED) {
                         DEBUG.log("Cache: updateNewMessages. Cache error, message not found: "
                             + message.mime2DecodedSubject + " "
-                            + header.mime2DecodedAuthor + " " + header.messageId);
+                            + message.mime2DecodedAuthor + " " + message.messageId);
                     }
                     return;
                 }
