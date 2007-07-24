@@ -99,8 +99,8 @@ function ContainerVisualisation(stack, strings, container, colour, left, top,
         this.style ="dummy";
     }
 
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_VIS)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_VIS,
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "ContainerVisualisation()", {"action" : "start", "container" :
             this.container.toString(), "colour" : this.colour, "style" :
             this.style, "left" : this.left, "top" : this.top});
@@ -265,8 +265,8 @@ ContainerVisualisation.prototype.getToolTip = function() {
     }
 
     if (! this.container.isDummy()) {
-        if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_VIS)) {
-            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_VIS,
+        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
+            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
                 "Visualisation.drawDot()", {"action" : "create tooltip start"});
         }
 
@@ -311,13 +311,13 @@ ContainerVisualisation.prototype.getToolTip = function() {
         this.tooltip.appendChild(date);
         this.tooltip.appendChild(subject);
 
-        if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_VIS)) {
-            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_VIS,
+        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
+            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
                 "Visualisation.drawDot()", {"action" : "create tooltip end"});
         }
     } else {
-        if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_VIS)) {
-            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_VIS,
+        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
+            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
                 "Visualisation.drawDot()", {"action" :
                 "create missing tooltip start"});
         }
@@ -334,8 +334,8 @@ ContainerVisualisation.prototype.getToolTip = function() {
         this.tooltip.appendChild(desc1);
         this.tooltip.appendChild(desc2);
 
-        if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_VIS)) {
-            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_VIS,
+        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
+            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
                 "Visualisation.drawDot()",
                 {"action" : "create missing tooltip end"});
         }
@@ -501,8 +501,8 @@ ContainerVisualisation.prototype.onMouseClick = function(event) {
         ThreadPaneDoubleClick();
     }
 
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_INFORM)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFORM,
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Visualisation.onMouseClick()", {});
     }
 
@@ -657,8 +657,8 @@ ContainerVisualisation.prototype.visualiseCircle = function(colour) {
     var styleBorder = "";
     styleBorder = (this.dotSize / 6 * this.resize) + "px solid " + colour;
 
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_VIS)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_VIS,
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Visualisation.drawDot()", {"action" : "draw selection circle",
             "top" : styleTop, "left" : styleLeft, "height" : styleHeight,
             "width" : styleWidth, "background" : styleBackground,
@@ -688,8 +688,8 @@ ContainerVisualisation.prototype.visualiseClick = function() {
     var styleBackground = "";
     var styleBorder = "";
 
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_VIS)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_VIS,
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Visualisation.drawClick()", {"top" : styleTop, "left" : styleLeft,
             "height" : styleHeight, "width" : styleWidth, "background" :
             styleBackground, "border" : styleBorder});
@@ -730,8 +730,8 @@ ContainerVisualisation.prototype.visualiseDot = function() {
             + this.colour;
     }
 
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_VIS)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_VIS,
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Visualisation.drawDot()", {"top" : styleTop, "left" : styleLeft,
             "height" : styleHeight, "width" : styleWidth, "background" :
             styleBackground, "border" : styleBorder});

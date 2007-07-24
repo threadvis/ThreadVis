@@ -84,8 +84,8 @@
             <preference id="extensions.threadvis.logging.debug"
                 name="extensions.threadvis.logging.debug"
                 type="bool" />
-            <preference id="extensions.threadvis.logging.debug.level"
-                name="extensions.threadvis.logging.debug.level"
+            <preference id="extensions.threadvis.logging.debug.component"
+                name="extensions.threadvis.logging.debug.component"
                 type="string" />
             <preference id="extensions.threadvis.logging.console"
                 name="extensions.threadvis.logging.console"
@@ -373,7 +373,7 @@
                             control="logdebuglevel"
                             value="&logfiles.debug.level;" />
                         <textbox class="indent detailedDescription"
-                            preference="extensions.threadvis.logging.debug.level"
+                            preference="extensions.threadvis.logging.debug.component"
                             id="logDebugLevel"
                             size="20" />
                     </hbox>

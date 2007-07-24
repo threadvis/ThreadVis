@@ -23,11 +23,15 @@ function Cache(threadvis) {
  * Read X-ThreadVis-Cache
  ******************************************************************************/
 Cache.prototype.getCache = function(msg) {
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "getCache", {"action" : "start"});
+    }
     var cache = this.getCacheInternal(msg);
     this.threadvis.getThreader().thread();
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_CACHE)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_CACHE,
-            "getCache", {"cache" : cache});
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "getCache", {"action" : "end", "cache" : cache});
     }
     return cache;
 }
@@ -38,13 +42,27 @@ Cache.prototype.getCache = function(msg) {
  * Get cache string for message (internal)
  ******************************************************************************/
 Cache.prototype.getCacheInternal = function(msg) {
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "getCacheInternal", {"action" : "start"});
+    }
     var cache = "";
     cache = msg.getStringProperty("X-ThreadVis-Cache");
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "getCacheInternal", {"read cache" : cache});
+    }
     if (cache != "") {
         this.addToThreaderFromCache(cache, msg.folder.rootFolder);
     } else {
-        //this.addToThreaderFromReferences(msg);
+        this.addToThreaderFromReferences(msg);
     }
+
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "getCacheInternal", {"action" : "end"});
+    }
+
     return cache;
 }
 
@@ -53,18 +71,30 @@ Cache.prototype.getCacheInternal = function(msg) {
 /** ****************************************************************************
  * Add all messages from references to threader
  ******************************************************************************/
-//Cache.prototype.addToThreaderFromReferences = function(msg) {
-//    this.threadvis.addMessage(msg);
-//    var references = (new References(msg.getStringProperty("references")))
-//        .getReferences();
-//    for (var i = 0; i < references.length; i++) {
-//        var ref = references[i];
-//        var refMessage = this.searchMessageByMsgId(ref);
-//        if (refMessage) {
-//            this.getCacheInternal(refMessage);
-//        }
-//    }
-//}
+Cache.prototype.addToThreaderFromReferences = function(msg) {
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "addToThreaderFromReferences", {"action" : "start"});
+    }
+
+    var rootFolder = msg.folder.rootFolder;
+    this.threadvis.addMessage(msg);
+    var references = (new References(msg.getStringProperty("references")))
+        .getReferences();
+    for (var i = 0; i < references.length; i++) {
+        var ref = references[i];
+        // fixxme rootfolder
+        var refMessage = this.searchMessageByMsgId(ref, rootFolder);
+        if (refMessage) {
+            this.getCacheInternal(refMessage);
+        }
+    }
+
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "addToThreaderFromReferences", {"action" : "end"});
+    }
+}
 
 
 
@@ -72,16 +102,25 @@ Cache.prototype.getCacheInternal = function(msg) {
  * Get cache string for container, store for all messages in thread
  ******************************************************************************/
 Cache.prototype.updateCache = function(container, rootFolder) {
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "updateCache", {"action" : "start"});
+    }
     var topcontainer = container.getTopContainer();
     var cache = topcontainer.getCache();
     cache = "[" + cache + "]";
 
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_CACHE)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_CACHE,
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "updateCache", {"cache" : cache});
     }
 
     this.putCache(topcontainer, cache, rootFolder);
+
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "updateCache", {"action" : "end"});
+    }
 }
 
 
@@ -90,12 +129,18 @@ Cache.prototype.updateCache = function(container, rootFolder) {
  * Recursivly put cache string in all messages
  ******************************************************************************/
 Cache.prototype.putCache = function(container, cache, rootFolder) {
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "putCache", {"action" : "start",
+            "container" : container,
+            "cache" : cache});
+    }
     if (! container.isDummy()) {
         var msgId = container.getMessage().getId();
         var msg = this.searchMessageByMsgId(msgId, rootFolder);
         if (msg) {
-            if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_CACHE)) {
-                THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_CACHE,
+            if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+                THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
                     "putCache", {"cache" : cache});
             }
             msg.setStringProperty("X-ThreadVis-Cache", cache);
@@ -106,6 +151,11 @@ Cache.prototype.putCache = function(container, cache, rootFolder) {
     for (child = container.getChild(); child != null; child = child.getNext()) {
         this.putCache(child, cache, rootFolder);
     }
+
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "putCache", {"action" : "end"});
+    }
 }
 
 
@@ -114,6 +164,10 @@ Cache.prototype.putCache = function(container, cache, rootFolder) {
  * Add all messages from cache to threader
  ******************************************************************************/
 Cache.prototype.addToThreaderFromCache = function(cache, rootFolder) {
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "addToThreaderFromCache", {"action" : "start"});
+    }
     var elements = eval('(' + cache + ')');
 
     for (var i = 0; i < elements.length; i++) {
@@ -122,6 +176,11 @@ Cache.prototype.addToThreaderFromCache = function(cache, rootFolder) {
         if (msg != null) {
             this.threadvis.addMessage(msg);
         }
+    }
+
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "addToThreaderFromCache", {"action" : "end"});
     }
 }
 
@@ -187,12 +246,23 @@ Cache.prototype.searchInSubFolder = function(folder, messageId) {
  * Periodically update cache with new messages
  ******************************************************************************/
 Cache.prototype.updateNewMessages = function(message, doVisualise) {
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "updateNewMessages", {"action" : "start",
+                "message" : message.messageId});
+    }
+
     var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
         .getService(Components.interfaces.nsIMsgAccountManager))
         .FindAccountForServer(message.folder.server);
 
     this.updateNewMessagesInternal(message, doVisualise, 
         account.key, message.folder.rootFolder);
+
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "updateNewMessages", {"action" : "end"});
+    }
 }
 
 
@@ -202,6 +272,12 @@ Cache.prototype.updateNewMessages = function(message, doVisualise) {
  ******************************************************************************/
 Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
     accountKey, rootFolder) {
+
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "updateNewMessagesInternal", {"action" : "start"});
+    }
+
     // check for already running update
     var ref = this;
     if (this.updatingCache) {
@@ -210,6 +286,11 @@ Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
                     rootFolder);
             }, 1000);
         return;
+    }
+
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "updateNewMessagesInternal", {"action" : "start2"});
     }
 
     this.updatingCache = true;
@@ -229,6 +310,16 @@ Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
     // get last update timestamp from preferences
     var updateTimestamp = this.getLastUpdateTimestamp(accountKey);
 
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_WARNING,
+            "updateNewMessagesInternal", {
+                "updatetimestamp" : updateTimestamp,
+                "date" : new Date(updateTimestamp / 1000),
+                "looking for message date" : message.date,
+                "date" : new Date(message.date / 1000)
+            });
+    }
+
     termValue.date = updateTimestamp;
     searchTerm.value = termValue;
 
@@ -240,9 +331,17 @@ Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
     var count = 0;
     searchSession.registerListener({
         onNewSearch: function() {
+            if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+                THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+                    "updateNewMessagesInternal", {"action" : "new search"});
+            }
             ref.cacheBuildCount++;
         },
         onSearchDone: function(status) {
+            if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+                THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+                    "updateNewMessagesInternal", {"action" : "search done"});
+            }
             ref.threadvis.setStatus("");
             ref.setLastUpdateTimestamp(accountKey, newUpdateTimestamp);
 
@@ -252,8 +351,8 @@ Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
 
             if (container) {
                 if (container.isDummy()) {
-                    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_CACHE)) {
-                        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_CACHE,
+                    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+                        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_WARNING,
                         "updateNewMessages", {"action" : "dummy container found"});
                     }
                     // current message still not found
@@ -304,14 +403,26 @@ Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
                 // reset to 0 just in case
                 if (ref.cacheBuildCount > 1) {
                     messageUpdateTimestamp = 0;
+                    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+                        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_ERROR,
+                            "updateNewMessages", {
+                                "action" : "cache error, message not found. reset timestamp to 0.",
+                                "updateTimestamp" : messageUpdateTimestamp,
+                                "date" : new Date(updateTimestamp / 1000),
+                                "subject" : message.mime2DecodedSubject,
+                                "autor" : message.mime2DecodedAutor,
+                                "messageId" : message.messageId,
+                                "messagedate" : message.date
+                            });
+                    }
                 }
                 if (ref.cacheBuildCount > 2) {
                     ref.threadvis.setStatus(
                         ref.threadvis.strings.getString("cache.error"));
-                    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_CACHE)) {
-                        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_CACHE,
+                    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+                        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_ERROR,
                             "updateNewMessages", {
-                                "action" : "cache error, message not found",
+                                "action" : "cache error, message not found.",
                                 "subject" : message.mime2DecodedSubject,
                                 "autor" : message.mime2DecodedAutor,
                                 "messageId" : message.messageId
@@ -335,11 +446,20 @@ Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
             ref.getCacheInternal(header);
             count++;
             ref.newMessages.push(header);
-            if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_CACHE)) {
-                THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_CACHE,
+            if (ref.cacheBuildCount <=1) {
+                if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+                    THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_WARNING,
+                        "updateNewMessages", {"action" : "hit",
+                            "subject" : header.mime2DecodedSubject,
+                            "author" : header.mime2DecodedAuthor,
+                            "messageId" : header.messageId});
+                }
+            }
+            if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+                THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
                     "updateNewMessages", {"action" : "hit",
                         "subject" : header.mime2DecodedSubject,
-                        "author" : header.mime2DecodedAutor,
+                        "author" : header.mime2DecodedAuthor,
                         "messageId" : header.messageId});
             }
         }
@@ -421,12 +541,18 @@ Cache.prototype.addSubFolders = function(searchSession, folder) {
                     if (!nextFolder.noSelect &&
                         this.threadvis.checkEnabledAccountOrFolder(nextFolder)) {
                         var searchScope = nextFolder.server.searchScope;
-                        searchSession.addScopeTerm(searchScope, nextFolder);
-                        // ??? FIXME
-                        // newsgroups messages are only found when using localNews
-                        if (searchScope == nsMsgSearchScope.news) {
+                        if (searchScope == nsMsgSearchScope.onlineMail) {
+                            // ??? FIXXME
+                            // imap messages are only found when using offline mail
+                            searchSession.addScopeTerm(nsMsgSearchScope.offlineMail,
+                                nextFolder);
+                        } else if (searchScope == nsMsgSearchScope.news) {
+                            // ??? FIXME
+                            // newsgroups messages are only found when using localNews
                             searchSession.addScopeTerm(nsMsgSearchScope.localNews,
                                 nextFolder);
+                        } else {
+                            searchSession.addScopeTerm(searchScope, nextFolder);
                         }
                     }
                     this.addSubFolders(searchSession, nextFolder);
@@ -543,10 +669,12 @@ Cache.prototype.updateNewMessagesWriteCache = function(rootFolder, callback) {
         },
         onFinished: function() {
             ref.threadvis.setStatus("Cache done");
+            delete this.newMessages;
+            this.newMessages = new Array();
             callback();
         }
     });
-    util.do(this.newMessages);
+    util.process(this.newMessages);
 }
 
 
@@ -560,14 +688,14 @@ Util.prototype.registerListener = function(listener) {
     this.listener = listener;
 }
 
-Util.prototype.do = function(array) {
+Util.prototype.process = function(array) {
     var elem = array.pop();
     var remaining = array.length;
     var ref = this;
     if (elem) {
         this.count++;
         this.listener.onItem(elem, this.count, remaining);
-        setTimeout(function() {ref.do(array);}, 1);
+        setTimeout(function() {ref.process(array);}, 1);
     } else {
         this.listener.onFinished();
     }

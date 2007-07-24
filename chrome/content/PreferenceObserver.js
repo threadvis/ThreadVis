@@ -22,7 +22,7 @@ function PreferenceObserver() {
     this.PREF_ENABLED = "enabled";
     this.PREF_LOGGING = "logging.enabled";
     this.PREF_LOGGING_DEBUG = "logging.debug";
-    this.PREF_LOGGING_DEBUG_LEVEL = "logging.debug.level";
+    this.PREF_LOGGING_DEBUG_COMPONENT = "logging.debug.component";
     this.PREF_LOGGING_CONSOLE = "logging.console";
     this.PREF_NOTES = "notes";
     this.PREF_TIMELINE = "timeline.enabled";
@@ -139,7 +139,7 @@ PreferenceObserver.prototype.preferenceReload = function() {
         this.prefBranch.PREF_BOOL, false);
     this.loadPreference(this.PREF_LOGGING_DEBUG,
         this.prefBranch.PREF_BOOL, false);
-    this.loadPreference(this.PREF_LOGGING_DEBUG_LEVEL,
+    this.loadPreference(this.PREF_LOGGING_DEBUG_COMPONENT,
         this.prefBranch.PREF_STRING, "");
     this.loadPreference(this.PREF_LOGGING_CONSOLE,
         this.prefBranch.PREF_BOOL, false);

@@ -354,8 +354,8 @@
                             value="&logfiles.debug.level;" />
                         <textbox class="indent detailedDescription"
                             id="doLoggingDebugLevel"
-                            preference="extensions.threadvis.logging.debug.level"
-                            prefstring="extensions.threadvis.logging.debug.level"
+                            preference="extensions.threadvis.logging.debug.component"
+                            prefstring="extensions.threadvis.logging.debug.component"
                             preftype="string"
                             size="20" />
                     </hbox>

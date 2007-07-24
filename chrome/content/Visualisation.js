@@ -182,8 +182,8 @@ Visualisation.prototype.checkSize = function() {
  * delete all children
  ******************************************************************************/
 Visualisation.prototype.clearStack = function() {
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_VIS)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_VIS,
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Visualisation.clearStack()", {});
     }
 
@@ -358,8 +358,8 @@ Visualisation.prototype.createLegendBox = function(hsv, name, count) {
  * Create stack
  ******************************************************************************/
 Visualisation.prototype.createStack = function() {
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_VIS)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_VIS,
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Visualisation.createStack()", {});
     }
 
@@ -369,8 +369,8 @@ Visualisation.prototype.createStack = function() {
 
     var ref = this;
     if (! this.stack) {
-        if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_VIS)) {
-            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_VIS,
+        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
+            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
                 "Visualisation.createStack()", {"action" : "create stack"});
         }
 
@@ -387,8 +387,8 @@ Visualisation.prototype.createStack = function() {
         this.box.addEventListener("DOMMouseScroll",
             function(event) {ref.onScroll(event);}, false);
     } else {
-        if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_VIS)) {
-            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_VIS,
+        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
+            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
                 "Visualisation.createStack()", {"action" : "clear stack"});
         }
         this.clearStack();
@@ -531,8 +531,8 @@ Visualisation.prototype.getNewColour = function() {
  * and needed width and height
  *******************************************************************************/
 Visualisation.prototype.getResize = function(xCount, yCount, sizeX, sizeY) {
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_VIS)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_VIS, 
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO, 
             "Visualisation.getResize()", {"action" : "start",
             "xcount" : xCount, "ycount" : yCount, "sizex" : sizeX,
             "sizey" : sizeY});
@@ -567,8 +567,8 @@ Visualisation.prototype.getResize = function(xCount, yCount, sizeX, sizeY) {
         resize = 1;
     }
 
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_VIS)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_VIS,
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Visualisation.getResize()", {"action" : "end",
             "resize" : resize, "resizex" : resizeX,
             "resizey" : resizeY, "spaceperarcavailablex" : spacePerArcAvailableX,
@@ -639,8 +639,8 @@ Visualisation.prototype.moveVisualisationTo = function(position) {
  * display message user clicked on
  ******************************************************************************/
 Visualisation.prototype.onMouseClick = function(event) {
-    if (THREADVIS.logger.isDebug(THRESDVIS.logger.LEVEL_VIS)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_VIS,
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPOMENT_VISUALISATION)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Visualisation.onMouseClick()", {});
     }
 
@@ -773,8 +773,8 @@ Visualisation.prototype.onScroll = function(event) {
  * set all margins to zero
  ******************************************************************************/
 Visualisation.prototype.resetStack = function() {
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_VIS)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_VIS,
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Visualisation.resetStack()", {});
     }
 
@@ -791,8 +791,8 @@ Visualisation.prototype.resetStack = function() {
  ******************************************************************************/
 Visualisation.prototype.timeScaling = function(containers, 
     minimalTimeDifference, width) {
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_VIS)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_VIS,
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Visualisation.timeScaling()", {"action" : "start",
             "containers" : containers.toString(),
             "minimaltimedifference" : minimalTimeDifference,
@@ -840,8 +840,8 @@ Visualisation.prototype.timeScaling = function(containers,
     // fit 2, since we want some spacing between the messages and the border
     var maxCountX = (width / prefSpacing) - 1;
 
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_VIS)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_VIS,
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Visualisation.timeScaling()",  {"action" : "first pass done",
             "totalTimeScale" : totalTimeScale,
             "maxCountX" : maxCountX});
@@ -870,8 +870,8 @@ Visualisation.prototype.timeScaling = function(containers,
         }
     }
 
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_VIS)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_VIS,
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Visualisation.timeScaling()",
             {"action" : "second pass done", 
             "totalTimeScale" : totalTimeScale});
@@ -894,8 +894,8 @@ Visualisation.prototype.visualise = function(container, force) {
         container = this.currentContainer;
     }
 
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_VIS)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_VIS,
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Visualisation.visualise()", {"action" : "start",
             "container" : container.toString()});
     }
@@ -1202,8 +1202,8 @@ Visualisation.prototype.visualiseExisting = function(container) {
 
         // if thread has changed and we don't have all container visualisations
         if (this.containerVisualisations[thisContainer] == null) {
-            if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_VIS)) {
-                THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_VIS,
+            if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
+                THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_WARNING,
                     "Visualisation.visualiseExisting()",
                     {"action" : "cached visualisation does not contain this message, redraw"});
             }

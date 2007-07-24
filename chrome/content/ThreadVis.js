@@ -95,8 +95,8 @@ ThreadVis.prototype.addMessage = function(header) {
         return;
     }
 
-    if (this.logger.isDebug(this.logger.LEVEL_EMAIL)) {
-        this.logger.logDebug(this.logger.LEVEL_EMAIL,
+    if (this.logger.isDebug(this.logger.COMPONENT_EMAIL)) {
+        this.logger.logDebug(this.logger.LEVEL_INFO,
             "ThreadVis.addMessage()", {});
     }
 
@@ -124,8 +124,8 @@ ThreadVis.prototype.addMessage = function(header) {
     message.setSent(issent);
     this.getThreader().addMessage(message);
 
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_EMAIL)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_EMAIL,
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_EMAIL)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "addMessageToThreader", {"message" : message});
     }
 }
@@ -200,8 +200,8 @@ ThreadVis.prototype.checkEnabledAccountOrFolder = function(folder) {
     if (this.preferences.getPreference(this.preferences.PREF_DISABLED_ACCOUNTS) != ""
         && this.preferences.getPreference(this.preferences.PREF_DISABLED_ACCOUNTS)
         .match(regexpAccount)) {
-        if (this.logger.isDebug(this.logger.LEVEL_INFORM)) {
-            this.logger.logDebug(this.logger.LEVEL_INFORM, "accountdisabled",
+        if (this.logger.isDebug(this.logger.COMPONENT_EMAIL)) {
+            this.logger.logDebug(this.logger.LEVEL_INFO, "accountdisabled",
                 {"total_regexp" : this.preferences.getPreference(
                     this.preferences.PREF_DISABLED_ACCOUNTS),
                 "this_account" : account.key});
@@ -214,8 +214,8 @@ ThreadVis.prototype.checkEnabledAccountOrFolder = function(folder) {
         if (this.preferences.getPreference(this.preferences.PREF_DISABLED_FOLDERS) != ""
             && this.preferences.getPreference(this.preferences.PREF_DISABLED_FOLDERS)
             .match(regexpFolder)) {
-            if (this.logger.isDebug(this.logger.LEVEL_INFORM)) {
-                this.logger.logDebug(this.logger.LEVEL_INFORM, "folderdisabled",
+            if (this.logger.isDebug(this.logger.COMPONENT_EMAIL)) {
+                this.logger.logDebug(this.logger.LEVEL_INFO, "folderdisabled",
                     {"total_regexp" : this.preferences
                         .getPreference(this.preferences.PREF_DISABLED_FOLDERS),
                     "this_folder" : folder.URI});
@@ -237,8 +237,8 @@ ThreadVis.prototype.checkEnabledAccountOrFolder = function(folder) {
  * clear visualisation
  ******************************************************************************/
 ThreadVis.prototype.clearVisualisation = function() {
-    if (this.logger.isDebug(this.logger.LEVEL_VIS)) {
-        this.logger.logDebug(this.logger.LEVEL_VIS,
+    if (this.logger.isDebug(this.logger.COMPONENT_VISUALISATION)) {
+        this.logger.logDebug(this.logger.LEVEL_INFO,
             "ThreadVis.clearVisualisation()", {"clear" : this.clear});
     }
 
@@ -549,8 +549,8 @@ ThreadVis.prototype.logJavaScriptErrors = function(message, file, line) {
  * called when a new message is saved to a folder
  ******************************************************************************/
 ThreadVis.prototype.onItemAdded = function(parentItem, item, view) {
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_CACHE)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_CACHE,
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "onItemAdded", {});
     }
 
@@ -648,8 +648,8 @@ ThreadVis.prototype.setSelectedMessage = function() {
         return;
     }
 
-    if (this.logger.isDebug(this.logger.LEVEL_INFORM)) {
-        this.logger.logDebug(this.logger.LEVEL_INFORM,
+    if (this.logger.isDebug(this.logger.COMPONENT_EMAIL)) {
+        this.logger.logDebug(this.logger.LEVEL_INFO,
             "ThreadVis.setSelectedMessage()", {});
     }
 
@@ -704,8 +704,8 @@ ThreadVis.prototype.visualise = function(container) {
         return;
     }
 
-    if (this.logger.isDebug(this.logger.LEVEL_INFORM)) {
-        this.logger.logDebug(this.logger.LEVEL_INFORM,
+    if (this.logger.isDebug(this.logger.COMPONENT_VISUALISATION)) {
+        this.logger.logDebug(this.logger.LEVEL_INFO,
             "ThreadVis.visualise()", {"container" : container});
     }
     
@@ -742,23 +742,28 @@ ThreadVis.prototype.visualiseMessage = function(message) {
         return;
     }
 
-    if (this.logger.isDebug(this.logger.LEVEL_INFORM)) {
-        this.logger.logDebug(this.logger.LEVEL_INFORM,
+    if (this.logger.isDebug(this.logger.COMPONENT_VISUALISATION)) {
+        this.logger.logDebug(this.logger.LEVEL_INFO,
             "ThreadVis.visualiseMsgId()", {"message-id" : message.messageId});
     }
 
     // try to find in threader
     var container = this.getThreader().findContainer(message.messageId);
+    var cache = "";
 
     if (container != null && ! container.isDummy()) {
-        cache = container.getTopContainer().getCache();
+        cache = "[" + container.getTopContainer().getCache() + "]";
+        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+                "visualise", {"action" : "container already in threader",
+                    "cache" : cache});
+        }
     }
 
     // if not in threader, try to get from cache
-    var cache = "";
     if (container == null || container.isDummy()) {
-        if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_CACHE)) {
-            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_CACHE,
+        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_WARNING,
                 "visualise", {"action" : "message not in threader, getting from cache"});
         }
         cache = this.cache.getCache(message);
@@ -767,8 +772,8 @@ ThreadVis.prototype.visualiseMessage = function(message) {
 
     // not in threader, not in cache. add to threader
     if (container == null || container.isDummy()) {
-        if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_CACHE)) {
-            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_CACHE,
+        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_WARNING,
                 "visualise", {"action" : "message not in cache, update new messages"});
         }
         this.cache.updateNewMessages(message, true);
@@ -777,8 +782,8 @@ ThreadVis.prototype.visualiseMessage = function(message) {
 
     var newCache = "[" + container.getTopContainer().getCache() + "]";
     if (cache != newCache) {
-        if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_CACHE)) {
-            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_CACHE,
+        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_WARNING,
                 "visualise", {"action" : "cache changed, writing new",
                     "old" : cache,
                     "new" : newCache});

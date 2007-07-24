@@ -23,12 +23,14 @@ function Logger() {
     this.STARTTAG = '\n<log extensionversion="<<version>>.<<build>>">';
     this.ENDTAG = "\n</log>";
 
-    this.LEVEL_ERROR ="error";
-    this.LEVEL_INFORM = "info";
-    this.LEVEL_VIS = "vis";
-    this.LEVEL_EMAIL = "email";
-    this.LEVEL_ALL = "all";
-    this.LEVEL_CACHE = "cache";
+    this.COMPONENT_VISUALISATION = "visualisation";
+    this.COMPONENT_CACHE = "cache";
+    this.COMPONENT_THREADER = "threader";
+    this.COMPONENT_EMAIL = "email";
+
+    this.LEVEL_INFO = "info";
+    this.LEVEL_WARNING = "warning";
+    this.LEVEL_ERROR = "error";
 
     // init class variables
     this.strings = document.getElementById("ThreadVisStrings");
@@ -152,27 +154,23 @@ Logger.prototype.isConsole = function() {
 
 
 /** ****************************************************************************
- * check to see if debug logging is enabled
+ * check to see if debug logging is enabled for this component
  ******************************************************************************/
-Logger.prototype.isDebug = function(level) {
+Logger.prototype.isDebug = function(component) {
     return (THREADVIS.preferences.getPreference(
             THREADVIS.preferences.PREF_LOGGING_DEBUG)
         && THREADVIS.preferences.getPreference(
-            THREADVIS.preferences.PREF_LOGGING_DEBUG_LEVEL).search(level) != -1);
+            THREADVIS.preferences.PREF_LOGGING_DEBUG_COMPONENT).search(component) != -1);
 }
 
 
 
 /** ****************************************************************************
- * write a string to the file
+ * log an info message
  ******************************************************************************/
 Logger.prototype.log = function(item, infos) {
     if (this.isConsole()) {
-        msg = item;
-        for (var i in infos) {
-            msg += "\n" + i + ": " + infos[i];
-        }
-        this.consoleService.logStringMessage(msg);
+        this.logConsole(this.LEVEL_INFO, item, infos);
     } else {
         if (this.ready) {
             var date = new Date();
@@ -188,15 +186,42 @@ Logger.prototype.log = function(item, infos) {
 
 
 /** ****************************************************************************
+ * write string to error console
+ ******************************************************************************/
+Logger.prototype.logConsole = function(severity, item, infos) {
+    var msg = item;
+    for (var i in infos) {
+        msg += "\n" + i + ": " + infos[i];
+    }
+
+    var flag = 0;
+    switch (severity) {
+        case this.LEVEL_INFO:
+            this.consoleService.logStringMessage(msg);
+            return;
+        case this.LEVEL_ERROR:
+            flag = Components.interfaces.nsIScriptError.errorFlag;
+            break;
+        case this.LEVEL_WARNING:
+            flag = Components.interfaces.nsIScriptError.warningFlag;
+            break;
+    }
+    var scriptError = Components.classes["@mozilla.org/scripterror;1"]
+        .createInstance(Components.interfaces.nsIScriptError);
+    scriptError.init(msg, null, null, null, 
+        null, flag, null);
+
+    this.consoleService.logMessage(scriptError);
+}
+
+
+
+/** ****************************************************************************
  * write a string to the file in debug mode
  ******************************************************************************/
-Logger.prototype.logDebug = function(level, item, infos) {
+Logger.prototype.logDebug = function(severity, item, infos) {
     if (this.isConsole()) {
-        msg = item;
-        for (var i in infos) {
-            msg += "\n" + i + ": " + infos[i];
-        }
-        this.consoleService.logStringMessage(msg);
+        this.logConsole(severity, item, infos);
     } else {
         if (this.ready) {
             var date = new Date();

@@ -88,8 +88,8 @@ function ArcVisualisation(stack, dotSize, resize, arcMinHeight, arcDifference,
      */
     this.opacity = opacity;
 
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_VIS)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_VIS, 
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO, 
             "ArcVisualisation()", {"action" : "start", "colour" : this.colour,
             "vposition" : this.vPosition, "height" : this.height,
             "left" : this.left, "right" : this.right});
@@ -151,8 +151,8 @@ ArcVisualisation.prototype.visualise = function() {
     var styleBackground = this.colour;
     var styleOpacity = this.opacity;
 
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.LEVEL_VIS)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_VIS, 
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO, 
             "Visualisation.drawArc()", {"action" : "draw arc",
             "top" : styleTop, "left" : styleLeft, "height" : styleHeight,
             "width" : styleWidth, "background" : styleBackground});

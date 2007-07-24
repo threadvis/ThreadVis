@@ -13,7 +13,7 @@ pref("extensions.threadvis.disabledaccounts", "");
 pref("extensions.threadvis.disabledfolders", "");
 pref("extensions.threadvis.enabled", true);
 pref("extensions.threadvis.logging.debug", false);
-pref("extensions.threadvis.logging.debug.level", "");
+pref("extensions.threadvis.logging.debug.component", "");
 pref("extensions.threadvis.logging.enabled", false);
 pref("extensions.threadvis.logging.console", false);
 pref("extensions.threadvis.notes", 0);
