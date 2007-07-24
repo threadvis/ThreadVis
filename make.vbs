@@ -103,4 +103,4 @@ Set installRdfFile = fso.OpenTextFile("install.rdf", 2)
 installRdfFile.write(installRdf)
 installRdfFile.Close
 
-MsgBox "Build successful"
+MsgBox "Build " + revision + " successful"
