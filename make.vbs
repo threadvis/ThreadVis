@@ -87,7 +87,7 @@ WScript.Sleep 1000
 ' Create XPI file
 ' ========================================================================
 
-shell.Run "c:\Programme\7-Zip\7z a -tzip ThreadVis.xpi @make.list"
+shell.Exec("c:\Programme\7-Zip\7z a -tzip ThreadVis.xpi @make.list")
 
 WScript.Sleep 1000
 

@@ -554,8 +554,12 @@ ThreadVis.prototype.onItemAdded = function(parentItem, item, view) {
             "onItemAdded", {});
     }
 
+    var ref = this;
+    clearTimeout(this.timeoutItemAdded);
     if (item instanceof Components.interfaces.nsIMsgDBHdr) {
-        this.cache.updateNewMessages(item, false);
+        this.timeoutItemAdded = setTimeout(function() {
+            this.cache.updateNewMessages(item, false);
+        }, 1000);
     }
 }
 

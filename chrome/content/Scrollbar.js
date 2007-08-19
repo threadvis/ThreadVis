@@ -4,7 +4,7 @@
  * (c) 2006-2007 Alexander C. Hubmann
  * (c) 2007 Alexander C. Hubmann-Haidvogel
  *
- * $Id: Timeline.js 267 2006-01-07 19:19:38Z sascha $
+ * $Id$
  ******************************************************************************/
 
 
@@ -37,18 +37,18 @@ function Scrollbar(visualisation, stack, box) {
     this.vertical = document.getElementById("ThreadVisScrollbarVertical");
 
     var ref = this;
-    this.horizontal.addEventListener("mousemove",
+    document.addEventListener("mousemove",
         function(event) {ref.onMouseMoveHorizontal(event);}, false);
     this.horizontal.addEventListener("mousedown",
         function(event) {ref.onMouseDownHorizontal(event);}, false);
-    this.horizontal.addEventListener("mouseup",
+    document.addEventListener("mouseup",
         function(event) { ref.onMouseUpHorizontal(event); }, false);
 
-    this.vertical.addEventListener("mousemove",
+    document.addEventListener("mousemove",
         function(event) {ref.onMouseMoveVertical(event);}, false);
     this.vertical.addEventListener("mousedown",
         function(event) {ref.onMouseDownVertical(event);}, false);
-    this.vertical.addEventListener("mouseup",
+    document.addEventListener("mouseup",
         function(event) { ref.onMouseUpVertical(event); }, false);
 }
 
@@ -163,7 +163,7 @@ Scrollbar.prototype.onMouseMoveHorizontal = function(event) {
         if (currentX == "") {
             currentX = 0;
         }
-        dx = parseInt(currentx) + parseInt(dx);
+        dx = parseInt(currentX) + parseInt(dx);
         this.startX = x;
 
         var barWidth = this.horizontal.boxObject.width;
@@ -240,7 +240,7 @@ Scrollbar.prototype.onMouseMoveVertical = function(event) {
             dy = 0;
         }
 
-        if (dy + baHeight > totalHeight) {
+        if (dy + barHeight > totalHeight) {
             dy = totalHeight - barHeight;
         }
 

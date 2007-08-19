@@ -27,7 +27,7 @@ Cache.prototype.getCache = function(msg) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "getCache", {"action" : "start"});
     }
-    var cache = this.getCacheInternal(msg);
+    var cache = this.getCacheInternal(msg, false);
     this.threadvis.getThreader().thread();
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
@@ -41,7 +41,7 @@ Cache.prototype.getCache = function(msg) {
 /** ****************************************************************************
  * Get cache string for message (internal)
  ******************************************************************************/
-Cache.prototype.getCacheInternal = function(msg) {
+Cache.prototype.getCacheInternal = function(msg, references) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "getCacheInternal", {"action" : "start"});
@@ -55,7 +55,9 @@ Cache.prototype.getCacheInternal = function(msg) {
     if (cache != "") {
         this.addToThreaderFromCache(cache, msg.folder.rootFolder);
     } else {
-        this.addToThreaderFromReferences(msg);
+        if (references) {
+            this.addToThreaderFromReferences(msg);
+        }
     }
 
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
@@ -86,7 +88,7 @@ Cache.prototype.addToThreaderFromReferences = function(msg) {
         // fixxme rootfolder
         var refMessage = this.searchMessageByMsgId(ref, rootFolder);
         if (refMessage) {
-            this.getCacheInternal(refMessage);
+            this.getCacheInternal(refMessage, true);
         }
     }
 
@@ -443,7 +445,8 @@ Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
             ref.threadvis.addMessage(header);
             // also add messages from cache to threader, since we re-write
             // the cache
-            ref.getCacheInternal(header);
+            ref.getCacheInternal(header, true);
+            //ref.getCacheInternal(header, false);
             count++;
             ref.newMessages.push(header);
             if (ref.cacheBuildCount <=1) {

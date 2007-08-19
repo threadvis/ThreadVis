@@ -83,7 +83,7 @@ WScript.Sleep 2000
 ' Create JAR file
 ' ========================================================================
 
-shell.Run "c:\Programme\7-Zip\7z a -mx0 -tzip threadvis.jar @make.list"
+shell.Exec("c:\Programme\7-Zip\7z a -mx0 -tzip threadvis.jar @make.list")
 
 WScript.Sleep 2000
 

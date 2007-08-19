@@ -378,11 +378,11 @@ Visualisation.prototype.createStack = function() {
         this.stack.setAttribute("id", "ThreadVisStack");
         this.stack.style.position = "relative";
         this.box.appendChild(this.stack);
-        this.box.addEventListener("mousemove",
+        document.addEventListener("mousemove",
             function(event) {ref.onMouseMove(event);}, false);
         this.box.addEventListener("mousedown",
             function(event) {ref.onMouseDown(event);}, false);
-        this.box.addEventListener("mouseup",
+        document.addEventListener("mouseup",
             function(event) { ref.onMouseUp(event); }, false);
         this.box.addEventListener("DOMMouseScroll",
             function(event) {ref.onScroll(event);}, false);
