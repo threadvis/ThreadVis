@@ -86,6 +86,9 @@ Cache.prototype.addToThreaderFromReferences = function(msg) {
     for (var i = 0; i < references.length; i++) {
         var ref = references[i];
         // fixxme rootfolder
+        if (this.threadvis.getThreader().hasMessage(ref)) {
+            continue;
+        }
         var refMessage = this.searchMessageByMsgId(ref, rootFolder);
         if (refMessage) {
             this.getCacheInternal(refMessage, true);
@@ -174,6 +177,9 @@ Cache.prototype.addToThreaderFromCache = function(cache, rootFolder) {
 
     for (var i = 0; i < elements.length; i++) {
         var msgId = elements[i];
+        if (this.threadvis.getThreader().hasMessage(msgId)) {
+            continue;
+        }
         var msg = this.searchMessageByMsgId(msgId, rootFolder);
         if (msg != null) {
             this.threadvis.addMessage(msg);
