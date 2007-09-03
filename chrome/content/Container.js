@@ -69,14 +69,10 @@ Container.prototype.addChild = function(child) {
      * that's why we don't allow it
      */
     if (this.findParent(child)) {
-        alert("Error: Loop detected in message structure.\nConflicting message:\n" + 
-            this.toString() + "\n" + child.toString());
-        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_THREADER)) {
-            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_ERROR,
-                "Container.addChild()" , {"error" : "tried to create loop",
-                "child container" : child.toString(),
-                "parent container" : this.toString()});
-        }
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_ERROR,
+            "Container.addChild()" , {"error" : "tried to create loop",
+            "child container" : child.toString(),
+            "parent container" : this.toString()});
         return;
     }
 
