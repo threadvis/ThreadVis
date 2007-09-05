@@ -32,6 +32,8 @@ function Visualisation() {
     this.timeline = null;
     this.scrollbar = null;
     this.changed = false;
+
+    this.disabled = false;
 }
 
 
@@ -165,6 +167,10 @@ Visualisation.prototype.calculateSize = function(containers) {
  * if resized, resize visualisation
  ******************************************************************************/
 Visualisation.prototype.checkSize = function() {
+    if (this.disabled) {
+        return;
+    }
+
     if (this.box.boxObject.height != this.boxHeight || 
         this.box.boxObject.width != this.boxWidth) {
         this.resetStack();
@@ -413,6 +419,44 @@ Visualisation.prototype.DECtoHEX = function(dec) {
     var n_ = Math.floor(dec / 16)
     var _n = dec - n_*16;
     return alpha[n_] + alpha[_n];
+}
+
+
+
+/** ****************************************************************************
+ * Display disabled message
+ ******************************************************************************/
+Visualisation.prototype.displayDisabled = function() {
+    this.clearStack();
+    var warning = document.createElementNS(THREADVIS.XUL_NAMESPACE, "label");
+    warning.setAttribute("value",
+        this.strings.getString("visualisation.disabledWarning"));
+    warning.style.position = "relative";
+    warning.style.top = "10px"
+    warning.style.left = "20px"
+    warning.style.color = "#999999";
+    this.stack.appendChild(warning);
+
+    var link = document.createElementNS(THREADVIS.XUL_NAMESPACE, "label");
+    link.setAttribute("value", this.strings.getString("visualisation.disabledWarningLink"));
+    link.style.position = "relative";
+    link.style.top = "30px"
+    link.style.left = "20px"
+    link.style.color = "#0000ff";
+    link.style.textDecoration = "underline";
+    var ref = this;
+    link.addEventListener("click", function() {
+        THREADVIS.openThreadVisOptionsDialog();
+    }, true);
+    link.style.cursor = "pointer";
+    this.stack.appendChild(link);
+
+    // set cursor
+    this.box.style.cursor = "";
+
+    this.disabled = true;
+    this.changed = true;
+    this.colourAuthors(new Array());
 }
 
 
@@ -886,6 +930,10 @@ Visualisation.prototype.timeScaling = function(containers,
  * Visualise a new thread
  ******************************************************************************/
 Visualisation.prototype.visualise = function(container, force) {
+    if (this.disabled) {
+        return;
+    }
+
     if (typeof force == "undefined") {
         force = false;
     }

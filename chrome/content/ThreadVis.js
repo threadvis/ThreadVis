@@ -311,6 +311,11 @@ ThreadVis.prototype.displayLegend = function() {
  * Display legend popup
  ******************************************************************************/
 ThreadVis.prototype.displayLegendWindow = function() {
+
+    if (this.visualisation.disabled) {
+        return;
+    }
+
     if (window.opener && window.opener.THREADVIS) {
         window.opener.THREADVIS.displayLegendWindow();
         return;
@@ -351,6 +356,11 @@ ThreadVis.prototype.displayNotes = function() {
  * display a popup window for the visualisation
  ******************************************************************************/
 ThreadVis.prototype.displayVisualisationWindow = function() {
+
+    if (this.visualisation.disabled) {
+        return;
+    }
+
     this.logger.log("popupvisualisation", {"action" : "open"});
 
     if (this.popupWindow != null && ! this.popupWindow.closed) {
@@ -644,13 +654,19 @@ ThreadVis.prototype.preferenceChanged = function(enabled) {
  ******************************************************************************/
 ThreadVis.prototype.setSelectedMessage = function() {
     if (! this.preferences.getPreference(this.preferences.PREF_ENABLED)) {
-        this.deleteBox();
+        this.visualisation.disabled = true;
+        this.visualisation.displayDisabled();
+        this.visualisedMsgId = null;
         return;
     }
     if (! this.checkEnabledAccountOrFolder()) {
-        this.deleteBox();
+        this.visualisation.disabled = true;
+        this.visualisation.displayDisabled();
+        this.visualisedMsgId = null;
         return;
     }
+
+    this.visualisation.disabled = false;
 
     if (this.logger.isDebug(this.logger.COMPONENT_EMAIL)) {
         this.logger.logDebug(this.logger.LEVEL_INFO,
