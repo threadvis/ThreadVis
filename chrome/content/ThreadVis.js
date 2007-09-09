@@ -567,9 +567,17 @@ ThreadVis.prototype.onItemAdded = function(parentItem, item, view) {
     var ref = this;
     clearTimeout(this.timeoutItemAdded);
     if (item instanceof Components.interfaces.nsIMsgDBHdr) {
-        this.timeoutItemAdded = setTimeout(function() {
-            this.cache.updateNewMessages(item, false);
-        }, 1000);
+        // check if added to folder or account that is disabled
+        if (this.checkEnabledAccountOrFolder(item.folder)) {
+            this.timeoutItemAdded = setTimeout(function() {
+                ref.cache.updateNewMessages(item, false);
+            }, 1000);
+        } else {
+            if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+                THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+                    "onItemAdded", {"stopped": "account or folder disabled"});
+            }
+        }
     }
 }
 
