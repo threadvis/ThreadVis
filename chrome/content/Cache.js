@@ -436,6 +436,7 @@ Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
                                 "messageId" : message.messageId
                             });
                     }
+                    ref.updatingCache = false;
                     return;
                 }
 
