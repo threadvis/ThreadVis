@@ -934,6 +934,9 @@ Visualisation.prototype.visualise = function(container, force) {
         return;
     }
 
+    // set cursor
+    this.box.style.cursor = "wait";
+
     if (typeof force == "undefined") {
         force = false;
     }
@@ -1033,9 +1036,6 @@ Visualisation.prototype.visualise = function(container, force) {
     var x = prefSpacing / 2;
     this.resize = this.getResize(this.containers.length, totalMaxHeight,
         width, height);
-
-    // set cursor
-    this.box.style.cursor = "-moz-grab";
 
     // pre-calculate colours for different authors
     this.authors = new Object();
@@ -1172,6 +1172,9 @@ Visualisation.prototype.visualise = function(container, force) {
     this.boxWidth = this.box.boxObject.width;
     var ref = this;
     this.checkResizeInterval = setInterval(function() {ref.checkSize();}, 100);
+
+    // set cursor
+    this.box.style.cursor = "-moz-grab";
 }
 
 
@@ -1201,6 +1204,9 @@ Visualisation.prototype.visualiseExisting = function(container) {
     var prefOpacity = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_OPACITY) / 100;
 
+    // set cursor
+    this.box.style.cursor = "wait";
+
     // remember current container to redraw after zoom
     this.currentContainer = container;
 
@@ -1229,9 +1235,6 @@ Visualisation.prototype.visualiseExisting = function(container) {
     var x = prefSpacing / 2;
     this.resize = this.getResize(this.containers.length, totalMaxHeight,
         width, height);
-
-    // set cursor
-    this.box.style.cursor = "-moz-grab";
 
     for (var counter = 0; counter < this.containers.length; counter++) {
         var thisContainer = this.containers[counter];
@@ -1339,6 +1342,9 @@ Visualisation.prototype.visualiseExisting = function(container) {
     }
 
     this.scrollbar.draw();
+
+    // set cursor
+    this.box.style.cursor = "-moz-grab";
 }
 
 

@@ -588,6 +588,8 @@ ThreadVis.prototype.onItemAdded = function(parentItem, item, view) {
  ******************************************************************************/
 ThreadVis.prototype.onVisualisationWindowClose = function() {
     this.logger.log("popupvisualisation", {"action" : "close"});
+    this.visualisedMsgId = null;
+    this.threadvisParent.visualisedMsgId = null;
     this.threadvisParent.setSelectedMessage();
 }
 

@@ -670,6 +670,9 @@ Cache.prototype.updateNewMessagesWriteCache = function(rootFolder, callback) {
     util.registerListener({
         onItem: function(item, count, remaining) {
             var container = ref.threadvis.getThreader().findContainer(item.messageId);
+            if (container == null) {
+                return;
+            }
             var topContainer = container.getTopContainer();
             ref.threadvis.setStatus(
                 ref.threadvis.strings.getString("cache.update.status") + count + " [" + remaining + "]");
