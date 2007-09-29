@@ -530,10 +530,12 @@ Visualisation.prototype.drawDot = function(container, colour, left, top,
         THREADVIS.preferences.PREF_VIS_DOTSIZE);
     var prefSpacing = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_SPACING);
+    var prefMessageCircles = THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_VIS_MESSAGE_CIRCLES);
 
     var msg = new ContainerVisualisation(this.stack, this.strings, container,
         colour, left, top, selected, prefDotSize, this.resize, circle, flash,
-        prefSpacing, opacity);
+        prefSpacing, opacity, prefMessageCircles);
 
     return msg;
 }

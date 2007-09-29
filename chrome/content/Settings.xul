@@ -30,9 +30,9 @@
         "visualisationDotSize", "visualisationArcMinHeight",
         "visualisationArcRadius", "visualisationArcDifference",
         "visualisationArcWidth", "visualisationSpacing",
-        "zoomWidth", "zoomHeight", "visualisationColour",
-        "visualisationHighlight", "visualisationOpacity", "doLogging",
-        "doLoggingDebug", "doLoggingDebugLevel", "doLoggingConsole"];
+        "visualisationMessageCircles", "zoomWidth", "zoomHeight",
+        "visualisationColour", "visualisationHighlight", "visualisationOpacity",
+        "doLogging", "doLoggingDebug", "doLoggingDebugLevel", "doLoggingConsole"];
     ]]>
     </script>
 
@@ -225,6 +225,15 @@
                                     </menupopup>
                                 </menulist>
                                 <label value="(24)" />
+                            </row>
+                            <row>
+                                <label control="visualisationMessageCircles"
+                                    value="&visualisation.size.messagecircles;" />
+                                <checkbox id="visualisationMessageCircles"
+                                    label=""
+                                    preference="extensions.threadvis.visualisation.messagecircles"
+                                    prefstring="extensions.threadvis.visualisation.messagecircles"
+                                    preftype="bool" />
                             </row>
                         </rows>
                     </grid>

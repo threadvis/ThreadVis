@@ -15,7 +15,7 @@
  * Constructor for visualisation class
  ******************************************************************************/
 function ContainerVisualisation(stack, strings, container, colour, left, top,
-    selected, dotSize, resize, circle, flash, spacing, opacity) {
+    selected, dotSize, resize, circle, flash, spacing, opacity, messageCircles) {
     /**
      * XUL stack on which container gets drawn
      */
@@ -85,6 +85,11 @@ function ContainerVisualisation(stack, strings, container, colour, left, top,
      * the opacity of the item
      */
     this.opacity = opacity;
+
+    /**
+     * if true, draw circle, else draw square
+     */
+    this.messageCircles = messageCircles;
 
     // calculate style
     // full == received message
@@ -672,7 +677,11 @@ ContainerVisualisation.prototype.visualiseCircle = function(colour) {
     this.circle.style.height = styleHeight;
     this.circle.style.verticalAlign = "top";
     this.circle.style.border = styleBorder;
-    this.circle.style.MozBorderRadius = styleWidth;
+    if (this.messageCircles) {
+        this.circle.style.MozBorderRadius = styleWidth;
+    } else {
+        this.circle.style.MozBorderRadius = "";
+    }
 }
 
 
@@ -748,7 +757,11 @@ ContainerVisualisation.prototype.visualiseDot = function() {
     this.dot.style.opacity = styleOpacity;
 
     if (this.style != "dummy") {
-        this.dot.style.MozBorderRadius = styleWidth;
+        if (this.messageCircles) {
+            this.dot.style.MozBorderRadius = styleWidth;
+        } else {
+            this.dot.style.MozBorderRadius = "";
+        }
     } else {
         this.dot.style.MozBorderRadius = "";
     }

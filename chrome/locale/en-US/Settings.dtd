@@ -49,6 +49,7 @@
 <!ENTITY visualisation.size.arcdifference                   "Spacing between Arcs">
 <!ENTITY visualisation.size.arcwidth                        "Arc Width">
 <!ENTITY visualisation.size.spacing                         "Spacing between Messages">
+<!ENTITY visualisation.size.messagecircles                  "Draw messages as circles">
 <!ENTITY visualisation.colour.caption                       "Colours">
 <!ENTITY visualisation.colour.single.caption                "Single Colour">
 <!ENTITY visualisation.colour.single.description            "Only use a single colour in the visualisation. The selected message is displayed in blue, other messages are displayed in grey.">

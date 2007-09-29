@@ -63,6 +63,9 @@
             <preference id="extensions.threadvis.visualisation.spacing"
                 name="extensions.threadvis.visualisation.spacing"
                 type="int" />
+            <preference id="extensions.threadvis.visualisation.messagecircles"
+                name="extensions.threadvis.visualisation.messagecircles"
+                type="bool" />
             <preference id="extensions.threadvis.zoom.height"
                 name="extensions.threadvis.zoom.height"
                 type="int" />
@@ -257,6 +260,13 @@
                                     </menupopup>
                                 </menulist>
                                 <label value="(24)" />
+                            </row>
+                            <row>
+                                <label control="visualisationMessageCircles"
+                                    value="&visualisation.size.messagecircles;" />
+                                <checkbox id="visualisationMessageCircles"
+                                    label=""
+                                    preference="extensions.threadvis.visualisation.messagecircles" />
                             </row>
                         </rows>
                     </grid>

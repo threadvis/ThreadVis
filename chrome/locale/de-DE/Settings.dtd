@@ -49,6 +49,7 @@
 <!ENTITY visualisation.size.arcdifference                   "Abstand zwischen zwei B&#xF6;gen">
 <!ENTITY visualisation.size.arcwidth                        "Linienbreite">
 <!ENTITY visualisation.size.spacing                         "Abstand zwischen zwei Nachrichten">
+<!ENTITY visualisation.size.messagecircles                  "Nachrichten als Kreise zeichnen">
 <!ENTITY visualisation.colour.caption                       "Farben">
 <!ENTITY visualisation.colour.single.caption                "Einzelne Farbe">
 <!ENTITY visualisation.colour.single.description            "Verwendet nur eine einzige Farbe in der Visualisierung. Die ausgew&#xE4;hlte Nachricht wird blau dargestellt, andere Nachrichten in grau.">

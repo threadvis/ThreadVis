@@ -33,6 +33,7 @@ function PreferenceObserver() {
     this.PREF_VIS_ARC_DIFFERENCE = "visualisation.arcdifference";
     this.PREF_VIS_ARC_WIDTH = "visualisation.arcwidth";
     this.PREF_VIS_SPACING = "visualisation.spacing";
+    this.PREF_VIS_MESSAGE_CIRCLES = "visualisation.messagecircles";
     this.PREF_VIS_COLOUR = "visualisation.colour";
     this.PREF_VIS_HIGHLIGHT = "visualisation.highlight";
     this.PREF_VIS_OPACITY = "visualisation.opacity";
@@ -161,6 +162,8 @@ PreferenceObserver.prototype.preferenceReload = function() {
         this.prefBranch.PREF_INT, 2);
     this.loadPreference(this.PREF_VIS_SPACING,
         this.prefBranch.PREF_INT, 24);
+    this.loadPreference(this.PREF_VIS_MESSAGE_CIRCLES,
+        this.prefBranch.PREF_BOOL, true);
     this.loadPreference(this.PREF_VIS_COLOUR,
         this.prefBranch.PREF_STRING, "author");
     this.loadPreference(this.PREF_VIS_HIGHLIGHT,
