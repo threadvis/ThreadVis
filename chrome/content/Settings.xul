@@ -30,9 +30,10 @@
         "visualisationDotSize", "visualisationArcMinHeight",
         "visualisationArcRadius", "visualisationArcDifference",
         "visualisationArcWidth", "visualisationSpacing",
-        "visualisationMessageCircles", "zoomWidth", "zoomHeight",
-        "visualisationColour", "visualisationHighlight", "visualisationOpacity",
-        "doLogging", "doLoggingDebug", "doLoggingDebugLevel", "doLoggingConsole"];
+        "visualisationMessageCircles", "visualisationSVG", "zoomWidth",
+        "zoomHeight", "visualisationColour", "visualisationHighlight",
+        "visualisationOpacity", "doLogging", "doLoggingDebug",
+        "doLoggingDebugLevel", "doLoggingConsole"];
     ]]>
     </script>
 
@@ -235,6 +236,15 @@
                                     prefstring="extensions.threadvis.visualisation.messagecircles"
                                     preftype="bool" />
                             </row>
+                            <row>
+                                <label control="visualisationSVG"
+                                    value="&visualisation.svg;" />
+                                <checkbox id="visualisationSVG"
+                                    label="(beta)"
+                                    preference="extensions.threadvis.visualisation.svg"
+                                    prefstring="extensions.threadvis.visualisation.svg"
+                                    preftype="bool" />
+                            </row>
                         </rows>
                     </grid>
                     <separator />
@@ -388,7 +398,7 @@
                         label="&logfiles.console;"
                         preference="extensions.threadvis.logging.console"
                         prefstring="extensions.threadvis.logging.console"
-                        preftype="string" />
+                        preftype="bool" />
                 </tabpanel>
 
             </tabpanels>

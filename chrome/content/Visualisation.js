@@ -198,9 +198,13 @@ Visualisation.prototype.clearStack = function() {
     }
 
     // reset move
-    this.stack.style.marginLeft = "0px";
-    this.stack.style.marginTop = "0px";
-    this.stack.style.padding = "5px";
+    if (THREADVIS.SVG) {
+        this.stack.setAttribute("transform", "translate(0,0)");
+    } else {
+        this.stack.style.marginLeft = "0px";
+        this.stack.style.marginTop = "0px";
+        this.stack.style.padding = "5px";
+    }
 }
 
 
@@ -379,11 +383,35 @@ Visualisation.prototype.createStack = function() {
             THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
                 "Visualisation.createStack()", {"action" : "create stack"});
         }
-
-        this.stack = document.createElementNS(THREADVIS.XUL_NAMESPACE, "stack");
-        this.stack.setAttribute("id", "ThreadVisStack");
-        this.stack.style.position = "relative";
-        this.box.appendChild(this.stack);
+        this.stack = null;
+        // try to create SVG if enabled
+        var svgEnabled = THREADVIS.preferences.getPreference(
+            THREADVIS.preferences.PREF_VIS_SVG);
+        if (svgEnabled) {
+            try {
+                var svg = document.createElementNS(THREADVIS.SVG_NAMESPACE, "svg");
+                if (svg instanceof SVGSVGElement) {
+                    this.stack = document.createElementNS(THREADVIS.SVG_NAMESPACE, "g");
+                    svg.appendChild(this.stack);
+                    this.stack.setAttribute("id", "ThreadVisStack");
+                    this.box.appendChild(svg);
+                    THREADVIS.SVG = true;
+                    THREADVIS.logger.log("Using SVG.", {});
+                } else {
+                    this.stack = null;
+                }
+            } catch (ex) {
+                this.stack = null;
+            }
+        }
+        if (this.stack == null) {
+            THREADVIS.logger.log("Using XUL.", {});
+            THREADVIS.SVG = false;
+            this.stack = document.createElementNS(THREADVIS.XUL_NAMESPACE, "stack");
+            this.stack.setAttribute("id", "ThreadVisStack");
+            this.stack.style.position = "relative";
+            this.box.appendChild(this.stack);
+        }
         document.addEventListener("mousemove",
             function(event) {ref.onMouseMove(event);}, false);
         this.box.addEventListener("mousedown",
@@ -400,12 +428,22 @@ Visualisation.prototype.createStack = function() {
         this.clearStack();
     }
 
-    var loading = document.createElementNS(THREADVIS.XUL_NAMESPACE, "description");
-    loading.setAttribute("value", this.strings.getString("visualisation.loading"));
-    loading.style.position = "relative";
-    loading.style.top = "20px"
-    loading.style.left = "20px"
-    loading.style.color = "#999999";
+    if (THREADVIS.SVG) {
+        var loading = document.createElementNS(THREADVIS.SVG_NAMESPACE, "text");
+        var text = document.createTextNode(
+            this.strings.getString("visualisation.loading"));
+        loading.appendChild(text);
+        loading.setAttribute("x", "20");
+        loading.setAttribute("y", "20");
+        loading.setAttribute("color", "#999999");
+    } else {
+        var loading = document.createElementNS(THREADVIS.XUL_NAMESPACE, "description");
+        loading.setAttribute("value", this.strings.getString("visualisation.loading"));
+        loading.style.position = "relative";
+        loading.style.top = "20px"
+        loading.style.left = "20px"
+        loading.style.color = "#999999";
+    }
     this.stack.appendChild(loading);
 }
 
@@ -428,28 +466,51 @@ Visualisation.prototype.DECtoHEX = function(dec) {
  ******************************************************************************/
 Visualisation.prototype.displayDisabled = function() {
     this.clearStack();
-    var warning = document.createElementNS(THREADVIS.XUL_NAMESPACE, "label");
-    warning.setAttribute("value",
-        this.strings.getString("visualisation.disabledWarning"));
-    warning.style.position = "relative";
-    warning.style.top = "10px"
-    warning.style.left = "20px"
-    warning.style.color = "#999999";
-    this.stack.appendChild(warning);
 
-    var link = document.createElementNS(THREADVIS.XUL_NAMESPACE, "label");
-    link.setAttribute("value", this.strings.getString("visualisation.disabledWarningLink"));
-    link.style.position = "relative";
-    link.style.top = "30px"
-    link.style.left = "20px"
-    link.style.color = "#0000ff";
-    link.style.textDecoration = "underline";
-    var ref = this;
-    link.addEventListener("click", function() {
-        THREADVIS.openThreadVisOptionsDialog();
-    }, true);
-    link.style.cursor = "pointer";
-    this.stack.appendChild(link);
+    if (THREADVIS.SVG) {
+        var warning = document.createElementNS(THREADVIS.SVG_NAMESPACE, "text");
+        var text = document.createTextNode(
+            this.strings.getString("visualisation.disabledWarning"));
+        warning.appendChild(text);
+        warning.setAttribute("x", "20");
+        warning.setAttribute("y", "10");
+        warning.setAttribute("color", "#999999");
+        this.stack.appendChild(warning);
+
+        var link = document.createElementNS(THREADVIS.SVG_NAMESPACE, "text");
+        var text = document.createTextNode(
+            this.strings.getString("visualisation.disabledWarning"));
+        link.appendChild(text);
+        link.setAttribute("x", "20");
+        link.setAttribute("y", "30");
+        link.setAttribute("color", "#0000ff");
+        link.addEventListener("click", function() {
+            THREADVIS.openThreadVisOptionsDialog();
+        }, true);
+        this.stack.appendChild(link);
+    } else {
+        var warning = document.createElementNS(THREADVIS.XUL_NAMESPACE, "label");
+        warning.setAttribute("value",
+            this.strings.getString("visualisation.disabledWarning"));
+        warning.style.position = "relative";
+        warning.style.top = "10px"
+        warning.style.left = "20px"
+        warning.style.color = "#999999";
+        this.stack.appendChild(warning);
+
+        var link = document.createElementNS(THREADVIS.XUL_NAMESPACE, "label");
+        link.setAttribute("value", this.strings.getString("visualisation.disabledWarningLink"));
+        link.style.position = "relative";
+        link.style.top = "30px"
+        link.style.left = "20px"
+        link.style.color = "#0000ff";
+        link.style.textDecoration = "underline";
+        link.addEventListener("click", function() {
+            THREADVIS.openThreadVisOptionsDialog();
+        }, true);
+        link.style.cursor = "pointer";
+        this.stack.appendChild(link);
+    }
 
     // set cursor
     this.box.style.cursor = "";
@@ -466,31 +527,54 @@ Visualisation.prototype.displayDisabled = function() {
  ******************************************************************************/
 Visualisation.prototype.displayWarningCount = function(container) {
     this.clearStack();
-    var warning = document.createElementNS(THREADVIS.XUL_NAMESPACE, "label");
-    warning.setAttribute("value",
-        this.strings.getString("visualisation.warningCount") + " [" +
-        container.getTopContainer().getCountRecursive() + "].");
-    warning.style.position = "relative";
-    warning.style.top = "10px"
-    warning.style.left = "20px"
-    warning.style.color = "#999999";
-    this.stack.appendChild(warning);
 
-    var link = document.createElementNS(THREADVIS.XUL_NAMESPACE, "label");
-    link.setAttribute("value", this.strings.getString("visualisation.warningCountLink"));
-    link.style.position = "relative";
-    link.style.top = "30px"
-    link.style.left = "20px"
-    link.style.color = "#0000ff";
-    link.style.textDecoration = "underline";
-    var ref = this;
-    link.addEventListener("click", function() {
-        ref.visualise(container, true);
-    }, true);
-    link.style.cursor = "pointer";
-    this.stack.appendChild(link);
+    if (THREADVIS.SVG) {
+        var warning = document.createElementNS(THREADVIS.SVG_NAMESPACE, "text");
+        warning.appendChild(document.createTextNode(
+            this.strings.getString("visualisation.warningCount") + " [" +
+            container.getTopContainer().getCountRecursive() + "]."));
+        warning.setAttribute("x", "20");
+        warning.setAttribute("y", "10");
+        warning.setAttribute("color", "#999999");
+        this.stack.appendChild(warning);
 
-        // set cursor
+        var link = document.createElementNS(THREADVIS.SVG_NAMESPACE, "text");
+        link.appendChild(document.createTextNode(
+            this.strings.getString("visualisation.warningCountLink")));
+        link.setAttribute("x", "20");
+        link.setAttribute("y", "30");
+        link.setAttribute("color", "#0000ff");
+        var ref = this;
+        link.addEventListener("click", function() {
+            ref.visualise(container, true);
+        }, true);
+        this.stack.appendChild(link);
+    } else {
+        var warning = document.createElementNS(THREADVIS.XUL_NAMESPACE, "label");
+        warning.setAttribute("value",
+            this.strings.getString("visualisation.warningCount") + " [" +
+            container.getTopContainer().getCountRecursive() + "].");
+        warning.style.position = "relative";
+        warning.style.top = "10px"
+        warning.style.left = "20px"
+        warning.style.color = "#999999";
+        this.stack.appendChild(warning);
+
+        var link = document.createElementNS(THREADVIS.XUL_NAMESPACE, "label");
+        link.setAttribute("value", this.strings.getString("visualisation.warningCountLink"));
+        link.style.position = "relative";
+        link.style.top = "30px"
+        link.style.left = "20px"
+        link.style.color = "#0000ff";
+        link.style.textDecoration = "underline";
+        var ref = this;
+        link.addEventListener("click", function() {
+            ref.visualise(container, true);
+        }, true);
+        link.style.cursor = "pointer";
+        this.stack.appendChild(link);
+    }
+    // set cursor
     this.box.style.cursor = "";
 }
 
@@ -512,11 +596,72 @@ Visualisation.prototype.drawArc = function(colour, vPosition, height, left,
     var prefArcWidth = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_ARC_WIDTH);
 
-    var arc = new ArcVisualisation(this.stack, prefDotSize, this.resize,
-        prefArcMinHeight, prefArcDifference, prefArcRadius, prefArcWidth,
-        colour, vPosition, height, left, right, top, opacity);
+    if (THREADVIS.SVG) {
+        var arc = new ArcVisualisationSVG(this.stack, prefDotSize, this.resize,
+            prefArcMinHeight, prefArcDifference, prefArcRadius, prefArcWidth,
+            colour, vPosition, height, left, right, top, opacity);
+    } else {
+        var arc = new ArcVisualisation(this.stack, prefDotSize, this.resize,
+            prefArcMinHeight, prefArcDifference, prefArcRadius, prefArcWidth,
+            colour, vPosition, height, left, right, top, opacity);
+    }
 
     return arc;
+}
+
+
+
+/** ****************************************************************************
+ * Export an arc to SVG
+ ******************************************************************************/
+Visualisation.prototype.drawArcSVG = function(colour, vPosition, height, left, 
+    right, top, opacity, resize, counter) {
+    var prefDotSize = THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_VIS_DOTSIZE);
+    var prefArcMinHeight = THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_VIS_ARC_MINHEIGHT);
+    var prefArcDifference = THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_VIS_ARC_DIFFERENCE);
+    var prefArcRadius = THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_VIS_ARC_RADIUS);
+    var prefArcWidth = THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_VIS_ARC_WIDTH);
+
+    var height = ((prefArcMinHeight + prefArcDifference * height) - prefArcWidth)
+        * resize;
+    var startX = left * resize;
+    var startY = 0;
+    var width = ((right - left) * resize) ;
+    var radiusY = height;
+    var radiusX = Math.min(height, width / 2);
+    width = width - 2 * radiusX;
+    var cornerStart = radiusY;
+    var cornerEnd = radiusY;
+    var sweep = 1;
+
+    if (vPosition == "top") {
+        var cornerStart = -cornerStart;
+        startY = (top - (prefDotSize / 2)) * resize;
+    } else {
+        var cornerEnd = -cornerEnd;
+        startY = (top + (prefDotSize / 2)) * resize;
+        sweep = 0;
+    }
+
+    var path = "M"+ startX + "," + startY
+        + " a" + radiusX + "," + radiusY 
+        + " 0 0," + sweep
+        + " " + radiusX + "," + cornerStart
+        + " h " + width
+        + " a" + radiusX + "," + radiusY
+        + " 0 0," + sweep
+        + " " + radiusX + "," + cornerEnd;
+
+    return "<path id='p_" + counter + "'"
+        + " d='" + path + "'"
+        + " fill='none'"
+        + " stroke='" + colour + "'"
+        + " stroke-width='" + (prefArcWidth * resize) + "' />";
 }
 
 
@@ -533,11 +678,58 @@ Visualisation.prototype.drawDot = function(container, colour, left, top,
     var prefMessageCircles = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_MESSAGE_CIRCLES);
 
-    var msg = new ContainerVisualisation(this.stack, this.strings, container,
-        colour, left, top, selected, prefDotSize, this.resize, circle, flash,
-        prefSpacing, opacity, prefMessageCircles);
+    if (THREADVIS.SVG) {
+        var msg = new ContainerVisualisationSVG(this.stack, this.strings, container,
+            colour, left, top, selected, prefDotSize, this.resize, circle, flash,
+            prefSpacing, opacity, prefMessageCircles);
+    } else {
+        var msg = new ContainerVisualisation(this.stack, this.strings, container,
+            colour, left, top, selected, prefDotSize, this.resize, circle, flash,
+            prefSpacing, opacity, prefMessageCircles);
+    }
 
     return msg;
+}
+
+
+
+/** ****************************************************************************
+ * Export a dot to SVG
+ ******************************************************************************/
+Visualisation.prototype.drawDotSVG = function(container, colour, left, top, 
+    selected, circle, flash, opacity, resize, counter) {
+    var prefDotSize = THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_VIS_DOTSIZE);
+    var prefSpacing = THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_VIS_SPACING);
+    var prefMessageCircles = THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_VIS_MESSAGE_CIRCLES);
+
+    var style = "full";
+    if (! container.isDummy()) {
+        if (container.getMessage().isSent()) {
+            style = "half";
+        }
+    } else {
+        style ="dummy";
+    }
+
+    var svg = "<circle id='c_" + counter + "'"
+        + " onmouseover='toggle(evt,this);' onmouseout='toggle(evt,this);'"
+        + " cx='" + (left * resize) + "'"
+        + " cy='" + (top * resize) + "'"
+        + " r='" + (prefDotSize * resize * 0.5) + "'";
+
+    if (style != "half") {
+        svg += " fill='" + colour + "'";
+    } else {
+        svg += " stroke='" + colour + "'"
+            + " stroke-width='" + (prefDotSize / 4 * resize) + "'"
+            + " fill='none'";
+    }
+    svg += " />"
+
+    return svg;
 }
 
 
@@ -637,8 +829,11 @@ Visualisation.prototype.moveVisualisation = function(container) {
         THREADVIS.preferences.PREF_ZOOM_HEIGHT);
 
     // get current left margin
-    var oldMargin = this.stack.style.marginLeft;
-    oldMargin = parseInt(oldMargin.replace(/px/, ""));
+    if (THREADVIS.SVG) {
+        var oldMargin = this.stack.transform.baseVal.getConsolidationMatrix().e;
+    } else {
+        var oldMargin = parseFloat(this.stack.style.marginLeft);
+    }
     var newMargin = oldMargin;
 
     var originalWidth = this.box.boxObject.width;
@@ -661,7 +856,12 @@ Visualisation.prototype.moveVisualisation = function(container) {
         newMargin = (- container.xPosition + (prefSpacing / 2))* this.resize;
     }
 
-    this.stack.style.marginLeft = newMargin + "px";
+    if (THREADVIS.SVG) {
+        this.moveVisualisationTo({x: newMargin});
+    } else {
+        //this.stack.style.marginLeft = newMargin + "px";
+        this.moveVisualisationTo({x: newMargin});
+    }
 }
 
 
@@ -670,11 +870,24 @@ Visualisation.prototype.moveVisualisation = function(container) {
  * Move visualisation by given delta
  ******************************************************************************/
 Visualisation.prototype.moveVisualisationTo = function(position) {
-    if (position.x) {
-        this.stack.style.marginLeft = position.x + "px";
-    }
-    if (position.y) {
-        this.stack.style.marginTop = position.y + "px";
+    if (THREADVIS.SVG) {
+        var matrix = this.stack.transform.baseVal.getConsolidationMatrix();
+        var x = matrix.e;
+        var y = matrix.f;
+        if (position.x) {
+            x = position.x;
+        }
+        if (position.y) {
+            y = position.y;
+        }
+        this.stack.setAttribute("transform", "translate(" + x + "," + y + ")");
+    } else {
+        if (position.x) {
+            this.stack.style.marginLeft = position.x + "px";
+        }
+        if (position.y) {
+            this.stack.style.marginTop = position.y + "px";
+        }
     }
 }
 
@@ -712,8 +925,13 @@ Visualisation.prototype.onMouseDown = function(event) {
     // remember box size now
     this.boxWidth = this.box.boxObject.width;
     this.boxHeight = this.box.boxObject.height;
-    this.stackWidth = this.stack.boxObject.width;
-    this.stackHeight = this.stack.boxObject.height;
+    if (THREADVIS.SVG) {
+        this.stackWidth = this.stack.getBBox().width;
+        this.stackHeight = this.stack.getBBox().height;
+    } else {
+        this.stackWidth = this.stack.boxObject.width;
+        this.stackHeight = this.stack.boxObject.height;
+    }
 
     this.startX = event.clientX;
     this.startY = event.clientY;
@@ -735,16 +953,22 @@ Visualisation.prototype.onMouseMove = function(event) {
         var y = event.clientY;
         var dx = x - this.startX;
         var dy = y - this.startY;
-        var currentX = this.stack.style.marginLeft.replace(/px/, "");
+        if (THREADVIS.SVG) {
+            var matrix = this.stack.transform.baseVal.getConsolidationMatrix();
+            var currentX = matrix.e;
+            var currentY = matrix.f;
+        } else {
+            var currentX = parseFloat(this.stack.style.marginLeft);
+            var currentY = parseFloat(this.stack.style.marginTop);
+        }
         if (currentX == "") {
             currentX = 0;
         }
-        var currentY = this.stack.style.marginTop.replace(/px/, "");
         if (currentY == "") {
             currentY = 0;
         }
-        dx = parseInt(currentX) + parseInt(dx);
-        dy = parseInt(currentY) + parseInt(dy);
+        dx = parseFloat(currentX) + parseFloat(dx);
+        dy = parseFloat(currentY) + parseFloat(dy);
         this.startX = x;
         this.startY = y;
 
@@ -778,7 +1002,7 @@ Visualisation.prototype.onMouseMove = function(event) {
 
         this.moveVisualisationTo(position);
 
-        this.scrollbar.init(this.box);
+        //this.scrollbar.init(this.box);
         this.scrollbar.draw();
     }
 }
@@ -1153,9 +1377,15 @@ Visualisation.prototype.visualise = function(container, force) {
     this.stack.appendChild(popupBox);
 
     if (prefTimeline) {
-        this.timeline = new Timeline(this.stack, this.strings, this.containers,
-            this.resize, prefDotSize, topHeight,
-            prefArcMinHeight + prefDotSize - prefArcWidth - 2);
+        if (THREADVIS.SVG) {
+            this.timeline = new TimelineSVG(this.stack, this.strings, this.containers,
+                this.resize, prefDotSize, topHeight,
+                prefArcMinHeight + prefDotSize - prefArcWidth - 2);
+        } else {
+            this.timeline = new Timeline(this.stack, this.strings, this.containers,
+                this.resize, prefDotSize, topHeight,
+                prefArcMinHeight + prefDotSize - prefArcWidth - 2);
+        }
         this.timeline.draw();
     } else {
         this.timeline = null;
@@ -1173,6 +1403,7 @@ Visualisation.prototype.visualise = function(container, force) {
     this.boxHeight = this.box.boxObject.height;
     this.boxWidth = this.box.boxObject.width;
     var ref = this;
+    clearInterval(this.checkResizeInterval);
     this.checkResizeInterval = setInterval(function() {ref.checkSize();}, 100);
 
     // set cursor
@@ -1399,4 +1630,302 @@ Visualisation.prototype.zoomOut = function(amount) {
  ******************************************************************************/
 Visualisation.prototype.zoomReset = function() {
     this.zoom = 1.0;
+}
+
+
+
+/** ****************************************************************************
+ * Export to SVG
+ ******************************************************************************/
+Visualisation.prototype.exportToSVG = function(container, force) {
+    if (typeof force == "undefined") {
+        force = false;
+    }
+
+    if (container == null) {
+        container = this.currentContainer;
+    }
+
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "Visualisation.exportToSVG()", {"action" : "start",
+            "container" : container.toString()});
+    }
+
+    var prefArcDifference = THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_VIS_ARC_DIFFERENCE);
+    var prefArcMinHeight = THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_VIS_ARC_MINHEIGHT);
+    var prefArcWidth = THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_VIS_ARC_WIDTH);
+    var prefSpacing = THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_VIS_SPACING);
+    var prefDotSize = THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_VIS_DOTSIZE);
+    var prefDefaultZoomHeight = THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_ZOOM_HEIGHT);
+    var prefDefaultZoomWidth = THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_ZOOM_WIDTH);
+    var prefColour = THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_VIS_COLOUR);
+    var prefTimeline = THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_TIMELINE);
+    var prefOpacity = THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_VIS_OPACITY) / 100;
+
+    // get topmost container
+    var topContainer = container.getTopContainer();
+
+    // get all containers in thread as array
+    var containers = new Array();
+    containers.push(topContainer);
+    containers = containers.concat(topContainer.getChildren());
+
+    // sort containers by date
+    containers.sort(Container_sortFunction);
+
+    // pre-calculate size
+    var preSize = this.calculateSize(this.containers);
+    containers = preSize.containers;
+    // totalmaxheight counts the maximal number of stacked arcs
+    var totalMaxHeight = preSize.totalMaxHeight;
+    // minmaltimedifference stores the minimal time between two messages
+    var minimalTimeDifference = preSize.minimalTimeDifference;
+
+    var topHeight = prefDotSize / 2 + prefArcMinHeight
+        + preSize.topHeight * prefArcDifference;
+    var bottomHeight = prefDotSize / 2 + prefArcMinHeight
+        + preSize.bottomHeight * prefArcDifference;
+
+    var width = prompt(this.strings.getString("visualisation.exportsvg.width"),
+        "1000");
+    var height = prompt(this.strings.getString("visualisation.exportsvg.height")
+        , "1000");
+
+    containers = this.timeScaling(containers, minimalTimeDifference, width);
+
+    // do final resizing
+    var x = prefSpacing / 2;
+    var resize = this.getResize(containers.length, totalMaxHeight,
+        width, height);
+
+    // pre-calculate colours for different authors
+    var authors = new Object();
+    // remember last colour to reset
+    var lastColour = this.lastColour;
+    this.lastColour = -1;
+
+    var svg = "<?xml version=\"1.0\" standalone=\"no\"?>"
+        + "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">"
+        + "<svg width=\"100%\" height=\"100%\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">";
+
+    for (var counter = 0; counter < containers.length; counter++) {
+        var thisContainer = containers[counter];
+
+        var selected = thisContainer == container;
+        var inThread = container.findParent(thisContainer)
+            || thisContainer.findParent(container);
+
+        var colour = this.COLOUR_DUMMY;
+        var opacity = 1;
+        var hsv = {"hue" : 60, "saturation" : 6.8, "value" : 45.9};
+        var tmpStart = (new Date()).getTime();
+        if (! thisContainer.isDummy()) {
+            if (prefColour == "single") {
+                if (selected) {
+                    colour = this.COLOUR_SINGLE;
+                } else {
+                    colour = this.COLOUR_DUMMY;
+                }
+            } else {
+                if (authors[thisContainer.getMessage().getFromEmail()] != null) {
+                    hsv = authors[thisContainer.getMessage()
+                        .getFromEmail()].hsv;
+                } else {
+                    hsv = this.getNewColour();
+                    authors[thisContainer.getMessage().getFromEmail()] =
+                        {"hsv" : hsv};
+                }
+                colour = this.getColour(hsv.hue, 100, hsv.value);
+                if (selected || inThread) {
+                    opacity = 1;
+                } else {
+                    opacity = prefOpacity;
+                }
+            }
+        }
+
+        // only display black circle to highlight selected message
+        // if we are using more than one colour
+        var circle = prefColour == "single" ? false : true;
+
+        svg += this.drawDotSVG(thisContainer, colour, x, topHeight, selected,
+                circle, false, opacity, resize, counter);
+
+        thisContainer.xPosition = x;
+        thisContainer.svgId = counter;
+
+        // draw arc
+        var parent = thisContainer.getParent()
+        if (parent != null && ! parent.isRoot()) {
+            var position = "bottom";
+            if (parent.odd) {
+                position = "top";
+            }
+
+            var arcHeight = thisContainer.arcHeight;
+            // if we are using a single colour, display all arcs from
+            // a selected message in this colour
+            if (prefColour == "single") {
+                if (selected || inThread) {
+                    colour = this.COLOUR_SINGLE;
+                } else {
+                    colour = this.COLOUR_DUMMY;
+                }
+            } else {
+                // get colour for arc
+                colour = this.getColour(hsv.hue, 100, hsv.value);
+                if (selected || inThread) {
+                    opacity = 1;
+                } else {
+                    opacity = prefOpacity;
+                }
+            }
+
+            svg += this.drawArcSVG(colour, position, arcHeight,
+                parent.xPosition, x, topHeight, opacity, resize, counter);
+        }
+        x = x + (thisContainer.xScaled * prefSpacing);
+    }
+
+    this.lastColour = lastColour;
+/*
+    if (prefTimeline) {
+        svg += new TimelineSVG(this.stack, this.strings, this.containers,
+                this.resize, prefDotSize, topHeight,
+                prefArcMinHeight + prefDotSize - prefArcWidth - 2).exportSVG();
+    }
+*/
+
+    var script = "<script type='text/ecmascript'>"
+        + "<![CDATA["
+        + "var links=new Object();"
+        + "function toggleElement(id,opacity){"
+        + "var elem=document.getElementById('c_'+id);"
+        + "if(elem){elem.setAttributeNS(null, 'opacity', opacity);}"
+        + "elem=document.getElementById('p_'+id);"
+        + "if(elem){elem.setAttributeNS(null, 'opacity', opacity);}}"
+        + "function toggle(event,elem){"
+        + "var item=links[elem.id.replace('c_', '')];"
+        + "if(event.type=='mouseover'){"
+        + "toggleRecursiveChildren(item,1);"
+        + "toggleRecursiveParent(item,1);"
+        + "displayTooltip(elem);}"
+        + "else{toggleRecursiveChildren(item, 0.3);"
+        + "toggleRecursiveParent(item, 0.3);"
+        + "hideTooltip();}}"
+        + "function toggleRecursiveChildren(item,opacity){"
+        + "if(!item){return;}"
+        + "toggleElement(item.id, opacity);"
+        + "for(var i in item.children){"
+        + "var childItem=links[item.children[i]];"
+        + "if(childItem){"
+        + "toggleRecursiveChildren(childItem, opacity);}}}"
+        + "function toggleRecursiveParent(item,opacity){"
+        + "if(!item){return;}"
+        + "toggleElement(item.id,opacity);"
+        + "toggleRecursiveParent(links[item.parent],opacity);}";
+    for (var counter = 0; counter < containers.length; counter++) {
+        var thisContainer = containers[counter];
+        
+        var scriptChildren = "";
+        var tmpChildren = thisContainer.getChildren();
+        if (tmpChildren) {
+            for (var i in tmpChildren) {
+                scriptChildren += "'" + tmpChildren[i].svgId + "',";
+            }
+        }
+        var parent = thisContainer.getParent();
+        if (parent) {
+            parent = parent.svgId;
+        } else {
+            parent = null;
+        }
+        var date = thisContainer.getDate();
+        var author = "";
+        if (! thisContainer.isDummy()) {
+            author = thisContainer.getMessage().getFrom();
+        }
+        script += "links['" + thisContainer.svgId + "']={"
+            + "id:'" + thisContainer.svgId + "',"
+            + "children:[" + scriptChildren + "],"
+            + "parent:'" + parent + "',"
+            + "author:'" + author + "',"
+            + "date:'" + date + "'};";
+    }
+
+    var tooltip = "<g id='tooltip' style='visibility: hidden;'>"
+        + "<rect x='0' y='0' height='45' fill='white' opacity='0.75' stroke='#c6c6c6' stroke-width='1' id='background'></rect>"
+        + "<text x='10' y='20' id='author'></text>"
+        + "<text x='10' y='40' id='date'></text>"
+        + "</g>";
+    script += "function displayTooltip(elem){"
+        + "var item=links[elem.id.replace('c_','')];"
+        + "var tooltip=document.getElementById('tooltip');"
+        + "var authorElement=document.getElementById('author');"
+        + "var dateElement=document.getElementById('date');"
+        + "authorElement.appendChild(document.createTextNode(item.author));"
+        + "dateElement.appendChild(document.createTextNode(item.date));"
+        + "tooltip.style.visibility='visible';"
+        + "var x=elem.cx.baseVal.value+10;"
+        + "var y=elem.cy.baseVal.value+10;"
+        + "tooltip.setAttributeNS(null,'transform','translate('+x+','+y+')');"
+        + "var authorLength=authorElement.getComputedTextLength();"
+        + "var dateLength=dateElement.getComputedTextLength();"
+        + "var width=authorLength;"
+        + "if(dateLength>width){"
+        + "width=dateLength;"
+        + "}"
+        + "width+=20;"
+        + "var rect=document.getElementById('background');"
+        + "rect.setAttributeNS(null,'width',width);"
+        + "}"
+        + "function hideTooltip(){"
+        + "var tooltip=document.getElementById('tooltip');"
+        + "tooltip.style.visibility='hidden';"
+        + "clearElement('date');"
+        + "clearElement('author');"
+        + "}"
+        + "function clearElement(elem){"
+        + "var elem=document.getElementById(elem);"
+        + "var child=elem.firstChild;"
+        + "while(child){"
+        + "elem.removeChild(child);"
+        + "child=elem.firstChild;"
+        + "}"
+        + "}";
+
+    script += "]]></script>";
+
+    svg += tooltip;
+    svg += script;
+    svg += "</svg>";
+
+    var nsIFilePicker = Components.interfaces.nsIFilePicker;
+    var fp = Components.classes["@mozilla.org/filepicker;1"]
+        .createInstance(nsIFilePicker);
+    fp.init(window, "Select a File", nsIFilePicker.modeSave);
+    fp.appendFilter("SVG Files","*.svg");
+
+    var res = fp.show();
+    if (res == nsIFilePicker.returnOK || res == nsIFilePicker.returnReplace){
+        var file = fp.file;
+        var foStream = Components.classes["@mozilla.org/network/file-output-stream;1"]
+            .createInstance(Components.interfaces.nsIFileOutputStream);
+
+        // use 0x02 | 0x10 to open file for appending.
+        foStream.init(file, 0x02 | 0x08 | 0x20, 0666, 0); // write, create, truncate
+        foStream.write(svg, svg.length);
+        foStream.close();
+    }
 }

@@ -23,8 +23,10 @@
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
     <script src="chrome://threadvis/content/ArcVisualisation.js" />
+    <script src="chrome://threadvis/content/ArcVisualisationSVG.js" />
     <script src="chrome://threadvis/content/Container.js" />
     <script src="chrome://threadvis/content/ContainerVisualisation.js" />
+    <script src="chrome://threadvis/content/ContainerVisualisationSVG.js" />
     <script src="chrome://threadvis/content/CopyCut.js" />
     <script src="chrome://threadvis/content/Logger.js" />
     <script src="chrome://threadvis/content/Message.js" />
@@ -34,6 +36,7 @@
     <script src="chrome://threadvis/content/Threader.js" />
     <script src="chrome://threadvis/content/ThreadVis.js" />
     <script src="chrome://threadvis/content/Timeline.js" />
+    <script src="chrome://threadvis/content/TimelineSVG.js" />
     <script src="chrome://threadvis/content/Visualisation.js" />
 
     <stringbundleset>

@@ -37,6 +37,7 @@ function PreferenceObserver() {
     this.PREF_VIS_COLOUR = "visualisation.colour";
     this.PREF_VIS_HIGHLIGHT = "visualisation.highlight";
     this.PREF_VIS_OPACITY = "visualisation.opacity";
+    this.PREF_VIS_SVG = "visualisation.svg";
     this.PREF_ZOOM_HEIGHT = "zoom.height";
     this.PREF_ZOOM_WIDTH = "zoom.width";
 
@@ -170,6 +171,8 @@ PreferenceObserver.prototype.preferenceReload = function() {
         this.prefBranch.PREF_BOOL, true);
     this.loadPreference(this.PREF_VIS_OPACITY,
         this.prefBranch.PREF_INT, 30);
+    this.loadPreference(this.PREF_VIS_SVG,
+        this.prefBranch.PREF_BOOL, false);
     this.loadPreference(this.PREF_ZOOM_HEIGHT,
         this.prefBranch.PREF_INT, 1);
     this.loadPreference(this.PREF_ZOOM_WIDTH,

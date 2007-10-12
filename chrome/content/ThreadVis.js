@@ -65,7 +65,12 @@ function checkForThreadVis(win) {
 function ThreadVis(threadvisParent) {
     this.XUL_NAMESPACE =
         "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
+    this.SVG_NAMESPACE =
+        "http://www.w3.org/2000/svg";
     this.NOTES = 3;
+
+    // store SVG enabled
+    this.SVG = false;
 
     this.clear = false;
 
@@ -372,6 +377,7 @@ ThreadVis.prototype.displayVisualisationWindow = function() {
     this.popupWindow = window.openDialog("chrome://threadvis/content/ThreadVisPopup.xul",
         "ThreadVisPopup", flags);
     this.deleteBox();
+    clearInterval(this.visualisation.checkResizeInterval);
     this.visualisedMsgId = null;
 }
 

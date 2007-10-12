@@ -1,7 +1,9 @@
 content/ArcVisualisation.js
+content/ArcVisualisationSVG.js
 content/Cache.js
 content/Container.js
 content/ContainerVisualisation.js
+content/ContainerVisualisationSVG.js
 content/contents.rdf
 content/CopyCut.js
 content/Legend.js
@@ -23,6 +25,7 @@ content/ThreadVis.js
 content/ThreadVis.xul
 content/ThreadVisPopup.xul
 content/Timeline.js
+content/TimelineSVG.js
 content/Visualisation.js
 content/images/about.png
 content/images/icon.png

@@ -13,6 +13,7 @@
 <!ENTITY popup.legend               "Legende einblenden">
 <!ENTITY popup.popupwindow          "In eigenem Fenster darstellen">
 <!ENTITY popup.settings             "Einstellungen...">
+<!ENTITY popup.exportsvg            "Als SVG exportieren...">
 <!ENTITY popupwindow.title          "ThreadVis Visualisierung">
 <!ENTITY zoomin.tooltip             "Visualisierung vergr&#xF6;&#xDF;ern">
 <!ENTITY zoomout.tooltip            "Visualisierung verkleinern">

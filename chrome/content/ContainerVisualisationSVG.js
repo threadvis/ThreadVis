@@ -1,12 +1,12 @@
 /** ****************************************************************************
- * ContainerVisualisation.js
+ * ContainerVisualisationSVG.js
  *
  * (c) 2005-2007 Alexander C. Hubmann
  * (c) 2007 Alexander C. Hubmann-Haidvogel
  *
  * JavaScript file to visualise message in threadvis
  *
- * $Id$
+ * $Id: ContainerVisualisation.js 407 2007-09-29 12:16:23Z sascha $
  ******************************************************************************/
 
 
@@ -14,7 +14,7 @@
 /** ****************************************************************************
  * Constructor for visualisation class
  ******************************************************************************/
-function ContainerVisualisation(stack, strings, container, colour, left, top,
+function ContainerVisualisationSVG(stack, strings, container, colour, left, top,
     selected, dotSize, resize, circle, flash, spacing, opacity, messageCircles) {
     /**
      * XUL stack on which container gets drawn
@@ -106,7 +106,7 @@ function ContainerVisualisation(stack, strings, container, colour, left, top,
 
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "ContainerVisualisation()", {"action" : "start", "container" :
+            "ContainerVisualisationSVG()", {"action" : "start", "container" :
             this.container.toString(), "colour" : this.colour, "style" :
             this.style, "left" : this.left, "top" : this.top});
     }
@@ -120,9 +120,10 @@ function ContainerVisualisation(stack, strings, container, colour, left, top,
         this.showCircle();
     }
 
+    this.createToolTip();
+
     this.drawClick();
 
-    this.createToolTip();
     this.createMenu();
 
     if (this.selected && this.isCircle && this.flash) {
@@ -136,7 +137,7 @@ function ContainerVisualisation(stack, strings, container, colour, left, top,
 * create popup menu to delete, copy and cut messages
 * just create stub menu
  ******************************************************************************/
-ContainerVisualisation.prototype.createMenu = function() {
+ContainerVisualisationSVG.prototype.createMenu = function() {
     var menuname = "dot_popup_" + this.left;
     this.click.setAttribute("context", menuname);
 
@@ -158,7 +159,7 @@ ContainerVisualisation.prototype.createMenu = function() {
 /** ****************************************************************************
 * fill popup menu to delete, copy and cut messages
  ******************************************************************************/
-ContainerVisualisation.prototype.getMenu = function() {
+ContainerVisualisationSVG.prototype.getMenu = function() {
     if (this.popup.rendered == true) {
         return;
     }
@@ -246,17 +247,25 @@ ContainerVisualisation.prototype.getMenu = function() {
  * Create tooltip for container containing information about container
  * just create stub menu
  ******************************************************************************/
-ContainerVisualisation.prototype.createToolTip = function() {
+ContainerVisualisationSVG.prototype.createToolTip = function() {
+    if (document.getElementById("ThreadVisTooltip")) {
+        this.tooltip = document.getElementById("ThreadVisTooltip");
+        return;
+    }
     var tooltip = document.createElementNS(THREADVIS.XUL_NAMESPACE, "tooltip");
     tooltip.setAttribute("orient", "vertical");
-    tooltip.setAttribute("id", "ThreadVis_" + this.left);
+    tooltip.setAttribute("id", "ThreadVisTooltip");
+
+    var ref = this;
+    tooltip.addEventListener("popupshowing", function(event) {
+        if (! ref.tooltip.hover) {
+            event.preventDefault();
+        }
+    }, true);
 
     this.tooltip = tooltip;
-    var ref = this;
-    tooltip.addEventListener("popupshowing",
-        function() { ref.getToolTip(); }, true);
-
-    this.stack.appendChild(tooltip);
+    document.getElementById("ThreadVisBox").appendChild(tooltip);
+    document.getElementById("ThreadVisBox").tooltip = "ThreadVisTooltip";
 }
 
 
@@ -264,9 +273,13 @@ ContainerVisualisation.prototype.createToolTip = function() {
 /** ****************************************************************************
  * fill tooltip for container containing information about container
  ******************************************************************************/
-ContainerVisualisation.prototype.getToolTip = function() {
+ContainerVisualisationSVG.prototype.getToolTip = function() {
     if (this.tooltip.rendered == true) {
-        return;
+        //return;
+        while(this.tooltip.firstChild != null) {
+            this.tooltip.removeChild(this.tooltip.firstChild);
+        }
+        this.tooltip.rendered = false;
     }
 
     if (! this.container.isDummy()) {
@@ -355,7 +368,7 @@ ContainerVisualisation.prototype.getToolTip = function() {
  * don't do anything until we paste the message
  * just remember which message we have to cut
  ******************************************************************************/
-ContainerVisualisation.prototype.cut = function() {
+ContainerVisualisationSVG.prototype.cut = function() {
     THREADVIS.copyMessage = this.container;
     var msgKey = THREADVIS.copyMessage.isDummy() ? "DUMMY" : 
                     THREADVIS.copyMessage.getMessage().getKey();
@@ -369,7 +382,7 @@ ContainerVisualisation.prototype.cut = function() {
  * delete the parent-child relationship for this message
  * (i.e. delete the reference to the parent)
  ******************************************************************************/
-ContainerVisualisation.prototype.deleteParent = function() {
+ContainerVisualisationSVG.prototype.deleteParent = function() {
     var parent = this.container.getParent();
     parent.removeChild(this.container);
     parent.getTopContainer().pruneEmptyContainers();
@@ -394,9 +407,9 @@ ContainerVisualisation.prototype.deleteParent = function() {
 /** ****************************************************************************
  * Draw circle around container if container is selected
  ******************************************************************************/
-ContainerVisualisation.prototype.drawCircle = function(colour) {
+ContainerVisualisationSVG.prototype.drawCircle = function(colour) {
     if (! this.circle) {
-        this.circle = document.createElementNS(THREADVIS.XUL_NAMESPACE, "box");
+        this.circle = document.createElementNS(THREADVIS.SVG_NAMESPACE, "circle");
     }
 
     this.visualiseCircle(colour);
@@ -409,23 +422,34 @@ ContainerVisualisation.prototype.drawCircle = function(colour) {
 /** ****************************************************************************
  * Draw container around dot to catch click events and show tooltip
  ******************************************************************************/
-ContainerVisualisation.prototype.drawClick = function() {
+ContainerVisualisationSVG.prototype.drawClick = function() {
     if (! this.click) {
-        this.click = document.createElementNS(THREADVIS.XUL_NAMESPACE, "box");
+        this.click = document.createElementNS(THREADVIS.SVG_NAMESPACE, "circle");
     }
 
     this.visualiseClick();
 
     this.click.container = this.container;
-    this.click.setAttribute("tooltip", "ThreadVis_" + this.left);
 
     this.stack.appendChild(this.click);
-    this.click.addEventListener("click", this.onMouseClick, true);
+    var ref = this;
+    this.click.addEventListener("click", function(event) {
+        ref.onMouseClick(event);
+    }, true);
+
+    this.click.addEventListener("mouseover", function(event) {
+        ref.tooltip.hover = true;
+        ref.getToolTip();
+    }, true);
+    this.click.addEventListener("mouseout", function(event) {
+        ref.tooltip.hover = false;
+    }, true);
 
     // prevent mousedown event from bubbling to box object
     // prevent dragging of visualisation by clicking on message
-    this.click.addEventListener("mousedown",
-        function(event) {event.stopPropagation();},true);
+    this.click.addEventListener("mousedown", function(event) {
+        event.stopPropagation();
+    },true);
 }
 
 
@@ -433,8 +457,8 @@ ContainerVisualisation.prototype.drawClick = function() {
 /** ****************************************************************************
  * Draw dot for container
  ******************************************************************************/
-ContainerVisualisation.prototype.drawDot = function() {
-    this.dot = document.createElementNS(THREADVIS.XUL_NAMESPACE, "box");
+ContainerVisualisationSVG.prototype.drawDot = function() {
+    this.dot = document.createElementNS(THREADVIS.SVG_NAMESPACE, "circle");
 
     this.visualiseDot();
 
@@ -446,7 +470,7 @@ ContainerVisualisation.prototype.drawDot = function() {
 /** ****************************************************************************
  * Flash (show and hide) circle to draw attention to selected container
  ******************************************************************************/
-ContainerVisualisation.prototype.flash = function() {
+ContainerVisualisationSVG.prototype.flash = function() {
     if (this.flashCount == 0) {
         clearTimeout(this.flashTimeout);
         return;
@@ -463,7 +487,7 @@ ContainerVisualisation.prototype.flash = function() {
 /** ****************************************************************************
  * Hide circle
  ******************************************************************************/
-ContainerVisualisation.prototype.flashOff = function(old) {
+ContainerVisualisationSVG.prototype.flashOff = function(old) {
     this.showCircle();
     var ref = this;
     this.flashTimeout = setTimeout(function() {ref.flash();}, 500);
@@ -474,7 +498,7 @@ ContainerVisualisation.prototype.flashOff = function(old) {
 /** ****************************************************************************
  * Show circle
  ******************************************************************************/
-ContainerVisualisation.prototype.flashOn = function() {
+ContainerVisualisationSVG.prototype.flashOn = function() {
     this.hideCircle();
     var ref = this;
     this.flashOffTimeout = setTimeout(function() {ref.flashOff();}, 500);
@@ -485,8 +509,8 @@ ContainerVisualisation.prototype.flashOn = function() {
 /** ****************************************************************************
  * Hide circle
  ******************************************************************************/
-ContainerVisualisation.prototype.hideCircle = function() {
-    this.circle.hidden = true;
+ContainerVisualisationSVG.prototype.hideCircle = function() {
+    this.circle.setAttribute("display", "none");
 }
 
 
@@ -495,7 +519,7 @@ ContainerVisualisation.prototype.hideCircle = function() {
  * mouse click event handler
  * display message user clicked on
  ******************************************************************************/
-ContainerVisualisation.prototype.onMouseClick = function(event) {
+ContainerVisualisationSVG.prototype.onMouseClick = function(event) {
     // only react to left mouse click
     if (event.button != 0) {
         return;
@@ -523,7 +547,7 @@ ContainerVisualisation.prototype.onMouseClick = function(event) {
 /** ****************************************************************************
  * paste a previously cut message in this thread
  ******************************************************************************/
-ContainerVisualisation.prototype.paste = function() {
+ContainerVisualisationSVG.prototype.paste = function() {
     if (THREADVIS.copyMessage) {
         // check to see if user creates a loop
         if (THREADVIS.copyMessage.findChild(this.container)) {
@@ -565,7 +589,7 @@ ContainerVisualisation.prototype.paste = function() {
 /** ****************************************************************************
  * Re-Draw all elements
  ******************************************************************************/
-ContainerVisualisation.prototype.redraw = function(resize, left, top, selected,
+ContainerVisualisationSVG.prototype.redraw = function(resize, left, top, selected,
     flash, colour, opacity) {
     this.resize = resize;
     this.left = left;
@@ -595,7 +619,7 @@ ContainerVisualisation.prototype.redraw = function(resize, left, top, selected,
 /** ****************************************************************************
  * Re-Draw circle around container if container is selected
  ******************************************************************************/
-ContainerVisualisation.prototype.redrawCircle = function(colour) {
+ContainerVisualisationSVG.prototype.redrawCircle = function(colour) {
     this.visualiseCircle(colour);
 }
 
@@ -604,7 +628,7 @@ ContainerVisualisation.prototype.redrawCircle = function(colour) {
 /** ****************************************************************************
  * Re-Draw container around dot to catch click events and show tooltip
  ******************************************************************************/
-ContainerVisualisation.prototype.redrawClick = function() {
+ContainerVisualisationSVG.prototype.redrawClick = function() {
     this.visualiseClick();
 }
 
@@ -613,7 +637,7 @@ ContainerVisualisation.prototype.redrawClick = function() {
 /** ****************************************************************************
  * Re-Draw dot for container
  ******************************************************************************/
-ContainerVisualisation.prototype.redrawDot = function() {
+ContainerVisualisationSVG.prototype.redrawDot = function() {
     this.visualiseDot();
 }
 
@@ -622,8 +646,8 @@ ContainerVisualisation.prototype.redrawDot = function() {
 /** ****************************************************************************
  * Show circle
  ******************************************************************************/
-ContainerVisualisation.prototype.showCircle = function() {
-    this.circle.hidden = false;
+ContainerVisualisationSVG.prototype.showCircle = function() {
+    this.circle.setAttribute("display", "");
 }
 
 
@@ -631,7 +655,7 @@ ContainerVisualisation.prototype.showCircle = function() {
 /** ****************************************************************************
  * Flash (show and hide) circle to draw attention to selected container
  ******************************************************************************/
-ContainerVisualisation.prototype.startFlash = function() {
+ContainerVisualisationSVG.prototype.startFlash = function() {
     this.flashCount = 3;
     this.flash();
 }
@@ -641,7 +665,7 @@ ContainerVisualisation.prototype.startFlash = function() {
 /** ****************************************************************************
  * Stop flashing
  ******************************************************************************/
-ContainerVisualisation.prototype.stopFlash = function() {
+ContainerVisualisationSVG.prototype.stopFlash = function() {
     clearInterval(this.flashInterval);
     clearTimeout(this.flashOnTimeout);
     clearTimeout(this.flashOffTimeout);
@@ -653,35 +677,21 @@ ContainerVisualisation.prototype.stopFlash = function() {
 /** ****************************************************************************
  * Visualise circle around container if container is selected
  ******************************************************************************/
-ContainerVisualisation.prototype.visualiseCircle = function(colour) {
-    var styleTop = ((this.top - (this.dotSize * 4/6)) * this.resize) + "px";
-    var styleLeft = ((this.left - (this.dotSize * 4/6)) * this.resize) + "px";
-    var styleHeight = (this.dotSize * 8/6 * this.resize) + "px";
-    var styleWidth = (this.dotSize * 8/6 * this.resize) + "px";
-    var styleBackground = "";
-    var styleBorder = "";
-    styleBorder = (this.dotSize / 6 * this.resize) + "px solid " + colour;
+ContainerVisualisationSVG.prototype.visualiseCircle = function(colour) {
+    var radius = (this.dotSize * 8/6 * this.resize * 0.5);
 
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Visualisation.drawDot()", {"action" : "draw selection circle",
-            "top" : styleTop, "left" : styleLeft, "height" : styleHeight,
-            "width" : styleWidth, "background" : styleBackground,
-            "border" : styleBorder});
+            "top" : this.top, "left" : this.left, "radius" : radius});
     }
 
-    this.circle.style.position = "relative";
-    this.circle.style.top = styleTop;
-    this.circle.style.left = styleLeft;
-    this.circle.style.width = styleWidth;
-    this.circle.style.height = styleHeight;
-    this.circle.style.verticalAlign = "top";
-    this.circle.style.border = styleBorder;
-    if (this.messageCircles) {
-        this.circle.style.MozBorderRadius = styleWidth;
-    } else {
-        this.circle.style.MozBorderRadius = "";
-    }
+    this.circle.setAttribute("cx", this.left * this.resize);
+    this.circle.setAttribute("cy", this.top * this.resize);
+    this.circle.setAttribute("r", radius);
+    this.circle.setAttribute("stroke", colour);
+    this.circle.setAttribute("stroke-width", (this.dotSize / 6 * this.resize));
+    this.circle.setAttribute("fill", "none");
 }
 
 
@@ -689,34 +699,26 @@ ContainerVisualisation.prototype.visualiseCircle = function(colour) {
 /** ****************************************************************************
  * Visualise container around dot to catch click events and show tooltip
  ******************************************************************************/
-ContainerVisualisation.prototype.visualiseClick = function() {
-    var styleTop = ((this.top - (this.spacing / 2)) * this.resize) + "px";
-    var styleLeft = ((this.left - this.spacing / 2) * this.resize) + "px";
-    var styleHeight = (this.spacing * this.resize) + "px";
-    var styleWidth = (this.spacing * this.resize) + "px";
-    var styleBackground = "";
-    var styleBorder = "";
+ContainerVisualisationSVG.prototype.visualiseClick = function() {
+    var radius = (this.spacing * this.resize * 0.5);
 
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "Visualisation.drawClick()", {"top" : styleTop, "left" : styleLeft,
-            "height" : styleHeight, "width" : styleWidth, "background" :
-            styleBackground, "border" : styleBorder});
+            "Visualisation.drawClick()", {"top" : this.top, "left" : this.left,
+            "radius" : radius});
     }
 
-    this.click.style.position = "relative";
-    this.click.style.top = styleTop;
-    this.click.style.left = styleLeft;
-    this.click.style.width = styleWidth;
-    this.click.style.height = styleHeight;
-    this.click.style.verticalAlign = "top";
+    this.click.setAttribute("cx", this.left * this.resize);
+    this.click.setAttribute("cy", this.top * this.resize);
+    this.click.setAttribute("r", radius);
+    this.click.setAttribute("fill", "#000000");
+    this.click.setAttribute("fill-opacity", "0");
 
     if (this.style == "dummy") {
         this.click.style.cursor = "default";
     } else {
         this.click.style.cursor = "pointer";
     }
-    this.click.style.zIndex = "2";
 }
 
 
@@ -724,20 +726,8 @@ ContainerVisualisation.prototype.visualiseClick = function() {
 /** ****************************************************************************
  * Draw dot for container
  ******************************************************************************/
-ContainerVisualisation.prototype.visualiseDot = function() {
-    var styleTop = ((this.top - (this.dotSize / 2)) * this.resize);
-    var styleLeft = ((this.left - (this.dotSize / 2)) * this.resize);
-    var styleHeight = (this.dotSize * this.resize);
-    var styleWidth = (this.dotSize * this.resize);
-    var styleBackground = "";
-    var styleBorder = "";
-    var styleOpacity = this.opacity;
-    if (this.style != "half") {
-        styleBackground = this.colour;
-    } else {
-        styleBorder = (this.dotSize / 4 * this.resize) + "px solid "
-            + this.colour;
-    }
+ContainerVisualisationSVG.prototype.visualiseDot = function() {
+    var radius = (this.dotSize * this.resize * 0.5);
 
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
@@ -746,24 +736,15 @@ ContainerVisualisation.prototype.visualiseDot = function() {
             styleBackground, "border" : styleBorder});
     }
 
-    this.dot.style.position = "relative";
-    this.dot.style.top = styleTop + "px";
-    this.dot.style.left = styleLeft + "px";
-    this.dot.style.width = styleWidth + "px";
-    this.dot.style.height = styleHeight + "px";
-    this.dot.style.verticalAlign = "top";
-    this.dot.style.background = styleBackground;
-    this.dot.style.border = styleBorder;
-    this.dot.style.opacity = styleOpacity;
-
-    if (this.style != "dummy") {
-        if (this.messageCircles) {
-            this.dot.style.MozBorderRadius = styleWidth + "px";
-        } else {
-            this.dot.style.MozBorderRadius = "";
-        }
+    this.dot.setAttribute("cx", this.left * this.resize);
+    this.dot.setAttribute("cy", this.top * this.resize);
+    this.dot.setAttribute("r", radius);
+    this.dot.setAttribute("opacity", this.opacity);
+    if (this.style != "half") {
+        this.dot.setAttribute("fill", this.colour);
     } else {
-        this.dot.style.MozBorderRadius = "";
+        this.dot.setAttribute("stroke", this.colour);
+        this.dot.setAttribute("stroke-width", (this.dotSize / 4 * this.resize));
+        this.dot.setAttribute("fill", "none");
     }
-    this.dot.style.cursor = "default";
 }

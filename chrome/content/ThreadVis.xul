@@ -17,12 +17,15 @@
 
 <!DOCTYPE overlay SYSTEM "chrome://threadvis/locale/ThreadVis.dtd">
 <overlay id="ThreadVis"
-    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+    xmlns:svg="http://www.w3.org/2000/svg">
 
     <script src="chrome://threadvis/content/ArcVisualisation.js" />
+    <script src="chrome://threadvis/content/ArcVisualisationSVG.js" />
     <script src="chrome://threadvis/content/Cache.js" />
     <script src="chrome://threadvis/content/Container.js" />
     <script src="chrome://threadvis/content/ContainerVisualisation.js" />
+    <script src="chrome://threadvis/content/ContainerVisualisationSVG.js" />
     <script src="chrome://threadvis/content/CopyCut.js" />
     <script src="chrome://threadvis/content/Logger.js" />
     <script src="chrome://threadvis/content/Message.js" />
@@ -32,6 +35,7 @@
     <script src="chrome://threadvis/content/Threader.js" />
     <script src="chrome://threadvis/content/ThreadVis.js" />
     <script src="chrome://threadvis/content/Timeline.js" />
+    <script src="chrome://threadvis/content/TimelineSVG.js" />
     <script src="chrome://threadvis/content/Visualisation.js" />
 
     <hbox id="expandedHeaderView">
@@ -47,6 +51,8 @@
                     oncommand="THREADVIS.displayVisualisationWindow();" />
                 <menuitem label="&popup.legend;"
                     oncommand="THREADVIS.displayLegendWindow();" />
+                <menuitem label="&popup.exportsvg;"
+                    oncommand="THREADVIS.visualisation.exportToSVG();" />
             </popup>
         </popupset>
         <hbox id="ThreadVis" style="border: 1px solid #cccccc;">

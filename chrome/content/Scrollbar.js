@@ -92,8 +92,13 @@ Scrollbar.prototype.draw = function() {
 Scrollbar.prototype.calculateSize = function() {
     var boxWidth = this.box.boxObject.width;
     var boxHeight = this.totalHeight;
-    var stackWidth = this.stack.boxObject.width;
-    var stackHeight = this.stack.boxObject.height;
+    if (THREADVIS.SVG) {
+        var stackWidth = this.stack.getBBox().width;
+        var stackHeight = this.stack.getBBox().height;
+    } else {
+        var stackWidth = this.stack.boxObject.width;
+        var stackHeight = this.stack.boxObject.height;
+    }
 
     var width = (boxWidth / stackWidth) * boxWidth;
     var height = (boxHeight / stackHeight) * boxHeight;
@@ -133,11 +138,22 @@ Scrollbar.prototype.calculateSize = function() {
 Scrollbar.prototype.calculatePosition = function() {
     var boxWidth = this.box.boxObject.width;
     var boxHeight = this.totalHeight;
-    var stackWidth = this.stack.boxObject.width;
-    var stackHeight = this.stack.boxObject.height;
+    if (THREADVIS.SVG) {
+        var stackWidth = this.stack.getBBox().width;
+        var stackHeight = this.stack.getBBox().height;
+    } else {
+        var stackWidth = this.stack.boxObject.width;
+        var stackHeight = this.stack.boxObject.height;
+    }
 
-    var movedX = Math.abs(this.stack.style.marginLeft.replace(/px/, ""));
-    var movedY = Math.abs(this.stack.style.marginTop.replace(/px/, ""));
+    if (THREADVIS.SVG) {
+        var matrix = this.stack.transform.baseVal.getConsolidationMatrix();
+        var movedX = Math.abs(matrix.e);
+        var movedY = Math.abs(matrix.f);
+    } else {
+        var movedX = Math.abs(parseFloat(this.stack.style.marginLeft));
+        var movedY = Math.abs(parseFloat(this.stack.style.marginTop));
+    }
 
     var x = (movedX / stackWidth) * boxWidth;
     var y = (movedY / stackHeight) * boxHeight;
@@ -159,7 +175,7 @@ Scrollbar.prototype.onMouseMoveHorizontal = function(event) {
     if (this.panningHorizontal) {
         var x = event.clientX;
         var dx = x - this.startX;
-        var currentX = this.horizontal.style.left.replace(/px/, "");
+        var currentX = parseFloat(this.horizontal.style.left);
         if (currentX == "") {
             currentX = 0;
         }
@@ -180,7 +196,11 @@ Scrollbar.prototype.onMouseMoveHorizontal = function(event) {
         this.horizontal.style.left = dx + "px";
 
         var boxWidth = this.box.boxObject.width;
-        var stackWidth = this.stack.boxObject.width;
+        if (THREADVIS.SVG) {
+            var stackWidth = this.stack.getBBox().width;
+        } else {
+            var stackWidth = this.stack.boxObject.width;
+        }
         var multiplicator = -1 * stackWidth / boxWidth;
 
         var position = new Object();
@@ -226,7 +246,7 @@ Scrollbar.prototype.onMouseMoveVertical = function(event) {
     if (this.panningVertical) {
         var y = event.clientY;
         var dy = y - this.startY;
-        var currentY = this.vertical.style.top.replace(/px/, "");
+        var currentY = parseFloat(this.vertical.style.top);
         if (currentY == "") {
             currentY = 0;
         }
@@ -247,7 +267,11 @@ Scrollbar.prototype.onMouseMoveVertical = function(event) {
         this.vertical.style.top = dy + "px";
 
         var boxHeight = this.box.boxObject.height;
-        var stackHeight = this.stack.boxObject.height;
+        if (THREADVIS.SVG) {
+            var stackHeight = this.stack.getBBox().height;
+        } else {
+            var stackHeight = this.stack.boxObject.height;
+        }
         var multiplicator = -1 * stackHeight / boxHeight;
 
         var position = new Object();

@@ -77,14 +77,11 @@ Set logger = fso.OpenTextFile("content\Logger.js", 2)
 logger.write(loggerTextNew)
 logger.close
 
-WScript.Sleep 2000
-
 ' ========================================================================
 ' Create JAR file
 ' ========================================================================
 
 shell.Exec("c:\Programme\7-Zip\7z a -mx0 -tzip threadvis.jar @make.list")
-
 WScript.Sleep 2000
 
 ' ========================================================================
