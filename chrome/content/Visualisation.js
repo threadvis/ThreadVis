@@ -34,6 +34,9 @@ function Visualisation() {
     this.changed = false;
 
     this.disabled = false;
+
+    // force display of too many messages
+    this.force = false;
 }
 
 
@@ -1168,8 +1171,14 @@ Visualisation.prototype.visualise = function(container, force) {
     this.box.style.cursor = "wait";
 
     if (typeof force == "undefined") {
-        force = false;
+        // check to see parent force
+        if (THREADVIS.threadvisParent) {
+            force = THREADVIS.threadvisParent.visualisation.force;
+        } else {
+           force = false;
+        }
     }
+    this.force = force;
 
     if (container == null) {
         container = this.currentContainer;
@@ -1223,7 +1232,7 @@ Visualisation.prototype.visualise = function(container, force) {
 
     // get number of containers
     var count = topContainer.getCountRecursive();
-    if (count > 50 && ! force) {
+    if (count > 50 && ! this.force) {
         this.displayWarningCount(container);
         return;
     }
@@ -1645,6 +1654,7 @@ Visualisation.prototype.exportToSVG = function(container, force) {
     if (typeof force == "undefined") {
         force = false;
     }
+    this.force = force;
 
     if (container == null) {
         container = this.currentContainer;
