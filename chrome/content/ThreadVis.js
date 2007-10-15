@@ -361,7 +361,6 @@ ThreadVis.prototype.displayNotes = function() {
  * display a popup window for the visualisation
  ******************************************************************************/
 ThreadVis.prototype.displayVisualisationWindow = function() {
-
     if (this.visualisation.disabled) {
         return;
     }
@@ -379,6 +378,21 @@ ThreadVis.prototype.displayVisualisationWindow = function() {
     this.deleteBox();
     clearInterval(this.visualisation.checkResizeInterval);
     this.visualisedMsgId = null;
+}
+
+
+
+/** ****************************************************************************
+ * return true if popup exists, false otherwise
+ ******************************************************************************/
+ThreadVis.prototype.hasPopupVisualisation = function() {
+    if (this.threadvisParent) {
+        return this.threadvisParent.hasPopupVisualisation();
+    }
+    if (this.popupWindow != null && ! this.popupWindow.closed) {
+        return true;
+    }
+    return false;
 }
 
 

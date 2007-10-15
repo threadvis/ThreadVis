@@ -503,7 +503,11 @@ ContainerVisualisation.prototype.onMouseClick = function(event) {
 
     // check for double click
     if (event.detail > 1) {
-        ThreadPaneDoubleClick();
+        if (THREADVIS.hasPopupVisualisation()) {
+            THREADVIS.getMainWindow().ThreadPaneDoubleClick();
+        } else {
+            ThreadPaneDoubleClick();
+        }
     }
 
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
