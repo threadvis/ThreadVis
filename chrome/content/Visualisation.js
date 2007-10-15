@@ -221,6 +221,10 @@ Visualisation.prototype.colourAuthors = function(authors) {
 
     // check to see if we have the element expandedHeaderView
     if (document.getElementById("expandedHeaderView") == null) {
+        // check for parent window
+        if (THREADVIS.threadvisParent) {
+            THREADVIS.threadvisParent.visualisation.colourAuthors(authors);
+        }
         return;
     }
 
