@@ -57,7 +57,7 @@
 <!ENTITY visualisation.colour.author.caption                "Mehrere Farben">
 <!ENTITY visualisation.colour.author.description            "Verwendet verschiedene Farben f&#xFC;r verschiedene Autoren.">
 <!ENTITY visualisation.colour.highlight                     "Die Email-Adressen der Autoren farbig unterstreichen.">
-<!ENTITY visualisation.opacity                              "Unwichtige Konversations-Teile ausblenden:">
+<!ENTITY visualisation.opacity                              "Unwichtige Sub-Threads ausblenden:">
 <!ENTITY about.tab                                          "Info">
 <!ENTITY about.version                                      "Version">
 <!ENTITY extension.description                              "Zeigt eine kleine Grafik, die den Kontext (Thread) der aktuell angezeigten Nachricht visualisiert.">
