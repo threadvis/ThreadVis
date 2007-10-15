@@ -154,6 +154,21 @@ function buildCacheList() {
 
 
 
+function checkFolderType(folder) {
+    var trash = folder.flags & 0x0100;
+    var drafts = folder.flags & 0x0400;
+    var templates = folder.flags & 0x400000;
+    var junk = folder.flags & 0x40000000;
+
+    if (trash || drafts || templates || junk) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
+
 /** ****************************************************************************
  * create checkbox elements for all folders
  ******************************************************************************/

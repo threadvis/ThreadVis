@@ -43,6 +43,16 @@
         <stringbundle id="ThreadVisStrings"
             src="chrome://threadvis/locale/ThreadVis.properties" />
     </stringbundleset>
+    <popupset>
+        <popup id="ThreadVisPopUp">
+            <menuitem label="&popup.settings;" 
+                oncommand="THREADVIS.openThreadVisOptionsDialog();" />
+            <menuitem label="&popup.legend;"
+                oncommand="THREADVIS.displayLegendWindow();" />
+            <menuitem label="&popup.exportsvg;"
+                oncommand="THREADVIS.visualisation.exportToSVG();" />
+        </popup>
+    </popupset>
     <hbox id="ThreadVis" style="border: 1px solid #cccccc;" flex="1">
 
         <hbox flex="1">

@@ -619,13 +619,13 @@ ThreadVis.prototype.onVisualisationWindowClose = function() {
  * Open the options dialog for this extension
  ******************************************************************************/
 ThreadVis.prototype.openThreadVisOptionsDialog = function() {
-    if (typeof(openOptionsDialog) == "undefined") {
+    if (typeof(this.getMainWindow().openOptionsDialog) == "undefined") {
         // Mozilla doesn't know about openOptionsDialog, so we use goPreferences.
         // Although Thunderbird also knows goPreferences, Thunderbird 1.5
         // has some problems with it, so we use it only for Mozilla and use
         // openOptionsDialog for Thunderbird. For details see comments below.
-        goPreferences('threadvis', 'chrome://threadvis/content/Settings.xul',
-            'threadvis');
+        this.getMainWindow().goPreferences('threadvis',
+            'chrome://threadvis/content/Settings.xul', 'threadvis');
     } else {
         // Thunderbird knows both goPreferences and openOptionsDialog
         // but Thunderbird 1.5 doesn't do well with goPreferences.
@@ -657,7 +657,7 @@ ThreadVis.prototype.openThreadVisOptionsDialog = function() {
         // which defines the paneThreadVis component which gets passed as
         // aPaneID), and we have Settings.xul which gets used in
         // Thunderbird < 1.5 and Mozilla (which URL gets passed as paneURL).
-        openOptionsDialog('paneThreadVis',
+        this.getMainWindow().openOptionsDialog('paneThreadVis',
             'chrome://threadvis/content/Settings.xul');
     }
 }
