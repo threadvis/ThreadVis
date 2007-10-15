@@ -1036,7 +1036,7 @@ Visualisation.prototype.onMouseUp = function(event) {
 Visualisation.prototype.onScroll = function(event) {
     // event.detail gives number of lines to scroll
     // positive number means scroll down
-    if (event.detail > 0){
+    if (event.detail < 0){
         this.zoomIn();
     } else {
         this.zoomOut();
@@ -1607,7 +1607,7 @@ Visualisation.prototype.zoomIn = function(amount) {
 
     clearTimeout(this.zoomTimeout);
     var ref = this;
-    this.zoomTimeout = setTimeout(function() {ref.visualise();}, 500);
+    this.zoomTimeout = setTimeout(function() {ref.visualise();}, 200);
 
     THREADVIS.logger.log("zoom", {"action" : "in", "zoomlevel" : this.zoom,
         "delta" : amount});
@@ -1630,7 +1630,7 @@ Visualisation.prototype.zoomOut = function(amount) {
 
     clearTimeout(this.zoomTimeout);
     var ref = this;
-    this.zoomTimeout = setTimeout(function() {ref.visualise();}, 500);
+    this.zoomTimeout = setTimeout(function() {ref.visualise();}, 200);
 
     THREADVIS.logger.log("zoom", {"action" : "out", 
         "zoomlevel" : this.zoom, "delta" : amount});
