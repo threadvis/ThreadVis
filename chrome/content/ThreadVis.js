@@ -566,6 +566,20 @@ ThreadVis.prototype.init = function() {
 
 
 /** ****************************************************************************
+ * return true if this window is a message window
+******************************************************************************/
+ThreadVis.prototype.isMessageWindow = function() {
+    if (this.threadvisParent &&
+        document.getElementById("expandedHeaderView") != null) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
+
+/** ****************************************************************************
  * log all JavaScript errors to logfile
  ******************************************************************************/
 ThreadVis.prototype.logJavaScriptErrors = function(message, file, line) {
