@@ -28,14 +28,25 @@ function Scrollbar(visualisation, stack, box) {
      */
     this.box = box;
 
-    this.init(box);
-
+    /**
+     * XUL boxes for horizontal scrollbar
+     */
     this.boxHorizontal = document.getElementById("ThreadVisScrollbarHorizontalBox");
     this.horizontal = document.getElementById("ThreadVisScrollbarHorizontal");
+    this.arrowLeft = document.getElementById("ThreadVisScrollbarLeft");
+    this.arrowRight = document.getElementById("ThreadVisScrollbarRight");
 
+    /**
+     * XUL boxes for vertical scrollbar
+     */
     this.boxVertical = document.getElementById("ThreadVisScrollbarVerticalBox");
     this.vertical = document.getElementById("ThreadVisScrollbarVertical");
+    this.arrowDown = document.getElementById("ThreadVisScrollbarDown");
+    this.arrowUp = document.getElementById("ThreadVisScrollbarUp");
 
+    this.init(box);
+
+    // add event listeners
     var ref = this;
     document.addEventListener("mousemove",
         function(event) {ref.onMouseMoveHorizontal(event);}, false);
@@ -50,37 +61,83 @@ function Scrollbar(visualisation, stack, box) {
         function(event) {ref.onMouseDownVertical(event);}, false);
     document.addEventListener("mouseup",
         function(event) { ref.onMouseUpVertical(event); }, false);
+
+    // add event listeners for up/down/left/right buttons
+    this.leftPanInterval = null;
+    this.upPanInterval = null;
+    this.downPanInterval = null;
+    this.rightPanInterval = null;
+    this.arrowUp.addEventListener("click", function(event) {
+        clearInterval(ref.upPanInterval);
+        ref.panUp();
+    }, false);
+    this.arrowUp.addEventListener("mousedown", function(event) {
+        clearInterval(ref.upPanInterval);
+        ref.upPanInterval = setInterval(function() {
+            ref.panUp();
+        }, 100);
+    }, false);
+    this.arrowDown.addEventListener("click", function(event) {
+        clearInterval(ref.upPanInterval);
+        ref.panDown();
+    }, false);
+    this.arrowDown.addEventListener("mousedown", function(event) {
+        clearInterval(ref.downPanInterval);
+        ref.downPanInterval = setInterval(function() {
+            ref.panDown();
+        }, 100);
+    }, false);
+    this.arrowLeft.addEventListener("click", function(event) {
+        clearInterval(ref.upPanInterval);
+        ref.panLeft();
+    }, false);
+    this.arrowLeft.addEventListener("mousedown", function(event) {
+        clearInterval(ref.leftPanInterval);
+        ref.leftPanInterval = setInterval(function() {
+            ref.panLeft();
+        }, 100);
+    }, false);
+    this.arrowRight.addEventListener("click", function(event) {
+        clearInterval(ref.upPanInterval);
+        ref.panRight();
+    }, false);
+    this.arrowRight.addEventListener("mousedown", function(event) {
+        clearInterval(ref.rightPanInterval);
+        ref.rightPanInterval = setInterval(function() {
+            ref.panRight();
+        }, 100);
+    }, false);
+    document.addEventListener("mouseup", function(event) {
+        clearInterval(ref.upPanInterval);
+        clearInterval(ref.downPanInterval);
+        clearInterval(ref.leftPanInterval);
+        clearInterval(ref.rightPanInterval);
+    }, false);
 }
 
 
 
 /** ****************************************************************************
- * Init height of scrollbars
+ * Calculate positions of the scrollbars
  ******************************************************************************/
-Scrollbar.prototype.init = function(box) {
-    this.box = box;
-    this.totalHeight = this.box.boxObject.height - 4;
-    this.totalWidth = this.box.boxObject.width - 4;
-}
+Scrollbar.prototype.calculatePosition = function() {
+    if (THREADVIS.SVG) {
+        var matrix = this.stack.transform.baseVal.getConsolidationMatrix();
+        var movedX = Math.abs(matrix.e);
+        var movedY = Math.abs(matrix.f);
+    } else {
+        var movedX = Math.abs(parseFloat(this.stack.style.marginLeft));
+        var movedY = Math.abs(parseFloat(this.stack.style.marginTop));
+    }
 
+    var x = (movedX / this.getStackWidth()) * this.getScrollBarHorizontalWidth();
+    var y = (movedY / this.getStackHeight()) * this.getScrollBarVerticalHeight();
 
+    var position = new Object()
+    position.x = x;
+    position.y = y;
 
-/** ****************************************************************************
- * Draw the scrollbar
- ******************************************************************************/
-Scrollbar.prototype.draw = function() {
-    var size = this.calculateSize();
-    var position = this.calculatePosition();
-
-    this.boxHorizontal.hidden = size.hideHorizontal;
-    this.horizontal.style.position = "relative";
-    this.horizontal.style.width = size.width + "px";
-    this.horizontal.style.left = position.x + "px";
-
-    this.boxVertical.hidden = size.hideVertical;
-    this.vertical.style.position = "relative";
-    this.vertical.style.height = size.height + "px";
-    this.vertical.style.top = position.y + "px";
+    return position;
 }
 
 
@@ -90,34 +147,24 @@ Scrollbar.prototype.draw = function() {
  * Determine if scrollbars need to be drawn
  ******************************************************************************/
 Scrollbar.prototype.calculateSize = function() {
-    var boxWidth = this.box.boxObject.width;
-    var boxHeight = this.totalHeight;
-    if (THREADVIS.SVG) {
-        var stackWidth = this.stack.getBBox().width;
-        var stackHeight = this.stack.getBBox().height;
-    } else {
-        var stackWidth = this.stack.boxObject.width;
-        var stackHeight = this.stack.boxObject.height;
+    var width = (this.getTotalWidth() / this.getStackWidth()) * this.getScrollBarHorizontalWidth();
+    var height = (this.getTotalHeight() / this.getStackHeight()) * this.getScrollBarVerticalHeight();
+
+    if (width > this.getScrollBarHorizontalWidth()) {
+        width = this.getScrollBarHorizontalWidth();
     }
 
-    var width = (boxWidth / stackWidth) * boxWidth;
-    var height = (boxHeight / stackHeight) * boxHeight;
-
-    if (width > boxWidth) {
-        width = boxWidth;
-    }
-
-    if (height > boxHeight) {
-        height = boxHeight;
+    if (height > this.getScrollBarVerticalHeight()) {
+        height = this.getScrollBarVerticalHeight();
     }
 
     var hideHorizontal = false;
-    if (Math.abs(width - boxWidth) < 2) {
+    if (Math.abs(width - this.getScrollBarHorizontalWidth()) < 2) {
         hideHorizontal = true;
     }
 
     var hideVertical = false;
-    if (Math.abs(height - boxHeight) < 2) {
+    if (Math.abs(height - this.getScrollBarVerticalHeight()) < 2) {
         hideVertical = true;
     }
 
@@ -133,36 +180,108 @@ Scrollbar.prototype.calculateSize = function() {
 
 
 /** ****************************************************************************
- * Calculate positions of the scrollbars
+ * Draw the scrollbar
  ******************************************************************************/
-Scrollbar.prototype.calculatePosition = function() {
-    var boxWidth = this.box.boxObject.width;
-    var boxHeight = this.totalHeight;
-    if (THREADVIS.SVG) {
-        var stackWidth = this.stack.getBBox().width;
-        var stackHeight = this.stack.getBBox().height;
+Scrollbar.prototype.draw = function() {
+    var size = this.calculateSize();
+    var position = this.calculatePosition();
+
+    if (size.hideHorizontal) {
+        this.boxHorizontal.style.visibility = "hidden";
+        this.arrowLeft.style.visibility = "hidden";
+        this.arrowRight.style.visibility = "hidden";
     } else {
-        var stackWidth = this.stack.boxObject.width;
-        var stackHeight = this.stack.boxObject.height;
+        this.boxHorizontal.style.visibility = "visible";
+        this.arrowLeft.style.visibility = "visible";
+        this.arrowRight.style.visibility = "visible";
     }
+    this.horizontal.style.position = "relative";
+    this.horizontal.style.width = size.width + "px";
+    this.horizontal.style.left = position.x + "px";
 
-    if (THREADVIS.SVG) {
-        var matrix = this.stack.transform.baseVal.getConsolidationMatrix();
-        var movedX = Math.abs(matrix.e);
-        var movedY = Math.abs(matrix.f);
+    if (size.hideVertical) {
+        this.boxVertical.style.visibility= "hidden";
+        this.arrowUp.style.visibility= "hidden";
+        this.arrowDown.style.visibility= "hidden";
     } else {
-        var movedX = Math.abs(parseFloat(this.stack.style.marginLeft));
-        var movedY = Math.abs(parseFloat(this.stack.style.marginTop));
+        this.boxVertical.style.visibility= "visible";
+        this.arrowUp.style.visibility= "visible";
+        this.arrowDown.style.visibility= "visible";
     }
+    this.vertical.style.position = "relative";
+    this.vertical.style.height = size.height + "px";
+    this.vertical.style.top = position.y + "px";
+}
 
-    var x = (movedX / stackWidth) * boxWidth;
-    var y = (movedY / stackHeight) * boxHeight;
 
-    var position = new Object()
-    position.x = x;
-    position.y = y;
 
-    return position;
+/** ****************************************************************************
+ * Get width of horizontal scrollbar
+ ******************************************************************************/
+Scrollbar.prototype.getScrollBarHorizontalWidth = function() {
+    return  this.boxHorizontal.boxObject.width - 2;
+}
+
+
+
+/** ****************************************************************************
+ * Get vertical scrollbar height
+ ******************************************************************************/
+Scrollbar.prototype.getScrollBarVerticalHeight = function() {
+    return  this.boxVertical.boxObject.height - 2;
+}
+
+
+
+/** ****************************************************************************
+ * Get height of stack (visualisation)
+ ******************************************************************************/
+Scrollbar.prototype.getStackHeight = function() {
+    if (THREADVIS.SVG) {
+        return this.stack.getBBox().height;
+    } else {
+        return this.stack.boxObject.height;
+    }
+}
+
+
+
+/** ****************************************************************************
+ * Get width of stack (visualisation)
+ ******************************************************************************/
+Scrollbar.prototype.getStackWidth = function() {
+    if (THREADVIS.SVG) {
+        return this.stack.getBBox().width;
+    } else {
+        return this.stack.boxObject.width;
+    }
+}
+
+
+
+/** ****************************************************************************
+ * Get height of viewport (box)
+ ******************************************************************************/
+Scrollbar.prototype.getTotalHeight = function() {
+    return this.box.boxObject.height;
+}
+
+
+
+/** ****************************************************************************
+ * Get width of viewport (box)
+ ******************************************************************************/
+Scrollbar.prototype.getTotalWidth = function() {
+    return this.box.boxObject.width;
+}
+
+
+
+/** ****************************************************************************
+ * Init height of scrollbars
+ ******************************************************************************/
+Scrollbar.prototype.init = function(box) {
+    this.box = box;
 }
 
 
@@ -175,38 +294,8 @@ Scrollbar.prototype.onMouseMoveHorizontal = function(event) {
     if (this.panningHorizontal) {
         var x = event.clientX;
         var dx = x - this.startX;
-        var currentX = parseFloat(this.horizontal.style.left);
-        if (currentX == "") {
-            currentX = 0;
-        }
-        dx = parseInt(currentX) + parseInt(dx);
         this.startX = x;
-
-        var barWidth = this.horizontal.boxObject.width;
-        var totalWidth = this.totalWidth;
-
-        if (dx < 0) {
-            dx = 0;
-        }
-
-        if (dx + barWidth > totalWidth) {
-            dx = totalWidth - barWidth;
-        }
-
-        this.horizontal.style.left = dx + "px";
-
-        var boxWidth = this.box.boxObject.width;
-        if (THREADVIS.SVG) {
-            var stackWidth = this.stack.getBBox().width;
-        } else {
-            var stackWidth = this.stack.boxObject.width;
-        }
-        var multiplicator = -1 * stackWidth / boxWidth;
-
-        var position = new Object();
-        position.x = dx * multiplicator;
-
-        this.visualisation.moveVisualisationTo(position);
+        this.panHorizontal(dx);
     }
 }
 
@@ -246,38 +335,9 @@ Scrollbar.prototype.onMouseMoveVertical = function(event) {
     if (this.panningVertical) {
         var y = event.clientY;
         var dy = y - this.startY;
-        var currentY = parseFloat(this.vertical.style.top);
-        if (currentY == "") {
-            currentY = 0;
-        }
-        dy = parseInt(currentY) + parseInt(dy);
+
         this.startY = y;
-
-        var barHeight = this.vertical.boxObject.height;
-        var totalHeight = this.totalHeight;
-
-        if (dy < 0) {
-            dy = 0;
-        }
-
-        if (dy + barHeight > totalHeight) {
-            dy = totalHeight - barHeight;
-        }
-
-        this.vertical.style.top = dy + "px";
-
-        var boxHeight = this.box.boxObject.height;
-        if (THREADVIS.SVG) {
-            var stackHeight = this.stack.getBBox().height;
-        } else {
-            var stackHeight = this.stack.boxObject.height;
-        }
-        var multiplicator = -1 * stackHeight / boxHeight;
-
-        var position = new Object();
-        position.y = dy * multiplicator;
-
-        this.visualisation.moveVisualisationTo(position);
+        this.panVertical(dy);
     }
 }
 
@@ -304,4 +364,103 @@ Scrollbar.prototype.onMouseDownVertical = function(event) {
  ******************************************************************************/
 Scrollbar.prototype.onMouseUpVertical = function(event) {
     this.panningVertical = false;
+}
+
+
+
+/** ****************************************************************************
+ * React on click on "down" button
+ ******************************************************************************/
+Scrollbar.prototype.panDown = function() {
+    this.panVertical(1);
+}
+
+
+
+/** ****************************************************************************
+ * Do horizontal panning by dx
+ ******************************************************************************/
+Scrollbar.prototype.panHorizontal = function(dx) {
+    var currentX = parseFloat(this.horizontal.style.left);
+    if (currentX == "") {
+        currentX = 0;
+    }
+    dx = parseInt(currentX) + parseInt(dx);
+
+    var barWidth = this.horizontal.boxObject.width;
+
+    if (dx < 0) {
+        dx = 0;
+    }
+
+    if (dx + barWidth > this.getScrollBarHorizontalWidth()) {
+        dx = this.getScrollBarHorizontalWidth() - barWidth;
+    }
+    this.horizontal.style.left = dx + "px";
+
+    var multiplicator = -1 * this.getStackWidth() / this.getTotalWidth();
+
+    var position = new Object();
+    position.x = dx * multiplicator;
+    this.visualisation.moveVisualisationTo(position);
+}
+
+
+
+/** ****************************************************************************
+ * React on click on "left" button
+ ******************************************************************************/
+Scrollbar.prototype.panLeft = function() {
+    this.panHorizontal(-1);
+}
+
+
+
+/** ****************************************************************************
+ * React on click on "right" button
+ ******************************************************************************/
+Scrollbar.prototype.panRight = function() {
+    this.panHorizontal(1);
+}
+
+
+
+/** ****************************************************************************
+ * React on click on "up" button
+ ******************************************************************************/
+Scrollbar.prototype.panUp = function() {
+    this.panVertical(-1);
+}
+
+
+
+/** ****************************************************************************
+ * Do vertical panning by dy
+ ******************************************************************************/
+Scrollbar.prototype.panVertical = function(dy) {
+    var currentY = parseFloat(this.vertical.style.top);
+    if (currentY == "") {
+        currentY = 0;
+    }
+    dy = parseInt(currentY) + parseInt(dy);
+
+    var barHeight = this.vertical.boxObject.height;
+
+    if (dy < 0) {
+        dy = 0;
+    }
+
+    if (dy + barHeight > this.getScrollBarVerticalHeight()) {
+        dy = this.getScrollBarVerticalHeight() - barHeight;
+    }
+
+    this.vertical.style.top = dy + "px";
+
+    var boxHeight = this.box.boxObject.height;
+    var multiplicator = -1 * this.getStackHeight() / this.getTotalHeight();
+
+    var position = new Object();
+    position.y = dy * multiplicator;
+
+    this.visualisation.moveVisualisationTo(position);
 }

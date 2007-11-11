@@ -59,26 +59,45 @@
             <hbox>
                 <vbox>
                     <vbox id="ThreadVisBox" 
-                        style='width: 300px; max-width: 300px; height: 1px; overflow: hidden;'
+                        style="width: 300px; max-width: 300px; height: 1px; overflow: hidden;"
                         context="ThreadVisPopUp" flex="1" />
-                    <vbox style="height: 5px;">
+                    <hbox style="height: 5px;">
+                        <hbox id="ThreadVisScrollbarLeft"
+                            style="width: 6px; height: 5px; padding-right: 1px; visibility: hidden;">
+                            <image src="chrome://threadvis/content/images/arrowleft.png"
+                                style="width: 5px; height: 5px;" />
+                        </hbox>
                         <stack id="ThreadVisScrollbarHorizontalBox"
-                            style="background: #cccccc; border: 1px solid #333333;"
-                            hidden="true">
+                            style="background: #cccccc; border: 1px solid #333333; height: 5px; visibility: hidden" flex="1">
                             <box id="ThreadVisScrollbarHorizontal"
                                 style="height: 3px; background: #333333; cursor: e-resize;" />
                         </stack>
-                    </vbox>
+                        <hbox id="ThreadVisScrollbarRight"
+                            style="width: 6px; height: 5px; padding-left: 1px; visibility: hidden;">
+                            <image src="chrome://threadvis/content/images/arrowright.png"
+                                style="width: 5px; height: 5px;" />
+                        </hbox>
+                    </hbox>
                 </vbox>
                 <vbox>
-                    <hbox style="width: 5px;" flex="1">
+                    <vbox style="width: 5px;" flex="1">
+                        <hbox id="ThreadVisScrollbarUp"
+                            style="width: 5px; height: 6px; padding-bottom: 1px; visibility: hidden;">
+                            <image src="chrome://threadvis/content/images/arrowtop.png"
+                                style="width: 5px; height: 5px;" />
+                        </hbox>
                         <stack id="ThreadVisScrollbarVerticalBox"
-                            style="background: #cccccc; border: 1px solid #333333;"
-                            hidden="true">
+                            style="background: #cccccc; border: 1px solid #333333; visibility: hidden;"
+                            flex="1">
                             <box id="ThreadVisScrollbarVertical"
                                 style="width: 3px; background: #333333; cursor: s-resize;" />
                         </stack>
-                    </hbox>
+                        <hbox id="ThreadVisScrollbarDown"
+                            style="width: 5px; height: 6px; padding-top: 1px; visibility: hidden;">
+                            <image src="chrome://threadvis/content/images/arrowbottom.png"
+                                style="width: 5px; height: 5px;" />
+                        </hbox>
+                    </vbox>
                     <hbox style="height: 5px;" />
                 </vbox>
             </hbox>

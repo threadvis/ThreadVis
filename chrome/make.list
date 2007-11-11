@@ -28,6 +28,10 @@ content/Timeline.js
 content/TimelineSVG.js
 content/Visualisation.js
 content/images/about.png
+content/images/arrowbottom.png
+content/images/arrowleft.png
+content/images/arrowright.png
+content/images/arrowtop.png
 content/images/icon.png
 content/images/legend.png
 content/images/minus.png
