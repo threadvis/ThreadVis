@@ -68,7 +68,8 @@
                                 style="width: 5px; height: 5px;" />
                         </hbox>
                         <stack id="ThreadVisScrollbarHorizontalBox"
-                            style="background: #cccccc; border: 1px solid #333333; height: 5px; visibility: hidden" flex="1">
+                            style="background: #cccccc; border: 1px solid #333333; height: 5px; visibility: hidden"
+                            flex="1">
                             <box id="ThreadVisScrollbarHorizontal"
                                 style="height: 3px; background: #333333; cursor: e-resize;" />
                         </stack>

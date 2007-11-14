@@ -517,12 +517,18 @@ ContainerVisualisation.prototype.onMouseClick = function(event) {
 
     var container = event.target.container;
     if (container && ! container.isDummy()) {
-        if (THREADVIS.isMessageWindow()) {
-            SelectFolder(container.getMessage().getFolder());
-            LoadMessageByMsgKey(container.getMessage().getKey());
-            THREADVIS.visualise(container);
+        // check to see if this visualisation is in the popup window
+        // if so, call functions in opener
+        var elem = window;
+        if (THREADVIS.isPopupVisualisation()) {
+            elem = window.opener;
+        }
+        if (elem.THREADVIS.isMessageWindow()) {
+            elem.SelectFolder(container.getMessage().getFolder());
+            elem.LoadMessageByMsgKey(container.getMessage().getKey());
+            elem.THREADVIS.visualise(container);
         } else {
-            THREADVIS.callback(container.getMessage().getKey(),
+            elem.THREADVIS.callback(container.getMessage().getKey(),
                 container.getMessage().getFolder());
         }
     }

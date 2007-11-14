@@ -113,6 +113,24 @@ function Scrollbar(visualisation, stack, box) {
         clearInterval(ref.leftPanInterval);
         clearInterval(ref.rightPanInterval);
     }, false);
+
+    // on resize, reset size of scrollbars
+    window.addEventListener("resize", function(event) {
+        ref.resize();
+    }, false);
+}
+
+
+
+/** ****************************************************************************
+ * Reset size of scrollbar to 0 on window resize.
+ * Otherwise, window can't be resized to a size smaller than the
+ * scrollbars.
+ ******************************************************************************/
+Scrollbar.prototype.resize = function() {
+    this.vertical.style.height = "0px";
+    this.horizontal.style.width = "0px";
+    this.draw();
 }
 
 
@@ -228,7 +246,7 @@ Scrollbar.prototype.getScrollBarHorizontalWidth = function() {
  * Get vertical scrollbar height
  ******************************************************************************/
 Scrollbar.prototype.getScrollBarVerticalHeight = function() {
-    return  this.boxVertical.boxObject.height - 2;
+    return this.boxVertical.boxObject.height - 2;
 }
 
 

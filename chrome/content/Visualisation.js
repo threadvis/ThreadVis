@@ -178,6 +178,7 @@ Visualisation.prototype.checkSize = function() {
         this.box.boxObject.width != this.boxWidth) {
         this.resetStack();
         this.visualise();
+        
     }
 
     this.boxHeight = this.box.boxObject.height;

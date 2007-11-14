@@ -383,21 +383,6 @@ ThreadVis.prototype.displayVisualisationWindow = function() {
 
 
 /** ****************************************************************************
- * return true if popup exists, false otherwise
- ******************************************************************************/
-ThreadVis.prototype.hasPopupVisualisation = function() {
-    if (this.threadvisParent) {
-        return this.threadvisParent.hasPopupVisualisation();
-    }
-    if (this.popupWindow != null && ! this.popupWindow.closed) {
-        return true;
-    }
-    return false;
-}
-
-
-
-/** ****************************************************************************
  * Get legend object
  ******************************************************************************/
 ThreadVis.prototype.getLegend = function() {
@@ -420,10 +405,40 @@ ThreadVis.prototype.getMainWindow = function() {
         if (typeof(w.GetThreadTree) == "function") {
             return w;
         }
-        w = window.opener;
+        w = w.opener;
     }
 
     return null;
+}
+
+
+
+/** ****************************************************************************
+ * Get popup visualisation
+ ******************************************************************************/
+ThreadVis.prototype.getPopupVisualisation = function() {
+    if (this.popupWindow != null && ! this.popupWindow.closed) {
+        return this.popupWindow;
+    }
+    if (this.threadvisParent) {
+        return this.threadvisParent.getPopupVisualisation();
+    }
+    return null;
+}
+
+
+
+/** ****************************************************************************
+ * return true if popup exists, false otherwise
+ ******************************************************************************/
+ThreadVis.prototype.hasPopupVisualisation = function() {
+    if (this.popupWindow != null && ! this.popupWindow.closed) {
+        return true;
+    }
+    if (this.threadvisParent) {
+        return this.threadvisParent.hasPopupVisualisation();
+    }
+    return false;
 }
 
 
@@ -575,6 +590,15 @@ ThreadVis.prototype.isMessageWindow = function() {
     } else {
         return false;
     }
+}
+
+
+
+/** ****************************************************************************
+ * return true if in popup
+ ******************************************************************************/
+ThreadVis.prototype.isPopupVisualisation = function() {
+    return document.documentElement.id == "ThreadVisPopup";
 }
 
 
@@ -772,7 +796,7 @@ ThreadVis.prototype.visualise = function(container) {
         this.logger.logDebug(this.logger.LEVEL_INFO,
             "ThreadVis.visualise()", {"container" : container});
     }
-    
+
     var msgKey = container.isDummy() ? "DUMMY" : container.getMessage().getKey();
     var topContainerMsgKey = container.getTopContainer().isDummy() ? "DUMMY" :
         container.getTopContainer().getMessage().getKey();
@@ -780,6 +804,11 @@ ThreadVis.prototype.visualise = function(container) {
 
     this.logger.log("visualise", {"msgkey" : msgKey, "top container" : 
         topContainerMsgKey, "msgcount" : msgCount});
+
+    if (this.hasPopupVisualisation() && ! this.isPopupVisualisation()) {
+        this.getPopupVisualisation().THREADVIS.visualise(container);
+        return;
+    }
 
     this.clear = false;
     this.createBox();
