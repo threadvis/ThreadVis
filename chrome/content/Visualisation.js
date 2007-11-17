@@ -1859,6 +1859,7 @@ Visualisation.prototype.exportToSVG = function(container, force) {
             for (var i in tmpChildren) {
                 scriptChildren += "'" + tmpChildren[i].svgId + "',";
             }
+            scriptChildren = scriptChildren.substring(0, scriptChildren.length - 1);
         }
         var parent = thisContainer.getParent();
         if (parent) {
@@ -1875,7 +1876,7 @@ Visualisation.prototype.exportToSVG = function(container, force) {
             + "id:'" + thisContainer.svgId + "',"
             + "children:[" + scriptChildren + "],"
             + "parent:'" + parent + "',"
-            + "author:'" + author + "',"
+            + "author:'" + author.replace(/\'/g, "") + "',"
             + "date:'" + date + "'};";
     }
 
