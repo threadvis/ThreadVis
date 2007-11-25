@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+
+<!--
+/** ****************************************************************************
+ * About.xul
+ *
+ * (c) 2007 Alexander C. Hubmann-Haidvogel
+ *
+ * XUL file to display information about ThreadVis
+ *
+ * $Id$
+ ******************************************************************************/
+-->
+<?xml-stylesheet href="chrome://threadvis/content/About.css" type="text/css"?>
+
+
+
+<!DOCTYPE overlay SYSTEM "chrome://threadvis/locale/ThreadVisAbout.dtd">
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<wizard id="ThreadVisAbout" title="&window.title;"
+    persist="width height screenX screenY"
+    width="500"
+    height="400"
+    onload="loadAboutPreference(); buildAccountList();"
+    onwizardfinish="saveAboutSettings();"
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+    <script type="application/x-javascript"
+        src="chrome://threadvis/content/Settings.js" />
+
+    <wizardpage description="">
+        <label value="&about.name;" id="extensionName" />
+        <hbox>
+            <image src="chrome://threadvis/content/images/about.png" />
+        </hbox>
+        <label value="&about.version; &extension.version;"
+            id="aboutVersion" />
+        <description id="aboutDescription">
+            &about.description;
+        </description>
+        <label id="aboutCopyright">
+            &about.copyright;
+        </label>
+        <label value="&about.email;" onclick="writeEmail();"
+            id="aboutEmail" />
+        <label href="&about.homepage;"
+            value="&about.homepage;"
+            onclick="openURL(event.target.getAttribute('href'));"
+            id="aboutHomepage" />
+        <separator class="thin" />
+    </wizardpage>
+
+    <wizardpage description="&wizard.about.title;">
+        <description>&wizard.about.1;</description>
+        <description>&wizard.about.2;</description>
+        <hbox>
+            <image src="chrome://threadvis/locale/ui.png" width="400" height="102" />
+        </hbox>
+        <description>&wizard.about.3;</description>
+    </wizardpage>
+
+    <wizardpage description="&wizard.workings.title;">
+        <description>&wizard.workings.1;</description>
+        <description>&wizard.workings.2;</description>
+    </wizardpage>
+
+    <wizardpage description="&wizard.accounts.title;">
+        <description>&wizard.accounts.1;</description>
+        <textbox id="hiddenDisabledAccounts"
+            preference="extensions.threadvis.disabledaccounts"
+            hidden="true" />
+        <groupbox>
+            <vbox id="enableAccounts"
+                style="overflow: auto;"
+                class="indent" />
+            <textbox id="hiddenDisabledFolders"
+                preference="extensions.threadvis.disabledfolders"
+                hidden="true" />
+        </groupbox>
+    </wizardpage>
+
+    <wizardpage description="&wizard.thesis.title;">
+        <description>&wizard.thesis.1;</description>
+        <description>&wizard.thesis.2;</description>
+        <description>&wizard.thesis.3;</description>
+        <checkbox id="logging" label="&wizard.thesis.logging;" checked="false" />
+    </wizardpage>
+
+    <wizardpage description="&wizard.end.title;">
+        <description>&wizard.end.1;</description>
+        <checkbox id="donotshowagain"
+            label="&wizard.end.showagain;" checked="true" />
+    </wizardpage>
+</wizard>

@@ -67,6 +67,26 @@ Set settingsDtd = fso.OpenTextFile("locale\en-US\Settings.dtd", 2)
 settingsDtd.write(contentEnNew)
 settingsDtd.close
 
+Set aboutDtd = fso.OpenTextFile("locale\de-DE\ThreadVisAbout.dtd")
+aboutDe = aboutDtd.ReadAll
+aboutDeNew = Replace(aboutDe, "<<build>>", revision)
+aboutDeNew = Replace(aboutDeNew, "<<version>>", version)
+aboutDtd.Close
+
+Set aboutDtd = fso.OpenTextFile("locale\de-DE\ThreadVisAbout.dtd", 2)
+aboutDtd.write(aboutDeNew)
+aboutDtd.Close
+
+Set aboutDtd = fso.OpenTextFile("locale\en-US\ThreadVisAbout.dtd")
+aboutEn = aboutDtd.ReadAll
+aboutEnNew = Replace(aboutEn, "<<build>>", revision)
+aboutEnNew = Replace(aboutEnNew, "<<version>>", version)
+aboutDtd.Close
+
+Set aboutDtd = fso.OpenTextFile("locale\en-US\ThreadVisAbout.dtd", 2)
+aboutDtd.write(aboutEnNew)
+aboutDtd.Close
+
 Set logger = fso.OpenTextFile("content\Logger.js")
 loggerText = logger.ReadAll
 loggerTextNew = Replace(loggerText, "<<build>>", revision)
@@ -76,6 +96,8 @@ logger.Close
 Set logger = fso.OpenTextFile("content\Logger.js", 2)
 logger.write(loggerTextNew)
 logger.close
+
+WScript.Sleep 2000
 
 ' ========================================================================
 ' Create JAR file
@@ -95,6 +117,14 @@ settingsDtd.Close
 Set settingsDtd = fso.OpenTextFile("locale\en-US\Settings.dtd", 2)
 settingsDtd.write(contentEn)
 settingsDtd.Close
+
+Set aboutDtd = fso.OpenTextFile("locale\de-DE\ThreadVisAbout.dtd", 2)
+aboutDtd.Write(aboutDe)
+aboutDtd.Close
+
+Set aboutDtd = fso.OpenTextFile("locale\en-US\ThreadVisAbout.dtd", 2)
+aboutDtd.Write(aboutEn)
+aboutDtd.Close
 
 Set logger = fso.OpenTextFile("content\Logger.js", 2)
 logger.write(loggerText)

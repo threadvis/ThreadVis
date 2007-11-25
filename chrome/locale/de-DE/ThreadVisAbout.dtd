@@ -1,0 +1,37 @@
+<!--
+/* *******************************************************
+ * ThreadVisAbout.dtd
+ *
+ * (c) 2007 Alexander C. Hubmann-Haidvogel
+ *
+ * DTD file containing DE localisation of UI elements
+ *
+ * $Id$
+ ********************************************************/
+-->
+<!ENTITY window.title                                       "ThreadVis">
+<!ENTITY about.title                                        "&#xDC;ber ThreadVis">
+<!ENTITY about.version                                      "Version">
+<!ENTITY about.description                                  "Zeigt eine kleine Grafik, die den Kontext (Thread) der aktuell angezeigten Nachricht visualisiert.">
+<!ENTITY about.copyright                                    "&#xA9; 2004-2007 Alexander C. Hubmann &#xA9; 2007 Alexander C. Hubmann-Haidvogel">
+<!ENTITY about.homepage                                     "http://www.student.tugraz.at/ahubmann/threadvis/">
+<!ENTITY about.email                                        "ahubmann@gmail.com">
+<!ENTITY about.name                                         "ThreadVis">
+<!ENTITY extension.version                                  "<<version>>.<<build>>">
+<!ENTITY wizard.about.title                                 "&#xDC;ber die Visualisierung">
+<!ENTITY wizard.about.1                                     "Das Add-on f&#xFC;gt eine Visualisierung des aktuellen Threads in den Header-Bereich der Email-Ansicht ein. Diese Visualisierung stellt alle Nachrichten der aktuellen Konversation kompakt und &#xFC;bersichtlich dar.">
+<!ENTITY wizard.about.2                                     "&#xDC;ber die entsprechenden Buttons kann die Visualisierung verg&#xF6;&#xDF;ert oder verkleinert und in einem eigenen Popup-Window dargestellt werden. Eine Legende gibt zus&#xE4;tzliche Informationen.">
+<!ENTITY wizard.about.3                                     "Die Visualisierung kann auch zur Navigation zwischen den einzelnen Nachrichten des Threads verwendet werden.">
+<!ENTITY wizard.workings.title                              "Funktionsweise">
+<!ENTITY wizard.workings.1                                  "Beim ersten Start analysiert die Erweiterung alle vorhandenen Nachrichten und speichert die ben&#xF6;tigten Informationen in einem Cache ab. Dadurch ist keine erneute Berechnung f&#xFC;r bereits analysierte Nachrichten notwendig, nur neu empfangene Nachrichten werden im Hintergrund analysiert.">
+<!ENTITY wizard.workings.2                                  "Zus&#xE4;tzlich k&#xF6;nnen die Ordner, f&#xFC;r die die Erweiterung aktiviert werden soll, im n&#xE4;chsten Schritt ausgew&#xE4;hlt werden.">
+<!ENTITY wizard.accounts.title                              "Aktivierte Accounts/Ordner">
+<!ENTITY wizard.accounts.1                                  "Bitte w&#xE4;hlen Sie unten die Accounts/Order aus, f&#xFC;r die die Erweiterung aktiviert werden soll:">
+<!ENTITY wizard.thesis.title                                "Meine Diplomarbeit">
+<!ENTITY wizard.thesis.1                                    "Dieses Add-on ist Teil meiner Diplomarbeit. Ebenso ist eine anonyme Studie &#xFC;ber die Verwendung der Erweiterung Teil der Arbeit.">
+<!ENTITY wizard.thesis.2                                    "Daf&#xFC;r ben&#xF6;tige ich Mithilfe: Bitte aktivieren Sie unten das Sammeln von Informationen &#xFC;ber die Verwendung. Damit speichert das Add-on anonyme Daten in einer Log-Datei. Bitte schicken Sie mir diese Log-Datei in regelm&#xE4;&#xDF;igen Abst&#xE4;nden zu (die Erweiterung wird Sie daran erinnern).">
+<!ENTITY wizard.thesis.3                                    "Wenn die Checkbox nicht aktiviert ist, werden keinerlei Informationen gesammelt.">
+<!ENTITY wizard.thesis.logging                              "Logging aktivieren">
+<!ENTITY wizard.end.title                                   "">
+<!ENTITY wizard.end.1                                       "Alle hier getroffenen Einstellungen und noch weitere k&#xF6;nnen jederzeit in den Settings des Add-ons ge&#xE4;ndert werden. &#xD6;ffnen Sie daf&#xFC;r entweder den Einstellungs-Dialog oder klicken Sie rechts auf die Visualisierung und w&#xE4;hlen Sie 'Einstellungen'.">
+<!ENTITY wizard.end.showagain                               "Diese Nachricht nicht wieder anzeigen">

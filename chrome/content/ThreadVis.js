@@ -27,7 +27,7 @@ function createThreadVis() {
         THREADVIS = new ThreadVis(threadvisParent);
         THREADVIS.init();
         window.onerror = THREADVIS.logJavaScriptErrors;
-        setTimeout(function() { THREADVIS.displayNotes(); }, 5000);
+        setTimeout(function() { THREADVIS.displayAbout(); }, 5000);
     }
 }
 
@@ -67,7 +67,9 @@ function ThreadVis(threadvisParent) {
         "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
     this.SVG_NAMESPACE =
         "http://www.w3.org/2000/svg";
-    this.NOTES = 3;
+
+    // increment this to trigger about dialog
+    this.ABOUT = 1;
 
     // store SVG enabled
     this.SVG = false;
@@ -343,16 +345,13 @@ ThreadVis.prototype.displayLegendWindow = function() {
 /** ****************************************************************************
  * Display notes
  ******************************************************************************/
-ThreadVis.prototype.displayNotes = function() {
-    var showedNotes = this.preferences
-        .getPreference(this.preferences.PREF_NOTES);
-    for (var i = showedNotes + 1; i <= this.NOTES; i++) {
-        this.strings = document.getElementById("ThreadVisStrings");
-        var note = this.strings.getString("notes." + i);
-        alert(note);
+ThreadVis.prototype.displayAbout = function() {
+    var showedAbout = this.preferences
+        .getPreference(this.preferences.PREF_ABOUT);
+    if (showedAbout < this.ABOUT) {
+        window.openDialog("chrome://threadvis/content/About.xul",
+            "ThreadVisAbout", "chrome=yes,resizable=false;alwaysRaised=false,dependent=yes");
     }
-    this.preferences.setPreference(this.preferences.PREF_NOTES,
-        this.NOTES, this.preferences.PREF_INT);
 }
 
 

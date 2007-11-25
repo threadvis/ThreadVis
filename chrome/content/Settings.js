@@ -497,3 +497,50 @@ function resetCache() {
     alert(document.getElementById("threadVisStrings")
         .getString("cache.reset.done"));
 }
+
+
+
+/** ****************************************************************************
+ * load preferences in about dialog
+ ******************************************************************************/
+function loadAboutPreference() {
+    var preferences = window.opener.THREADVIS.preferences;
+    var disabledAccounts = preferences.getPreference(
+        preferences.PREF_DISABLED_ACCOUNTS);
+    var disabledFolders = preferences.getPreference(
+        preferences.PREF_DISABLED_FOLDERS);
+    var doLogging = preferences.getPreference(
+        preferences.PREF_LOGGING);
+    document.getElementById("hiddenDisabledAccounts").value = disabledAccounts;
+    document.getElementById("hiddenDisabledFolders").value = disabledFolders;
+    document.getElementById("logging").checked = doLogging;
+}
+
+/** ****************************************************************************
+ * save preferences in about dialog
+ ******************************************************************************/
+function saveAboutSettings() {
+    var disabledAccounts = document
+        .getElementById("hiddenDisabledAccounts").value;
+    var disabledFolders = document
+        .getElementById("hiddenDisabledFolders").value;
+    var doLogging = document.getElementById("logging").checked;
+    var notShowAgain = document.getElementById("donotshowagain").checked;
+
+    var preferences = window.opener.THREADVIS.preferences;
+    var about = window.opener.THREADVIS.ABOUT;
+    preferences.setPreference(
+        preferences.PREF_DISABLED_ACCOUNTS, disabledAccounts,
+        preferences.PREF_STRING);
+    preferences.setPreference(
+        preferences.PREF_DISABLED_FOLDERS, disabledFolders,
+        preferences.PREF_STRING);
+    preferences.setPreference(
+        preferences.PREF_LOGGING, doLogging,
+        preferences.PREF_BOOL);
+    if (notShowAgain) {
+        preferences.setPreference(
+            preferences.PREF_ABOUT, about,
+            preferences.PREF_INT);
+    }
+}

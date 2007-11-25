@@ -1,3 +1,5 @@
+content/About.css
+content/About.xul
 content/ArcVisualisation.js
 content/ArcVisualisationSVG.js
 content/Cache.js
@@ -44,8 +46,12 @@ content/images/window.png
 locale/en-US/contents.rdf
 locale/en-US/Settings.dtd
 locale/en-US/ThreadVis.dtd
+locale/en-US/ThreadVisAbout.dtd
 locale/en-US/ThreadVis.properties
+locale/en-US/ui.png
 locale/de-DE/contents.rdf
 locale/de-DE/Settings.dtd
 locale/de-DE/ThreadVis.dtd
+locale/de-DE/ThreadVisAbout.dtd
 locale/de-DE/ThreadVis.properties
+locale/de-DE/ui.png

@@ -355,7 +355,7 @@
                             <textbox id="hiddenDisabledFolders"
                                 preference="extensions.threadvis.disabledfolders"
                                 hidden="true" />
-                        </groupbox>
+                    </groupbox>
                 </tabpanel>
 
                 <tabpanel id="visualisation.caching" orient="vertical" flex="1">
