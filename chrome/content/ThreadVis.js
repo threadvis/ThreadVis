@@ -343,14 +343,26 @@ ThreadVis.prototype.displayLegendWindow = function() {
 
 
 /** ****************************************************************************
- * Display notes
+ * Display notes and possibly remind of sending email
  ******************************************************************************/
 ThreadVis.prototype.displayAbout = function() {
     var showedAbout = this.preferences
         .getPreference(this.preferences.PREF_ABOUT);
     if (showedAbout < this.ABOUT) {
         window.openDialog("chrome://threadvis/content/About.xul",
-            "ThreadVisAbout", "chrome=yes,resizable=false;alwaysRaised=false,dependent=yes");
+            "ThreadVisAbout", "chrome=yes,resizable=true;alwaysRaised=false,dependent=yes");
+    }
+
+    // remind to send email with log files
+    // when last email is more than 3 days old
+    var lastEmail = parseInt(this.preferences
+        .getPreference(this.preferences.PREF_LOGGING_EMAIL));
+    var logging = this.preferences
+        .getPreference(this.preferences.PREF_LOGGING);
+
+    if (lastEmail + 3 * 24 * 60 * 60 * 1000 < (new Date()).getTime()) {
+        window.openDialog("chrome://threadvis/content/Email.xul",
+            "ThreadVisEmail", "chrome=yes,resizable=false;alwaysRaised=false,dependent=yes");
     }
 }
 

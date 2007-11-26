@@ -516,6 +516,8 @@ function loadAboutPreference() {
     document.getElementById("logging").checked = doLogging;
 }
 
+
+
 /** ****************************************************************************
  * save preferences in about dialog
  ******************************************************************************/
@@ -543,4 +545,26 @@ function saveAboutSettings() {
             preferences.PREF_ABOUT, about,
             preferences.PREF_INT);
     }
+}
+
+
+
+/** ****************************************************************************
+ * set the timestamp when sending log files
+ ******************************************************************************/
+function logRemindTimestamp() {
+    var preferences = window.opener.THREADVIS.preferences;
+    var now = String((new Date()).getTime());
+    preferences.setPreference(
+        preferences.PREF_LOGGING_EMAIL, now, preferences.PREF_STRING);
+}
+
+
+
+/** ****************************************************************************
+ * send the logfiles
+ ******************************************************************************/
+function logRemindEmail() {
+    sendLogfiles();
+    logRemindTimestamp();
 }

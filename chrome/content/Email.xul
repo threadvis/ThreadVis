@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+
+<!--
+/** ****************************************************************************
+ * Email.xul
+ *
+ * (c) 2007 Alexander C. Hubmann-Haidvogel
+ *
+ * XUL file to display information about email logs
+ *
+ * $Id$
+ ******************************************************************************/
+-->
+<?xml-stylesheet href="chrome://threadvis/content/Email.css" type="text/css"?>
+
+
+
+<!DOCTYPE overlay SYSTEM "chrome://threadvis/locale/ThreadVisEmail.dtd">
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<wizard id="ThreadVisEmail" title="&window.title;"
+    persist="width height screenX screenY"
+    width="400"
+    height="250"
+    onload=""
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+    <script type="application/x-javascript"
+        src="chrome://threadvis/content/Settings.js" />
+
+    <wizardpage onpageadvanced="logRemindEmail();">
+        <description>&logfiles.remind;</description>
+    </wizardpage>
+
+    <wizardpage>
+        <description>&logfiles.delete;</description>
+        <button id="resetLog" label="&logfiles.reset.button;"
+            oncommand="resetLogfiles();"
+            tooltiptext="&logfiles.reset.tooltip;" />
+    </wizardpage>
+
+</wizard>

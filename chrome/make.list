@@ -8,6 +8,7 @@ content/ContainerVisualisation.js
 content/ContainerVisualisationSVG.js
 content/contents.rdf
 content/CopyCut.js
+content/Email.xul
 content/Legend.js
 content/Legend.xul
 content/Logger.js
@@ -47,11 +48,13 @@ locale/en-US/contents.rdf
 locale/en-US/Settings.dtd
 locale/en-US/ThreadVis.dtd
 locale/en-US/ThreadVisAbout.dtd
+locale/en-US/ThreadVisEmail.dtd
 locale/en-US/ThreadVis.properties
 locale/en-US/ui.png
 locale/de-DE/contents.rdf
 locale/de-DE/Settings.dtd
 locale/de-DE/ThreadVis.dtd
 locale/de-DE/ThreadVisAbout.dtd
+locale/de-DE/ThreadVisEmail.dtd
 locale/de-DE/ThreadVis.properties
 locale/de-DE/ui.png
