@@ -81,9 +81,9 @@
             <preference id="extensions.threadvis.visualisation.opacity"
                 name="extensions.threadvis.visualisation.opacity"
                 type="int" />
-            <preference id="extensions.threadvis.visualisation.svg"
+            <!--preference id="extensions.threadvis.visualisation.svg"
                 name="extensions.threadvis.visualisation.svg"
-                type="bool" />
+                type="bool" /-->
             <preference id="extensions.threadvis.logging.enabled"
                 name="extensions.threadvis.logging.enabled"
                 type="bool" />
@@ -271,13 +271,13 @@
                                     label=""
                                     preference="extensions.threadvis.visualisation.messagecircles" />
                             </row>
-                            <row>
+                            <!--row>
                                 <label control="visualisationSVG"
                                     value="&visualisation.svg;" />
                                 <checkbox id="visualisationSVG"
                                     label="(beta)"
                                     preference="extensions.threadvis.visualisation.svg" />
-                            </row>
+                            </row-->
                         </rows>
                     </grid>
                     <separator />

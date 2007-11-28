@@ -25,15 +25,30 @@
         src="chrome://threadvis/content/Settings.js" />
 
     <script type="application/x-javascript"><![CDATA[
-    var _elementIDs = ["enableThreadVis", "hiddenDisabledAccounts",
-        "hiddenDisabledFolders", "doTimeScaling", "enableTimeline",
-        "visualisationDotSize", "visualisationArcMinHeight",
-        "visualisationArcRadius", "visualisationArcDifference",
-        "visualisationArcWidth", "visualisationSpacing",
-        "visualisationMessageCircles", "visualisationSVG", "zoomWidth",
-        "zoomHeight", "visualisationColour", "visualisationHighlight",
-        "visualisationOpacity", "doLogging", "doLoggingDebug",
-        "doLoggingDebugLevel", "doLoggingConsole"];
+    var _elementIDs = [
+        "doLogging",
+        "doLoggingDebug",
+        "doLoggingDebugLevel",
+        "doLoggingConsole",
+        "doTimeScaling",
+        "enableThreadVis",
+        "enableTimeline",
+        "hiddenDisabledAccounts",
+        "hiddenDisabledFolders",
+        "visualisationArcDifference",
+        "visualisationArcMinHeight",
+        "visualisationArcRadius",
+        "visualisationArcWidth",
+        "visualisationColour",
+        "visualisationDotSize",
+        "visualisationHighlight",
+        "visualisationMessageCircles",
+        "visualisationOpacity",
+        "visualisationSpacing",
+        /*"visualisationSVG",*/
+        "zoomWidth",
+        "zoomHeight",
+    ];
     ]]>
     </script>
 
@@ -236,7 +251,7 @@
                                     prefstring="extensions.threadvis.visualisation.messagecircles"
                                     preftype="bool" />
                             </row>
-                            <row>
+                            <!--row>
                                 <label control="visualisationSVG"
                                     value="&visualisation.svg;" />
                                 <checkbox id="visualisationSVG"
@@ -244,7 +259,7 @@
                                     preference="extensions.threadvis.visualisation.svg"
                                     prefstring="extensions.threadvis.visualisation.svg"
                                     preftype="bool" />
-                            </row>
+                            </row-->
                         </rows>
                     </grid>
                     <separator />
