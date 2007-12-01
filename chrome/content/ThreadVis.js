@@ -27,7 +27,7 @@ function createThreadVis() {
         THREADVIS = new ThreadVis(threadvisParent);
         THREADVIS.init();
         window.onerror = THREADVIS.logJavaScriptErrors;
-        setTimeout(function() { THREADVIS.displayAbout(); }, 5000);
+        //setTimeout(function() { THREADVIS.displayAbout(); }, 5000);
     }
 }
 
@@ -536,6 +536,9 @@ ThreadVis.prototype.init = function() {
     /* ************************************************************************
      * code below only gets executed if no parent threadvis object was found
      * ***********************************************************************/
+
+    // display about dialog and email reminder only once on each startup
+    setTimeout(function() { THREADVIS.displayAbout(); }, 5000);
 
     // remember msgkey of selected message
     this.selectedMsgKey = "";
