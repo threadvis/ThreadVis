@@ -687,6 +687,7 @@ Threader.prototype.thread = function() {
     // close copy/cut database
     this.copycut.close();
     THREADVIS.setStatus("");
+    this.logInfo();
 }
 
 
@@ -710,39 +711,15 @@ Threader.prototype.logInfo = function() {
         return;
     }
 
-    var time_put_messages_in_container = this.put_messages_in_container_end_ -
-        this.put_messages_in_container_start_;
-    var time_find_rootset = this.find_rootset_end_ -
-        this.find_rootset_start_;
-    var time_prune_empty_containers = this.prune_empty_containers_end_ -
-        this.prune_empty_containers_start_;
-    var time_put_containers_in_subject_table =
-        this.put_containers_in_subject_table_end_ -
-        this.put_containers_in_subject_table_start_;
-    var time_group_by_subject = this.group_by_subject_end_ -
-        this.group_by_subject_start_;
-    var time_total = this.end_ - this.start_;
-
-    //var total_messages = this.messages_.length;
-    var total_messages = this.total_messages_;
-    var time_per_message = time_total / total_messages;
-
-    var num_threads = this.getRoot().getChildCount();
-    var msg_per_thread = total_messages / num_threads;
+    var numThreads = this.getRoot().getChildCount();
+    var totalMessages = this.getRoot().getCountRecursive();
+    var msgPerThread = totalMessages / numThreads;
 
     var distribution = this.getThreadDistribution();
 
-    var timing = {"put messages in container" : time_put_messages_in_container,
-        "find root set" : time_find_rootset,
-        "prune empty containers" : time_prune_empty_containers,
-        "put containers in subject table" : time_put_containers_in_subject_table,
-        "group by subject" : time_group_by_subject, "total" : time_total,
-        "per message" : time_per_message};
-
     THREADVIS.logger.log("threader", {"action" : "end",
-        "total messages" : total_messages, "total threads" : num_threads,
-        "messages per thread" : msg_per_thread, "distribution" : distribution,
-        "timing" : timing});
+        "totalMessages" : totalMessages, "totalThreads" : numThreads,
+        "msgPerThread" : msgPerThread,  "distribution" : distribution});
 }
 
 
