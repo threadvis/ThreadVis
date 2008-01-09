@@ -2,7 +2,7 @@
  * PreferenceObserver.js
  *
  * (c) 2005-2007 Alexander C. Hubmann
- * (c) 2007 Alexander C. Hubmann-Haidvogel
+ * (c) 2007-2008 Alexander C. Hubmann-Haidvogel
  *
  * JavaScript file to react to preference changing events
  *
@@ -26,6 +26,8 @@ function PreferenceObserver() {
     this.PREF_LOGGING_DEBUG_COMPONENT = "logging.debug.component";
     this.PREF_LOGGING_CONSOLE = "logging.console";
     this.PREF_LOGGING_EMAIL = "logging.email";
+    this.PREF_SVG_HEIGHT = "svg.height";
+    this.PREF_SVG_WIDTH = "svg.width";
     this.PREF_TIMELINE = "timeline.enabled";
     this.PREF_TIMESCALING = "timescaling.enabled";
     this.PREF_VIS_DOTSIZE = "visualisation.dotsize";
@@ -150,6 +152,10 @@ PreferenceObserver.prototype.preferenceReload = function() {
         this.prefBranch.PREF_BOOL, false);
     this.loadPreference(this.PREF_LOGGING_EMAIL,
         this.prefBranch.PREF_STRING, "0");
+    this.loadPreference(this.PREF_SVG_HEIGHT,
+        this.prefBranch.PREF_INT, 1000);
+    this.loadPreference(this.PREF_SVG_WIDTH,
+        this.prefBranch.PREF_INT, 1000);
     this.loadPreference(this.PREF_TIMELINE,
         this.prefBranch.PREF_BOOL, true);
     this.loadPreference(this.PREF_TIMESCALING,

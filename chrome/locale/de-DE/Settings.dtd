@@ -61,7 +61,7 @@
 <!ENTITY about.tab                                          "Info">
 <!ENTITY about.version                                      "Version">
 <!ENTITY extension.description                              "Zeigt eine kleine Grafik, die den Kontext (Thread) der aktuell angezeigten Nachricht visualisiert.">
-<!ENTITY extension.copyright                                "&#xA9; 2004-2007 Alexander C. Hubmann &#xA9; 2007 Alexander C. Hubmann-Haidvogel">
+<!ENTITY extension.copyright                                "&#xA9; 2004-2007 Alexander C. Hubmann &#xA9; 2007-2008 Alexander C. Hubmann-Haidvogel">
 <!ENTITY extension.homepage                                 "http://www.student.tugraz.at/ahubmann/threadvis/">
 <!ENTITY extension.email                                    "ahubmann@gmail.com">
 <!ENTITY extension.name                                     "ThreadVis">

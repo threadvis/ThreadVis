@@ -2,7 +2,7 @@
  * Visualisation.js
  *
  * (c) 2005-2007 Alexander C. Hubmann
- * (c) 2007 Alexander C. Hubmann-Haidvogel
+ * (c) 2007-2008 Alexander C. Hubmann-Haidvogel
  *
  * JavaScript file to visualise thread arcs
  *
@@ -1687,6 +1687,10 @@ Visualisation.prototype.exportToSVG = function(container, force) {
         THREADVIS.preferences.PREF_TIMELINE);
     var prefOpacity = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_OPACITY) / 100;
+    var prefWidth = THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_SVG_WIDTH);
+    var prefHeight = THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_SVG_HEIGHT);
 
     // get topmost container
     var topContainer = container.getTopContainer();
@@ -1712,10 +1716,8 @@ Visualisation.prototype.exportToSVG = function(container, force) {
     var bottomHeight = prefDotSize / 2 + prefArcMinHeight
         + preSize.bottomHeight * prefArcDifference;
 
-    var width = prompt(this.strings.getString("visualisation.exportsvg.width"),
-        "1000");
-    var height = prompt(this.strings.getString("visualisation.exportsvg.height")
-        , "1000");
+    var width = prefWidth;
+    var height = prefHeight;
 
     containers = this.timeScaling(containers, minimalTimeDifference, width);
 
