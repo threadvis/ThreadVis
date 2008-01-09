@@ -2,7 +2,7 @@
  * ThreadVisDefault.js
  *
  * (c) 2005-2007 Alexander C. Hubmann
- * (c) 2007 Alexander C. Hubmann-Haidvogel
+ * (c) 2007-2008 Alexander C. Hubmann-Haidvogel
  *
  * default preferences
  *
@@ -34,3 +34,5 @@ pref("extensions.threadvis.visualisation.messagecircles", true);
 pref("extensions.threadvis.zoom.height", 1);
 pref("extensions.threadvis.zoom.width", 1);
 pref("extensions.threadvis.cache.updatetimestamp", "");
+pref("extensions.threadvis.svg.height", 1000);
+pref("extensions.threadvis.svg.width", 1000);
