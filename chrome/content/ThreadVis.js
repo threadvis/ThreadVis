@@ -360,7 +360,8 @@ ThreadVis.prototype.displayAbout = function() {
     var logging = this.preferences
         .getPreference(this.preferences.PREF_LOGGING);
 
-    if (lastEmail + 3 * 24 * 60 * 60 * 1000 < (new Date()).getTime()) {
+    if (logging &&
+        lastEmail + 3 * 24 * 60 * 60 * 1000 < (new Date()).getTime()) {
         window.openDialog("chrome://threadvis/content/Email.xul",
             "ThreadVisEmail", "chrome=yes,resizable=false;alwaysRaised=false,dependent=yes");
     }
