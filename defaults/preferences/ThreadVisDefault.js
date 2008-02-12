@@ -16,7 +16,7 @@ pref("extensions.threadvis.logging.debug", false);
 pref("extensions.threadvis.logging.debug.component", "");
 pref("extensions.threadvis.logging.enabled", false);
 pref("extensions.threadvis.logging.console", false);
-pref("extensions.threadvis.logging.email", 0);
+pref("extensions.threadvis.logging.email", "0");
 pref("extensions.threadvis.about", 0);
 pref("extensions.threadvis.timeline.enabled", true);
 pref("extensions.threadvis.timescaling.enabled", true);
