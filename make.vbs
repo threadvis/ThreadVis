@@ -43,6 +43,11 @@ If fso.fileExists("ThreadVis.xpi") Then
     xpi.Delete
 End If
 
+If fso.fileExists("ThreadVis-addons.mozilla.org.xpi") Then
+    Set xpi = fso.GetFile("ThreadVis-addons.mozilla.org.xpi")
+    xpi.Delete
+End If
+
 ' ========================================================================
 ' Update code with version and revision
 ' ========================================================================
@@ -88,6 +93,24 @@ WScript.Sleep 1000
 ' ========================================================================
 
 shell.Exec("c:\Programme\7-Zip\7z a -tzip ThreadVis.xpi @make.list")
+
+WScript.Sleep 1000
+
+' ========================================================================
+' Create XPI file for addons.mozilla.org
+' ========================================================================
+
+installRdfNew = Replace(installRdfNew, "<em:updateURL>http://www.student.tugraz.at/ahubmann/threadvis/update.rdf</em:updateURL>", "")
+
+Set installRdfFile = fso.OpenTextFile("install.rdf", 2)
+installRdfFile.write(installRdfNew)
+installRdfFile.Close
+
+' ========================================================================
+' Create XPI file for addons.mozilla.org
+' ========================================================================
+
+shell.Exec("c:\Programme\7-Zip\7z a -tzip ThreadVis-addons.mozilla.org.xpi @make.list")
 
 WScript.Sleep 1000
 
