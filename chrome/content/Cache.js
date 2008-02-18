@@ -552,6 +552,7 @@ Cache.prototype.addSubFolders = function(searchSession, folder) {
                     & MSG_FOLDER_FLAG_VIRTUAL)) {
                     if (!nextFolder.noSelect &&
                         this.threadvis.checkEnabledAccountOrFolder(nextFolder)) {
+                        nextFolder.updateFolder(msgWindow);
                         var searchScope = nextFolder.server.searchScope;
                         if (searchScope == nsMsgSearchScope.onlineMail) {
                             // ??? FIXXME
