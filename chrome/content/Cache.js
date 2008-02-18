@@ -225,6 +225,7 @@ Cache.prototype.searchInSubFolder = function(folder, messageId) {
             }
 
             if (!msgHdr) {
+                subfolder.updateFolder(msgWindow);
                 try {
                     msgDB = subfolder.getMsgDatabase(msgWindow);
                 } catch (ex) {
