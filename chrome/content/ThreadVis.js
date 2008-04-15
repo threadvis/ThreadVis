@@ -87,6 +87,26 @@ function ThreadVis(threadvisParent) {
     // cache enabled account/folder
     this.cacheKeyCheckEnabledAccountOrFolder = null;
     this.cacheValueCheckEnabledAccountOrFolder = null;
+
+    // remember all local accounts, for sent-mail comparison
+    var accountManager = Components.classes["@mozilla.org/messenger/account-manager;1"]
+        .getService(Components.interfaces.nsIMsgAccountManager);
+    var identities = accountManager.allIdentities.QueryInterface(
+        Components.interfaces.nsICollection).Enumerate();
+    var done = false;
+    this.sentMailIdentities = new Object();
+    while (! done) {
+        var identity = identities.currentItem().QueryInterface(
+            Components.interfaces.nsIMsgIdentity);
+        if (identity) {
+            this.sentMailIdentities[identity.email] = true;
+        }
+        try {
+            identities.next();
+        } catch (e) {
+            done = true;
+        }
+    }
 }
 
 
@@ -120,13 +140,9 @@ ThreadVis.prototype.addMessage = function(header) {
         header.mime2DecodedAuthor, header.messageId, header.messageKey, date,
         header.folder.URI, header.getStringProperty("references"), false);
 
-    var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
-        .getService(Components.interfaces.nsIMsgAccountManager))
-        .FindAccountForServer(header.folder.server);
-
     // see if msg is a sent mail
     var issent = IsSpecialFolder(header.folder, MSG_FOLDER_FLAG_SENTMAIL, true)
-        || account.defaultIdentity.email == message.getFromEmail();
+        || this.sentMailIdentities[message.getFromEmail()] == true;
 
     message.setSent(issent);
     this.getThreader().addMessage(message);
