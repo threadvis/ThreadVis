@@ -262,6 +262,27 @@ ContainerVisualisation.prototype.createToolTip = function() {
 
 
 /** ****************************************************************************
+ * format a datetime
+ ******************************************************************************/
+ContainerVisualisation.prototype.formatDate = function(date) {
+    var dateFormatService = Components.classes["@mozilla.org/intl/scriptabledateformat;1"]
+        .getService(Components.interfaces.nsIScriptableDateFormat);
+    var dateString = dateFormatService.FormatDateTime("",
+        dateFormatService.dateFormatShort,
+        dateFormatService.timeFormatNoSeconds,
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        date.getHours(),
+        date.getMinutes(),
+        date.getSeconds());
+
+    return dateString;
+}
+
+
+
+/** ****************************************************************************
  * fill tooltip for container containing information about container
  ******************************************************************************/
 ContainerVisualisation.prototype.getToolTip = function() {
@@ -297,7 +318,8 @@ ContainerVisualisation.prototype.getToolTip = function() {
         date.appendChild(dateText);
         dateLabel.setAttribute("value", this.strings.getString("tooltip.date"));
         dateLabel.style.fontWeight = "bold";
-        dateText.setAttribute("value", this.container.getMessage().getDate());
+        dateText.setAttribute("value", this.formatDate(
+            this.container.getMessage().getDate()));
 
         var subjectLabel = document.createElementNS(THREADVIS.XUL_NAMESPACE,
             "label");
