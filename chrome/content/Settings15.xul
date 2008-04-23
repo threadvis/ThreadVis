@@ -126,9 +126,8 @@
                     </label>
                     <label value="&extension.email;" onclick="writeEmail();"
                         id="aboutEmail" />
-                    <label href="&extension.homepage;"
-                        value="&extension.homepage;"
-                        onclick="openURL(event.target.getAttribute('href'));"
+                    <label value="&extension.homepage;"
+                        onclick="openURL('&extension.homepage;');"
                         id="aboutHomepage" />
                     <separator class="thin" />
                     <groupbox>
