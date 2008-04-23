@@ -347,7 +347,7 @@ ThreadVis.prototype.displayLegendWindow = function() {
     this.logger.log("legend", {"action" : "open"});
 
     if (this.legendWindow != null && ! this.legendWindow.closed) {
-        this.legendWindow.focus();
+        this.legendWindow.close();
         return;
     }
 
