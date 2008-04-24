@@ -70,9 +70,7 @@ Container.prototype.addChild = function(child) {
      */
     if (this.findParent(child)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_ERROR,
-            "Container.addChild()" , {"error" : "tried to create loop",
-            "child container" : child.toString(),
-            "parent container" : this.toString()});
+            "Container.addChild()" , {"error" : "tried to create loop"});
         return;
     }
 
