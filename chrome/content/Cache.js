@@ -13,6 +13,7 @@ function Cache(threadvis) {
     this.threadvis = threadvis;
     this.cacheBuildCount = 0;
     this.updatingCache = false;
+    this.addedMessages = new Array();
     this.newMessages = new Array();
 }
 
@@ -150,6 +151,7 @@ Cache.prototype.putCache = function(container, cache, rootFolder) {
             }
             msg.setStringProperty("X-ThreadVis-Cache", cache);
         }
+        delete msg;
     }
 
     var child = null;
@@ -235,6 +237,8 @@ Cache.prototype.searchInSubFolder = function(folder, messageId) {
                 msgHdr = msgDB.getMsgHdrForMessageID(messageId);
             }
 
+            delete msgDB;
+
             if (msgHdr) {
                 return msgHdr;
             }
@@ -268,6 +272,8 @@ Cache.prototype.updateNewMessages = function(message, doVisualise) {
     this.updateNewMessagesInternal(message, doVisualise, 
         account.key, message.folder.rootFolder);
 
+    delete account;
+
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "updateNewMessages", {"action" : "end"});
@@ -290,10 +296,10 @@ Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
     // check for already running update
     var ref = this;
     if (this.updatingCache) {
-        setTimeout(function() {
+        /*setTimeout(function() {
                 ref.updateNewMessagesInternal(message, doVisualise, accountKey,
                     rootFolder);
-            }, 1000);
+            }, 5000);*/
         return;
     }
 
@@ -347,139 +353,172 @@ Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
             ref.cacheBuildCount++;
         },
         onSearchDone: function(status) {
-            if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-                THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-                    "updateNewMessagesInternal", {"action" : "search done"});
-            }
-            ref.threadvis.setStatus("");
-            ref.setLastUpdateTimestamp(accountKey, newUpdateTimestamp);
-
-            ref.threadvis.threader.thread();
-            var container = ref.threadvis.getThreader()
-                .findContainer(message.messageId);
-
-            if (container) {
-                if (container.isDummy()) {
+            delete searchSession;
+            var util = new Util();
+            util.registerListener({
+                onItem: function(item, count, remaining, timeRemaining) {
+                    if (count % 10 == 0) {
+                        ref.threadvis.setStatus("Adding: " + count + " [" + remaining +
+                            "] " + timeRemaining);
+                    }
+                    ref.threadvis.addMessage(item);
+                    // also add messages from cache to threader, since we re-write
+                    // the cache
+                    ref.getCacheInternal(item, true);
+                    //ref.getCacheInternal(header, false);
+                    if (ref.cacheBuildCount <=1) {
+                        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+                            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_WARNING,
+                                "updateNewMessages", {"action" : "hit",
+                                "subject" : item.mime2DecodedSubject,
+                                "author" : item.mime2DecodedAuthor,
+                                "messageId" : item.messageId});
+                        }
+                    }
                     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-                        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_WARNING,
-                        "updateNewMessages", {"action" : "dummy container found"});
+                        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+                            "updateNewMessages", {"action" : "hit",
+                            "subject" : item.mime2DecodedSubject,
+                            "author" : item.mime2DecodedAuthor,
+                        "messageId" : item.messageId});
                     }
-                    // current message still not found
-                    // somehow it is not cached altough it should have been
-                    // reset last update timestamp to date if this message
-                    ref.threadvis.setStatus(
-                        ref.threadvis.strings.getString("cache.error"));
-
-                    // set last update timestamp just before this message
-                    // set -10 minutes
-                    var messageUpdateTimestamp = message.date - 1000000*60*10;
-
-                    // if we already tried to build cache for this message
-                    // reset to 0 just in case
-                    if (ref.cacheBuildCount > 1) {
-                        messageUpdateTimestamp = 0;
-                    }
-                    ref.setLastUpdateTimestamp(accountKey,
-                        messageUpdateTimestamp);
-
-                    ref.updatingCache = false;
-                    ref.updateNewMessagesInternal(message, doVisualise,
-                        accountKey, rootFolder);
-                    return;
+                },
+                onFinished: function() {
+                    ref.onSearchDone(message, doVisualise, accountKey,
+                        rootFolder, newUpdateTimestamp);
                 }
-
-                ref.updateNewMessagesWriteCache(rootFolder, function() {
-                    if (doVisualise) {
-                        ref.threadvis.visualiseMessage(message);
-                    }
-                });
-
-                ref.cacheBuildCount = 0;
-                ref.updatingCache = false;
-
-            } else {
-                // current message still not found
-                // somehow it is not cached altough it should have been
-                // reset last update timestamp to date if this message
-                ref.threadvis.setStatus(
-                    ref.threadvis.strings.getString("cache.error"));
-
-                // set last update timestamp just before this message
-                // -10 minutes
-                var messageUpdateTimestamp = message.date - 1000000 * 60;
-
-                // if we already tried to build cache for this message
-                // reset to 0 just in case
-                if (ref.cacheBuildCount > 1) {
-                    messageUpdateTimestamp = 0;
-                    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-                        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_ERROR,
-                            "updateNewMessages", {
-                                "action" : "cache error, message not found. reset timestamp to 0.",
-                                "updateTimestamp" : messageUpdateTimestamp,
-                                "date" : new Date(updateTimestamp / 1000),
-                                "subject" : message.mime2DecodedSubject,
-                                "autor" : message.mime2DecodedAutor,
-                                "messageId" : message.messageId,
-                                "messagedate" : message.date
-                            });
-                    }
-                }
-                if (ref.cacheBuildCount > 2) {
-                    ref.threadvis.setStatus(
-                        ref.threadvis.strings.getString("cache.error"));
-                    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-                        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_ERROR,
-                            "updateNewMessages", {
-                                "action" : "cache error, message not found.",
-                                "subject" : message.mime2DecodedSubject,
-                                "autor" : message.mime2DecodedAutor,
-                                "messageId" : message.messageId
-                            });
-                    }
-                    ref.cacheBuildCount = 0;
-                    ref.updatingCache = false;
-                    return;
-                }
-
-                ref.updatingCache = false;
-                ref.setLastUpdateTimestamp(accountKey, messageUpdateTimestamp);
-                ref.updateNewMessagesInternal(message, doVisualise, accountKey,
-                    rootFolder);
-            }
+            });
+            util.process(ref.addedMessages);
         },
         onSearchHit: function(header, folder) {
-            ref.threadvis.setStatus(
-                ref.threadvis.strings.getString("cache.building.status") + count);
-            ref.threadvis.addMessage(header);
-            // also add messages from cache to threader, since we re-write
-            // the cache
-            ref.getCacheInternal(header, true);
-            //ref.getCacheInternal(header, false);
+            if (count % 10 == 0) {
+                ref.threadvis.setStatus(
+                    ref.threadvis.strings.getString("cache.building.status") + count);
+            }
             count++;
             ref.newMessages.push(header);
-            if (ref.cacheBuildCount <=1) {
-                if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-                    THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_WARNING,
-                        "updateNewMessages", {"action" : "hit",
-                            "subject" : header.mime2DecodedSubject,
-                            "author" : header.mime2DecodedAuthor,
-                            "messageId" : header.messageId});
-                }
-            }
-            if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-                THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-                    "updateNewMessages", {"action" : "hit",
-                        "subject" : header.mime2DecodedSubject,
-                        "author" : header.mime2DecodedAuthor,
-                        "messageId" : header.messageId});
-            }
+            ref.addedMessages.push(header);
         }
     });
 
     searchSession.search(null);
 }
 
+
+
+Cache.prototype.onSearchDone = function(message, doVisualise,
+    accountKey, rootFolder, newUpdateTimestamp) {
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "updateNewMessagesInternal", {"action" : "search done"});
+    }
+    this.threadvis.setStatus("");
+    this.setLastUpdateTimestamp(accountKey, newUpdateTimestamp);
+
+    var ref = this;
+    this.threadvis.threader.threadBackground(function() {
+        ref.finishCache(message, doVisualise, accountKey, rootFolder,
+            newUpdateTimestamp);
+    });
+}
+
+
+Cache.prototype.finishCache = function(message, doVisualise, accountKey,
+    rootFolder, newUpdateTimestamp) {
+    var container = this.threadvis.getThreader()
+        .findContainer(message.messageId);
+
+    if (container) {
+        if (container.isDummy()) {
+            if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+                THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_WARNING,
+                    "updateNewMessages", {"action" : "dummy container found"});
+            }
+            // current message still not found
+            // somehow it is not cached altough it should have been
+            // reset last update timestamp to date if this message
+            this.threadvis.setStatus(
+                this.threadvis.strings.getString("cache.error"));
+
+            // set last update timestamp just before this message
+            // set -10 minutes
+            var messageUpdateTimestamp = message.date - 1000000*60*10;
+
+            // if we already tried to build cache for this message
+            // reset to 0 just in case
+            /*if (this.cacheBuildCount > 1) {
+                messageUpdateTimestamp = 0;
+            }*/
+            this.setLastUpdateTimestamp(accountKey,
+                messageUpdateTimestamp);
+
+            this.updatingCache = false;
+            this.updateNewMessagesInternal(message, doVisualise,
+                accountKey, rootFolder);
+            return;
+        }
+
+        var ref = this;
+        this.updateNewMessagesWriteCache(rootFolder, function() {
+            if (doVisualise) {
+                //ref.threadvis.visualiseMessage(message);
+                ref.threadvis.setSelectedMessage();
+            }
+            ref.updatingCache = false;
+            ref.cacheBuildCount = 0;
+        });
+
+    } else {
+        // current message still not found
+        // somehow it is not cached altough it should have been
+        // reset last update timestamp to date if this message
+        this.threadvis.setStatus(
+            this.threadvis.strings.getString("cache.error"));
+
+        // set last update timestamp just before this message
+        // -10 minutes
+        var messageUpdateTimestamp = message.date - 1000000 * 60;
+
+        // if we already tried to build cache for this message
+        // reset to 0 just in case
+        /*if (this.cacheBuildCount > 1) {
+            messageUpdateTimestamp = 0;
+            if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+                THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_ERROR,
+                    "updateNewMessages", {
+                    "action" : "cache error, message not found. reset timestamp to 0.",
+                    "updateTimestamp" : messageUpdateTimestamp,
+                    "date" : new Date(updateTimestamp / 1000),
+                    "subject" : message.mime2DecodedSubject,
+                    "autor" : message.mime2DecodedAutor,
+                    "messageId" : message.messageId,
+                    "messagedate" : message.date
+                });
+            }
+        }*/
+        if (this.cacheBuildCount > 2) {
+            this.threadvis.setStatus(
+                this.threadvis.strings.getString("cache.error"));
+            if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+                THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_ERROR,
+                        "updateNewMessages", {
+                            "action" : "cache error, message not found.",
+                            "subject" : message.mime2DecodedSubject,
+                            "autor" : message.mime2DecodedAutor,
+                            "messageId" : message.messageId
+                });
+            }
+            this.cacheBuildCount = 0;
+            this.updatingCache = false;
+            return;
+        }
+
+        this.updatingCache = false;
+        this.setLastUpdateTimestamp(accountKey, messageUpdateTimestamp);
+        this.updateNewMessagesInternal(message, doVisualise, accountKey,
+            rootFolder);
+    }
+}
 
 
 /** ****************************************************************************
@@ -670,23 +709,34 @@ Cache.prototype.updateNewMessagesWriteCache = function(rootFolder, callback) {
     var ref = this;
     this.updatedTopContainers = new Object();
     util.registerListener({
-        onItem: function(item, count, remaining) {
+        onItem: function(item, count, remaining, timeRemaining) {
             var container = ref.threadvis.getThreader().findContainer(item.messageId);
             if (container == null) {
                 return;
             }
             var topContainer = container.getTopContainer();
-            ref.threadvis.setStatus(
-                ref.threadvis.strings.getString("cache.update.status") + count + " [" + remaining + "]");
+            if (count % 10 == 0) {
+                ref.threadvis.setStatus(
+                    ref.threadvis.strings.getString("cache.update.status")
+                        + count + " [" + remaining + "] " + timeRemaining);
+            }
             if (! ref.updatedTopContainers[topContainer]) {
                 ref.updatedTopContainers[topContainer] = true;
                 ref.updateCache(container, rootFolder);
+                ref.threadvis.getThreader().removeThread(topContainer);
             }
+            delete container;
+            delete topContainer;
         },
         onFinished: function() {
             ref.threadvis.setStatus("Cache done");
-            delete this.newMessages;
-            this.newMessages = new Array();
+            delete ref.newMessages;
+            delete ref.addedMessages;
+            delete ref.updatedTopContainers;
+            ref.newMessages = new Array();
+            ref.addedMessages = new Array();
+            ref.updatedTopContainers = new Object();
+            ref.threadvis.getThreader().reset();
             callback();
         }
     });
@@ -696,8 +746,9 @@ Cache.prototype.updateNewMessagesWriteCache = function(rootFolder, callback) {
 
 
 function Util() {
-    var listener = null;
+    this.listener = null;
     this.count = 0;
+    this.startTime = 0;
 }
 
 Util.prototype.registerListener = function(listener) {
@@ -705,14 +756,87 @@ Util.prototype.registerListener = function(listener) {
 }
 
 Util.prototype.process = function(array) {
+    if (this.startTime == 0) {
+        this.startTime = (new Date()).getTime();
+    }
+    var currentTime = (new Date()).getTime();
     var elem = array.pop();
     var remaining = array.length;
+    var timeRemaining = ((currentTime - this.startTime) / this.count) * remaining;
     var ref = this;
     if (elem) {
         this.count++;
-        this.listener.onItem(elem, this.count, remaining);
-        setTimeout(function() {ref.process(array);}, 1);
+        this.listener.onItem(elem, this.count, remaining,
+            this.formatTimeRemaining(timeRemaining));
+        setTimeout(function() {ref.process(array);}, 0);
     } else {
+        delete array;
+        delete elem;
         this.listener.onFinished();
     }
+}
+
+Util.prototype.formatTimeRemaining = function(remaining) {
+    // remaining is in miliseconds
+    remaining = remaining - (remaining % 1000);
+    remaining = remaining / 1000;
+    var seconds = remaining % 60;
+    remaining = remaining - seconds;
+    remaining = remaining / 60;
+    var minutes = remaining % 60;
+    remaining = remaining - minutes;
+    remaining = remaining / 60;
+    var hours = remaining % 24;
+    remaining = remaining - hours;
+    remaining = remaining / 24;
+    var days = remaining % 365;
+    remaining = remaining - days;
+    remaining = remaining / 365;
+    var years = remaining;
+
+    var strings = THREADVIS.strings;
+
+    var label = "";
+    if (years == 1) {
+        label += years + " " +
+            strings.getString("visualisation.timedifference.year");
+    }
+    if (years > 1) {
+        label += years + " " +
+            strings.getString("visualisation.timedifference.years");
+    }
+    if (days == 1) {
+        label += " " + days + " " +
+            strings.getString("visualisation.timedifference.day");
+    }
+    if (days > 1) {
+        label += " " + days + " " +
+            strings.getString("visualisation.timedifference.days");
+    }
+    if (hours == 1) {
+        label += " " + hours + " " +
+            strings.getString("visualisation.timedifference.hour");
+    }
+    if (hours > 1) {
+        label += " " + hours + " " +
+            strings.getString("visualisation.timedifference.hours");
+    }
+    if (minutes == 1) {
+        label += " " + minutes + " " +
+            strings.getString("visualisation.timedifference.minute");
+    }
+    if (minutes > 1) {
+        label += " " + minutes + " " +
+            strings.getString("visualisation.timedifference.minutes");
+    }
+    if (seconds == 1) {
+        label += " " + seconds + " " +
+            strings.getString("visualisation.timedifference.second");
+    }
+    if (seconds > 1) {
+        label += " " + seconds + " " +
+            strings.getString("visualisation.timedifference.seconds");
+    }
+
+    return label;
 }

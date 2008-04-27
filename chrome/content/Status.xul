@@ -19,7 +19,10 @@
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
     <statusbar id="status-bar">
-        <statusbarpanel id="ThreadVisStatusText" label="" />
+        <statusbarpanel tooltiptext="ThreadVis">
+            <image src="chrome://threadvis/content/images/statusbar.png" />
+            <label id="ThreadVisStatusText" />
+        </statusbarpanel>
     </statusbar> 
 
 </overlay>

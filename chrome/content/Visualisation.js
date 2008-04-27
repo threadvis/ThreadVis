@@ -322,14 +322,60 @@ Visualisation.prototype.convertHSVtoRGB = function(hue, saturation, value) {
                 var varR = var3;
                 var varG = var1;
                 var varB = v;
+                break;
             default:
                 var varR = v;
                 var varG = var1;
                 var varB = var2;
         }
-
         return {"r" : varR * 255, "g" : varG * 255, "b" : varB * 255};
     }
+}
+
+
+
+/** ****************************************************************************
+ * Convert a RGB colour to a HSV colour
+ ******************************************************************************/
+Visualisation.prototype.convertRGBtoHSV = function (r, g, b) {
+    r = r / 255;
+    g = g / 255;
+    b = b / 255;
+    var h = 0;
+    var s = 0;
+    var v = 0;
+
+    var minVal = Math.min(r, g, b);
+    var maxVal = Math.max(r, g, b);
+    var delta = maxVal - minVal;
+
+    var v = maxVal;
+
+    if (delta == 0) {
+        h = 0;
+        s = 0;
+    } else {
+        s = delta / maxVal;
+        var del_R = (((maxVal - r) / 6) + (delta / 2)) / delta;
+        var del_G = (((maxVal - g) / 6) + (delta / 2)) / delta;
+        var del_B = (((maxVal - b) / 6) + (delta / 2)) / delta;
+
+        if (r == maxVal) {
+            h = del_B - del_G;
+        } else if (g == maxVal) {
+            h = (1 / 3) + del_R - del_B;
+        } else if (b == maxVal) {
+            h = (2 / 3) + del_G - del_R;
+        }
+
+        if (h < 0) {
+            h += 1;
+        }
+        if (h > 1) {
+            h -= 1;
+        }
+    }
+    return {"hue" : h * 360, "saturation" : s * 100, "value" : v * 100};
 }
 
 
@@ -381,6 +427,7 @@ Visualisation.prototype.createStack = function() {
             "Visualisation.createStack()", {});
     }
 
+    this.outerBox = document.getElementById("ThreadVis");
     this.box = document.getElementById("ThreadVisBox");
     this.stack = document.getElementById("ThreadVisStack");
     this.strings = document.getElementById("ThreadVisStrings");
@@ -465,6 +512,15 @@ Visualisation.prototype.DECtoHEX = function(dec) {
     var n_ = Math.floor(dec / 16)
     var _n = dec - n_*16;
     return alpha[n_] + alpha[_n];
+}
+
+
+
+/** ****************************************************************************
+ * Get decimal representation of a hexadecimal number
+ ******************************************************************************/
+Visualisation.prototype.HEXtoDEC = function(hex) {
+    return parseInt(hex, 16);
 }
 
 
@@ -758,15 +814,38 @@ Visualisation.prototype.getColour = function(hue, saturation, value) {
 /** ****************************************************************************
  * Get a new colour for the arc
  ******************************************************************************/
-Visualisation.prototype.getNewColour = function() {
-    var hues = new Array(0,90,180,270,45,135,225,315,0,90,180,270,45,135,225,
+Visualisation.prototype.getNewColour = function(sent) {
+    // display sent emails always in the same colour
+    if (sent) {
+        var hex = THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_VIS_COLOURS_SENT);
+        
+    } else {
+        var receivedColours = THREADVIS.preferences.getPreference(
+            THREADVIS.preferences.PREF_VIS_COLOURS_RECEIVED).split(",");
+
+        this.lastColour = (this.lastColour + 1) % receivedColours.length;
+        var hex = receivedColours[this.lastColour];
+    }
+    var hex = hex.substr(1);
+    return this.convertRGBtoHSV(
+        this.HEXtoDEC(hex.substr(0,2)),
+        this.HEXtoDEC(hex.substr(2,2)),
+        this.HEXtoDEC(hex.substr(4,2))
+        );
+    /*
+    if (sent) {
+        return {"hue" : 0, "value" : 100};
+    }
+    var hues = new Array(90,180,270,45,135,225,315,0,90,180,270,45,135,225,
         315,0,90,180,270,45,135,225,315,0,90,180,270,45,135,225,315);
-    var values = new Array(100,100,100,100,60,60,60,60,60,60,60,60,100,
+    var values = new Array(100,100,100,60,60,60,60,60,60,60,60,100,
         100,100,100,80,80,80,80,40,40,40,40,40,40,40,40,80,80,80,80);
 
     this.lastColour = (this.lastColour + 1) % hues.length;
 
     return {"hue" : hues[this.lastColour], "value" : values[this.lastColour]};
+    */
 }
 
 
@@ -833,8 +912,8 @@ Visualisation.prototype.getResize = function(xCount, yCount, sizeX, sizeY) {
 Visualisation.prototype.moveVisualisation = function(container) {
     var prefSpacing = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_SPACING);
-    var prefDefaultZoomHeight = THREADVIS.preferences.getPreference(
-        THREADVIS.preferences.PREF_ZOOM_HEIGHT);
+    var prefDefaultZoomHeight = parseFloat(THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_ZOOM_HEIGHT));
 
     // get current left margin
     if (THREADVIS.SVG) {
@@ -1171,6 +1250,10 @@ Visualisation.prototype.visualise = function(container, force) {
     // set cursor
     this.box.style.cursor = "wait";
 
+    // set background
+    this.outerBox.style.backgroundColor = THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_VIS_COLOURS_BACKGROUND);
+
     if (typeof force == "undefined") {
         // check to see parent force
         if (THREADVIS.threadvisParent) {
@@ -1201,10 +1284,10 @@ Visualisation.prototype.visualise = function(container, force) {
         THREADVIS.preferences.PREF_VIS_SPACING);
     var prefDotSize = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_DOTSIZE);
-    var prefDefaultZoomHeight = THREADVIS.preferences.getPreference(
-        THREADVIS.preferences.PREF_ZOOM_HEIGHT);
-    var prefDefaultZoomWidth = THREADVIS.preferences.getPreference(
-        THREADVIS.preferences.PREF_ZOOM_WIDTH);
+    var prefDefaultZoomHeight = parseFloat(THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_ZOOM_HEIGHT));
+    var prefDefaultZoomWidth = parseFloat(THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_ZOOM_WIDTH));
     var prefColour = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_COLOUR);
     var prefTimeline = THREADVIS.preferences.getPreference(
@@ -1290,6 +1373,8 @@ Visualisation.prototype.visualise = function(container, force) {
         var selected = thisContainer == container;
         var inThread = container.findParent(thisContainer)
             || thisContainer.findParent(container);
+        var sent = ! thisContainer.isDummy() ?
+            thisContainer.getMessage().isSent() : false;
 
         var colour = this.COLOUR_DUMMY;
         var opacity = 1;
@@ -1310,7 +1395,7 @@ Visualisation.prototype.visualise = function(container, force) {
                         this.authors[thisContainer.getMessage()
                             .getFromEmail()].count + 1;
                 } else {
-                    hsv = this.getNewColour();
+                    hsv = this.getNewColour(sent);
                     this.authors[thisContainer.getMessage().getFromEmail()] =
                         {"hsv" : hsv,
                          "name" : thisContainer.getMessage().getFrom(),
@@ -1440,10 +1525,10 @@ Visualisation.prototype.visualiseExisting = function(container) {
         THREADVIS.preferences.PREF_VIS_DOTSIZE);
     var prefSpacing = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_SPACING);
-    var prefDefaultZoomHeight = THREADVIS.preferences.getPreference(
-        THREADVIS.preferences.PREF_ZOOM_HEIGHT);
-    var prefDefaultZoomWidth = THREADVIS.preferences.getPreference(
-        THREADVIS.preferences.PREF_ZOOM_WIDTH);
+    var prefDefaultZoomHeight = parseFloat(THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_ZOOM_HEIGHT));
+    var prefDefaultZoomWidth = parseFloat(THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_ZOOM_WIDTH));
     var prefColour = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_COLOUR);
     var prefTimeline = THREADVIS.preferences.getPreference(
@@ -1489,6 +1574,8 @@ Visualisation.prototype.visualiseExisting = function(container) {
         var selected = thisContainer == container;
         var inThread = thisContainer.findParent(container)
             || container.findParent(thisContainer);
+        var sent = ! thisContainer.isDummy() ?
+            thisContainer.getMessage().isSent() : false;
 
         // only display black circle to highlight selected message
         // if we are using more than one colour
@@ -1528,7 +1615,7 @@ Visualisation.prototype.visualiseExisting = function(container) {
                     hsv = this.authors[thisContainer.getMessage()
                         .getFromEmail()].hsv;
                 } else {
-                    hsv = this.getNewColour();
+                    hsv = this.getNewColour(sent);
                     this.authors[thisContainer.getMessage().getFromEmail()] =
                         {"hsv" : hsv,
                          "name" : thisContainer.getMessage().getFrom(),
@@ -1677,10 +1764,10 @@ Visualisation.prototype.exportToSVG = function(container, force) {
         THREADVIS.preferences.PREF_VIS_SPACING);
     var prefDotSize = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_DOTSIZE);
-    var prefDefaultZoomHeight = THREADVIS.preferences.getPreference(
-        THREADVIS.preferences.PREF_ZOOM_HEIGHT);
-    var prefDefaultZoomWidth = THREADVIS.preferences.getPreference(
-        THREADVIS.preferences.PREF_ZOOM_WIDTH);
+    var prefDefaultZoomHeight = parseFloat(THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_ZOOM_HEIGHT));
+    var prefDefaultZoomWidth = parseFloat(THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_ZOOM_WIDTH));
     var prefColour = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_COLOUR);
     var prefTimeline = THREADVIS.preferences.getPreference(
@@ -1742,6 +1829,8 @@ Visualisation.prototype.exportToSVG = function(container, force) {
         var selected = thisContainer == container;
         var inThread = container.findParent(thisContainer)
             || thisContainer.findParent(container);
+        var sent = ! thisContainer.isDummy() ?
+            thisContainer.getMessage().isSent() : false;
 
         var colour = this.COLOUR_DUMMY;
         var opacity = 1;
@@ -1759,7 +1848,7 @@ Visualisation.prototype.exportToSVG = function(container, force) {
                     hsv = authors[thisContainer.getMessage()
                         .getFromEmail()].hsv;
                 } else {
-                    hsv = this.getNewColour();
+                    hsv = this.getNewColour(sent);
                     authors[thisContainer.getMessage().getFromEmail()] =
                         {"hsv" : hsv};
                 }

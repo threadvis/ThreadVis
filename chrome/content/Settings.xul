@@ -45,7 +45,6 @@
         "visualisationMessageCircles",
         "visualisationOpacity",
         "visualisationSpacing",
-        /*"visualisationSVG",*/
         "zoomWidth",
         "zoomHeight",
     ];
@@ -250,15 +249,6 @@
                                     prefstring="extensions.threadvis.visualisation.messagecircles"
                                     preftype="bool" />
                             </row>
-                            <!--row>
-                                <label control="visualisationSVG"
-                                    value="&visualisation.svg;" />
-                                <checkbox id="visualisationSVG"
-                                    label="(beta)"
-                                    preference="extensions.threadvis.visualisation.svg"
-                                    prefstring="extensions.threadvis.visualisation.svg"
-                                    preftype="bool" />
-                            </row-->
                         </rows>
                     </grid>
                     <separator />
@@ -268,14 +258,14 @@
                             <textbox id="zoomWidth"
                                 preference="extensions.threadvis.zoom.width"
                                 prefstring="extensions.threadvis.zoom.width"
-                                preftype="int" size="2" />
+                                preftype="string" size="4" />
                             <label value="&visualisation.defaultzoom.width;" />
                         </hbox>
                         <hbox>
                             <textbox id="zoomHeight"
                                 preference="extensions.threadvis.zoom.height"
                                 prefstring="extensions.threadvis.zoom.height"
-                                preftype="int" size="2" />
+                                preftype="string" size="4" />
                             <label value="&visualisation.defaultzoom.height;" />
                         </hbox>
                     </groupbox>

@@ -68,10 +68,10 @@
                 type="bool" />
             <preference id="extensions.threadvis.zoom.height"
                 name="extensions.threadvis.zoom.height"
-                type="int" />
+                type="string" />
             <preference id="extensions.threadvis.zoom.width"
                 name="extensions.threadvis.zoom.width"
-                type="int" />
+                type="string" />
             <preference id="extensions.threadvis.visualisation.colour"
                 name="extensions.threadvis.visualisation.colour"
                 type="string" />
@@ -81,9 +81,6 @@
             <preference id="extensions.threadvis.visualisation.opacity"
                 name="extensions.threadvis.visualisation.opacity"
                 type="int" />
-            <!--preference id="extensions.threadvis.visualisation.svg"
-                name="extensions.threadvis.visualisation.svg"
-                type="bool" /-->
             <preference id="extensions.threadvis.logging.enabled"
                 name="extensions.threadvis.logging.enabled"
                 type="bool" />
@@ -270,13 +267,6 @@
                                     label=""
                                     preference="extensions.threadvis.visualisation.messagecircles" />
                             </row>
-                            <!--row>
-                                <label control="visualisationSVG"
-                                    value="&visualisation.svg;" />
-                                <checkbox id="visualisationSVG"
-                                    label="(beta)"
-                                    preference="extensions.threadvis.visualisation.svg" />
-                            </row-->
                         </rows>
                     </grid>
                     <separator />
@@ -285,13 +275,13 @@
                         <hbox>
                             <textbox id="zoomWidth"
                                 preference="extensions.threadvis.zoom.width"
-                                size="2" />
+                                size="4" />
                             <label value="&visualisation.defaultzoom.width;" />
                         </hbox>
                         <hbox>
                             <textbox id="zoomHeight"
                                 preference="extensions.threadvis.zoom.height"
-                                size="2" />
+                                size="4" />
                             <label value="&visualisation.defaultzoom.height;" />
                         </hbox>
                     </groupbox>

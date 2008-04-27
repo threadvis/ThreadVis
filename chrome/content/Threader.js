@@ -216,7 +216,7 @@ Threader.prototype.putMessageInContainer = function(message) {
     for (referencekey in references) {
         var referenceId = references[referencekey];
 
-        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONTENT_THREADER)) {
+        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_THREADER)) {
             THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
                 "Threader.putMessageInContainer()", {"reference" : referenceId});
         }
@@ -740,4 +740,130 @@ Threader.prototype.getThreadDistribution = function() {
         }
     }
     return distribution;
+}
+
+
+
+/** ****************************************************************************
+ * Thread all messages
+ ******************************************************************************/
+Threader.prototype.removeThread = function(topContainer) {
+    if (topContainer) {
+        this.rootSet.removeChild(topContainer);
+        var children = topContainer.getChildren();
+        for (var i = 0; i < children.length; i++) {
+            var msgid = children[i].isDummy() ? null : 
+                children[i].getMessage().getId();
+            if (msgid) {
+                delete this.idTable[msgid];
+            }
+        }
+    }
+}
+
+
+/** ****************************************************************************
+ * Thread all messages in background
+ ******************************************************************************/
+Threader.prototype.threadBackground = function(continueFunction) {
+    THREADVIS.setStatus("Threading ...");
+    // open copy/cut database
+    this.copycut.read();
+
+    this.start = (new Date()).getTime();
+    THREADVIS.logger.log("threader", {"action" : "start"});
+    // 1. For each message
+    //this.id_table_ = new Object();
+    var ref = this;
+    this.putMessagesInContainerBackground(function() {
+
+        THREADVIS.setStatus("Threading ...");
+        // 2. Find the root set
+        // walk over all elements in id_table
+        ref.findRootSet();
+
+        // 3. Discard id_table
+        // do not discard id_table_, we might need it to find individual messages
+
+        THREADVIS.setStatus("Threading ...");
+        // 4. Prune empty containers
+        // recursively walk all containers under root set
+        // for each container
+        ref.pruneEmptyContainers();
+
+        // 5. Group root set by subject
+        // 5.A. create new hashtable for all subjects
+        //this.subject_table_ = new Object();
+
+        // 5.B. put all containers in subject table
+        //this.topPutContainersInSubjectTable();
+
+        // 5.C. group all containers by subject
+        //this.topGroupBySubject();
+
+        // 6. that's it
+        //root_set_.check();
+
+        // close copy/cut database
+        ref.copycut.close();
+        THREADVIS.setStatus("");
+        ref.logInfo();
+
+        continueFunction();
+    });
+}
+
+
+Threader.prototype.reset = function() {
+    delete this.idTable;
+    this.idTable = new Object();
+    delete this.rootSet;
+    this.rootSet = new Container(true);
+    delete this.messages;
+    this.messages = new Object();
+}
+
+
+
+/** ****************************************************************************
+ * put all messages in a container
+ * loop over all messages
+ ******************************************************************************/
+Threader.prototype.putMessagesInContainerBackground = function(continueFunction) {
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_THREADER)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "Threader.putMessagesInContainer()", {"action" : 
+            "loop over all messages"});
+    }
+
+    var util = new Util();
+    var ref = this;
+    var count = 0;
+    var msgArray = new Array();
+    util.registerListener({
+        onItem: function(item, count, remaining, timeRemaining) {
+            if (count % 10 == 0) {
+                THREADVIS.setStatus("Threading: " + count + " [" + remaining +
+                    "] " + timeRemaining);
+            }
+            ref.totalMessages++;
+            ref.putMessageInContainer(item);
+        },
+        onFinished: function() {
+            if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_THREADER)) {
+                THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+                    "Threader.putMessagesInContainer()", {"action" : 
+                    "end", "count" : count});
+            }
+            // reset this.messages
+            delete ref.messages;
+            delete msgArray;
+            ref.messages = new Object();
+            continueFunction();
+        }
+    });
+    for (var id in this.messages) {
+        msgArray.push(this.messages[id]);
+    }
+    util.process(msgArray);
 }

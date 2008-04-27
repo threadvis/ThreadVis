@@ -172,15 +172,15 @@ Timeline.prototype.formatTime = function(timeDifference) {
     // label
     // only display years if >= 1
     if (years >= 1) {
-        string = years +
+        string = (years + (Math.round((days / 365) * 10) / 10)) +
             this.strings.getString("visualisation.timedifference.years.short");
     // only display days if >= 1
     } else if (days >= 1) {
-        string = days +
+        string = Math.round(days + hours / 24) + 
             this.strings.getString("visualisation.timedifference.days.short");
     // display hours if >= 1
      } else if (hours >= 1) {
-        string = hours +
+        string = Math.round(hours + minutes / 60) +
             this.strings.getString("visualisation.timedifference.hours.short");
     // display minutes otherwise
      } else {

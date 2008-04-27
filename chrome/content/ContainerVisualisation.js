@@ -271,7 +271,7 @@ ContainerVisualisation.prototype.formatDate = function(date) {
         dateFormatService.dateFormatShort,
         dateFormatService.timeFormatNoSeconds,
         date.getFullYear(),
-        date.getMonth(),
+        date.getMonth() + 1,
         date.getDate(),
         date.getHours(),
         date.getMinutes(),
@@ -404,7 +404,7 @@ ContainerVisualisation.prototype.deleteParent = function() {
 
     if (msgid != "" && parentmsgid != "") {
         THREADVIS.threader.copycut.addCut(msgid + " " + parentmsgid);
-        THREADVIS.setSelectedMessage();
+        THREADVIS.setSelectedMessage(true);
 
         THREADVIS.logger.log("copycut", {"action" : "deletemessage",
             "msgkey" : msgkey});
@@ -564,7 +564,8 @@ ContainerVisualisation.prototype.onMouseClick = function(event) {
 ContainerVisualisation.prototype.paste = function() {
     if (THREADVIS.copyMessage) {
         // check to see if user creates a loop
-        if (THREADVIS.copyMessage.findChild(this.container)) {
+        //if (THREADVIS.copyMessage.findChild(this.container)) {
+        if (this.container.findParent(THREADVIS.copyMessage)) {
             alert("Action not allowed. This would create a loop.");
             return;
         }
@@ -579,17 +580,21 @@ ContainerVisualisation.prototype.paste = function() {
             THREADVIS.copyMessage.getMessage().getId() : "";
         var copyMessageMsgkey = ! THREADVIS.copyMessage.isDummy() ?
             THREADVIS.copyMessage.getMessage().getKey() : "";
-        var copyMessageParentMsgid = ! copyParent.isDummy() ?
-            copyParent.getMessage().getId() : "";
-        var copyMessageParentMsgkey = ! copyParent.isDummy() ?
-            copyParent.getMessage().getKey() : "";
-        
+        var copyMessageParentMsgid = "";
+        var copyMessageParentMsgkey = "";
+        if (copyParent) {
+            copyMessageParentMsgid = ! copyParent.isDummy() ?
+                copyParent.getMessage().getId() : "";
+            copyMessageParentMsgkey = ! copyParent.isDummy() ?
+                copyParent.getMessage().getKey() : "";
+        }
+
         if (thisMsgid != "" && copyMessageMsgid != "") {
             THREADVIS.threader.copycut.addCut(copyMessageMsgid + " "
                 + copyMessageParentMsgid);
             THREADVIS.threader.copycut.addCopy(copyMessageMsgid + " "
                 + thisMsgid);
-            THREADVIS.setSelectedMessage();
+            THREADVIS.setSelectedMessage(true);
 
             THREADVIS.logger.log("copycut", {"action" : "pastemessage",
                 "copied-msgkey" : copyMessageMsgkey,

@@ -507,7 +507,13 @@ ThreadVis.prototype.init = function() {
             function(value) {ref.preferenceChanged(value);});
         this.preferences.registerCallback(this.preferences.PREF_VIS_SPACING,
             function(value) {ref.preferenceChanged(value);});
+        this.preferences.registerCallback(this.preferences.PREF_VIS_MESSAGE_CIRCLES,
+            function(value) {ref.preferenceChanged(value);});
         this.preferences.registerCallback(this.preferences.PREF_VIS_COLOUR,
+            function(value) {ref.preferenceChanged(value);});
+        this.preferences.registerCallback(this.preferences.PREF_VIS_COLOURS_BACKGROUND,
+            function(value) {ref.preferenceChanged(value);});
+        this.preferences.registerCallback(this.preferences.PREF_VIS_HIGHLIGHT,
             function(value) {ref.preferenceChanged(value);});
         this.preferences.registerCallback(this.preferences.PREF_VIS_OPACITY,
             function(value) {ref.preferenceChanged(value);});
@@ -742,7 +748,7 @@ ThreadVis.prototype.preferenceChanged = function(enabled) {
     if (this.popupWindow && this.popupWindow.THREADVIS)
         this.popupWindow.THREADVIS.visualisation.changed = true;
 
-    this.doLoad.onStartHeaders();
+    this.setSelectedMessage(true);
 }
 
 
@@ -751,7 +757,7 @@ ThreadVis.prototype.preferenceChanged = function(enabled) {
  * Called when a message is selected
  * Call visualisation with messageid to visualise
  ******************************************************************************/
-ThreadVis.prototype.setSelectedMessage = function() {
+ThreadVis.prototype.setSelectedMessage = function(force) {
     if (! this.preferences.getPreference(this.preferences.PREF_ENABLED)) {
         this.visualisation.disabled = true;
         this.visualisation.displayDisabled();
@@ -796,7 +802,7 @@ ThreadVis.prototype.setSelectedMessage = function() {
 
     // delay display to give UI time to layout
     var ref = this;
-    setTimeout(function(){ref.visualiseMessage(msg);}, 100);
+    setTimeout(function(){ref.visualiseMessage(msg, force);}, 100);
 }
 
 
@@ -854,8 +860,8 @@ ThreadVis.prototype.visualise = function(container) {
  * find the container
  * call method visualise(container)
  ******************************************************************************/
-ThreadVis.prototype.visualiseMessage = function(message) {
-    if (this.visualisedMsgId == message.messageId) {
+ThreadVis.prototype.visualiseMessage = function(message, force) {
+    if (this.visualisedMsgId == message.messageId && ! force) {
         return;
     }
 
@@ -972,5 +978,5 @@ ThreadVis.prototype.getThreader = function() {
  ******************************************************************************/
 ThreadVis.prototype.setStatus = function(text) {
     var elem = document.getElementById("ThreadVisStatusText");
-    elem.label = text;
+    elem.value = text;
 }
