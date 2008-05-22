@@ -37,6 +37,14 @@ function Visualisation() {
 
     // force display of too many messages
     this.force = false;
+
+    this.outerBox = document.getElementById("ThreadVis");
+    this.box = document.getElementById("ThreadVisBox");
+    this.verticalScrollbarBox = document.getElementById("ThreadVisVerticalScrollbar");
+    this.horizontalScrollbarBox = document.getElementById("ThreadVisHorizontalScrollbar");
+    this.buttonsBox = document.getElementById("ThreadVisButtons");
+    this.stack = document.getElementById("ThreadVisStack");
+    this.strings = document.getElementById("ThreadVisStrings");
 }
 
 
@@ -209,6 +217,8 @@ Visualisation.prototype.clearStack = function() {
         this.stack.style.marginTop = "0px";
         this.stack.style.padding = "5px";
     }
+    this.setVariableSize();
+    this.setFixedSize();
 }
 
 
@@ -426,11 +436,6 @@ Visualisation.prototype.createStack = function() {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Visualisation.createStack()", {});
     }
-
-    this.outerBox = document.getElementById("ThreadVis");
-    this.box = document.getElementById("ThreadVisBox");
-    this.stack = document.getElementById("ThreadVisStack");
-    this.strings = document.getElementById("ThreadVisStrings");
 
     var ref = this;
     if (! this.stack) {
@@ -1142,6 +1147,44 @@ Visualisation.prototype.resetStack = function() {
 
 
 /** ****************************************************************************
+ * set the outer box to a fixed size. if x or y is given, the size is
+ * set to that size. otherwise the current size is set as a fixed size
+ ******************************************************************************/
+Visualisation.prototype.setFixedSize = function(x, y) {
+    // total width and height of available space
+    var outerWidth = 0;
+    if (x) {
+        outerWidth = x;
+    } else {
+        outerWidth = this.outerBox.boxObject.width;
+    }
+    var outerHeight = this.outerBox.boxObject.height;
+
+    this.outerBox.style.width = outerWidth + "px";
+    this.outerBox.style.height = outerHeight + "px";
+    this.outerBox.setAttribute("flex", "0");
+
+    this.maxSizeWidth = outerWidth;
+    this.maxSizeHeight = outerHeight;
+}
+
+
+
+/** ****************************************************************************
+ * remove any fixed size and set the flex flag
+ ******************************************************************************/
+Visualisation.prototype.setVariableSize = function() {
+    if (this.scrollbar) {
+        this.scrollbar.reset();
+    }
+    this.outerBox.style.width = "";
+    this.outerBox.style.height = "";
+    this.outerBox.setAttribute("flex", "2");
+}
+
+
+
+/** ****************************************************************************
  * If time scaling is enabled, we want to layout the messages so that their 
  * horizontal spacing is proportional to the time difference between 
  * those two messages
@@ -1163,11 +1206,11 @@ Visualisation.prototype.timeScaling = function(containers,
         THREADVIS.preferences.PREF_TIMESCALING);
 
     // if we do not want to do timescaling, reset all scaling info to 1
+    for (var counter = 0; counter < containers.length; counter++) {
+        var thisContainer = containers[counter];
+        thisContainer.xScaled = 1;
+    }
     if (! prefTimescaling) {
-        for (var counter = 0; counter < containers.length - 1; counter++) {
-            var thisContainer = containers[counter];
-            thisContainer.xScaled = 1;
-        }
         return containers;
     }
 
@@ -1457,6 +1500,12 @@ Visualisation.prototype.visualise = function(container, force) {
         }
         x = x + (thisContainer.xScaled * prefSpacing);
     }
+    x += prefSpacing;
+
+    // if visualisation needs less space than available, make box smaller
+    if (x < this.maxSizeWidth) {
+        this.setFixedSize(x);
+    }
 
     // underline authors if enabled
     this.colourAuthors(this.authors);
@@ -1495,7 +1544,6 @@ Visualisation.prototype.visualise = function(container, force) {
     }
     this.scrollbar.init(this.box);
     this.scrollbar.draw();
-
     this.changed = false;
 
     // check for resize of box

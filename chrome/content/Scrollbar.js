@@ -123,19 +123,6 @@ function Scrollbar(visualisation, stack, box) {
 
 
 /** ****************************************************************************
- * Reset size of scrollbar to 0 on window resize.
- * Otherwise, window can't be resized to a size smaller than the
- * scrollbars.
- ******************************************************************************/
-Scrollbar.prototype.resize = function() {
-    this.vertical.style.height = "0px";
-    this.horizontal.style.width = "0px";
-    this.draw();
-}
-
-
-
-/** ****************************************************************************
  * Calculate positions of the scrollbars
  ******************************************************************************/
 Scrollbar.prototype.calculatePosition = function() {
@@ -201,6 +188,7 @@ Scrollbar.prototype.calculateSize = function() {
  * Draw the scrollbar
  ******************************************************************************/
 Scrollbar.prototype.draw = function() {
+    this.reset();
     var size = this.calculateSize();
     var position = this.calculatePosition();
 
@@ -481,4 +469,26 @@ Scrollbar.prototype.panVertical = function(dy) {
     position.y = dy * multiplicator;
 
     this.visualisation.moveVisualisationTo(position);
+}
+
+
+
+/** ****************************************************************************
+ * Reset size of scrollbar to 0
+ ******************************************************************************/
+Scrollbar.prototype.reset = function() {
+    this.vertical.style.height = "0px";
+    this.horizontal.style.width = "0px";
+}
+
+
+
+/** ****************************************************************************
+ * Reset size of scrollbar to 0 on window resize.
+ * Otherwise, window can't be resized to a size smaller than the
+ * scrollbars.
+ ******************************************************************************/
+Scrollbar.prototype.resize = function() {
+    this.reset();
+    this.draw();
 }

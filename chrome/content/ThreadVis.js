@@ -536,13 +536,13 @@ ThreadVis.prototype.init = function() {
 
     this.logger.log("threadvis", {"action": "startup"});
 
-    // create box object
-    this.createBox();
-
     // visualisation object
     if (! this.visualisation) {
         this.visualisation = new Visualisation();
     }
+
+    // create box object
+    this.createBox();
 
     this.clearVisualisation();
 
