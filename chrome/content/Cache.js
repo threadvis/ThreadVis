@@ -210,7 +210,18 @@ Cache.prototype.searchMessageByMsgId = function(messageId, rootFolder) {
  ******************************************************************************/
 Cache.prototype.searchInSubFolder = function(folder, messageId) {
     if (folder.hasSubFolders) {
-        var subfolders = folder.GetSubFolders();
+        // Seamonkey and Thunderbird <= 2 use GetSubFolders
+        // (which returns a nsIEnumerator)
+        // so we have to use .currentItem() and .next()
+        // Thunderbird 3 uses subFolders (which returns a nsISimpleEnumerator
+        // so we have to use .getNext() and .hasMoreElements()
+        var subfolders = null;
+        if (folder.GetSubFolders) {
+            subfolders = folder.GetSubFolders();
+        }
+        if (folder.subFolders) {
+            subfolders = folder.subFolders;
+        }
         var subfolder = null;
         var msgHdr = null;
         var msgDB = null;
@@ -218,7 +229,14 @@ Cache.prototype.searchInSubFolder = function(folder, messageId) {
 
         var done = false;
         while(!done) {
-            currentFolderURI = subfolders.currentItem()
+            var currentItem = null;
+            if (subfolders.currentItem) {
+                currentItem = subfolders.currentItem();
+            }
+            if (subfolders.getNext) {
+                currentItem = subfolders.getNext();
+            }
+            currentFolderURI = currentItem
                 .QueryInterface(Components.interfaces.nsIRDFResource).Value;
             subfolder = GetMsgFolderFromUri(currentFolderURI);
 
@@ -244,7 +262,12 @@ Cache.prototype.searchInSubFolder = function(folder, messageId) {
             }
 
             try {
-                subfolders.next();
+                if (subfolders.next) {
+                    subfolders.next();
+                }
+                if (subfolders.hasMoreElements) {
+                    done = ! subfolders.hasMoreElements();
+                }
             } catch(e) {
                 done = true;
             }
