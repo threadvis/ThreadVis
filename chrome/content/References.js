@@ -35,6 +35,10 @@ References.prototype.buildReferences = function(references) {
         var distinct = new Array();
 
         for (var i = result.length - 1; i >= 0; i--) {
+            // TODO
+            // email from user: some mail servers seem to change the
+            // message id after the @ sign
+            // add switch to ignore mail host after @ (setting in preferences)
             var msgid = result[i];
             if (dupes[msgid]) {
                 continue;
