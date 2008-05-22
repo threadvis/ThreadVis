@@ -2,7 +2,7 @@
  * install.js
  *
  * (c) 2005-2007 Alexander C. Hubmann
- * (c) 2007 Alexander C. Hubmann-Haidvogel
+ * (c) 2007-2008 Alexander C. Hubmann-Haidvogel
  *
  * javascript install script for mozilla
  *
@@ -15,7 +15,7 @@ var XpiInstaller =
     extFullName: 'ThreadVis', // The name displayed to the user (don't include the version)
     extShortName: 'threadvis', // The leafname of the JAR file (without the .jar part)
     extVersion: '<<version>>.<<build>>',
-    extAuthor: 'Alexander C. Hubmann',
+    extAuthor: 'Alexander C. Hubmann-Haidvogel',
     extLocaleNames: ["en-US", "de-DE"], // e.g. ['en-US', 'en-GB']
     extSkinNames: null, // e.g. ['classic', 'modern']
     extPostInstallMessage: null, // Set to null for no post-install message

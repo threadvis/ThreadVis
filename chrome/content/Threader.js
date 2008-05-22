@@ -2,7 +2,7 @@
  * Threader.js
  *
  * (c) 2005-2007 Alexander C. Hubmann
- * (c) 2007 Alexander C. Hubmann-Haidvogel
+ * (c) 2007-2008 Alexander C. Hubmann-Haidvogel
  *
  * based on the algorithm from Jamie Zawinski <jwz@jwz.org>
  * www.jwz.org/doc/threading.html
