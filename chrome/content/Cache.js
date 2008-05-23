@@ -737,7 +737,8 @@ Cache.prototype.resetGetAllFolders = function(folder) {
             if (folderEnumerator.next) {
                 folderEnumerator.next();
             }
-            if (! folderEnumerator.hasMoreElements) {
+            if (folderEnumerator.hasMoreElements &&
+                ! folderEnumerator.hasMoreElements()) {
                 break;
             }
         } catch (Exception) {

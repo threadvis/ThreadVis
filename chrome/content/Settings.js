@@ -313,10 +313,11 @@ function getAllFolders(folder) {
             if (folderEnumerator.next) {
                 folderEnumerator.next();
             }
-            if (! folderEnumerator.hasMoreElements) {
+            if (folderEnumerator.hasMoreElements && 
+                ! folderEnumerator.hasMoreElements()) {
                 break;
             }
-        } catch (Exception) {
+        } catch (e) {
             break;
         }
     }
