@@ -274,13 +274,29 @@ function composeEmail(to, subject, body, attachments) {
  * get all subfolders starting from "folder" as array
  ******************************************************************************/
 function getAllFolders(folder) {
-    var folderEnumerator = folder.GetSubFolders();
+    // Seamonkey < 2 and Thunderbird <= 2 use GetSubFolders
+    // (which returns a nsIEnumerator)
+    // so we have to use .currentItem() and .next()
+    // Thunderbird 3 and Seamonkey 2 use subFolders (which returns a nsISimpleEnumerator
+    // so we have to use .getNext() and .hasMoreElements()
+    var folderEnumerator = null;
+    if (folder.GetSubFolders) {
+        folderEnumerator = folder.GetSubFolders();
+    }
+    if (folder.subFolders) {
+        folderEnumerator = folder.subFolders;
+    }
     var currentFolder = null;
     var folders = new Array();
 
     while (true) {
         try {
-            currentFolder = folderEnumerator.currentItem();
+            if (folderEnumerator.currentItem) {
+                currentFolder = folderEnumerator.currentItem();
+            }
+            if (folderEnumerator.getNext) {
+                currentFolder = folderEnumerator.getNext();
+            }
         } catch (Exception) {
             break;
         }
@@ -294,7 +310,12 @@ function getAllFolders(folder) {
         }
 
         try {
-            folderEnumerator.next();
+            if (folderEnumerator.next) {
+                folderEnumerator.next();
+            }
+            if (! folderEnumerator.hasMoreElements) {
+                break;
+            }
         } catch (Exception) {
             break;
         }

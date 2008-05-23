@@ -210,10 +210,10 @@ Cache.prototype.searchMessageByMsgId = function(messageId, rootFolder) {
  ******************************************************************************/
 Cache.prototype.searchInSubFolder = function(folder, messageId) {
     if (folder.hasSubFolders) {
-        // Seamonkey and Thunderbird <= 2 use GetSubFolders
+        // Seamonkey < 2 and Thunderbird <= 2 use GetSubFolders
         // (which returns a nsIEnumerator)
         // so we have to use .currentItem() and .next()
-        // Thunderbird 3 uses subFolders (which returns a nsISimpleEnumerator
+        // Thunderbird 3 and Seamonkey 2 use subFolders (which returns a nsISimpleEnumerator
         // so we have to use .getNext() and .hasMoreElements()
         var subfolders = null;
         if (folder.GetSubFolders) {
@@ -603,10 +603,27 @@ Cache.prototype.setLastUpdateTimestamp = function(accountKey, timestamp) {
  ******************************************************************************/
 Cache.prototype.addSubFolders = function(searchSession, folder) {
     if (folder.hasSubFolders) {
-        var subFolderEnumerator = folder.GetSubFolders();
+        // Seamonkey < 2 and Thunderbird <= 2 use GetSubFolders
+        // (which returns a nsIEnumerator)
+        // so we have to use .currentItem() and .next()
+        // Thunderbird 3 and Seamonkey 2 use subFolders (which returns a nsISimpleEnumerator
+        // so we have to use .getNext() and .hasMoreElements()
+        var subFolderEnumerator = null;
+        if (folder.GetSubFolders) {
+            subFolderEnumerator = folder.GetSubFolders();
+        }
+        if (folder.subFolders) {
+            subFolderEnumerator = folder.subFolders;
+        }
         var done = false;
         while (! done) {
-            var next = subFolderEnumerator.currentItem();
+            var next = null;
+            if (subFolderEnumerator.currentItem) {
+                next = subFolderEnumerator.currentItem();
+            }
+            if (subFolderEnumerator.getNext) {
+                next = subFolderEnumerator.getNext();
+            }
             if (next) {
                 var nextFolder = next.QueryInterface(
                     Components.interfaces.nsIMsgFolder);
@@ -634,7 +651,12 @@ Cache.prototype.addSubFolders = function(searchSession, folder) {
                 }
             }
             try {
-                subFolderEnumerator.next();
+                if (subFolderEnumerator.next) {
+                    subFolderEnumerator.next();
+                }
+                if (subFolderEnumerator.hasMoreElements) {
+                    done = ! subFolderEnumerator.hasMoreElements();
+                }
             } catch (ex) {
                 done = true;
             }
@@ -674,13 +696,29 @@ Cache.prototype.reset = function(key) {
  * Get all subfolders starting from "folder" as array
  ******************************************************************************/
 Cache.prototype.resetGetAllFolders = function(folder) {
-    var folderEnumerator = folder.GetSubFolders();
+    // Seamonkey < 2 and Thunderbird <= 2 use GetSubFolders
+    // (which returns a nsIEnumerator)
+    // so we have to use .currentItem() and .next()
+    // Thunderbird 3 and Seamonkey 2 use subFolders (which returns a nsISimpleEnumerator
+    // so we have to use .getNext() and .hasMoreElements()
+    var folderEnumerator = null;
+    if (folder.GetSubFolders) {
+        folderEnumerator = folder.GetSubFolders();
+    }
+    if (folder.subFolders) {
+        folderEnumerator = folder.subFolders;
+    }
     var currentFolder = null;
     var folders = new Array();
 
     while (true) {
         try {
-            currentFolder = folderEnumerator.currentItem();
+            if (folderEnumerator.currentItem) {
+                currentFolder = folderEnumerator.currentItem();
+            }
+            if (folderEnumerator.getNext) {
+                currentFolder = folderEnumerator.getNext();
+            }
         } catch (Exception) {
             break;
         }
@@ -696,7 +734,12 @@ Cache.prototype.resetGetAllFolders = function(folder) {
         }
 
         try {
-            folderEnumerator.next();
+            if (folderEnumerator.next) {
+                folderEnumerator.next();
+            }
+            if (! folderEnumerator.hasMoreElements) {
+                break;
+            }
         } catch (Exception) {
             break;
         }
