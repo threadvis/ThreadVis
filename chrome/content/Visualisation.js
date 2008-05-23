@@ -1309,6 +1309,13 @@ Visualisation.prototype.visualise = function(container, force) {
     // set background
     this.outerBox.style.backgroundColor = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_COLOURS_BACKGROUND);
+    var borderColour = THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_VIS_COLOURS_BORDER);
+    if (borderColour != "") {
+        this.outerBox.style.border = "1px solid " + borderColour;
+    } else {
+        this.outerBox.style.border = "";
+    }
 
     if (typeof force == "undefined") {
         // check to see parent force

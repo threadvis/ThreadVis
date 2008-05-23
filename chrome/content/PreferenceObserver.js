@@ -39,6 +39,7 @@ function PreferenceObserver() {
     this.PREF_VIS_MESSAGE_CIRCLES = "visualisation.messagecircles";
     this.PREF_VIS_COLOUR = "visualisation.colour";
     this.PREF_VIS_COLOURS_BACKGROUND = "visualisation.colours.background";
+    this.PREF_VIS_COLOURS_BORDER = "visualisation.colours.border";
     this.PREF_VIS_COLOURS_RECEIVED = "visualisation.colours.received";
     this.PREF_VIS_COLOURS_SENT = "visualisation.colours.sent";
     this.PREF_VIS_HIGHLIGHT = "visualisation.highlight";
@@ -180,6 +181,8 @@ PreferenceObserver.prototype.preferenceReload = function() {
     this.loadPreference(this.PREF_VIS_COLOUR,
         this.prefBranch.PREF_STRING, "author");
     this.loadPreference(this.PREF_VIS_COLOURS_BACKGROUND,
+        this.prefBranch.PREF_STRING, "");
+    this.loadPreference(this.PREF_VIS_COLOURS_BORDER,
         this.prefBranch.PREF_STRING, "");
     this.loadPreference(this.PREF_VIS_COLOURS_RECEIVED,
         this.prefBranch.PREF_STRING, "#7FFF00,#00FFFF,#7F00FF,#997200,#009926,#002699,#990072,#990000,#4C9900,#009999,#4C0099,#FFBF00,#00FF3F,#003FFF,#FF00BF");
