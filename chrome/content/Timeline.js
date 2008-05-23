@@ -234,8 +234,8 @@ Timeline.prototype.formatTime = function(timeDifference) {
 /** ****************************************************************************
  * Re-Draw the timeline
  ******************************************************************************/
-Timeline.prototype.redraw = function(resize, vertical) {
+Timeline.prototype.redraw = function(resize, top) {
     this.resize = resize;
-    this.vertical = vertical;
+    this.top = top;
     this.draw();
 }
