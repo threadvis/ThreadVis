@@ -137,5 +137,6 @@ logger.Close
 Set jar = fso.GetFile("threadvis.jar")
 jar.copy("c:\Dokumente und Einstellungen\sascha\Anwendungsdaten\Thunderbird\Profiles\u0f36pb7.default\extensions\{A23E4120-431F-4753-AE53-5D028C42CFDC}\chrome\")
 jar.copy("C:\Dokumente und Einstellungen\sascha\Anwendungsdaten\Mozilla\Profiles\default\6sp0b816.slt\chrome\")
+jar.copy("C:\Dokumente und Einstellungen\sascha\Anwendungsdaten\Mozilla\SeaMonkey\Profiles\w3sdwezu.default\extensions\{A23E4120-431F-4753-AE53-5D028C42CFDC}\chrome\")
 
 MsgBox "Build " + revision + " successful."
