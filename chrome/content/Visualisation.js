@@ -804,6 +804,18 @@ Visualisation.prototype.drawDotSVG = function(container, colour, left, top,
 
 
 /** ****************************************************************************
+ * Get the size of the available viewbox
+ ******************************************************************************/
+Visualisation.prototype.getBoxSize = function() {
+    return {
+            height: this.box.boxObject.height,
+            width: this.box.boxObject.width
+    };
+}
+
+
+
+/** ****************************************************************************
  * Get a colour for the arc
  ******************************************************************************/
 Visualisation.prototype.getColour = function(hue, saturation, value) {
@@ -1154,7 +1166,8 @@ Visualisation.prototype.setFixedSize = function(x, y) {
     // total width and height of available space
     var outerWidth = 0;
     if (x) {
-        outerWidth = x;
+        outerWidth = x + this.verticalScrollbarBox.boxObject.width
+            + this.buttonsBox.boxObject.width;
     } else {
         outerWidth = this.outerBox.boxObject.width;
     }
@@ -1388,20 +1401,24 @@ Visualisation.prototype.visualise = function(container, force) {
     var bottomHeight = prefDotSize / 2 + prefArcMinHeight
         + preSize.bottomHeight * prefArcDifference;
 
-    // do time scaling
-    var originalWidth = this.box.boxObject.width;
-    var originalHeight = this.box.boxObject.height;
+    var availableSize = this.getBoxSize();
 
-    var width = originalWidth * this.zoom * prefDefaultZoomWidth;
-    var height = originalHeight * this.zoom * prefDefaultZoomHeight;
+    // do time scaling
+    var width = availableSize.width * this.zoom * prefDefaultZoomWidth;
+    var height = availableSize.height  * this.zoom * prefDefaultZoomHeight;
 
     this.containers = this.timeScaling(this.containers, 
         minimalTimeDifference, width);
 
     // do final resizing
-    var x = prefSpacing / 2;
     this.resize = this.getResize(this.containers.length, totalMaxHeight,
         width, height);
+
+    var x = (prefSpacing / 2) * (1 / this.resize);
+
+    // vertically center the visualisation
+    topHeight = topHeight - (prefDotSize / 2) + ((availableSize.height * 
+        (1 / this.resize) - (topHeight + bottomHeight)) / 2);
 
     // pre-calculate colours for different authors
     this.authors = new Object();
@@ -1500,11 +1517,11 @@ Visualisation.prototype.visualise = function(container, force) {
         }
         x = x + (thisContainer.xScaled * prefSpacing);
     }
-    x += prefSpacing;
+    x += (prefSpacing / 2) * (1 / this.resize);
 
     // if visualisation needs less space than available, make box smaller
-    if (x < this.maxSizeWidth) {
-        this.setFixedSize(x);
+    if (x * this.resize < this.maxSizeWidth) {
+        this.setFixedSize(x * this.resize);
     }
 
     // underline authors if enabled
@@ -1603,10 +1620,9 @@ Visualisation.prototype.visualiseExisting = function(container) {
     var bottomHeight = prefDotSize / 2 + prefArcMinHeight
         + preSize.bottomHeight * prefArcDifference;
 
-    var originalWidth = this.box.boxObject.width;
-    var originalHeight = this.box.boxObject.height;
-    var width = originalWidth * this.zoom * prefDefaultZoomWidth;
-    var height = originalHeight * this.zoom * prefDefaultZoomHeight;
+    var availableSize = this.getBoxSize();
+    var width = availableSize.width * this.zoom * prefDefaultZoomWidth;
+    var height = availableSize.height * this.zoom * prefDefaultZoomHeight;
 
     this.containers = this.timeScaling(this.containers, minimalTimeDifference,
         width);
@@ -1615,6 +1631,10 @@ Visualisation.prototype.visualiseExisting = function(container) {
     var x = prefSpacing / 2;
     this.resize = this.getResize(this.containers.length, totalMaxHeight,
         width, height);
+
+    // vertically center the visualisation
+    topHeight = topHeight - (prefDotSize / 2) + ((availableSize.height *
+        (1 / this.resize) - (topHeight + bottomHeight)) / 2);
 
     for (var counter = 0; counter < this.containers.length; counter++) {
         var thisContainer = this.containers[counter];
