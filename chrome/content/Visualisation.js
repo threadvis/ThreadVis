@@ -45,6 +45,7 @@ function Visualisation() {
     this.buttonsBox = document.getElementById("ThreadVisButtons");
     this.stack = document.getElementById("ThreadVisStack");
     this.strings = document.getElementById("ThreadVisStrings");
+    this.popups = document.getElementById("ThreadVisPopUpSet");
 }
 
 
@@ -205,8 +206,13 @@ Visualisation.prototype.clearStack = function() {
             "Visualisation.clearStack()", {});
     }
 
-    while(this.stack.firstChild != null) {
+    while (this.stack.firstChild != null) {
         this.stack.removeChild(this.stack.firstChild);
+    }
+
+    // also delete all popupset menus
+    while (this.popups.firstChild != null) {
+        this.popups.removeChild(this.popups.firstChild);
     }
 
     // reset move
@@ -1546,7 +1552,7 @@ Visualisation.prototype.visualise = function(container, force) {
     popupBox.style.width = "100%";
     popupBox.style.height = "100%";
     popupBox.setAttribute("context", "ThreadVisPopUp");
-    this.stack.appendChild(popupBox);
+    //this.stack.appendChild(popupBox);
 
     if (prefTimeline) {
         if (THREADVIS.SVG) {

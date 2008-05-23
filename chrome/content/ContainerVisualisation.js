@@ -140,7 +140,7 @@ ContainerVisualisation.prototype.createMenu = function() {
     var menuname = "dot_popup_" + this.left;
     this.click.setAttribute("context", menuname);
 
-    var popupset = document.createElementNS(THREADVIS.XUL_NAMESPACE, "popupset");
+    var popupset = document.getElementById("ThreadVisPopUpSet");
     var popup = document.createElementNS(THREADVIS.XUL_NAMESPACE, "popup");
     popup.setAttribute("id", menuname);
 
@@ -150,7 +150,6 @@ ContainerVisualisation.prototype.createMenu = function() {
     popup.addEventListener("popupshowing", function() { ref.getMenu(); }, true);
 
     popupset.appendChild(popup);
-    this.stack.appendChild(popupset);
 }
 
 
@@ -256,7 +255,8 @@ ContainerVisualisation.prototype.createToolTip = function() {
     tooltip.addEventListener("popupshowing",
         function() { ref.getToolTip(); }, true);
 
-    this.stack.appendChild(tooltip);
+    var popupset = document.getElementById("ThreadVisPopUpSet");
+    popupset.appendChild(tooltip);
 }
 
 
@@ -759,7 +759,7 @@ ContainerVisualisation.prototype.visualiseClick = function() {
     } else {
         this.click.style.cursor = "pointer";
     }
-    this.click.style.zIndex = "2";
+    this.click.style.zIndex = "2"
 }
 
 

@@ -96,8 +96,12 @@ function ThreadVis(threadvisParent) {
     var done = false;
     this.sentMailIdentities = new Object();
     while (! done) {
-        var identity = identities.currentItem().QueryInterface(
-            Components.interfaces.nsIMsgIdentity);
+        try {
+            var identity = identities.currentItem().QueryInterface(
+                Components.interfaces.nsIMsgIdentity);
+        } catch (e) {
+            done = true;
+        }
         if (identity) {
             this.sentMailIdentities[identity.email] = true;
         }
