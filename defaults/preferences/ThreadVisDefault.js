@@ -26,6 +26,7 @@ pref("extensions.threadvis.visualisation.arcdifference", 6);
 pref("extensions.threadvis.visualisation.arcwidth", 2);
 pref("extensions.threadvis.visualisation.colour", "author");
 pref("extensions.threadvis.visualisation.colours.background", "");
+pref("extensions.threadvis.visualisation.colours.border", "#cccccc");
 pref("extensions.threadvis.visualisation.colours.received", "#7FFF00,#00FFFF,#7F00FF,#997200,#009926,#002699,#990072,#990000,#4C9900,#009999,#4C0099,#FFBF00,#00FF3F,#003FFF,#FF00BF");
 pref("extensions.threadvis.visualisation.colours.sent", "#ff0000");
 pref("extensions.threadvis.visualisation.dotsize", 12);
