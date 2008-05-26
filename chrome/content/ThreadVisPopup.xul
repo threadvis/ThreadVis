@@ -20,6 +20,7 @@
 <window id="ThreadVisPopup" title="&popupwindow.title;"
     onclose="THREADVIS.onVisualisationWindowClose();"
     persist="width height screenX screenY"
+    orient="vertical"
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
     <script src="chrome://threadvis/content/ArcVisualisation.js" />
@@ -53,13 +54,15 @@
                 oncommand="THREADVIS.visualisation.exportToSVG();" />
         </popup>
     </popupset>
+        <popupset id="ThreadVisPopUpSet">
+    </popupset>
     <hbox id="ThreadVis" style="border: 1px solid #cccccc;" flex="1">
 
         <hbox flex="1">
             <vbox flex="1">
                 <vbox id="ThreadVisBox" style="overflow: hidden;"
                     context="ThreadVisPopUp" flex="2" />
-                <hbox style="height: 5px;">
+                <hbox id="ThreadVisHorizontalScrollbar" style="height: 5px;">
                     <hbox id="ThreadVisScrollbarLeft"
                         style="width: 6px; height: 5px; padding-right: 1px; visibility: hidden;">
                         <image src="chrome://threadvis/content/images/arrowleft.png"
@@ -78,7 +81,7 @@
                     </hbox>
                 </hbox>
             </vbox>
-            <vbox>
+            <vbox id="ThreadVisVerticalScrollbar">
                 <vbox flex="1">
                     <hbox id="ThreadVisScrollbarUp"
                         style="width: 5px; height: 6px; padding-bottom: 1px; visibility: hidden;">
@@ -102,7 +105,7 @@
             </vbox>
         </hbox>
 
-        <vbox>
+        <vbox id="ThreadVisButtons">
                 <hbox id="ThreadVisZoomIn" onclick="THREADVIS.zoomIn();">
                     <image src="chrome://threadvis/content/images/plus.png"
                         style="width: 16px; height: 16px; padding: 1px;"

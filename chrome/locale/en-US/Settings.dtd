@@ -11,6 +11,7 @@
  ********************************************************/
 -->
 <!ENTITY settings.title                                     "ThreadVis">
+<!ENTITY label.default                                      "(default)">
 <!ENTITY extension.enabled                                  "Enable Extension">
 <!ENTITY logfiles.tab                                       "Logfiles">
 <!ENTITY logfiles.caption                                   "Enable Logging">
@@ -31,9 +32,9 @@
 <!ENTITY visualisation.caching.caption                      "Cache">
 <!ENTITY visualisation.caching.reset                        "Reset Cache for Selected Account">
 <!ENTITY visualisation.caching.selectAccount                "Select Account...">
-<!ENTITY visualisation.defaultzoom.caption                  "Maximum Size of the Visualisation">
-<!ENTITY visualisation.defaultzoom.width                    "x visible width">
-<!ENTITY visualisation.defaultzoom.height                   "x visible height">
+<!ENTITY visualisation.zoom.caption                         "Default Size">
+<!ENTITY visualisation.zoom.fit                             "fit">
+<!ENTITY visualisation.zoom.full                            "full">
 <!ENTITY visualisation.enabledaccounts.caption              "Enabled Accounts and Folders">
 <!ENTITY visualisation.enabledaccounts.description          "Only enable extension for selected accounts and folders.">
 <!ENTITY visualisation.timescaling.caption                  "Time Scaling">

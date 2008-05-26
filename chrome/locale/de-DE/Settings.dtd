@@ -11,6 +11,7 @@
  ********************************************************/
 -->
 <!ENTITY settings.title                                     "ThreadVis">
+<!ENTITY label.default                                      "(Standard)">
 <!ENTITY extension.enabled                                  "Erweiterung aktivieren">
 <!ENTITY logfiles.tab                                       "Log-Dateien">
 <!ENTITY logfiles.caption                                   "Logging aktivieren">
@@ -31,9 +32,9 @@
 <!ENTITY visualisation.caching.caption                      "Cache">
 <!ENTITY visualisation.caching.reset                        "Cache f&#xFC;r ausgew&#xE4;hltes Konto zur&#xFC;cksetzen">
 <!ENTITY visualisation.caching.selectAccount                "Konto w&#xE4;hlen...">
-<!ENTITY visualisation.defaultzoom.caption                  "Maximale Gr&#xF6;&#xDF;e der Visualisierung">
-<!ENTITY visualisation.defaultzoom.width                    "x sichtbare Breite">
-<!ENTITY visualisation.defaultzoom.height                   "x sichtbare H&#xF6;he">
+<!ENTITY visualisation.zoom.caption                         "Standard-Gr&#xF6;&#xDF;e">
+<!ENTITY visualisation.zoom.fit                             "angepasst (Auto-Zoom)">
+<!ENTITY visualisation.zoom.full                            "normale Gr&#xF6;&#xDF;e (kein Zoom)">
 <!ENTITY visualisation.enabledaccounts.caption              "Aktivierte Konten und Ordner">
 <!ENTITY visualisation.enabledaccounts.description          "Aktiviert die Erweiterung nur f&#xFC;r die ausgew&#xE4;hlten Konten und Ordner.">
 <!ENTITY visualisation.timescaling.caption                  "Time Scaling">

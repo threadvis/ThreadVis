@@ -45,8 +45,7 @@ function PreferenceObserver() {
     this.PREF_VIS_HIGHLIGHT = "visualisation.highlight";
     this.PREF_VIS_OPACITY = "visualisation.opacity";
     this.PREF_VIS_SVG = "visualisation.svg";
-    this.PREF_ZOOM_HEIGHT = "zoom.height";
-    this.PREF_ZOOM_WIDTH = "zoom.width";
+    this.PREF_VIS_ZOOM = "visualisation.zoom";
 
     // save cache update timestamps per account
     this.PREF_CACHE_LASTUPDATETIMESTAMP = "cache.updatetimestamp";
@@ -194,10 +193,8 @@ PreferenceObserver.prototype.preferenceReload = function() {
         this.prefBranch.PREF_INT, 30);
     this.loadPreference(this.PREF_VIS_SVG,
         this.prefBranch.PREF_BOOL, false);
-    this.loadPreference(this.PREF_ZOOM_HEIGHT,
-        this.prefBranch.PREF_STRING, "1");
-    this.loadPreference(this.PREF_ZOOM_WIDTH,
-        this.prefBranch.PREF_STRING, "1");
+    this.loadPreference(this.PREF_VIS_ZOOM,
+        this.prefBranch.PREF_STRING, "full");
     this.loadPreference(this.PREF_CACHE_LASTUPDATETIMESTAMP,
         this.prefBranch.PREF_STRING, "");
 }

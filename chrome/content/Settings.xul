@@ -45,8 +45,7 @@
         "visualisationMessageCircles",
         "visualisationOpacity",
         "visualisationSpacing",
-        "zoomWidth",
-        "zoomHeight",
+        "visualisationZoom"
     ];
     ]]>
     </script>
@@ -140,7 +139,6 @@
                         <columns>
                             <column />
                             <column />
-                            <column />
                         </columns>
                         <rows>
                             <row>
@@ -152,11 +150,10 @@
                                     preftype="int">
                                     <menupopup>
                                         <menuitem label="8" value="8" />
-                                        <menuitem label="12" value="12" />
+                                        <menuitem label="12 &label.default;" value="12" />
                                         <menuitem label="16" value="16" />
                                     </menupopup>
                                 </menulist>
-                                <label value="(12)" />
                             </row>
                             <row>
                                 <label control="visualisationArcMinHeight"
@@ -167,11 +164,10 @@
                                     preftype="int">
                                     <menupopup>
                                         <menuitem label="8" value="8" />
-                                        <menuitem label="12" value="12" />
+                                        <menuitem label="12 &label.default;" value="12" />
                                         <menuitem label="16" value="16" />
                                     </menupopup>
                                 </menulist>
-                                <label value="(12)" />
                             </row>
                             <row>
                                 <label control="visualisationArcRadius"
@@ -185,11 +181,10 @@
                                         <menuitem label="8" value="8" />
                                         <menuitem label="16" value="16" />
                                         <menuitem label="24" value="24" />
-                                        <menuitem label="32" value="32" />
+                                        <menuitem label="32 &label.default;" value="32" />
                                         <menuitem label="40" value="40" />
                                     </menupopup>
                                 </menulist>
-                                <label value="(32)" />
                             </row>
                             <row>
                                 <label control="visualisation.arcDifference"
@@ -201,13 +196,12 @@
                                     <menupopup>
                                         <menuitem label="2" value="2" />
                                         <menuitem label="4" value="4" />
-                                        <menuitem label="6" value="6" />
+                                        <menuitem label="6 &label.default;" value="6" />
                                         <menuitem label="8" value="8" />
                                         <menuitem label="10" value="10" />
                                         <menuitem label="12" value="12" />
                                     </menupopup>
                                 </menulist>
-                                <label value="(6)" />
                             </row>
                             <row>
                                 <label control="visualisationArcWidth"
@@ -218,12 +212,11 @@
                                     preftype="int">
                                     <menupopup>
                                         <menuitem label="1" value="1" />
-                                        <menuitem label="2" value="2" />
+                                        <menuitem label="2 &label.default;" value="2" />
                                         <menuitem label="3" value="3" />
                                         <menuitem label="4" value="4" />
                                     </menupopup>
                                 </menulist>
-                                <label value="(2)" />
                             </row>
                             <row>
                                 <label control="visualisationSpacing"
@@ -234,11 +227,26 @@
                                     preftype="int">
                                     <menupopup>
                                         <menuitem label="16" value="16" />
-                                        <menuitem label="24" value="24" />
+                                        <menuitem label="24 &label.default;" value="24" />
                                         <menuitem label="32" value="32" />
                                     </menupopup>
                                 </menulist>
-                                <label value="(24)" />
+                            </row>
+                            <row>
+                                <label control="visualisationZoom"
+                                    value="&visualisation.zoom.caption;" />
+                                <menulist id="visualisationZoom"
+                                    preference="extensions.threadvis.visualisation.zoom"
+                                    prefstring="extensions.threadvis.visualisation.zoom"
+                                    preftype="string">
+                                    <menupopup>
+                                        <menuitem label="&visualisation.zoom.fit;" value="fit" />
+                                        <menuitem label="&visualisation.zoom.full;" value="full" />
+                                    </menupopup>
+                                </menulist>
+                            </row>
+                            <row>
+                                <separator class="thin" />
                             </row>
                             <row>
                                 <label control="visualisationMessageCircles"
@@ -251,24 +259,6 @@
                             </row>
                         </rows>
                     </grid>
-                    <separator />
-                    <groupbox>
-                        <caption label="&visualisation.defaultzoom.caption;" />
-                        <hbox>
-                            <textbox id="zoomWidth"
-                                preference="extensions.threadvis.zoom.width"
-                                prefstring="extensions.threadvis.zoom.width"
-                                preftype="string" size="4" />
-                            <label value="&visualisation.defaultzoom.width;" />
-                        </hbox>
-                        <hbox>
-                            <textbox id="zoomHeight"
-                                preference="extensions.threadvis.zoom.height"
-                                prefstring="extensions.threadvis.zoom.height"
-                                preftype="string" size="4" />
-                            <label value="&visualisation.defaultzoom.height;" />
-                        </hbox>
-                    </groupbox>
                 </tabpanel>
 
                 <tabpanel id="visualisation.colour" orient="vertical" flex="1">

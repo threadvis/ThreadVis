@@ -118,6 +118,9 @@ function Scrollbar(visualisation, stack, box) {
     window.addEventListener("resize", function(event) {
         ref.resize();
     }, false);
+
+    this.verticalShown = false;
+    this.horizontalShown = false;
 }
 
 
@@ -197,26 +200,28 @@ Scrollbar.prototype.draw = function() {
         this.arrowLeft.style.visibility = "hidden";
         this.arrowRight.style.visibility = "hidden";
     } else {
+        this.horizontalShown = true;
         this.boxHorizontal.style.visibility = "visible";
         this.arrowLeft.style.visibility = "visible";
         this.arrowRight.style.visibility = "visible";
+        this.horizontal.style.position = "relative";
+        this.horizontal.style.width = size.width + "px";
+        this.horizontal.style.left = position.x + "px";
     }
-    this.horizontal.style.position = "relative";
-    this.horizontal.style.width = size.width + "px";
-    this.horizontal.style.left = position.x + "px";
 
     if (size.hideVertical) {
         this.boxVertical.style.visibility= "hidden";
         this.arrowUp.style.visibility= "hidden";
         this.arrowDown.style.visibility= "hidden";
     } else {
+        this.verticalShown = true;
         this.boxVertical.style.visibility= "visible";
         this.arrowUp.style.visibility= "visible";
         this.arrowDown.style.visibility= "visible";
+        this.vertical.style.position = "relative";
+        this.vertical.style.height = size.height + "px";
+        this.vertical.style.top = position.y + "px";
     }
-    this.vertical.style.position = "relative";
-    this.vertical.style.height = size.height + "px";
-    this.vertical.style.top = position.y + "px";
 }
 
 
@@ -288,6 +293,33 @@ Scrollbar.prototype.getTotalWidth = function() {
  ******************************************************************************/
 Scrollbar.prototype.init = function(box) {
     this.box = box;
+}
+
+
+
+/** ****************************************************************************
+ * Return true if scrollbar is shown
+ ******************************************************************************/
+Scrollbar.prototype.isShown = function() {
+    return this.verticalShown || this.horizontalShown;
+}
+
+
+
+/** ****************************************************************************
+ * Return true if scrollbar is shown
+ ******************************************************************************/
+Scrollbar.prototype.isShownVertical = function() {
+    return this.verticalShown;
+}
+
+
+
+/** ****************************************************************************
+ * Return true if scrollbar is shown
+ ******************************************************************************/
+Scrollbar.prototype.isShownHorizontal= function() {
+    return this.horizontalShown;
 }
 
 
@@ -478,7 +510,10 @@ Scrollbar.prototype.panVertical = function(dy) {
  ******************************************************************************/
 Scrollbar.prototype.reset = function() {
     this.vertical.style.height = "0px";
+    this.vertical.style.top = "0px";
     this.horizontal.style.width = "0px";
+    this.horizontal.style.left = "0px";
+    this.shown = false;
 }
 
 

@@ -81,15 +81,6 @@ Visualisation.prototype.calculateArcHeights = function(containers) {
                     innerCounter++) {
                     var lookAtContainer = containers[innerCounter];
 
-                    /*
-                    if (lookatcontainer.getParent() == parent &&
-                        lookatcontainer.x_index_ == thiscontainer.x_index_ - 1)
-                    {
-                        free_height = lookatcontainer.arc_height_;
-                        break;
-                    }
-                    */
-
                     if (lookAtContainer.odd == parent.odd && 
                         lookAtContainer.currentArcHeightOutgoing[freeHeight] == 1) {
                         freeHeight++;
@@ -855,20 +846,7 @@ Visualisation.prototype.getNewColour = function(sent) {
         this.HEXtoDEC(hex.substr(0,2)),
         this.HEXtoDEC(hex.substr(2,2)),
         this.HEXtoDEC(hex.substr(4,2))
-        );
-    /*
-    if (sent) {
-        return {"hue" : 0, "value" : 100};
-    }
-    var hues = new Array(90,180,270,45,135,225,315,0,90,180,270,45,135,225,
-        315,0,90,180,270,45,135,225,315,0,90,180,270,45,135,225,315);
-    var values = new Array(100,100,100,60,60,60,60,60,60,60,60,100,
-        100,100,100,80,80,80,80,40,40,40,40,40,40,40,40,80,80,80,80);
-
-    this.lastColour = (this.lastColour + 1) % hues.length;
-
-    return {"hue" : hues[this.lastColour], "value" : values[this.lastColour]};
-    */
+    );
 }
 
 
@@ -935,8 +913,8 @@ Visualisation.prototype.getResize = function(xCount, yCount, sizeX, sizeY) {
 Visualisation.prototype.moveVisualisation = function(container) {
     var prefSpacing = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_SPACING);
-    var prefDefaultZoomHeight = parseFloat(THREADVIS.preferences.getPreference(
-        THREADVIS.preferences.PREF_ZOOM_HEIGHT));
+    /*var prefDefaultZoomHeight = parseFloat(THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_ZOOM_HEIGHT));*/
 
     // get current left margin
     if (THREADVIS.SVG) {
@@ -948,7 +926,7 @@ Visualisation.prototype.moveVisualisation = function(container) {
 
     var originalWidth = this.box.boxObject.width;
     var originalHeight = this.box.boxObject.height;
-    var height = originalHeight * this.zoom * prefDefaultZoomHeight;
+    var height = originalHeight * this.zoom;// * prefDefaultZoomHeight;
 
     if (container.xPosition * this.resize + oldMargin > originalWidth) {
         // calculate necessary margin
@@ -992,10 +970,10 @@ Visualisation.prototype.moveVisualisationTo = function(position) {
         }
         this.stack.setAttribute("transform", "translate(" + x + "," + y + ")");
     } else {
-        if (position.x) {
+        if (typeof(position.x) != "undefined") {
             this.stack.style.marginLeft = position.x + "px";
         }
-        if (position.y) {
+        if (typeof(position.y) != "undefined") {
             this.stack.style.marginTop = position.y + "px";
         }
     }
@@ -1032,6 +1010,11 @@ Visualisation.prototype.onMouseDown = function(event) {
         return;
     }
 
+    // only pan if visualisation is larger than viewport
+    if (this.scrollbar && ! this.scrollbar.isShown()) {
+        return;
+    }
+
     // remember box size now
     this.boxWidth = this.box.boxObject.width;
     this.boxHeight = this.box.boxObject.height;
@@ -1048,7 +1031,7 @@ Visualisation.prototype.onMouseDown = function(event) {
     this.panning = true;
 
     // set mouse cursor
-    this.box.style.cursor = "-moz-grabbing";
+    this.setCursor();
 }
 
 
@@ -1096,7 +1079,7 @@ Visualisation.prototype.onMouseMove = function(event) {
             dx = minDx;
         }
 
-         // don't move more to the bottom than necessary
+        // don't move more to the bottom than necessary
         if (dy > 0) {
             dy = 0;
         }
@@ -1107,8 +1090,12 @@ Visualisation.prototype.onMouseMove = function(event) {
         }
 
         var position = new Object;
-        position.x = dx;
-        position.y = dy;
+        if (this.scrollbar.isShownHorizontal()) {
+            position.x = dx;
+        }
+        if (this.scrollbar.isShownVertical()) {
+            position.y = dy;
+        }
 
         this.moveVisualisationTo(position);
 
@@ -1127,7 +1114,7 @@ Visualisation.prototype.onMouseUp = function(event) {
     this.panning = false;
 
     // reset mouse cursor
-    this.box.style.cursor = "-moz-grab";
+    this.setCursor();
 }
 
 
@@ -1160,6 +1147,24 @@ Visualisation.prototype.resetStack = function() {
 
     this.stack.style.marginLeft = "0px";
     this.stack.style.marginTop = "0px";
+}
+
+
+
+/** ****************************************************************************
+ * set the cursor
+ ******************************************************************************/
+Visualisation.prototype.setCursor = function() {
+    // set cursor to dragging if currently panning
+    if (this.panning) {
+        this.box.style.cursor = "-moz-grabbing";
+    }
+    // set cursor if visualisation is draggable
+    else if (this.scrollbar && this.scrollbar.isShown()) {
+        this.box.style.cursor = "-moz-grab";
+    } else {
+        this.box.style.cursor = "";
+    }
 }
 
 
@@ -1255,9 +1260,8 @@ Visualisation.prototype.timeScaling = function(containers,
     // laid out with the minimal horizontal spacing
     // e.g.
     // |---|---|---|
-    // width / spacing would lead to 3, but in effect we can only
-    // fit 2, since we want some spacing between the messages and the border
-    var maxCountX = (width / prefSpacing) - 1;
+    // width / spacing would lead to 3
+    var maxCountX = width / prefSpacing;
 
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
@@ -1353,10 +1357,8 @@ Visualisation.prototype.visualise = function(container, force) {
         THREADVIS.preferences.PREF_VIS_SPACING);
     var prefDotSize = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_DOTSIZE);
-    var prefDefaultZoomHeight = parseFloat(THREADVIS.preferences.getPreference(
-        THREADVIS.preferences.PREF_ZOOM_HEIGHT));
-    var prefDefaultZoomWidth = parseFloat(THREADVIS.preferences.getPreference(
-        THREADVIS.preferences.PREF_ZOOM_WIDTH));
+    var defaultZoom = THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_VIS_ZOOM);
     var prefColour = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_COLOUR);
     var prefTimeline = THREADVIS.preferences.getPreference(
@@ -1417,21 +1419,20 @@ Visualisation.prototype.visualise = function(container, force) {
     var availableSize = this.getBoxSize();
 
     // do time scaling
-    var width = availableSize.width * this.zoom * prefDefaultZoomWidth;
-    var height = availableSize.height  * this.zoom * prefDefaultZoomHeight;
-
+    var width = availableSize.width * this.zoom - (prefSpacing / this.resize);
+    var height = availableSize.height  * this.zoom;
     this.containers = this.timeScaling(this.containers, 
         minimalTimeDifference, width);
 
     // do final resizing
-    this.resize = this.getResize(this.containers.length, totalMaxHeight,
-        width, height);
+    if (defaultZoom == "fit") {
+        this.resize = this.getResize(this.containers.length, totalMaxHeight,
+            width, height);
+    } else {
+        this.resize = 1;
+    }
 
     var x = (prefSpacing / 2) * (1 / this.resize);
-
-    // vertically center the visualisation
-    topHeight = topHeight - (prefDotSize / 2) + ((availableSize.height * 
-        (1 / this.resize) - (topHeight + bottomHeight)) / 2);
 
     // pre-calculate colours for different authors
     this.authors = new Object();
@@ -1528,9 +1529,12 @@ Visualisation.prototype.visualise = function(container, force) {
                 position, arcHeight, parent.xPosition, x, topHeight, 
                 opacity);
         }
-        x = x + (thisContainer.xScaled * prefSpacing);
+        if (counter < this.containers.length - 1) {
+            x = x + (thisContainer.xScaled * prefSpacing);
+        }
     }
-    x += (prefSpacing / 2) * (1 / this.resize);
+
+    x += prefDotSize * this.resize + (prefSpacing / 2) * (1 / this.resize);
 
     // if visualisation needs less space than available, make box smaller
     if (x * this.resize < this.maxSizeWidth) {
@@ -1552,7 +1556,6 @@ Visualisation.prototype.visualise = function(container, force) {
     popupBox.style.width = "100%";
     popupBox.style.height = "100%";
     popupBox.setAttribute("context", "ThreadVisPopUp");
-    //this.stack.appendChild(popupBox);
 
     if (prefTimeline) {
         if (THREADVIS.SVG) {
@@ -1583,8 +1586,14 @@ Visualisation.prototype.visualise = function(container, force) {
     clearInterval(this.checkResizeInterval);
     this.checkResizeInterval = setInterval(function() {ref.checkSize();}, 100);
 
-    // set cursor
-    this.box.style.cursor = "-moz-grab";
+    // set cursor if visualisation is draggable
+    this.setCursor();
+
+    // vertically center the visualisation
+    var centerY = (availableSize.height - prefDotSize * this.resize) / 2;
+    var nowY = topHeight * this.resize;
+    var deltaY = centerY - nowY;
+    this.moveVisualisationTo({y: deltaY});
 }
 
 
@@ -1603,10 +1612,8 @@ Visualisation.prototype.visualiseExisting = function(container) {
         THREADVIS.preferences.PREF_VIS_DOTSIZE);
     var prefSpacing = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_SPACING);
-    var prefDefaultZoomHeight = parseFloat(THREADVIS.preferences.getPreference(
-        THREADVIS.preferences.PREF_ZOOM_HEIGHT));
-    var prefDefaultZoomWidth = parseFloat(THREADVIS.preferences.getPreference(
-        THREADVIS.preferences.PREF_ZOOM_WIDTH));
+    var defaultZoom = THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_VIS_ZOOM);
     var prefColour = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_COLOUR);
     var prefTimeline = THREADVIS.preferences.getPreference(
@@ -1634,20 +1641,22 @@ Visualisation.prototype.visualiseExisting = function(container) {
         + preSize.bottomHeight * prefArcDifference;
 
     var availableSize = this.getBoxSize();
-    var width = availableSize.width * this.zoom * prefDefaultZoomWidth;
-    var height = availableSize.height * this.zoom * prefDefaultZoomHeight;
 
+    // do timescaling
+    var width = availableSize.width * this.zoom - (prefSpacing / this.resize);
+    var height = availableSize.height * this.zoom;
     this.containers = this.timeScaling(this.containers, minimalTimeDifference,
         width);
 
     // do final resizing
-    var x = prefSpacing / 2;
-    this.resize = this.getResize(this.containers.length, totalMaxHeight,
-        width, height);
+    if (defaultZoom == "fit") {
+        this.resize = this.getResize(this.containers.length, totalMaxHeight,
+            width, height);
+    } else {
+        this.resize = 1;
+    }
 
-    // vertically center the visualisation
-    topHeight = topHeight - (prefDotSize / 2) + ((availableSize.height *
-        (1 / this.resize) - (topHeight + bottomHeight)) / 2);
+    var x = (prefSpacing / 2) * (1 / this.resize);
 
     for (var counter = 0; counter < this.containers.length; counter++) {
         var thisContainer = this.containers[counter];
@@ -1756,10 +1765,18 @@ Visualisation.prototype.visualiseExisting = function(container) {
             prefArcMinHeight + prefDotSize - prefArcWidth - 2);
     }
 
+    // reset vertical position before drawing scrollbars
+    this.moveVisualisationTo({y: 0});
     this.scrollbar.draw();
 
-    // set cursor
-    this.box.style.cursor = "-moz-grab";
+    // set cursor if visualisation is draggable
+    this.setCursor();
+
+    // vertically center the visualisation
+    var centerY = (availableSize.height - prefDotSize * this.resize) / 2;
+    var nowY = topHeight * this.resize;
+    var deltaY = centerY - nowY;
+    this.moveVisualisationTo({y: deltaY});
 }
 
 
@@ -1986,13 +2003,6 @@ Visualisation.prototype.exportToSVG = function(container, force) {
     }
 
     this.lastColour = lastColour;
-/*
-    if (prefTimeline) {
-        svg += new TimelineSVG(this.stack, this.strings, this.containers,
-                this.resize, prefDotSize, topHeight,
-                prefArcMinHeight + prefDotSize - prefArcWidth - 2).exportSVG();
-    }
-*/
 
     var script = "<script type='text/ecmascript'>"
         + "<![CDATA["
