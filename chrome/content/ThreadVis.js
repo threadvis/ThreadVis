@@ -14,7 +14,9 @@
 var THREADVIS = null;
 
 // add visualisation at startup
-addEventListener("load", createThreadVis, false);
+addEventListener("load", function() {
+    createThreadVis();
+}, false);
 
 
 
@@ -490,41 +492,45 @@ ThreadVis.prototype.init = function() {
         var ref = this;
         this.preferences = new PreferenceObserver();
         this.preferences.registerCallback(this.preferences.PREF_DISABLED_ACCOUNTS,
-            function(value) {ref.preferenceChanged(value);});
+            function(value) {ref.preferenceChanged();});
         this.preferences.registerCallback(this.preferences.PREF_DISABLED_FOLDERS,
-            function(value) {ref.preferenceChanged(value);});
+            function(value) {ref.preferenceChanged();});
         this.preferences.registerCallback(this.preferences.PREF_ENABLED,
-            function(value) {ref.preferenceChanged(value);});
+            function(value) {ref.preferenceChanged();});
         this.preferences.registerCallback(this.preferences.PREF_TIMELINE,
-            function(value) {ref.preferenceChanged(value);});
+            function(value) {ref.preferenceChanged();});
         this.preferences.registerCallback(this.preferences.PREF_TIMESCALING,
-            function(value) {ref.preferenceChanged(value);});
+            function(value) {ref.preferenceChanged();});
         this.preferences.registerCallback(this.preferences.PREF_VIS_DOTSIZE,
-            function(value) {ref.preferenceChanged(value);});
+            function(value) {ref.preferenceChanged();});
         this.preferences.registerCallback(this.preferences.PREF_VIS_ARC_MINHEIGHT,
-            function(value) {ref.preferenceChanged(value);});
+            function(value) {ref.preferenceChanged();});
         this.preferences.registerCallback(this.preferences.PREF_VIS_ARC_RADIUS,
-            function(value) {ref.preferenceChanged(value);});
+            function(value) {ref.preferenceChanged();});
         this.preferences.registerCallback(this.preferences.PREF_VIS_ARC_DIFFERENCE,
-            function(value) {ref.preferenceChanged(value);});
+            function(value) {ref.preferenceChanged();});
         this.preferences.registerCallback(this.preferences.PREF_VIS_ARC_WIDTH,
-            function(value) {ref.preferenceChanged(value);});
+            function(value) {ref.preferenceChanged();});
         this.preferences.registerCallback(this.preferences.PREF_VIS_SPACING,
-            function(value) {ref.preferenceChanged(value);});
+            function(value) {ref.preferenceChanged();});
         this.preferences.registerCallback(this.preferences.PREF_VIS_MESSAGE_CIRCLES,
-            function(value) {ref.preferenceChanged(value);});
+            function(value) {ref.preferenceChanged();});
         this.preferences.registerCallback(this.preferences.PREF_VIS_COLOUR,
-            function(value) {ref.preferenceChanged(value);});
+            function(value) {ref.preferenceChanged();});
         this.preferences.registerCallback(this.preferences.PREF_VIS_COLOURS_BACKGROUND,
-            function(value) {ref.preferenceChanged(value);});
+            function(value) {ref.preferenceChanged();});
+        this.preferences.registerCallback(this.preferences.PREF_VIS_COLOURS_BORDER,
+            function(value) {ref.preferenceChanged();});
+        this.preferences.registerCallback(this.preferences.PREF_VIS_COLOURS_RECEIVED,
+            function(value) {ref.preferenceChanged();});
+        this.preferences.registerCallback(this.preferences.PREF_VIS_COLOURS_SENT,
+            function(value) {ref.preferenceChanged();});
         this.preferences.registerCallback(this.preferences.PREF_VIS_HIGHLIGHT,
-            function(value) {ref.preferenceChanged(value);});
+            function(value) {ref.preferenceChanged();});
         this.preferences.registerCallback(this.preferences.PREF_VIS_OPACITY,
-            function(value) {ref.preferenceChanged(value);});
-        this.preferences.registerCallback(this.preferences.PREF_ZOOM_HEIGHT,
-            function(value) {ref.preferenceChanged(value);});
-        this.preferences.registerCallback(this.preferences.PREF_ZOOM_WIDTH,
-            function(value) {ref.preferenceChanged(value);});
+            function(value) {ref.preferenceChanged();});
+        this.preferences.registerCallback(this.preferences.PREF_VIS_ZOOM,
+            function(value) {ref.preferenceChanged();});
 
         this.cache = new Cache(this);
         // only create logger object if extension is enabled
@@ -553,7 +559,8 @@ ThreadVis.prototype.init = function() {
     // check to see if parent threadvis object exists
     if (this.threadvisParent) {
         // visualise selected message
-        this.visualise(this.threadvisParent.selectedContainer);
+        // delay drawing until size of box is known
+        this.delayDrawing();
         return;
     } else {
         if (! this.threader)
@@ -617,6 +624,23 @@ ThreadVis.prototype.init = function() {
     this.gMailSession.AddFolderListener(this.folderListener, notifyFlags);
 
     addEventListener("unload", function() {ref.unloadHandler()}, false);
+}
+
+
+
+/** ****************************************************************************
+ * Delay drawing of visualisation until size of box is known
+******************************************************************************/
+ThreadVis.prototype.delayDrawing = function() {
+    var boxSize = this.visualisation.getBoxSize();
+    if (boxSize.width > 0) {
+        this.visualise(this.threadvisParent.selectedContainer);
+    } else {
+        var ref = this;
+        setTimeout(function() {
+            ref.delayDrawing();
+        }, 100);
+    }
 }
 
 
@@ -746,7 +770,7 @@ ThreadVis.prototype.openThreadVisOptionsDialog = function() {
 /** ****************************************************************************
  * preference changed
  ******************************************************************************/
-ThreadVis.prototype.preferenceChanged = function(enabled) {
+ThreadVis.prototype.preferenceChanged = function() {
     this.visualisation.changed = true;
 
     if (this.popupWindow && this.popupWindow.THREADVIS)
