@@ -442,7 +442,10 @@ ContainerVisualisation.prototype.drawClick = function() {
     this.click.setAttribute("tooltip", "ThreadVis_" + this.left);
 
     this.stack.appendChild(this.click);
-    this.click.addEventListener("click", this.onMouseClick, true);
+    var ref = this;
+    this.click.addEventListener("click", function(event) {
+        ref.onMouseClick(event);
+    }, true);
 
     // prevent mousedown event from bubbling to box object
     // prevent dragging of visualisation by clicking on message
@@ -525,13 +528,26 @@ ContainerVisualisation.prototype.onMouseClick = function(event) {
 
     // check for double click
     if (event.detail > 1) {
+        clearTimeout(this.clickTimeout);
         if (THREADVIS.hasPopupVisualisation()) {
             THREADVIS.getMainWindow().ThreadPaneDoubleClick();
         } else {
             ThreadPaneDoubleClick();
         }
+    } else {
+        var ref = this;
+        this.clickTimeout = setTimeout(function() {
+            ref.onMouseClickDelayed(event);
+        }, 100);
     }
+}
 
+
+
+/** ****************************************************************************
+ * mouse click delayed, to catch for double click
+ ******************************************************************************/
+ContainerVisualisation.prototype.onMouseClickDelayed = function(event) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Visualisation.onMouseClick()", {});
