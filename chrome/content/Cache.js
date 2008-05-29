@@ -241,7 +241,7 @@ Cache.prototype.searchInSubFolder = function(folder, messageId) {
             subfolder = GetMsgFolderFromUri(currentFolderURI);
 
             // exclude virtual folders in search
-            if (! subfolder.flags & MSG_FOLDER_FLAG_VIRTUAL) {
+            if (! (subfolder.flags & MSG_FOLDER_FLAG_VIRTUAL)) {
                 if (currentFolderURI.substring(1,7) != "news://") {
                     msgHdr = this.searchInSubFolder(subfolder, messageId);
                 }
