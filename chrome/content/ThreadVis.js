@@ -224,7 +224,7 @@ ThreadVis.prototype.checkEnabledAccountOrFolder = function(folder) {
     var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
         .getService(Components.interfaces.nsIMsgAccountManager))
         .FindAccountForServer(server);
-    var regexpAccount = new RegExp(account.key);
+    var regexpAccount = new RegExp("\\b" + account.key + "\\b");
 
     if (this.preferences.getPreference(this.preferences.PREF_DISABLED_ACCOUNTS) != ""
         && this.preferences.getPreference(this.preferences.PREF_DISABLED_ACCOUNTS)
