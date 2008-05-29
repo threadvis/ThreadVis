@@ -240,25 +240,28 @@ Cache.prototype.searchInSubFolder = function(folder, messageId) {
                 .QueryInterface(Components.interfaces.nsIRDFResource).Value;
             subfolder = GetMsgFolderFromUri(currentFolderURI);
 
-            if (currentFolderURI.substring(1,7) != "news://") {
-                msgHdr = this.searchInSubFolder(subfolder, messageId);
-            }
-
-            if (!msgHdr) {
-                subfolder.updateFolder(msgWindow);
-                try {
-                    msgDB = subfolder.getMsgDatabase(msgWindow);
-                } catch (ex) {
-                    subfolder.updateFolder(msgWindow);
-                    msgDB = subfolder.getMsgDatabase(msgWindow);
+            // exclude virtual folders in search
+            if (! subfolder.flags & MSG_FOLDER_FLAG_VIRTUAL) {
+                if (currentFolderURI.substring(1,7) != "news://") {
+                    msgHdr = this.searchInSubFolder(subfolder, messageId);
                 }
-                msgHdr = msgDB.getMsgHdrForMessageID(messageId);
-            }
 
-            delete msgDB;
+                if (!msgHdr) {
+                    subfolder.updateFolder(msgWindow);
+                    try {
+                        msgDB = subfolder.getMsgDatabase(msgWindow);
+                    } catch (ex) {
+                        subfolder.updateFolder(msgWindow);
+                        msgDB = subfolder.getMsgDatabase(msgWindow);
+                    }
+                    msgHdr = msgDB.getMsgHdrForMessageID(messageId);
+                }
 
-            if (msgHdr) {
-                return msgHdr;
+                delete msgDB;
+
+                if (msgHdr) {
+                    return msgHdr;
+                }
             }
 
             try {
