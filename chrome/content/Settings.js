@@ -71,7 +71,7 @@ function buildAccountList() {
         checkbox.setAttribute("oncommand", "buildAccountPreference();");
         checkbox.setAttribute("accountkey", account.key);
         checkbox.setAttribute("checkboxtype", "account");
-        var regexp = new RegExp(account.key);
+        var regexp = new RegExp("\\b" + account.key + "\\b");
         if (pref != "" && pref.match(regexp)) {
             checkbox.setAttribute("checked", false);
         } else {
