@@ -57,7 +57,7 @@
         </popupset>
         <popupset id="ThreadVisPopUpSet">
         </popupset>
-        <hbox id="ThreadVis" style="border: 1px solid #cccccc;" flex="2">
+        <hbox id="ThreadVis" flex="2">
             <vbox flex="1">
                 <vbox id="ThreadVisBox"
                     style="overflow: hidden;" flex="1"
