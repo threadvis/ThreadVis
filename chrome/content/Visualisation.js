@@ -214,8 +214,10 @@ Visualisation.prototype.clearStack = function() {
         this.stack.style.marginTop = "0px";
         this.stack.style.padding = "5px";
     }
-    this.setVariableSize();
-    this.setFixedSize();
+    if (! THREADVIS.isPopupVisualisation()) {
+        this.setVariableSize();
+        this.setFixedSize();
+    }
 }
 
 
@@ -1537,8 +1539,10 @@ Visualisation.prototype.visualise = function(container, force) {
     x += prefDotSize * this.resize + (prefSpacing / 2) * (1 / this.resize);
 
     // if visualisation needs less space than available, make box smaller
-    if (x * this.resize < this.maxSizeWidth) {
-        this.setFixedSize(x * this.resize);
+    if (! THREADVIS.isPopupVisualisation()) {
+        if (x * this.resize < this.maxSizeWidth) {
+            this.setFixedSize(x * this.resize);
+        }
     }
 
     // underline authors if enabled
