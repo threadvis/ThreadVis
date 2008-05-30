@@ -197,6 +197,7 @@ Visualisation.prototype.clearStack = function() {
             "Visualisation.clearStack()", {});
     }
 
+    this.outerBox.hidden = false;
     while (this.stack.firstChild != null) {
         this.stack.removeChild(this.stack.firstChild);
     }
@@ -534,6 +535,13 @@ Visualisation.prototype.HEXtoDEC = function(hex) {
  ******************************************************************************/
 Visualisation.prototype.displayDisabled = function() {
     this.clearStack();
+
+    // if preference set, hide box completely
+    if (THREADVIS.preferences.getPreference(
+        THREADVIS.preferences.PREF_VIS_HIDE_ON_DISABLE)) {
+        this.outerBox.hidden = true;
+        return;
+    }
 
     if (THREADVIS.SVG) {
         var warning = document.createElementNS(THREADVIS.SVG_NAMESPACE, "text");
