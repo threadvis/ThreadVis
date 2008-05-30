@@ -228,6 +228,22 @@ ContainerVisualisation.prototype.getMenu = function() {
     this.popup.appendChild(menuitemCut);
     this.popup.appendChild(menuitemPaste);
 
+    // include normal menu items
+    var separator = document.createElementNS(THREADVIS.XUL_NAMESPACE,
+        "menuseparator");
+    this.popup.appendChild(separator);
+    var defaultPopup = document.getElementById("ThreadVisPopUp");
+    var items = defaultPopup.getElementsByTagName("menuitem");
+    for (var i = 0; i < items.length; i++) {
+        var item = document.createElementNS(THREADVIS.XUL_NAMESPACE,
+            "menuitem");
+        item.setAttribute("label",
+            items[i].getAttribute("label"));
+        item.setAttribute("oncommand",
+            items[i].getAttribute("oncommand"));
+        this.popup.appendChild(item);
+    }
+
     var ref = this;
     menuitemDelete.addEventListener("command",
         function() {ref.deleteParent();}, true);
