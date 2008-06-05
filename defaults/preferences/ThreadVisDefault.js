@@ -30,6 +30,7 @@ pref("extensions.threadvis.visualisation.colours.border", "");
 pref("extensions.threadvis.visualisation.colours.received", "#7FFF00,#00FFFF,#7F00FF,#997200,#009926,#002699,#990072,#990000,#4C9900,#009999,#4C0099,#FFBF00,#00FF3F,#003FFF,#FF00BF");
 pref("extensions.threadvis.visualisation.colours.sent", "#ff0000");
 pref("extensions.threadvis.visualisation.dotsize", 12);
+pref("extensions.threadvis.visualisation.hideondisable", true);
 pref("extensions.threadvis.visualisation.highlight", true);
 pref("extensions.threadvis.visualisation.spacing", 24);
 pref("extensions.threadvis.visualisation.opacity", 30);
