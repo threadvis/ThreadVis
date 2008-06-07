@@ -1,0 +1,17 @@
+/** ****************************************************************************
+ * ThreadVis.css
+ *
+ * (c) 2008 Alexander C. Hubmann-Haidvogel
+ *
+ * CSS file to layout visualisation
+ *
+ * $Id: About.css 419 2007-11-25 08:51:54Z sascha $
+ ******************************************************************************/
+
+splitter.mousehidden {
+    visibility: hidden;
+}
+
+splitter.mousehidden:hover {
+    visibility: visible;
+}

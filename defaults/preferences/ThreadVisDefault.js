@@ -32,6 +32,7 @@ pref("extensions.threadvis.visualisation.colours.sent", "#ff0000");
 pref("extensions.threadvis.visualisation.dotsize", 12);
 pref("extensions.threadvis.visualisation.hideondisable", true);
 pref("extensions.threadvis.visualisation.highlight", true);
+pref("extensions.threadvis.visualisation.minimalwidth", 0);
 pref("extensions.threadvis.visualisation.spacing", 24);
 pref("extensions.threadvis.visualisation.opacity", 30);
 pref("extensions.threadvis.visualisation.svg", false);

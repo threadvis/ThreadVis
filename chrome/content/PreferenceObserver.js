@@ -43,6 +43,7 @@ function PreferenceObserver() {
     this.PREF_VIS_COLOURS_RECEIVED = "visualisation.colours.received";
     this.PREF_VIS_COLOURS_SENT = "visualisation.colours.sent";
     this.PREF_VIS_HIGHLIGHT = "visualisation.highlight";
+    this.PREF_VIS_MINIMAL_WIDTH = "visualisation.minimalwidth";
     this.PREF_VIS_OPACITY = "visualisation.opacity";
     this.PREF_VIS_SVG = "visualisation.svg";
     this.PREF_VIS_ZOOM = "visualisation.zoom";
@@ -190,6 +191,8 @@ PreferenceObserver.prototype.preferenceReload = function() {
         this.prefBranch.PREF_STRING, "#ff0000");
     this.loadPreference(this.PREF_VIS_HIGHLIGHT,
         this.prefBranch.PREF_BOOL, true);
+    this.loadPreference(this.PREF_VIS_MINIMAL_WIDTH,
+        this.prefBranch.PREF_INT, 0);
     this.loadPreference(this.PREF_VIS_OPACITY,
         this.prefBranch.PREF_INT, 30);
     this.loadPreference(this.PREF_VIS_SVG,

@@ -46,6 +46,7 @@ function Visualisation() {
     this.stack = document.getElementById("ThreadVisStack");
     this.strings = document.getElementById("ThreadVisStrings");
     this.popups = document.getElementById("ThreadVisPopUpSet");
+    this.expandedHeaders = document.getElementById("expandedHeaders");
 }
 
 
@@ -1191,12 +1192,21 @@ Visualisation.prototype.setFixedSize = function(x, y) {
             + this.buttonsBox.boxObject.width;
     } else {
         outerWidth = this.outerBox.boxObject.width;
+        // check for minimal width
+        var minimalWidth = THREADVIS.preferences.getPreference(
+            THREADVIS.preferences.PREF_VIS_MINIMAL_WIDTH);
+        if (outerWidth < minimalWidth) {
+            outerWidth = minimalWidth;
+        }
     }
     var outerHeight = this.outerBox.boxObject.height;
 
-    this.outerBox.style.width = outerWidth + "px";
-    this.outerBox.style.height = outerHeight + "px";
+
+    this.outerBox.width = outerWidth;
+    this.outerBox.height = outerHeight;
     this.outerBox.setAttribute("flex", "0");
+    this.popups.removeAttribute("width");
+    this.expandedHeaders.removeAttribute("width");
 
     this.maxSizeWidth = outerWidth;
     this.maxSizeHeight = outerHeight;
@@ -1211,9 +1221,11 @@ Visualisation.prototype.setVariableSize = function() {
     if (this.scrollbar) {
         this.scrollbar.reset();
     }
-    this.outerBox.style.width = "";
-    this.outerBox.style.height = "";
+    this.outerBox.removeAttribute("width");
+    this.outerBox.removeAttribute("height");
     this.outerBox.setAttribute("flex", "2");
+    this.popups.removeAttribute("width");
+    this.expandedHeaders.removeAttribute("width");
 }
 
 

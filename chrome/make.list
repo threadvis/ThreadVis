@@ -24,6 +24,7 @@ content/Settings15.xul
 content/SettingsDialog.xul
 content/Status.xul
 content/Threader.js
+content/ThreadVis.css
 content/ThreadVis.js
 content/ThreadVis.xul
 content/ThreadVisPopup.xul

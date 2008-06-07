@@ -16,6 +16,7 @@
 
 
 <!DOCTYPE overlay SYSTEM "chrome://threadvis/locale/ThreadVis.dtd">
+<?xml-stylesheet href="chrome://threadvis/content/ThreadVis.css" type="text/css"?>
 <overlay id="ThreadVis"
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
     xmlns:svg="http://www.w3.org/2000/svg">
@@ -57,6 +58,8 @@
         </popupset>
         <popupset id="ThreadVisPopUpSet">
         </popupset>
+        <splitter class="mousehidden" oncommand="THREADVIS.setMinimalWidth();">
+        </splitter>
         <hbox id="ThreadVis" flex="2">
             <vbox flex="1">
                 <vbox id="ThreadVisBox"

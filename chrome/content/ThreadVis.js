@@ -782,6 +782,17 @@ ThreadVis.prototype.preferenceChanged = function() {
 
 
 /** ****************************************************************************
+ * Called after user resized visualisation using splitter
+ ******************************************************************************/
+ThreadVis.prototype.setMinimalWidth = function() {
+    var width = document.getElementById("ThreadVis").boxObject.width;
+    this.preferences.setPreference(this.preferences.PREF_VIS_MINIMAL_WIDTH,
+        width, this.preferences.PREF_INT);
+}
+
+
+
+/** ****************************************************************************
  * Called when a message is selected
  * Call visualisation with messageid to visualise
  ******************************************************************************/
