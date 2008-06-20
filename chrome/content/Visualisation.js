@@ -536,6 +536,7 @@ Visualisation.prototype.HEXtoDEC = function(hex) {
  ******************************************************************************/
 Visualisation.prototype.displayDisabled = function() {
     this.clearStack();
+    this.currentContainer = null;
 
     // if preference set, hide box completely
     if (THREADVIS.preferences.getPreference(
