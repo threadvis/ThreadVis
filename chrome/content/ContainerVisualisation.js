@@ -159,6 +159,11 @@ ContainerVisualisation.prototype.createMenu = function() {
  ******************************************************************************/
 ContainerVisualisation.prototype.getMenu = function() {
     if (this.popup.rendered == true) {
+        if (THREADVIS.copyMessage) {
+            this.menuitemPaste.setAttribute("disabled", false);
+        } else {
+            this.menuitemPaste.setAttribute("disabled", true);
+        }
         return;
     }
 
@@ -168,6 +173,8 @@ ContainerVisualisation.prototype.getMenu = function() {
         "menuitem");
     var menuitemPaste = document.createElementNS(THREADVIS.XUL_NAMESPACE,
         "menuitem");
+
+    this.menuitemPaste = menuitemPaste;
 
     // delete menu item
     menuitemDelete.setAttribute("label",
@@ -208,6 +215,11 @@ ContainerVisualisation.prototype.getMenu = function() {
     // paste menu item
     menuitemPaste.setAttribute("label",
         this.strings.getString("copycut.paste"));
+    if (THREADVIS.copyMessage) {
+        menuitemPaste.setAttribute("disabled", false);
+    } else {
+        menuitemPaste.setAttribute("disabled", true);
+    }
     var tooltipPaste = document.createElementNS(THREADVIS.XUL_NAMESPACE,
         "tooltip");
     tooltipPaste.setAttribute("orient", "vertical");
@@ -633,6 +645,7 @@ ContainerVisualisation.prototype.paste = function() {
                 "pasted-msgkey" : thisMsgkey});
         }
     }
+    THREADVIS.copyMessage = null;
 }
 
 
