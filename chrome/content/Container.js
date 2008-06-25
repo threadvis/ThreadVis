@@ -809,8 +809,9 @@ Container.prototype.toStringThread = function() {
  * Get string cache
  ******************************************************************************/
 Container.prototype.getCache = function() {
-    var string = ! this.isDummy() ? "\"" + this.getMessage().getId()
-        + "\"" : "\"DUMMY\"";
+    // escape quote characters to avoid exceptions when eval'ing the cache
+    var string = ! this.isDummy() ? "\""
+        + this.getMessage().getId().replace(/\"/g, "\\\"") + "\"" : "\"DUMMY\"";
 
     string += ",";
     if (this.hasChild()) {
