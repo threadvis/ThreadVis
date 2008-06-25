@@ -34,17 +34,20 @@ References.prototype.buildReferences = function(references) {
         var dupes = new Object();
         var distinct = new Array();
 
-        for (var i = result.length - 1; i >= 0; i--) {
-            // TODO
-            // email from user: some mail servers seem to change the
-            // message id after the @ sign
-            // add switch to ignore mail host after @ (setting in preferences)
-            var msgid = result[i];
-            if (dupes[msgid]) {
-                continue;
+        // result can be null if no matches have been found
+        if (result) {
+            for (var i = result.length - 1; i >= 0; i--) {
+                // TODO
+                // email from user: some mail servers seem to change the
+                // message id after the @ sign
+                // add switch to ignore mail host after @ (setting in preferences)
+                var msgid = result[i];
+                if (dupes[msgid]) {
+                    continue;
+                }
+                dupes[msgid] = msgid;
+                distinct.push(msgid);
             }
-            dupes[msgid] = msgid;
-            distinct.push(msgid);
         }
         distinct.reverse();
         this.references = distinct;
