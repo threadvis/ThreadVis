@@ -175,7 +175,19 @@ Cache.prototype.addToThreaderFromCache = function(cache, rootFolder) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "addToThreaderFromCache", {"action" : "start"});
     }
-    var elements = eval('(' + cache + ')');
+    // catch any errors from eval'ing the cache
+    var elements = null;
+    try {
+        elements = eval('(' + cache + ')');
+    } catch (ex) {
+        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+                "addToThreaderFromCache", {
+                    "error" : "eval'ing of cache string threw an exception",
+                    "exception" : ex});
+        }
+        return;
+    }
 
     for (var i = 0; i < elements.length; i++) {
         var msgId = elements[i];
