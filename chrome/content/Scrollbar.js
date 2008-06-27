@@ -513,8 +513,8 @@ Scrollbar.prototype.reset = function() {
     this.vertical.style.top = "0px";
     this.horizontal.style.width = "0px";
     this.horizontal.style.left = "0px";
-    this.shown = false;
-}
+    this.verticalShown = false;
+    this.horizontalShown = false;}
 
 
 
