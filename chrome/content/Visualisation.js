@@ -1452,7 +1452,7 @@ Visualisation.prototype.visualise = function(container, force) {
         this.resize = this.getResize(this.containers.length, totalMaxHeight,
             width, height);
     } else {
-        this.resize = 1;
+        this.resize = 1 * this.zoom;
     }
 
     var x = (prefSpacing / 2) * (1 / this.resize);
@@ -1678,7 +1678,7 @@ Visualisation.prototype.visualiseExisting = function(container) {
         this.resize = this.getResize(this.containers.length, totalMaxHeight,
             width, height);
     } else {
-        this.resize = 1;
+        this.resize = 1 * this.zoom;
     }
 
     var x = (prefSpacing / 2) * (1 / this.resize);
@@ -1830,6 +1830,10 @@ Visualisation.prototype.zoomIn = function(amount) {
  * Zoom out and draw new visualisation
  ******************************************************************************/
 Visualisation.prototype.zoomOut = function(amount) {
+    // don't zoom out if there are no scrollbars
+    if (! this.scrollbar.isShown()) {
+        return;
+    }
     if (! isFinite(amount) || amount == 0) {
         amount = 1;
     }
