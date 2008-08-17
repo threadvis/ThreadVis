@@ -2,7 +2,7 @@
  * Settings.js
  *
  * (c) 2005-2007 Alexander C. Hubmann
- * (c) 2007 Alexander C. Hubmann-Haidvogel
+ * (c) 2007-2008 Alexander C. Hubmann-Haidvogel
  *
  * JavaScript file for settings dialog
  *
@@ -54,6 +54,7 @@ function addAttachments(composeFields, attachments) {
 function buildAccountList() {
     var accountBox = document.getElementById("enableAccounts");
     var pref = document.getElementById("hiddenDisabledAccounts").value;
+    var strings = document.getElementById("threadVisStrings");
 
     var accountManager = Components.classes["@mozilla.org/messenger/account-manager;1"]
         .getService(Components.interfaces.nsIMsgAccountManager);
@@ -76,7 +77,25 @@ function buildAccountList() {
         } else {
             checkbox.setAttribute("checked", true);
         }
-        accountBox.appendChild(checkbox);
+
+        var buttonAll = document.createElementNS(XUL_NAMESPACE, "button");
+        buttonAll.setAttribute("label", strings.getString("enabledaccounts.button.all"));
+        buttonAll.setAttribute("accountkey", account.key);
+        buttonAll.setAttribute("oncommand", "selectAll(this);");
+        var buttonNone = document.createElementNS(XUL_NAMESPACE, "button");
+        buttonNone.setAttribute("label", strings.getString("enabledaccounts.button.none"));
+        buttonNone.setAttribute("accountkey", account.key);
+        buttonNone.setAttribute("oncommand", "selectNone(this);");
+        var spacer = document.createElementNS(XUL_NAMESPACE, "spacer");
+        spacer.setAttribute("flex", "1");
+        var hbox = document.createElementNS(XUL_NAMESPACE, "hbox");
+
+        hbox.appendChild(checkbox);
+        hbox.appendChild(spacer);
+        hbox.appendChild(buttonAll);
+        hbox.appendChild(buttonNone);
+        accountBox.appendChild(hbox);
+
         buildFolderCheckboxes(accountBox, folders, account.key, 1);
 
         var separator = document.createElementNS(XUL_NAMESPACE, "separator");
@@ -564,6 +583,44 @@ function saveAboutSettings() {
         preferences.setPreference(
             preferences.PREF_ABOUT, about,
             preferences.PREF_INT);
+    }
+}
+
+
+
+/** ****************************************************************************
+ * select all folders for an account
+ ******************************************************************************/
+function selectAll(element) {
+    var accountKey = element.getAttribute("accountkey");
+
+    var accountBox = document.getElementById("enableAccounts");
+    var folderCheckboxes = accountBox
+        .getElementsByAttribute("checkboxtype", "folder");
+    for (var j = 0; j < folderCheckboxes.length; j++) {
+        var folderCheckbox = folderCheckboxes.item(j);
+        if (folderCheckbox.getAttribute("accountkey") == accountKey) {
+            folderCheckbox.checked = true;
+        }
+    }
+}
+
+
+
+/** ****************************************************************************
+ * deselect all folders for an account
+ ******************************************************************************/
+function selectNone(element) {
+    var accountKey = element.getAttribute("accountkey");
+
+    var accountBox = document.getElementById("enableAccounts");
+    var folderCheckboxes = accountBox
+        .getElementsByAttribute("checkboxtype", "folder");
+    for (var j = 0; j < folderCheckboxes.length; j++) {
+        var folderCheckbox = folderCheckboxes.item(j);
+        if (folderCheckbox.getAttribute("accountkey") == accountKey) {
+            folderCheckbox.checked = false;
+        }
     }
 }
 
