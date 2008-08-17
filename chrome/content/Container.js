@@ -320,7 +320,7 @@ Container.prototype.getDummy = function() {
     var container = null;
     for (container = this.getChild(); container != null;
         container = container.getNext()) {
-        if (container.getMessage() == null) {
+        if (container.isDummy()) {
             return container;
         }
     }
@@ -809,20 +809,19 @@ Container.prototype.toStringThread = function() {
  * Get string cache
  ******************************************************************************/
 Container.prototype.getCache = function() {
-    // escape quote characters to avoid exceptions when eval'ing the cache
-    var string = ! this.isDummy() ? "\""
-        + this.getMessage().getId().replace(/\"/g, "\\\"") + "\"" : "\"DUMMY\"";
+    var cache = [];
 
-    string += ",";
+    if (! this.isDummy()) {
+        cache.push(this.getMessage().getId());
+    }
+
     if (this.hasChild()) {
         // get cache for all children
         var container = null;
         for (container = this.getChild(); container != null;
             container = container.getNext()) {
-            string += container.getCache() + ",";
+            cache = cache.concat(container.getCache());
         }
     }
-    string = string.substring(0, string.length - 1);
-
-    return string;
+    return cache;
 }

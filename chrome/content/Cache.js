@@ -15,20 +15,31 @@ function Cache(threadvis) {
     this.updatingCache = false;
     this.addedMessages = new Array();
     this.newMessages = new Array();
+    this.openDatabases();
 }
 
 
 
 /** ****************************************************************************
- * Get cache string for message
- * Read X-ThreadVis-Cache
+ * Get cache array for message
  ******************************************************************************/
-Cache.prototype.getCache = function(msg) {
+Cache.prototype.getCache = function(msg, accountKey) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "getCache", {"action" : "start"});
     }
-    var cache = this.getCacheInternal(msg, false);
+    var server = msg.folder.server;
+    var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
+        .getService(Components.interfaces.nsIMsgAccountManager))
+        .FindAccountForServer(server);
+
+    var cache = this.getCacheInternal(msg, account.key, false);
+
+    account = null;
+    delete account;
+    server = null;
+    delete server;
+
     this.threadvis.getThreader().thread();
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
@@ -40,24 +51,63 @@ Cache.prototype.getCache = function(msg) {
 
 
 /** ****************************************************************************
- * Get cache string for message (internal)
+ * Get cache array for message (internal)
  ******************************************************************************/
-Cache.prototype.getCacheInternal = function(msg, references) {
+Cache.prototype.getCacheInternal = function(msg, accountKey, references) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "getCacheInternal", {"action" : "start"});
     }
-    var cache = "";
-    cache = msg.getStringProperty("X-ThreadVis-Cache");
+
+    var cache = [];
+    var connection = this.getDatabaseConnection(accountKey);
+    var statement = connection.createStatement(
+        "SELECT threadid FROM threads WHERE msgid = ?");
+    statement.bindStringParameter(0, msg.messageId);
+
+    var threadId = null;
+    try {
+        if (statement.executeStep()) {
+            threadId = statement.getInt32(0);
+        }
+    } catch (ex) {
+        THREADVIS.logger.log("Error while performing SQL statement", {
+            "exception": ex});
+    } finally {
+        statement.reset();
+        statement = null;
+    }
+
+    if (threadId != null) {
+        statement = connection.createStatement(
+            "SELECT msgid FROM threads WHERE threadid = ?");
+        statement.bindInt32Parameter(0, threadId);
+        try {
+            while (statement.executeStep()) {
+                var msgid = statement.getString(0);
+                cache.push(msgid);
+            }
+        } catch (ex) {
+            THREADVIS.logger.log("Error while performing SQL statement", {
+                "exception": ex});
+        } finally {
+            statement.reset;
+            statement = null;
+        }
+    }
+
+    connection = null;
+    delete connection;
+
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "getCacheInternal", {"read cache" : cache});
     }
-    if (cache != "") {
+    if (cache.length > 0) {
         this.addToThreaderFromCache(cache, msg.folder.rootFolder);
     } else {
         if (references) {
-            this.addToThreaderFromReferences(msg);
+            this.addToThreaderFromReferences(msg, accountKey);
         }
     }
 
@@ -74,7 +124,7 @@ Cache.prototype.getCacheInternal = function(msg, references) {
 /** ****************************************************************************
  * Add all messages from references to threader
  ******************************************************************************/
-Cache.prototype.addToThreaderFromReferences = function(msg) {
+Cache.prototype.addToThreaderFromReferences = function(msg, accountKey) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "addToThreaderFromReferences", {"action" : "start"});
@@ -84,6 +134,7 @@ Cache.prototype.addToThreaderFromReferences = function(msg) {
     this.threadvis.addMessage(msg);
     var references = (new References(msg.getStringProperty("references")))
         .getReferences();
+
     for (var i = 0; i < references.length; i++) {
         var ref = references[i];
         // fixxme rootfolder
@@ -92,7 +143,7 @@ Cache.prototype.addToThreaderFromReferences = function(msg) {
         }
         var refMessage = this.searchMessageByMsgId(ref, rootFolder);
         if (refMessage) {
-            this.getCacheInternal(refMessage, true);
+            this.getCacheInternal(refMessage, accountKey, true);
         }
     }
 
@@ -107,21 +158,25 @@ Cache.prototype.addToThreaderFromReferences = function(msg) {
 /** ****************************************************************************
  * Get cache string for container, store for all messages in thread
  ******************************************************************************/
-Cache.prototype.updateCache = function(container, rootFolder) {
+Cache.prototype.updateCache = function(container, msg) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "updateCache", {"action" : "start"});
     }
     var topcontainer = container.getTopContainer();
     var cache = topcontainer.getCache();
-    cache = "[" + cache + "]";
 
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "updateCache", {"cache" : cache});
     }
 
-    this.putCache(topcontainer, cache, rootFolder);
+    var server = msg.folder.server;
+    var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
+        .getService(Components.interfaces.nsIMsgAccountManager))
+        .FindAccountForServer(server);
+
+    this.putCache(cache, account.key);
 
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
@@ -134,30 +189,112 @@ Cache.prototype.updateCache = function(container, rootFolder) {
 /** ****************************************************************************
  * Recursivly put cache string in all messages
  ******************************************************************************/
-Cache.prototype.putCache = function(container, cache, rootFolder) {
+Cache.prototype.putCache = function(cache, accountKey) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "putCache", {"action" : "start",
-            "container" : container,
-            "cache" : cache});
-    }
-    if (! container.isDummy()) {
-        var msgId = container.getMessage().getId();
-        var msg = this.searchMessageByMsgId(msgId, rootFolder);
-        if (msg) {
-            if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-                THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-                    "putCache", {"cache" : cache});
-            }
-            msg.setStringProperty("X-ThreadVis-Cache", cache);
-        }
-        delete msg;
+            "cache" : cache,
+            "accountKey" : accountKey});
     }
 
-    var child = null;
-    for (child = container.getChild(); child != null; child = child.getNext()) {
-        this.putCache(child, cache, rootFolder);
+    if (cache.length == 0) {
+        return;
     }
+
+    var connection = this.getDatabaseConnection(accountKey);
+    var msgId = cache[0];
+    var statement = connection.createStatement(
+        "SELECT threadid FROM threads WHERE msgid = ?");
+    statement.bindStringParameter(0, msgId);
+
+    var threadId = null;
+    try {
+        if (statement.executeStep()) {
+            threadId = statement.getInt32(0);
+        }
+    } catch (ex) {
+        THREADVIS.logger.log("Error while performing SQL statement", {
+            "exception": ex});
+    } finally {
+        statement.reset();
+        statement = null;
+    }
+
+    // if threadId exists, reuse it, otherwise create a new id
+    if (threadId == null) {
+        statement = connection.createStatement(
+            "SELECT threadid FROM threadcounter");
+        try {
+            if (statement.executeStep()) {
+                threadId = statement.getInt32(0);
+            }
+        } catch (ex) {
+            THREADVIS.logger.log("Error while performing SQL statement", {
+                "exception": ex});
+        } finally {
+            statement.reset();
+            statement = null;
+        }
+        var exists = true;
+        if (threadId == null) {
+            threadId = 0;
+            exists = false;
+        }
+        threadId++;
+
+        if (exists) {
+            statement = connection.createStatement(
+                "UPDATE threadcounter SET threadid = ?");
+        } else {
+            statement = connection.createStatement(
+                "INSERT INTO threadcounter (threadid) VALUES (?)");
+        }
+        statement.bindInt32Parameter(0, threadId);
+        try {
+            statement.execute();
+        } catch (ex) {
+            THREADVIS.logger.log("Error while performing SQL statement", {
+                "exception": ex});
+        } finally {
+            statement.reset();
+            statement = null;
+        }
+    }
+
+    // clear cache for this threadid
+    statement = connection.createStatement(
+        "DELETE FROM threads WHERE threadid = ?");
+    try {
+        statement.bindInt32Parameter(0, threadId);
+        statement.execute();
+    } catch (ex) {
+        THREADVIS.logger.log("Error while performing SQL statement", {
+            "exception": ex});
+    } finally {
+        statement.reset();
+        statement = null;
+    }
+
+    // for all message ids in the cache, write to database
+    statement = connection.createStatement(
+        "INSERT INTO threads (msgid, threadid) VALUES (?, ?)");
+        var msgId = null;
+    try {
+        while ((msgId = cache.pop()) != null) {
+            statement.bindStringParameter(0, msgId);
+            statement.bindInt32Parameter(1, threadId);
+            statement.execute();
+        }
+    } catch (ex) {
+        THREADVIS.logger.log("Error while performing SQL statement", {
+            "exception": ex});
+    } finally {
+        statement.reset();
+        statement = null;
+    }
+
+    connection = null;
+    delete connection;
 
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
@@ -175,22 +312,9 @@ Cache.prototype.addToThreaderFromCache = function(cache, rootFolder) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "addToThreaderFromCache", {"action" : "start"});
     }
-    // catch any errors from eval'ing the cache
-    var elements = null;
-    try {
-        elements = eval('(' + cache + ')');
-    } catch (ex) {
-        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-                "addToThreaderFromCache", {
-                    "error" : "eval'ing of cache string threw an exception",
-                    "exception" : ex});
-        }
-        return;
-    }
 
-    for (var i = 0; i < elements.length; i++) {
-        var msgId = elements[i];
+    for (var i = 0; i < cache.length; i++) {
+        var msgId = cache[i];
         if (this.threadvis.getThreader().hasMessage(msgId)) {
             continue;
         }
@@ -261,10 +385,12 @@ Cache.prototype.searchInSubFolder = function(folder, messageId) {
                     }
 
                     if (!msgHdr) {
-                        subfolder.updateFolder(msgWindow);
+                        // again, do not call updateFolder, this is bad
+                        //subfolder.updateFolder(msgWindow);
                         try {
                             msgDB = subfolder.getMsgDatabase(msgWindow);
                         } catch (ex) {
+                            // can we do this here?
                             subfolder.updateFolder(msgWindow);
                             msgDB = subfolder.getMsgDatabase(msgWindow);
                         }
@@ -331,16 +457,16 @@ Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
 
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "updateNewMessagesInternal", {"action" : "start"});
+            "updateNewMessagesInternal", {"action" : "start",
+            "message" : message.messageId});
     }
+
+    this.threadvis.setStatus(null, {updateCache: {message: message,
+        accountKey: accountKey}});
 
     // check for already running update
     var ref = this;
     if (this.updatingCache) {
-        /*setTimeout(function() {
-                ref.updateNewMessagesInternal(message, doVisualise, accountKey,
-                    rootFolder);
-            }, 5000);*/
         return;
     }
 
@@ -405,8 +531,10 @@ Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
                     ref.threadvis.addMessage(item);
                     // also add messages from cache to threader, since we re-write
                     // the cache
-                    ref.getCacheInternal(item, true);
-                    //ref.getCacheInternal(header, false);
+                    // TODO: this is bad as it works around the queue we set up
+                    // don't add messages to the threader within the function, but return
+                    // a list of messages and add them to the queue here!
+                    ref.getCacheInternal(item, accountKey, true);
                     if (ref.cacheBuildCount <=1) {
                         if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
                             THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_WARNING,
@@ -447,6 +575,9 @@ Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
 
 
 
+/** ****************************************************************************
+ * Search for new messages is done, start threading
+ ******************************************************************************/
 Cache.prototype.onSearchDone = function(message, doVisualise,
     accountKey, rootFolder, newUpdateTimestamp) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
@@ -464,8 +595,12 @@ Cache.prototype.onSearchDone = function(message, doVisualise,
 }
 
 
+/** ****************************************************************************
+ * After messages have been threaded, check to see if message exists
+ ******************************************************************************/
 Cache.prototype.finishCache = function(message, doVisualise, accountKey,
     rootFolder, newUpdateTimestamp) {
+
     var container = this.threadvis.getThreader()
         .findContainer(message.messageId);
 
@@ -484,14 +619,10 @@ Cache.prototype.finishCache = function(message, doVisualise, accountKey,
             // set last update timestamp just before this message
             // set -10 minutes
             var messageUpdateTimestamp = message.date - 1000000*60*10;
-
-            // if we already tried to build cache for this message
-            // reset to 0 just in case
-            /*if (this.cacheBuildCount > 1) {
-                messageUpdateTimestamp = 0;
-            }*/
             this.setLastUpdateTimestamp(accountKey,
                 messageUpdateTimestamp);
+
+            this.threadvis.setStatus(null, {updateCache: {rethread: true}});
 
             this.updatingCache = false;
             this.updateNewMessagesInternal(message, doVisualise,
@@ -500,9 +631,8 @@ Cache.prototype.finishCache = function(message, doVisualise, accountKey,
         }
 
         var ref = this;
-        this.updateNewMessagesWriteCache(rootFolder, function() {
+        this.updateNewMessagesWriteCache(accountKey, function() {
             if (doVisualise) {
-                //ref.threadvis.visualiseMessage(message);
                 ref.threadvis.setSelectedMessage();
             }
             ref.updatingCache = false;
@@ -520,23 +650,6 @@ Cache.prototype.finishCache = function(message, doVisualise, accountKey,
         // -10 minutes
         var messageUpdateTimestamp = message.date - 1000000 * 60;
 
-        // if we already tried to build cache for this message
-        // reset to 0 just in case
-        /*if (this.cacheBuildCount > 1) {
-            messageUpdateTimestamp = 0;
-            if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-                THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_ERROR,
-                    "updateNewMessages", {
-                    "action" : "cache error, message not found. reset timestamp to 0.",
-                    "updateTimestamp" : messageUpdateTimestamp,
-                    "date" : new Date(updateTimestamp / 1000),
-                    "subject" : message.mime2DecodedSubject,
-                    "autor" : message.mime2DecodedAutor,
-                    "messageId" : message.messageId,
-                    "messagedate" : message.date
-                });
-            }
-        }*/
         if (this.cacheBuildCount > 2) {
             this.threadvis.setStatus(
                 this.threadvis.strings.getString("cache.error"));
@@ -553,6 +666,8 @@ Cache.prototype.finishCache = function(message, doVisualise, accountKey,
             this.updatingCache = false;
             return;
         }
+
+        this.threadvis.setStatus(null, {updateCache: {rethread: true}});
 
         this.updatingCache = false;
         this.setLastUpdateTimestamp(accountKey, messageUpdateTimestamp);
@@ -649,7 +764,9 @@ Cache.prototype.addSubFolders = function(searchSession, folder) {
                     & MSG_FOLDER_FLAG_VIRTUAL)) {
                     if (!nextFolder.noSelect &&
                         this.threadvis.checkEnabledAccountOrFolder(nextFolder)) {
-                        nextFolder.updateFolder(msgWindow);
+                        // NS_ERROR_NOT_INITIALIZED can happen here
+                        // i suppose we shouldn't do that at all
+                        //nextFolder.updateFolder(msgWindow);
                         var searchScope = nextFolder.server.searchScope;
                         if (searchScope == nsMsgSearchScope.onlineMail) {
                             // ??? FIXXME
@@ -687,109 +804,21 @@ Cache.prototype.addSubFolders = function(searchSession, folder) {
 /** ****************************************************************************
  * Reset all caches for all messages in account
  ******************************************************************************/
-Cache.prototype.reset = function(key) {
-    // get account for key
-    var accountManager = Components
-        .classes["@mozilla.org/messenger/account-manager;1"]
-        .getService(Components.interfaces.nsIMsgAccountManager);
-    var account = accountManager.getAccount(key)
+Cache.prototype.reset = function(accountKey) {
+    // reset update timestamp
+    this.setLastUpdateTimestamp(accountKey, 0);
 
-    var counter = 0;
-    if (account instanceof Components.interfaces.nsIMsgAccount) {
-        // reset update timestamp
-        this.setLastUpdateTimestamp(account.key, 0);
-
-        // reset all caches for all messages
-        var rootFolder = account.incomingServer.rootFolder;
-        var folders = this.resetGetAllFolders(rootFolder);
-        for (var j = 0; j < folders.length; j++) {
-            counter = this.resetAllMessages(folders[j], counter);
-        }
-    }
+    // reset the cache for the account, i.e. delete the cache file and
+    // re-create it
+    this.openDatabase(accountKey, true);
 }
 
-
-
-/** ****************************************************************************
- * Get all subfolders starting from "folder" as array
- ******************************************************************************/
-Cache.prototype.resetGetAllFolders = function(folder) {
-    // Seamonkey < 2 and Thunderbird <= 2 use GetSubFolders
-    // (which returns a nsIEnumerator)
-    // so we have to use .currentItem() and .next()
-    // Thunderbird 3 and Seamonkey 2 use subFolders (which returns a nsISimpleEnumerator
-    // so we have to use .getNext() and .hasMoreElements()
-    var folderEnumerator = null;
-    if (folder.GetSubFolders) {
-        folderEnumerator = folder.GetSubFolders();
-    }
-    if (folder.subFolders) {
-        folderEnumerator = folder.subFolders;
-    }
-    var currentFolder = null;
-    var folders = new Array();
-
-    while (true) {
-        try {
-            if (folderEnumerator.currentItem) {
-                currentFolder = folderEnumerator.currentItem();
-            }
-            if (folderEnumerator.getNext) {
-                currentFolder = folderEnumerator.getNext();
-            }
-        } catch (Exception) {
-            break;
-        }
-
-        if (currentFolder instanceof Components.interfaces.nsIMsgFolder) {
-            if (! (currentFolder.flags & MSG_FOLDER_FLAG_VIRTUAL)) {
-                folders.push(currentFolder);
-            }
-        }
-
-        if (currentFolder.hasSubFolders) {
-            folders.concat(this.resetGetAllFolders(currentFolder));
-        }
-
-        try {
-            if (folderEnumerator.next) {
-                folderEnumerator.next();
-            }
-            if (folderEnumerator.hasMoreElements &&
-                ! folderEnumerator.hasMoreElements()) {
-                break;
-            }
-        } catch (Exception) {
-            break;
-        }
-    }
-    return folders;
-}
-
-
-
-/** ****************************************************************************
- * Reset cache for all messages in folder
- ******************************************************************************/
-Cache.prototype.resetAllMessages = function(folder, counter) {
-    var enumerator = folder.getMessages(null);
-    while (enumerator.hasMoreElements()) {
-        var header = enumerator.getNext();
-        if (header instanceof Components.interfaces.nsIMsgDBHdr) {
-            counter++;
-            this.threadvis.setStatus(
-                this.threadvis.strings.getString("cache.reset.status") + counter);
-            header.setStringProperty("X-ThreadVis-Cache", "");
-        }
-    }
-    return counter;
-}
 
 
 /** ****************************************************************************
  * Write cache to disk for all new messages
  ******************************************************************************/
-Cache.prototype.updateNewMessagesWriteCache = function(rootFolder, callback) {
+Cache.prototype.updateNewMessagesWriteCache = function(accountKey, callback) {
     var util = new Util();
     var ref = this;
     this.updatedTopContainers = new Object();
@@ -805,16 +834,20 @@ Cache.prototype.updateNewMessagesWriteCache = function(rootFolder, callback) {
                     ref.threadvis.strings.getString("cache.update.status")
                         + count + " [" + remaining + "] " + timeRemaining);
             }
-            if (! ref.updatedTopContainers[topContainer]) {
-                ref.updatedTopContainers[topContainer] = true;
-                ref.updateCache(container, rootFolder);
+            var cache = topContainer.getCache();
+            if (! ref.updatedTopContainers[cache]) {
+                ref.updatedTopContainers[cache] = true;
+                ref.updateCache(container, item, accountKey);
                 ref.threadvis.getThreader().removeThread(topContainer);
             }
+            cache = null;
+            delete cache;
             delete container;
             delete topContainer;
         },
         onFinished: function() {
             ref.threadvis.setStatus("Cache done");
+            ref.commitDatabaseTransaction(accountKey);
             delete ref.newMessages;
             delete ref.addedMessages;
             delete ref.updatedTopContainers;
@@ -822,24 +855,151 @@ Cache.prototype.updateNewMessagesWriteCache = function(rootFolder, callback) {
             ref.addedMessages = new Array();
             ref.updatedTopContainers = new Object();
             ref.threadvis.getThreader().reset();
+            ref.threadvis.setStatus(null, {updateCache: null});
             callback();
         }
     });
+    // start transaction before writing messages
+    this.beginDatabaseTransaction(accountKey);
     util.process(this.newMessages);
 }
 
 
 
+/** ****************************************************************************
+ * Get the connection for a specific account
+ ******************************************************************************/
+Cache.prototype.getDatabaseConnection = function(account) {
+    return this.databaseConnections[account];
+}
+
+
+/** ****************************************************************************
+ * Open/create thread databases for all accounts
+ ******************************************************************************/
+Cache.prototype.openDatabases = function() {
+    this.databaseConnections = new Object();
+    var accountManager = Components.classes["@mozilla.org/messenger/account-manager;1"]
+        .getService(Components.interfaces.nsIMsgAccountManager);
+
+    var accounts = accountManager.accounts;
+    for (var i = 0; i < accounts.Count(); i++)  {
+        var account = accounts.QueryElementAt(i, Components.interfaces.nsIMsgAccount);
+        this.openDatabase(account.key);
+        delete account;
+        account = null;
+    }
+}
+
+
+
+/** ****************************************************************************
+ * Open/create thread database
+ ******************************************************************************/
+Cache.prototype.openDatabase = function(accountKey, forceRecreate) {
+    var storageService = Components.classes["@mozilla.org/storage/service;1"]
+        .getService(Components.interfaces.mozIStorageService);
+
+    // try to create file
+    var file = Components.classes["@mozilla.org/file/directory_service;1"]
+        .getService(Components.interfaces.nsIProperties)
+        .get("ProfD", Components.interfaces.nsIFile);
+
+    file.append("extensions");
+    if (! file.exists()) {
+        file.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
+    }
+
+    file.append("{A23E4120-431F-4753-AE53-5D028C42CFDC}");
+    if (! file.exists()) {
+        file.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
+    }
+
+    file.append("cache");
+    if (! file.exists()) {
+        file.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
+    }
+
+    // use one file per account to allow for selective cache clear
+    // and to avoid corruption
+    file.append(accountKey + ".cache.sqlite");
+
+    var connection = storageService.openDatabase(file);
+
+    // drop tables if forceRecreate
+    if (forceRecreate) {
+        if (connection.tableExists("threads")) {
+            connection.executeSimpleSQL("DROP TABLE threads");
+        }
+        if (connection.tableExists("threadcounter")) {
+            connection.executeSimpleSQL("DROP TABLE threadcounter");
+        }
+    }
+
+    var newCache = false;
+    // check for table
+    if (! connection.tableExists("threads")) {
+        connection.createTable("threads", "msgid string, threadid int");
+        connection.executeSimpleSQL("CREATE UNIQUE INDEX msgid_idx ON threads(msgid ASC)");
+        connection.executeSimpleSQL("CREATE INDEX threadid_idx ON threads(threadid ASC)");
+        newCache = true;
+    }
+    if (! connection.tableExists("threadcounter")) {
+        connection.createTable("threadcounter", "threadid int");
+        newCache = true;
+    }
+
+    // if new cache file, reset update timestamp so that all messages get
+    // re-cached
+    if (newCache) {
+        this.setLastUpdateTimestamp(accountKey, 0);
+    }
+    this.databaseConnections[accountKey] = connection;
+}
+
+
+
+/** ****************************************************************************
+ * Start a database transaction
+ ******************************************************************************/
+Cache.prototype.beginDatabaseTransaction = function(accountKey) {
+    this.getDatabaseConnection(accountKey).beginTransaction();
+}
+
+
+
+/** ****************************************************************************
+ * End a database transaction
+ ******************************************************************************/
+Cache.prototype.commitDatabaseTransaction = function(accountKey) {
+    this.getDatabaseConnection(accountKey).commitTransaction();
+}
+
+
+
+/** ****************************************************************************
+ * Utility class that provides background processing
+ ******************************************************************************/
 function Util() {
     this.listener = null;
     this.count = 0;
     this.startTime = 0;
 }
 
+
+
+/** ****************************************************************************
+ * Register listener
+ ******************************************************************************/
 Util.prototype.registerListener = function(listener) {
     this.listener = listener;
 }
 
+
+
+/** ****************************************************************************
+ * Process an array of elements
+ ******************************************************************************/
 Util.prototype.process = function(array) {
     if (this.startTime == 0) {
         this.startTime = (new Date()).getTime();
@@ -861,6 +1021,12 @@ Util.prototype.process = function(array) {
     }
 }
 
+
+
+
+/** ****************************************************************************
+ * Format remaining time to process array
+ ******************************************************************************/
 Util.prototype.formatTimeRemaining = function(remaining) {
     // remaining is in miliseconds
     remaining = remaining - (remaining % 1000);

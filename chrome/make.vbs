@@ -26,6 +26,13 @@ positionEnd = Instr(position, svninfo, vbNewLine, 1)
 length = positionEnd - position
 revision = Mid(svninfo, position, length)
 
+Set exec = shell.Exec("svn status ..")
+svnstatus = exec.StdOut.ReadAll
+position = InStr(1, svnstatus, "M     ", 1)
+If position > -1 Then
+    revision = revision + ".dev"
+End If
+
 ' ========================================================================
 ' Get newest version
 ' ========================================================================
@@ -47,55 +54,82 @@ End If
 ' Update code with version and revision
 ' ========================================================================
 
-Set settingsDtd = fso.OpenTextFile("locale\de-DE\Settings.dtd")
-contentDe = settingsDtd.ReadAll
-contentDeNew = Replace(contentDe, "<<build>>", revision)
-contentDeNew = Replace(contentDeNew, "<<version>>", version)
-settingsDtd.Close
+' DE Settings.dtd
+Set file = fso.OpenTextFile("locale\de-DE\Settings.dtd")
+settingsDe = file.ReadAll
+newContent = Replace(settingsDe, "<<build>>", revision)
+newContent = Replace(newContent, "<<version>>", version)
+file.Close
 
-Set settingsDtd = fso.OpenTextFile("locale\de-DE\Settings.dtd", 2)
-settingsDtd.write(contentDeNew)
-settingsDtd.Close
+Set file = fso.OpenTextFile("locale\de-DE\Settings.dtd", 2)
+file.write(newContent)
+file.Close
 
-Set settingsDtd = fso.OpenTextFile("locale\en-US\Settings.dtd")
-contentEn = settingsDtd.ReadAll
-contentEnNew = Replace(contentEn, "<<build>>", revision)
-contentEnNew = Replace(contentEnNew, "<<version>>", version)
-settingsDtd.Close
+' DE ThreadVis.dtd
+Set file = fso.OpenTextFile("locale\de-DE\ThreadVis.dtd")
+threadvisDe = file.ReadAll
+newContent = Replace(threadvisDe, "<<build>>", revision)
+newContent = Replace(newContent, "<<version>>", version)
+file.Close
 
-Set settingsDtd = fso.OpenTextFile("locale\en-US\Settings.dtd", 2)
-settingsDtd.write(contentEnNew)
-settingsDtd.close
+Set file = fso.OpenTextFile("locale\de-DE\ThreadVis.dtd", 2)
+file.write(newContent)
+file.Close
 
-Set aboutDtd = fso.OpenTextFile("locale\de-DE\ThreadVisAbout.dtd")
-aboutDe = aboutDtd.ReadAll
-aboutDeNew = Replace(aboutDe, "<<build>>", revision)
-aboutDeNew = Replace(aboutDeNew, "<<version>>", version)
-aboutDtd.Close
+' DE ThreadVisAbout.dtd
+Set file = fso.OpenTextFile("locale\de-DE\ThreadVisAbout.dtd")
+aboutDe = file.ReadAll
+newContent = Replace(aboutDe, "<<build>>", revision)
+newContent = Replace(newContent, "<<version>>", version)
+file.Close
 
-Set aboutDtd = fso.OpenTextFile("locale\de-DE\ThreadVisAbout.dtd", 2)
-aboutDtd.write(aboutDeNew)
-aboutDtd.Close
+Set file = fso.OpenTextFile("locale\de-DE\ThreadVisAbout.dtd", 2)
+file.write(newContent)
+file.Close
 
-Set aboutDtd = fso.OpenTextFile("locale\en-US\ThreadVisAbout.dtd")
-aboutEn = aboutDtd.ReadAll
-aboutEnNew = Replace(aboutEn, "<<build>>", revision)
-aboutEnNew = Replace(aboutEnNew, "<<version>>", version)
-aboutDtd.Close
+' EN Settings.dtd
+Set file = fso.OpenTextFile("locale\en-US\Settings.dtd")
+settingsEn = file.ReadAll
+newContent = Replace(settingsEn, "<<build>>", revision)
+newContent = Replace(newContent, "<<version>>", version)
+file.Close
 
-Set aboutDtd = fso.OpenTextFile("locale\en-US\ThreadVisAbout.dtd", 2)
-aboutDtd.write(aboutEnNew)
-aboutDtd.Close
+Set file = fso.OpenTextFile("locale\en-US\Settings.dtd", 2)
+file.write(newContent)
+file.close
 
-Set logger = fso.OpenTextFile("content\Logger.js")
-loggerText = logger.ReadAll
-loggerTextNew = Replace(loggerText, "<<build>>", revision)
-loggerTextNew = Replace(loggerTextNew, "<<version>>", version)
-logger.Close
+' EN ThreadVis.dtd
+Set file = fso.OpenTextFile("locale\en-US\ThreadVis.dtd")
+threadvisEn = file.ReadAll
+newContent = Replace(threadvisEn, "<<build>>", revision)
+newContent = Replace(newContent, "<<version>>", version)
+file.Close
 
-Set logger = fso.OpenTextFile("content\Logger.js", 2)
-logger.write(loggerTextNew)
-logger.close
+Set file = fso.OpenTextFile("locale\en-US\ThreadVis.dtd", 2)
+file.write(newContent)
+file.Close
+
+' EN ThreadVisAbout.dtd
+Set file = fso.OpenTextFile("locale\en-US\ThreadVisAbout.dtd")
+aboutEn = file.ReadAll
+newContent = Replace(aboutEn, "<<build>>", revision)
+newContent = Replace(newContent, "<<version>>", version)
+file.Close
+
+Set file = fso.OpenTextFile("locale\en-US\ThreadVisAbout.dtd", 2)
+file.write(newContent)
+file.Close
+
+' logger
+Set file = fso.OpenTextFile("content\Logger.js")
+loggerText = file.ReadAll
+newContent = Replace(loggerText, "<<build>>", revision)
+newContent = Replace(newContent, "<<version>>", version)
+file.Close
+
+Set file = fso.OpenTextFile("content\Logger.js", 2)
+file.write(newContent)
+file.close
 
 WScript.Sleep 2000
 
@@ -110,25 +144,40 @@ WScript.Sleep 2000
 ' Reset source
 ' ========================================================================
 
-Set settingsDtd = fso.OpenTextFile("locale\de-DE\Settings.dtd", 2)
-settingsDtd.Write(contentDe)
-settingsDtd.Close
+' DE Settings.dtd
+Set file = fso.OpenTextFile("locale\de-DE\Settings.dtd", 2)
+file.Write(settingsDe)
+file.Close
 
-Set settingsDtd = fso.OpenTextFile("locale\en-US\Settings.dtd", 2)
-settingsDtd.write(contentEn)
-settingsDtd.Close
+' DE ThreadVis.dtd
+Set file = fso.OpenTextFile("locale\de-DE\ThreadVis.dtd", 2)
+file.Write(threadvisDe)
+file.Close
 
-Set aboutDtd = fso.OpenTextFile("locale\de-DE\ThreadVisAbout.dtd", 2)
-aboutDtd.Write(aboutDe)
-aboutDtd.Close
+' DE ThreadVisAbout.dtd
+Set file = fso.OpenTextFile("locale\de-DE\ThreadVisAbout.dtd", 2)
+file.Write(aboutDe)
+file.Close
 
-Set aboutDtd = fso.OpenTextFile("locale\en-US\ThreadVisAbout.dtd", 2)
-aboutDtd.Write(aboutEn)
-aboutDtd.Close
+' EN Settings.dtd
+Set file = fso.OpenTextFile("locale\en-US\Settings.dtd", 2)
+file.write(settingsEn)
+file.Close
 
-Set logger = fso.OpenTextFile("content\Logger.js", 2)
-logger.write(loggerText)
-logger.Close
+' EN ThreadVis.dtd
+Set file = fso.OpenTextFile("locale\en-US\ThreadVis.dtd", 2)
+file.write(threadvisEn)
+file.Close
+
+' EN ThreadVisAbout.dtd
+Set file = fso.OpenTextFile("locale\en-US\ThreadVisAbout.dtd", 2)
+file.Write(aboutEn)
+file.Close
+
+' logger
+Set file = fso.OpenTextFile("content\Logger.js", 2)
+file.write(loggerText)
+file.Close
 
 ' ========================================================================
 ' Copy JAR file

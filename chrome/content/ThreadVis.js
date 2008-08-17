@@ -224,11 +224,10 @@ ThreadVis.prototype.checkEnabledAccountOrFolder = function(folder) {
     var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
         .getService(Components.interfaces.nsIMsgAccountManager))
         .FindAccountForServer(server);
-    var regexpAccount = new RegExp("\\b" + account.key + "\\b");
 
     if (this.preferences.getPreference(this.preferences.PREF_DISABLED_ACCOUNTS) != ""
         && this.preferences.getPreference(this.preferences.PREF_DISABLED_ACCOUNTS)
-        .match(regexpAccount)) {
+        .indexOf(" " + account.key + " ") > -1) {
         if (this.logger.isDebug(this.logger.COMPONENT_EMAIL)) {
             this.logger.logDebug(this.logger.LEVEL_INFO, "accountdisabled",
                 {"total_regexp" : this.preferences.getPreference(
@@ -239,10 +238,9 @@ ThreadVis.prototype.checkEnabledAccountOrFolder = function(folder) {
         this.cacheValueCheckEnabledAccountOrFolder = false;
         return false;
     } else {
-        var regexpFolder = new RegExp(folder.URI + " ");
         if (this.preferences.getPreference(this.preferences.PREF_DISABLED_FOLDERS) != ""
             && this.preferences.getPreference(this.preferences.PREF_DISABLED_FOLDERS)
-            .match(regexpFolder)) {
+            .indexOf(" " + folder.URI + " ") > -1) {
             if (this.logger.isDebug(this.logger.COMPONENT_EMAIL)) {
                 this.logger.logDebug(this.logger.LEVEL_INFO, "folderdisabled",
                     {"total_regexp" : this.preferences
@@ -772,6 +770,8 @@ ThreadVis.prototype.openThreadVisOptionsDialog = function() {
  ******************************************************************************/
 ThreadVis.prototype.preferenceChanged = function() {
     this.visualisation.changed = true;
+    this.cacheKeyCheckEnabledAccountOrFolder = null;
+    this.cacheValueCheckEnabledAccountOrFolder = null;
 
     if (this.popupWindow && this.popupWindow.THREADVIS)
         this.popupWindow.THREADVIS.visualisation.changed = true;
@@ -801,14 +801,17 @@ ThreadVis.prototype.setSelectedMessage = function(force) {
         this.visualisation.disabled = true;
         this.visualisation.displayDisabled();
         this.visualisedMsgId = null;
+        this.setStatus(null, {enabled: false});
         return;
     }
     if (! this.checkEnabledAccountOrFolder()) {
         this.visualisation.disabled = true;
         this.visualisation.displayDisabled();
         this.visualisedMsgId = null;
+        this.setStatus(null, {folderEnabled: false});
         return;
     }
+    this.setStatus(null, {enabled: true, folderEnabled: true});
 
     this.visualisation.disabled = false;
 
@@ -921,7 +924,7 @@ ThreadVis.prototype.visualiseMessage = function(message, force) {
     var cache = "";
 
     if (container != null && ! container.isDummy()) {
-        cache = "[" + container.getTopContainer().getCache() + "]";
+        cache = container.getTopContainer().getCache();
         if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
             THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
                 "visualise", {"action" : "container already in threader",
@@ -949,7 +952,8 @@ ThreadVis.prototype.visualiseMessage = function(message, force) {
         return;
     }
 
-    var newCache = "[" + container.getTopContainer().getCache() + "]";
+    var newCache = container.getTopContainer().getCache();
+    // TODO fix comparison for arrays
     if (cache != newCache) {
         if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
             THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_WARNING,
@@ -957,7 +961,7 @@ ThreadVis.prototype.visualiseMessage = function(message, force) {
                     "old" : cache,
                     "new" : newCache});
         }
-        this.cache.updateCache(container, message.folder.rootFolder);
+        this.cache.updateCache(container, message);
     }
 
     this.visualisedMsgId = message.messageId;
@@ -1015,7 +1019,104 @@ ThreadVis.prototype.getThreader = function() {
 /** ****************************************************************************
  * Set the status text in the statusbar
  ******************************************************************************/
-ThreadVis.prototype.setStatus = function(text) {
-    var elem = document.getElementById("ThreadVisStatusText");
-    elem.value = text;
+ThreadVis.prototype.setStatus = function(text, tooltip) {
+    if (text != null) {
+        var elem = document.getElementById("ThreadVisStatusText");
+        if (text != "") {
+            elem.value = text;
+        } else {
+            elem.value = elem.getAttribute("defaultvalue");
+        }
+    }
+    if (typeof(tooltip) != "undefined") {
+        if (typeof(tooltip.enabled) != "undefined") {
+            if (tooltip.enabled) {
+                document.getElementById("ThreadVisStatusTooltipDisabled").hidden = true;
+            } else {
+                document.getElementById("ThreadVisStatusTooltipDisabled").hidden = false;
+                document.getElementById("ThreadVisStatusMenuEnableFolder").setAttribute("disabled", true);
+                document.getElementById("ThreadVisStatusMenuDisableFolder").setAttribute("disabled", true);
+            }
+        }
+        if (typeof(tooltip.folderEnabled) != "undefined") {
+            if (tooltip.folderEnabled) {
+                document.getElementById("ThreadVisStatusTooltipFolderDisabled").hidden = true;
+                document.getElementById("ThreadVisStatusTooltipFolderEnabled").hidden = false;
+                document.getElementById("ThreadVisStatusMenuEnableFolder").setAttribute("disabled", true);
+                document.getElementById("ThreadVisStatusMenuDisableFolder").setAttribute("disabled", false);
+            } else {
+                document.getElementById("ThreadVisStatusTooltipFolderDisabled").hidden = false;
+                document.getElementById("ThreadVisStatusTooltipFolderEnabled").hidden = true;
+                document.getElementById("ThreadVisStatusMenuEnableFolder").setAttribute("disabled", false);
+                document.getElementById("ThreadVisStatusMenuDisableFolder").setAttribute("disabled", true);
+            }
+        }
+        if (typeof(tooltip.updateCache) != "undefined") {
+            if (tooltip.updateCache == null) {
+                document.getElementById("ThreadVisStatusTooltipCache").hidden = true;
+                document.getElementById("ThreadVisStatusTooltipCacheRethread").hidden = true;
+            } else {
+                document.getElementById("ThreadVisStatusTooltipCache").hidden = false;
+                if (tooltip.updateCache.message) {
+                    document.getElementById("ThreadVisStatusTooltipCacheMessage").value =
+                        tooltip.updateCache.message.mime2DecodedSubject + " / " +
+                        tooltip.updateCache.message.mime2DecodedAuthor;
+                }
+                if (tooltip.updateCache.accountKey) {
+                    var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
+                        .getService(Components.interfaces.nsIMsgAccountManager))
+                        .getAccount(tooltip.updateCache.accountKey);
+                    document.getElementById("ThreadVisStatusTooltipCacheAccountName").value =
+                        account.incomingServer.prettyName;
+                }
+                if (tooltip.updateCache.rethread) {
+                    document.getElementById("ThreadVisStatusTooltipCacheRethread").hidden = false;
+                }
+            }
+        }
+    }
+}
+
+
+
+/** ****************************************************************************
+ * Disable for current folder
+ ******************************************************************************/
+ThreadVis.prototype.disableCurrentFolder = function() {
+    // get currently displayed folder
+    var folder = this.getMainWindow().GetLoadedMsgFolder();
+    if (folder) {
+        var folderSetting = this.preferences.getPreference(
+            this.preferences.PREF_DISABLED_FOLDERS);
+
+        folderSetting = folderSetting + " " + folder.URI;
+
+        this.preferences.setPreference(
+            this.preferences.PREF_DISABLED_FOLDERS,
+            folderSetting,
+            this.preferences.PREF_STRING);
+    }
+}
+
+
+
+/** ****************************************************************************
+ * Enable for current folder
+ ******************************************************************************/
+ThreadVis.prototype.enableCurrentFolder = function() {
+    // get currently displayed folder
+    var folder = this.getMainWindow().GetLoadedMsgFolder();
+    if (folder) {
+        var folderSetting = this.preferences.getPreference(
+            this.preferences.PREF_DISABLED_FOLDERS);
+
+        var index = folderSetting.indexOf(" " + folder.URI + " ");
+        folderSetting = folderSetting.substring(0, index)
+            + folderSetting.substring(index + folder.URI.length);
+ 
+        this.preferences.setPreference(
+            this.preferences.PREF_DISABLED_FOLDERS,
+            folderSetting,
+            this.preferences.PREF_STRING);
+    }
 }
