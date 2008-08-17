@@ -29,7 +29,7 @@ revision = Mid(svninfo, position, length)
 Set exec = shell.Exec("svn status ..")
 svnstatus = exec.StdOut.ReadAll
 position = InStr(1, svnstatus, "M     ", 1)
-If position > -1 Then
+If position > 0 Then
     revision = revision + ".dev"
 End If
 
