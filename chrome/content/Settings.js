@@ -71,8 +71,7 @@ function buildAccountList() {
         checkbox.setAttribute("oncommand", "buildAccountPreference();");
         checkbox.setAttribute("accountkey", account.key);
         checkbox.setAttribute("checkboxtype", "account");
-        var regexp = new RegExp("\\b" + account.key + "\\b");
-        if (pref != "" && pref.match(regexp)) {
+        if (pref != "" && pref.indexOf(" " + account.key + " ") > -1) {
             checkbox.setAttribute("checked", false);
         } else {
             checkbox.setAttribute("checked", true);
@@ -95,14 +94,14 @@ function buildAccountPreference() {
     var accountBox = document.getElementById("enableAccounts");
     var pref = document.getElementById("hiddenDisabledAccounts");
 
-    var prefString = "";
+    var prefString = " ";
 
     var checkboxes = accountBox.getElementsByAttribute("checkboxtype", "account");
 
     for (var i = 0; i < checkboxes.length; i++) {
         var checkbox = checkboxes.item(i);
         if (! checkbox.checked) {
-            prefString += " " + checkbox.getAttribute("accountkey");
+            prefString += checkbox.getAttribute("accountkey") +  " ";
         }
 
         var folderCheckboxes = accountBox
@@ -190,8 +189,7 @@ function buildFolderCheckboxes(box, folders, account, indent) {
         checkbox.setAttribute("checkboxtype", "folder");
         checkbox.setAttribute("accountkey", account);
         checkbox.style.paddingLeft = indent + "em";
-        var regexp = new RegExp(folder.URI + " ");
-        if (pref != "" && pref.match(regexp)) {
+        if (pref != "" && pref.indexOf(folder.URI + " ") > -1) {
             checkbox.setAttribute("checked", false);
         } else {
             checkbox.setAttribute("checked", true);
@@ -209,7 +207,7 @@ function buildFolderPreference() {
     var accountBox = document.getElementById("enableAccounts");
     var pref = document.getElementById("hiddenDisabledFolders");
 
-    var prefString = "";
+    var prefString = " ";
 
     var checkboxes = accountBox.getElementsByAttribute("checkboxtype", "folder");
 
