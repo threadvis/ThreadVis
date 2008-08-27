@@ -814,6 +814,10 @@ Threader.prototype.threadBackground = function(continueFunction) {
 }
 
 
+
+/** ****************************************************************************
+ * reset in-memory data
+ ******************************************************************************/
 Threader.prototype.reset = function() {
     delete this.idTable;
     this.idTable = new Object();

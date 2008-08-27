@@ -682,7 +682,7 @@ ThreadVis.prototype.logJavaScriptErrors = function(message, file, line) {
 ThreadVis.prototype.onItemAdded = function(parentItem, item, view) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "onItemAdded", {});
+            "onItemAdded", {item: item});
     }
 
     var ref = this;
@@ -921,7 +921,7 @@ ThreadVis.prototype.visualiseMessage = function(message, force) {
 
     // try to find in threader
     var container = this.getThreader().findContainer(message.messageId);
-    var cache = "";
+    var cache = [];
 
     if (container != null && ! container.isDummy()) {
         cache = container.getTopContainer().getCache();
@@ -939,6 +939,8 @@ ThreadVis.prototype.visualiseMessage = function(message, force) {
                 "visualise", {"action" : "message not in threader, getting from cache"});
         }
         cache = this.cache.getCache(message);
+        this.cache.addToThreaderFromCache(cache, message.folder.rootFolder);
+        this.getThreader().thread();
         container = this.getThreader().findContainer(message.messageId);
     }
 
@@ -965,6 +967,9 @@ ThreadVis.prototype.visualiseMessage = function(message, force) {
     }
 
     this.visualisedMsgId = message.messageId;
+
+    // clear threader
+    this.threader.reset();
 
     if (container != null && ! container.isDummy()) {
         // visualise any popup windows that might exist
