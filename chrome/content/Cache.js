@@ -854,7 +854,7 @@ Cache.prototype.updateNewMessagesWriteCache = function(accountKey, callback) {
         onFinished: function() {
             ref.threadvis.setStatus("Cache done");
             ref.commitDatabaseTransaction(accountKey);
-            this.clearData();
+            ref.clearData();
             ref.threadvis.setStatus(null, {updateCache: null});
             callback();
         }
