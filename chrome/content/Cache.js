@@ -496,9 +496,9 @@ Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_WARNING,
             "updateNewMessagesInternal", {
                 "updatetimestamp" : updateTimestamp,
-                "date" : new Date(updateTimestamp / 1000),
+                "updatedate" : new Date(updateTimestamp / 1000),
                 "looking for message date" : message.date,
-                "date" : new Date(message.date / 1000)
+                "messagedate" : new Date(message.date / 1000)
             });
     }
 
@@ -616,6 +616,9 @@ Cache.prototype.finishCache = function(message, doVisualise, accountKey,
             this.threadvis.setStatus(
                 this.threadvis.strings.getString("cache.error"));
 
+            // reset in-memory data
+            this.clearData();
+
             // set last update timestamp just before this message
             // set -10 minutes
             var messageUpdateTimestamp = message.date - 1000000*60*10;
@@ -645,6 +648,9 @@ Cache.prototype.finishCache = function(message, doVisualise, accountKey,
         // reset last update timestamp to date if this message
         this.threadvis.setStatus(
             this.threadvis.strings.getString("cache.error"));
+
+        // clear in-memory data
+        this.clearData();
 
         // set last update timestamp just before this message
         // -10 minutes
@@ -848,13 +854,7 @@ Cache.prototype.updateNewMessagesWriteCache = function(accountKey, callback) {
         onFinished: function() {
             ref.threadvis.setStatus("Cache done");
             ref.commitDatabaseTransaction(accountKey);
-            delete ref.newMessages;
-            delete ref.addedMessages;
-            delete ref.updatedTopContainers;
-            ref.newMessages = new Array();
-            ref.addedMessages = new Array();
-            ref.updatedTopContainers = new Object();
-            ref.threadvis.getThreader().reset();
+            this.clearData();
             ref.threadvis.setStatus(null, {updateCache: null});
             callback();
         }
@@ -973,6 +973,21 @@ Cache.prototype.beginDatabaseTransaction = function(accountKey) {
  ******************************************************************************/
 Cache.prototype.commitDatabaseTransaction = function(accountKey) {
     this.getDatabaseConnection(accountKey).commitTransaction();
+}
+
+
+
+/** ****************************************************************************
+ * Clear in-memory data
+ ******************************************************************************/
+Cache.prototype.clearData = function() {
+    delete this.newMessages;
+    delete this.addedMessages;
+    delete this.updatedTopContainers;
+    this.newMessages = new Array();
+    this.addedMessages = new Array();
+    this.updatedTopContainers = new Object();
+    this.threadvis.getThreader().reset();
 }
 
 
