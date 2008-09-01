@@ -969,7 +969,7 @@ ThreadVis.prototype.visualiseMessage = function(message, force) {
     this.visualisedMsgId = message.messageId;
 
     // clear threader
-    this.threader.reset();
+    //this.threader.reset();
 
     if (container != null && ! container.isDummy()) {
         // visualise any popup windows that might exist
