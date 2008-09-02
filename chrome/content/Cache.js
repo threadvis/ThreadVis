@@ -513,28 +513,54 @@ Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
     var count = 0;
     searchSession.registerListener({
         onNewSearch: function() {
-            if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-                THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-                    "updateNewMessagesInternal", {"action" : "new search"});
+            try {
+                if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+                    THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+                        "updateNewMessagesInternal", {"action" : "new search"});
+                }
+            } catch (ex) {
+                THREADVIS.logger.log("exception", {"exception" : ex});
             }
             ref.cacheBuildCount++;
         },
         onSearchDone: function(status) {
+            try {
+                if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+                    THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+                        "updateNewMessagesInternal", {"action" : "search done",
+                            "count" : count,
+                            "status" : status});
+                }
+            } catch (ex) {
+                THREADVIS.logger.log("exception", {"exception" : ex});
+            }
             delete searchSession;
             var util = new Util();
             util.registerListener({
                 onItem: function(item, count, remaining, timeRemaining) {
-                    if (count % 10 == 0) {
-                        ref.threadvis.setStatus("Adding: " + count + " [" + remaining +
-                            "] " + timeRemaining);
+                    try {
+                        if (count % 10 == 0) {
+                            ref.threadvis.setStatus("Adding: " + count + " [" + remaining +
+                                "] " + timeRemaining);
+                        }
+                    } catch (ex) {
+                        THREADVIS.logger.log("exception", {"exception" : ex});
                     }
-                    ref.threadvis.addMessage(item);
+                    try {
+                        ref.threadvis.addMessage(item);
+                    } catch (ex) {
+                        THREADVIS.logger.log("exception", {"exception" : ex});
+                    }
                     // also add messages from cache to threader, since we re-write
                     // the cache
                     // TODO: this is bad as it works around the queue we set up
                     // don't add messages to the threader within the function, but return
                     // a list of messages and add them to the queue here!
-                    ref.getCacheInternal(item, accountKey, true);
+                    try {
+                        ref.getCacheInternal(item, accountKey, true);
+                    } catch (ex) {
+                        THREADVIS.logger.log("exception", {"exception" : ex});
+                    }
                     if (ref.cacheBuildCount <=1) {
                         if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
                             THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_WARNING,
@@ -553,20 +579,40 @@ Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
                     }
                 },
                 onFinished: function() {
-                    ref.onSearchDone(message, doVisualise, accountKey,
-                        rootFolder, newUpdateTimestamp);
+                    try {
+                        ref.onSearchDone(message, doVisualise, accountKey,
+                            rootFolder, newUpdateTimestamp);
+                    } catch (ex) {
+                        THREADVIS.logger.log("exception", {"exception" : ex});
+                    }
                 }
             });
+            try {
+                if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+                    THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+                        "updateNewMessagesInternal", {"action" : "process",
+                        "count" : ref.addedMessages.length});
+                }
+            } catch (ex) {
+                THREADVIS.logger.log("exception", {"exception" : ex});
+            }
             util.process(ref.addedMessages);
         },
         onSearchHit: function(header, folder) {
-            if (count % 10 == 0) {
-                ref.threadvis.setStatus(
-                    ref.threadvis.strings.getString("cache.building.status") + count);
+            try {
+                if (count % 10 == 0) {
+                    ref.threadvis.setStatus(
+                        ref.threadvis.strings.getString("cache.building.status") + count);
+                }
+            } catch (ex) {
+                THREADVIS.logger.log("exception", {"exception" : ex});
             }
             count++;
-            ref.newMessages.push(header);
-            ref.addedMessages.push(header);
+            try {
+                ref.newMessages.push(header);
+                ref.addedMessages.push(header);
+            } catch (ex) {
+            }
         }
     });
 
