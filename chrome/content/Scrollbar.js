@@ -9,10 +9,16 @@
 
 
 
+if (! window.ThreadVisNS) {
+    window.ThreadVisNS = {};
+}
+
+
+
 /** ****************************************************************************
  * Constructor for scrollbar class
  ******************************************************************************/
-function Scrollbar(visualisation, stack, box) {
+ThreadVisNS.Scrollbar = function(visualisation, stack, box) {
     /**
      * visualisation object
      */
@@ -128,7 +134,7 @@ function Scrollbar(visualisation, stack, box) {
 /** ****************************************************************************
  * Calculate positions of the scrollbars
  ******************************************************************************/
-Scrollbar.prototype.calculatePosition = function() {
+ThreadVisNS.Scrollbar.prototype.calculatePosition = function() {
     if (THREADVIS.SVG) {
         var matrix = this.stack.transform.baseVal.getConsolidationMatrix();
         var movedX = Math.abs(matrix.e);
@@ -154,7 +160,7 @@ Scrollbar.prototype.calculatePosition = function() {
  * Calculate size of scrollbars
  * Determine if scrollbars need to be drawn
  ******************************************************************************/
-Scrollbar.prototype.calculateSize = function() {
+ThreadVisNS.Scrollbar.prototype.calculateSize = function() {
     var width = (this.getTotalWidth() / this.getStackWidth()) * this.getScrollBarHorizontalWidth();
     var height = (this.getTotalHeight() / this.getStackHeight()) * this.getScrollBarVerticalHeight();
 
@@ -190,7 +196,7 @@ Scrollbar.prototype.calculateSize = function() {
 /** ****************************************************************************
  * Draw the scrollbar
  ******************************************************************************/
-Scrollbar.prototype.draw = function() {
+ThreadVisNS.Scrollbar.prototype.draw = function() {
     this.reset();
     var size = this.calculateSize();
     var position = this.calculatePosition();
@@ -229,7 +235,7 @@ Scrollbar.prototype.draw = function() {
 /** ****************************************************************************
  * Get width of horizontal scrollbar
  ******************************************************************************/
-Scrollbar.prototype.getScrollBarHorizontalWidth = function() {
+ThreadVisNS.Scrollbar.prototype.getScrollBarHorizontalWidth = function() {
     return  this.boxHorizontal.boxObject.width - 2;
 }
 
@@ -238,7 +244,7 @@ Scrollbar.prototype.getScrollBarHorizontalWidth = function() {
 /** ****************************************************************************
  * Get vertical scrollbar height
  ******************************************************************************/
-Scrollbar.prototype.getScrollBarVerticalHeight = function() {
+ThreadVisNS.Scrollbar.prototype.getScrollBarVerticalHeight = function() {
     return this.boxVertical.boxObject.height - 2;
 }
 
@@ -247,7 +253,7 @@ Scrollbar.prototype.getScrollBarVerticalHeight = function() {
 /** ****************************************************************************
  * Get height of stack (visualisation)
  ******************************************************************************/
-Scrollbar.prototype.getStackHeight = function() {
+ThreadVisNS.Scrollbar.prototype.getStackHeight = function() {
     if (THREADVIS.SVG) {
         return this.stack.getBBox().height;
     } else {
@@ -260,7 +266,7 @@ Scrollbar.prototype.getStackHeight = function() {
 /** ****************************************************************************
  * Get width of stack (visualisation)
  ******************************************************************************/
-Scrollbar.prototype.getStackWidth = function() {
+ThreadVisNS.Scrollbar.prototype.getStackWidth = function() {
     if (THREADVIS.SVG) {
         return this.stack.getBBox().width;
     } else {
@@ -273,7 +279,7 @@ Scrollbar.prototype.getStackWidth = function() {
 /** ****************************************************************************
  * Get height of viewport (box)
  ******************************************************************************/
-Scrollbar.prototype.getTotalHeight = function() {
+ThreadVisNS.Scrollbar.prototype.getTotalHeight = function() {
     return this.box.boxObject.height;
 }
 
@@ -282,7 +288,7 @@ Scrollbar.prototype.getTotalHeight = function() {
 /** ****************************************************************************
  * Get width of viewport (box)
  ******************************************************************************/
-Scrollbar.prototype.getTotalWidth = function() {
+ThreadVisNS.Scrollbar.prototype.getTotalWidth = function() {
     return this.box.boxObject.width;
 }
 
@@ -291,7 +297,7 @@ Scrollbar.prototype.getTotalWidth = function() {
 /** ****************************************************************************
  * Init height of scrollbars
  ******************************************************************************/
-Scrollbar.prototype.init = function(box) {
+ThreadVisNS.Scrollbar.prototype.init = function(box) {
     this.box = box;
 }
 
@@ -300,7 +306,7 @@ Scrollbar.prototype.init = function(box) {
 /** ****************************************************************************
  * Return true if scrollbar is shown
  ******************************************************************************/
-Scrollbar.prototype.isShown = function() {
+ThreadVisNS.Scrollbar.prototype.isShown = function() {
     return this.verticalShown || this.horizontalShown;
 }
 
@@ -309,7 +315,7 @@ Scrollbar.prototype.isShown = function() {
 /** ****************************************************************************
  * Return true if scrollbar is shown
  ******************************************************************************/
-Scrollbar.prototype.isShownVertical = function() {
+ThreadVisNS.Scrollbar.prototype.isShownVertical = function() {
     return this.verticalShown;
 }
 
@@ -318,7 +324,7 @@ Scrollbar.prototype.isShownVertical = function() {
 /** ****************************************************************************
  * Return true if scrollbar is shown
  ******************************************************************************/
-Scrollbar.prototype.isShownHorizontal= function() {
+ThreadVisNS.Scrollbar.prototype.isShownHorizontal= function() {
     return this.horizontalShown;
 }
 
@@ -328,7 +334,7 @@ Scrollbar.prototype.isShownHorizontal= function() {
  * React to mousemovement over horizontal scrollbar
  * Do actual scrolling
  ******************************************************************************/
-Scrollbar.prototype.onMouseMoveHorizontal = function(event) {
+ThreadVisNS.Scrollbar.prototype.onMouseMoveHorizontal = function(event) {
     if (this.panningHorizontal) {
         var x = event.clientX;
         var dx = x - this.startX;
@@ -343,7 +349,7 @@ Scrollbar.prototype.onMouseMoveHorizontal = function(event) {
  * React to mousedown event on horizontal scrollbar
  * Start scrolling
  ******************************************************************************/
-Scrollbar.prototype.onMouseDownHorizontal = function(event) {
+ThreadVisNS.Scrollbar.prototype.onMouseDownHorizontal = function(event) {
     // only react to left mousebutton
     if (event.button != 0) {
         return;
@@ -359,7 +365,7 @@ Scrollbar.prototype.onMouseDownHorizontal = function(event) {
  * React to mouseup event on horizontal scrollbar
  * Stop scrolling
  ******************************************************************************/
-Scrollbar.prototype.onMouseUpHorizontal = function(event) {
+ThreadVisNS.Scrollbar.prototype.onMouseUpHorizontal = function(event) {
     this.panningHorizontal = false;
 }
 
@@ -369,7 +375,7 @@ Scrollbar.prototype.onMouseUpHorizontal = function(event) {
  * React to mousemovement over vertical scrollbar
  * Do actual scrolling
  ******************************************************************************/
-Scrollbar.prototype.onMouseMoveVertical = function(event) {
+ThreadVisNS.Scrollbar.prototype.onMouseMoveVertical = function(event) {
     if (this.panningVertical) {
         var y = event.clientY;
         var dy = y - this.startY;
@@ -385,7 +391,7 @@ Scrollbar.prototype.onMouseMoveVertical = function(event) {
  * React to mousedown event on vertical scrollbar
  * Start scrolling
  ******************************************************************************/
-Scrollbar.prototype.onMouseDownVertical = function(event) {
+ThreadVisNS.Scrollbar.prototype.onMouseDownVertical = function(event) {
     if (event.button != 0) {
         return;
     }
@@ -400,7 +406,7 @@ Scrollbar.prototype.onMouseDownVertical = function(event) {
  * React to mouseup event on vertical scrollbar
  * Stop scrolling
  ******************************************************************************/
-Scrollbar.prototype.onMouseUpVertical = function(event) {
+ThreadVisNS.Scrollbar.prototype.onMouseUpVertical = function(event) {
     this.panningVertical = false;
 }
 
@@ -409,7 +415,7 @@ Scrollbar.prototype.onMouseUpVertical = function(event) {
 /** ****************************************************************************
  * React on click on "down" button
  ******************************************************************************/
-Scrollbar.prototype.panDown = function() {
+ThreadVisNS.Scrollbar.prototype.panDown = function() {
     this.panVertical(1);
 }
 
@@ -418,7 +424,7 @@ Scrollbar.prototype.panDown = function() {
 /** ****************************************************************************
  * Do horizontal panning by dx
  ******************************************************************************/
-Scrollbar.prototype.panHorizontal = function(dx) {
+ThreadVisNS.Scrollbar.prototype.panHorizontal = function(dx) {
     var currentX = parseFloat(this.horizontal.style.left);
     if (currentX == "") {
         currentX = 0;
@@ -448,7 +454,7 @@ Scrollbar.prototype.panHorizontal = function(dx) {
 /** ****************************************************************************
  * React on click on "left" button
  ******************************************************************************/
-Scrollbar.prototype.panLeft = function() {
+ThreadVisNS.Scrollbar.prototype.panLeft = function() {
     this.panHorizontal(-1);
 }
 
@@ -457,7 +463,7 @@ Scrollbar.prototype.panLeft = function() {
 /** ****************************************************************************
  * React on click on "right" button
  ******************************************************************************/
-Scrollbar.prototype.panRight = function() {
+ThreadVisNS.Scrollbar.prototype.panRight = function() {
     this.panHorizontal(1);
 }
 
@@ -466,7 +472,7 @@ Scrollbar.prototype.panRight = function() {
 /** ****************************************************************************
  * React on click on "up" button
  ******************************************************************************/
-Scrollbar.prototype.panUp = function() {
+ThreadVisNS.Scrollbar.prototype.panUp = function() {
     this.panVertical(-1);
 }
 
@@ -475,7 +481,7 @@ Scrollbar.prototype.panUp = function() {
 /** ****************************************************************************
  * Do vertical panning by dy
  ******************************************************************************/
-Scrollbar.prototype.panVertical = function(dy) {
+ThreadVisNS.Scrollbar.prototype.panVertical = function(dy) {
     var currentY = parseFloat(this.vertical.style.top);
     if (currentY == "") {
         currentY = 0;
@@ -508,7 +514,7 @@ Scrollbar.prototype.panVertical = function(dy) {
 /** ****************************************************************************
  * Reset size of scrollbar to 0
  ******************************************************************************/
-Scrollbar.prototype.reset = function() {
+ThreadVisNS.Scrollbar.prototype.reset = function() {
     this.vertical.style.height = "0px";
     this.vertical.style.top = "0px";
     this.horizontal.style.width = "0px";
@@ -523,7 +529,7 @@ Scrollbar.prototype.reset = function() {
  * Otherwise, window can't be resized to a size smaller than the
  * scrollbars.
  ******************************************************************************/
-Scrollbar.prototype.resize = function() {
+ThreadVisNS.Scrollbar.prototype.resize = function() {
     this.reset();
     this.draw();
 }

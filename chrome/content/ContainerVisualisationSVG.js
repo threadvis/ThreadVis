@@ -11,11 +11,18 @@
 
 
 
+if (! window.ThreadVisNS) {
+    window.ThreadVisNS = {};
+}
+
+
+
 /** ****************************************************************************
  * Constructor for visualisation class
  ******************************************************************************/
-function ContainerVisualisationSVG(stack, strings, container, colour, left, top,
-    selected, dotSize, resize, circle, flash, spacing, opacity, messageCircles) {
+ThreadVisNS.ContainerVisualisationSVG = function(stack, strings, container,
+    colour, left, top, selected, dotSize, resize, circle, flash, spacing,
+    opacity, messageCircles) {
     /**
      * XUL stack on which container gets drawn
      */
@@ -137,7 +144,7 @@ function ContainerVisualisationSVG(stack, strings, container, colour, left, top,
 * create popup menu to delete, copy and cut messages
 * just create stub menu
  ******************************************************************************/
-ContainerVisualisationSVG.prototype.createMenu = function() {
+ThreadVisNS.ContainerVisualisationSVG.prototype.createMenu = function() {
     var menuname = "dot_popup_" + this.left;
     this.click.setAttribute("context", menuname);
 
@@ -159,7 +166,7 @@ ContainerVisualisationSVG.prototype.createMenu = function() {
 /** ****************************************************************************
 * fill popup menu to delete, copy and cut messages
  ******************************************************************************/
-ContainerVisualisationSVG.prototype.getMenu = function() {
+ThreadVisNS.ContainerVisualisationSVG.prototype.getMenu = function() {
     if (this.popup.rendered == true) {
         return;
     }
@@ -247,7 +254,7 @@ ContainerVisualisationSVG.prototype.getMenu = function() {
  * Create tooltip for container containing information about container
  * just create stub menu
  ******************************************************************************/
-ContainerVisualisationSVG.prototype.createToolTip = function() {
+ThreadVisNS.ContainerVisualisationSVG.prototype.createToolTip = function() {
     if (document.getElementById("ThreadVisTooltip")) {
         this.tooltip = document.getElementById("ThreadVisTooltip");
         return;
@@ -273,7 +280,7 @@ ContainerVisualisationSVG.prototype.createToolTip = function() {
 /** ****************************************************************************
  * fill tooltip for container containing information about container
  ******************************************************************************/
-ContainerVisualisationSVG.prototype.getToolTip = function() {
+ThreadVisNS.ContainerVisualisationSVG.prototype.getToolTip = function() {
     if (this.tooltip.rendered == true) {
         //return;
         while(this.tooltip.firstChild != null) {
@@ -368,7 +375,7 @@ ContainerVisualisationSVG.prototype.getToolTip = function() {
  * don't do anything until we paste the message
  * just remember which message we have to cut
  ******************************************************************************/
-ContainerVisualisationSVG.prototype.cut = function() {
+ThreadVisNS.ContainerVisualisationSVG.prototype.cut = function() {
     THREADVIS.copyMessage = this.container;
     var msgKey = THREADVIS.copyMessage.isDummy() ? "DUMMY" : 
                     THREADVIS.copyMessage.getMessage().getKey();
@@ -382,7 +389,7 @@ ContainerVisualisationSVG.prototype.cut = function() {
  * delete the parent-child relationship for this message
  * (i.e. delete the reference to the parent)
  ******************************************************************************/
-ContainerVisualisationSVG.prototype.deleteParent = function() {
+ThreadVisNS.ContainerVisualisationSVG.prototype.deleteParent = function() {
     var parent = this.container.getParent();
     parent.removeChild(this.container);
     parent.getTopContainer().pruneEmptyContainers();
@@ -407,7 +414,7 @@ ContainerVisualisationSVG.prototype.deleteParent = function() {
 /** ****************************************************************************
  * Draw circle around container if container is selected
  ******************************************************************************/
-ContainerVisualisationSVG.prototype.drawCircle = function(colour) {
+ThreadVisNS.ContainerVisualisationSVG.prototype.drawCircle = function(colour) {
     if (! this.circle) {
         this.circle = document.createElementNS(THREADVIS.SVG_NAMESPACE, "circle");
     }
@@ -422,7 +429,7 @@ ContainerVisualisationSVG.prototype.drawCircle = function(colour) {
 /** ****************************************************************************
  * Draw container around dot to catch click events and show tooltip
  ******************************************************************************/
-ContainerVisualisationSVG.prototype.drawClick = function() {
+ThreadVisNS.ContainerVisualisationSVG.prototype.drawClick = function() {
     if (! this.click) {
         this.click = document.createElementNS(THREADVIS.SVG_NAMESPACE, "circle");
     }
@@ -457,7 +464,7 @@ ContainerVisualisationSVG.prototype.drawClick = function() {
 /** ****************************************************************************
  * Draw dot for container
  ******************************************************************************/
-ContainerVisualisationSVG.prototype.drawDot = function() {
+ThreadVisNS.ContainerVisualisationSVG.prototype.drawDot = function() {
     this.dot = document.createElementNS(THREADVIS.SVG_NAMESPACE, "circle");
 
     this.visualiseDot();
@@ -470,7 +477,7 @@ ContainerVisualisationSVG.prototype.drawDot = function() {
 /** ****************************************************************************
  * Flash (show and hide) circle to draw attention to selected container
  ******************************************************************************/
-ContainerVisualisationSVG.prototype.flash = function() {
+ThreadVisNS.ContainerVisualisationSVG.prototype.flash = function() {
     if (this.flashCount == 0) {
         clearTimeout(this.flashTimeout);
         return;
@@ -487,7 +494,7 @@ ContainerVisualisationSVG.prototype.flash = function() {
 /** ****************************************************************************
  * Hide circle
  ******************************************************************************/
-ContainerVisualisationSVG.prototype.flashOff = function(old) {
+ThreadVisNS.ContainerVisualisationSVG.prototype.flashOff = function(old) {
     this.showCircle();
     var ref = this;
     this.flashTimeout = setTimeout(function() {ref.flash();}, 500);
@@ -498,7 +505,7 @@ ContainerVisualisationSVG.prototype.flashOff = function(old) {
 /** ****************************************************************************
  * Show circle
  ******************************************************************************/
-ContainerVisualisationSVG.prototype.flashOn = function() {
+ThreadVisNS.ContainerVisualisationSVG.prototype.flashOn = function() {
     this.hideCircle();
     var ref = this;
     this.flashOffTimeout = setTimeout(function() {ref.flashOff();}, 500);
@@ -509,7 +516,7 @@ ContainerVisualisationSVG.prototype.flashOn = function() {
 /** ****************************************************************************
  * Hide circle
  ******************************************************************************/
-ContainerVisualisationSVG.prototype.hideCircle = function() {
+ThreadVisNS.ContainerVisualisationSVG.prototype.hideCircle = function() {
     this.circle.setAttribute("display", "none");
 }
 
@@ -519,7 +526,7 @@ ContainerVisualisationSVG.prototype.hideCircle = function() {
  * mouse click event handler
  * display message user clicked on
  ******************************************************************************/
-ContainerVisualisationSVG.prototype.onMouseClick = function(event) {
+ThreadVisNS.ContainerVisualisationSVG.prototype.onMouseClick = function(event) {
     // only react to left mouse click
     if (event.button != 0) {
         return;
@@ -547,7 +554,7 @@ ContainerVisualisationSVG.prototype.onMouseClick = function(event) {
 /** ****************************************************************************
  * paste a previously cut message in this thread
  ******************************************************************************/
-ContainerVisualisationSVG.prototype.paste = function() {
+ThreadVisNS.ContainerVisualisationSVG.prototype.paste = function() {
     if (THREADVIS.copyMessage) {
         // check to see if user creates a loop
         if (THREADVIS.copyMessage.findChild(this.container)) {
@@ -589,7 +596,7 @@ ContainerVisualisationSVG.prototype.paste = function() {
 /** ****************************************************************************
  * Re-Draw all elements
  ******************************************************************************/
-ContainerVisualisationSVG.prototype.redraw = function(resize, left, top, selected,
+ThreadVisNS.ContainerVisualisationSVG.prototype.redraw = function(resize, left, top, selected,
     flash, colour, opacity) {
     this.resize = resize;
     this.left = left;
@@ -619,7 +626,7 @@ ContainerVisualisationSVG.prototype.redraw = function(resize, left, top, selecte
 /** ****************************************************************************
  * Re-Draw circle around container if container is selected
  ******************************************************************************/
-ContainerVisualisationSVG.prototype.redrawCircle = function(colour) {
+ThreadVisNS.ContainerVisualisationSVG.prototype.redrawCircle = function(colour) {
     this.visualiseCircle(colour);
 }
 
@@ -628,7 +635,7 @@ ContainerVisualisationSVG.prototype.redrawCircle = function(colour) {
 /** ****************************************************************************
  * Re-Draw container around dot to catch click events and show tooltip
  ******************************************************************************/
-ContainerVisualisationSVG.prototype.redrawClick = function() {
+ThreadVisNS.ContainerVisualisationSVG.prototype.redrawClick = function() {
     this.visualiseClick();
 }
 
@@ -637,7 +644,7 @@ ContainerVisualisationSVG.prototype.redrawClick = function() {
 /** ****************************************************************************
  * Re-Draw dot for container
  ******************************************************************************/
-ContainerVisualisationSVG.prototype.redrawDot = function() {
+ThreadVisNS.ContainerVisualisationSVG.prototype.redrawDot = function() {
     this.visualiseDot();
 }
 
@@ -646,7 +653,7 @@ ContainerVisualisationSVG.prototype.redrawDot = function() {
 /** ****************************************************************************
  * Show circle
  ******************************************************************************/
-ContainerVisualisationSVG.prototype.showCircle = function() {
+ThreadVisNS.ContainerVisualisationSVG.prototype.showCircle = function() {
     this.circle.setAttribute("display", "");
 }
 
@@ -655,7 +662,7 @@ ContainerVisualisationSVG.prototype.showCircle = function() {
 /** ****************************************************************************
  * Flash (show and hide) circle to draw attention to selected container
  ******************************************************************************/
-ContainerVisualisationSVG.prototype.startFlash = function() {
+ThreadVisNS.ContainerVisualisationSVG.prototype.startFlash = function() {
     this.flashCount = 3;
     this.flash();
 }
@@ -665,7 +672,7 @@ ContainerVisualisationSVG.prototype.startFlash = function() {
 /** ****************************************************************************
  * Stop flashing
  ******************************************************************************/
-ContainerVisualisationSVG.prototype.stopFlash = function() {
+ThreadVisNS.ContainerVisualisationSVG.prototype.stopFlash = function() {
     clearInterval(this.flashInterval);
     clearTimeout(this.flashOnTimeout);
     clearTimeout(this.flashOffTimeout);
@@ -677,7 +684,7 @@ ContainerVisualisationSVG.prototype.stopFlash = function() {
 /** ****************************************************************************
  * Visualise circle around container if container is selected
  ******************************************************************************/
-ContainerVisualisationSVG.prototype.visualiseCircle = function(colour) {
+ThreadVisNS.ContainerVisualisationSVG.prototype.visualiseCircle = function(colour) {
     var radius = (this.dotSize * 8/6 * this.resize * 0.5);
 
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
@@ -699,7 +706,7 @@ ContainerVisualisationSVG.prototype.visualiseCircle = function(colour) {
 /** ****************************************************************************
  * Visualise container around dot to catch click events and show tooltip
  ******************************************************************************/
-ContainerVisualisationSVG.prototype.visualiseClick = function() {
+ThreadVisNS.ContainerVisualisationSVG.prototype.visualiseClick = function() {
     var radius = (this.spacing * this.resize * 0.5);
 
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
@@ -726,7 +733,7 @@ ContainerVisualisationSVG.prototype.visualiseClick = function() {
 /** ****************************************************************************
  * Draw dot for container
  ******************************************************************************/
-ContainerVisualisationSVG.prototype.visualiseDot = function() {
+ThreadVisNS.ContainerVisualisationSVG.prototype.visualiseDot = function() {
     var radius = (this.dotSize * this.resize * 0.5);
 
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {

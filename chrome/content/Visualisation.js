@@ -11,10 +11,16 @@
 
 
 
+if (! window.ThreadVisNS) {
+    window.ThreadVisNS = {};
+}
+
+
+
 /** ****************************************************************************
  * Constructor for visualisation class
  ******************************************************************************/
-function Visualisation() {
+ThreadVisNS.Visualisation = function() {
     this.COLOUR_DUMMY = "#75756D";
     this.COLOUR_SINGLE = "#0000FF";
 
@@ -54,7 +60,7 @@ function Visualisation() {
 /** ****************************************************************************
  * Calculate heights for all arcs
  ******************************************************************************/
-Visualisation.prototype.calculateArcHeights = function(containers) {
+ThreadVisNS.Visualisation.prototype.calculateArcHeights = function(containers) {
     // reset all heights
     for (var counter = 0; counter < containers.length; counter++) {
         var thisContainer = containers[counter];
@@ -109,7 +115,7 @@ Visualisation.prototype.calculateArcHeights = function(containers) {
 /** ****************************************************************************
  * Calculate size
  ******************************************************************************/
-Visualisation.prototype.calculateSize = function(containers) {
+ThreadVisNS.Visualisation.prototype.calculateSize = function(containers) {
     // totalmaxheight counts the maximal number of stacked arcs
     var totalMaxHeight = 0;
 
@@ -170,7 +176,7 @@ Visualisation.prototype.calculateSize = function(containers) {
  * Check size of stack
  * if resized, resize visualisation
  ******************************************************************************/
-Visualisation.prototype.checkSize = function() {
+ThreadVisNS.Visualisation.prototype.checkSize = function() {
     if (this.disabled) {
         return;
     }
@@ -192,7 +198,7 @@ Visualisation.prototype.checkSize = function() {
  * Clear stack
  * delete all children
  ******************************************************************************/
-Visualisation.prototype.clearStack = function() {
+ThreadVisNS.Visualisation.prototype.clearStack = function() {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Visualisation.clearStack()", {});
@@ -227,7 +233,7 @@ Visualisation.prototype.clearStack = function() {
 /** ****************************************************************************
  * Underline authors in header view
  ******************************************************************************/
-Visualisation.prototype.colourAuthors = function(authors) {
+ThreadVisNS.Visualisation.prototype.colourAuthors = function(authors) {
     var prefHighlight = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_HIGHLIGHT);
 
@@ -294,7 +300,7 @@ Visualisation.prototype.colourAuthors = function(authors) {
 /** ****************************************************************************
  * Convert a HSV colour to a RGB colour
  ******************************************************************************/
-Visualisation.prototype.convertHSVtoRGB = function(hue, saturation, value) {
+ThreadVisNS.Visualisation.prototype.convertHSVtoRGB = function(hue, saturation, value) {
     var h = hue / 360;
     var s = saturation / 100;
     var v = value / 100;
@@ -348,7 +354,7 @@ Visualisation.prototype.convertHSVtoRGB = function(hue, saturation, value) {
 /** ****************************************************************************
  * Convert a RGB colour to a HSV colour
  ******************************************************************************/
-Visualisation.prototype.convertRGBtoHSV = function (r, g, b) {
+ThreadVisNS.Visualisation.prototype.convertRGBtoHSV = function (r, g, b) {
     r = r / 255;
     g = g / 255;
     b = b / 255;
@@ -394,7 +400,7 @@ Visualisation.prototype.convertRGBtoHSV = function (r, g, b) {
 /** ****************************************************************************
  * Build legend popup containing all authors of current thread
  ******************************************************************************/
-Visualisation.prototype.createLegend = function(authors) {
+ThreadVisNS.Visualisation.prototype.createLegend = function(authors) {
     this.legend = document.createElementNS(THREADVIS.XUL_NAMESPACE, "vbox");
 
     for (var email in authors) {
@@ -410,7 +416,7 @@ Visualisation.prototype.createLegend = function(authors) {
 /** ****************************************************************************
  * Build one row for legend
  ******************************************************************************/
-Visualisation.prototype.createLegendBox = function(hsv, name, count) {
+ThreadVisNS.Visualisation.prototype.createLegendBox = function(hsv, name, count) {
     var box = document.createElementNS(THREADVIS.XUL_NAMESPACE, "hbox");
 
     var colourBox = document.createElementNS(THREADVIS.XUL_NAMESPACE, "hbox");
@@ -432,7 +438,7 @@ Visualisation.prototype.createLegendBox = function(hsv, name, count) {
 /** ****************************************************************************
  * Create stack
  ******************************************************************************/
-Visualisation.prototype.createStack = function() {
+ThreadVisNS.Visualisation.prototype.createStack = function() {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Visualisation.createStack()", {});
@@ -513,7 +519,7 @@ Visualisation.prototype.createStack = function() {
 /** ****************************************************************************
  * Get hexadecimal representation of a decimal number
  ******************************************************************************/
-Visualisation.prototype.DECtoHEX = function(dec) {
+ThreadVisNS.Visualisation.prototype.DECtoHEX = function(dec) {
     var alpha = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
     var n_ = Math.floor(dec / 16)
     var _n = dec - n_*16;
@@ -525,7 +531,7 @@ Visualisation.prototype.DECtoHEX = function(dec) {
 /** ****************************************************************************
  * Get decimal representation of a hexadecimal number
  ******************************************************************************/
-Visualisation.prototype.HEXtoDEC = function(hex) {
+ThreadVisNS.Visualisation.prototype.HEXtoDEC = function(hex) {
     return parseInt(hex, 16);
 }
 
@@ -534,7 +540,7 @@ Visualisation.prototype.HEXtoDEC = function(hex) {
 /** ****************************************************************************
  * Display disabled message
  ******************************************************************************/
-Visualisation.prototype.displayDisabled = function() {
+ThreadVisNS.Visualisation.prototype.displayDisabled = function() {
     this.clearStack();
     this.currentContainer = null;
 
@@ -603,7 +609,7 @@ Visualisation.prototype.displayDisabled = function() {
 /** ****************************************************************************
  * Display warning (too many messages)
  ******************************************************************************/
-Visualisation.prototype.displayWarningCount = function(container) {
+ThreadVisNS.Visualisation.prototype.displayWarningCount = function(container) {
     this.clearStack();
 
     if (THREADVIS.SVG) {
@@ -661,7 +667,7 @@ Visualisation.prototype.displayWarningCount = function(container) {
 /** ****************************************************************************
  * Draw arc
  ******************************************************************************/
-Visualisation.prototype.drawArc = function(colour, vPosition, height, left, 
+ThreadVisNS.Visualisation.prototype.drawArc = function(colour, vPosition, height, left, 
     right, top, opacity) {
     var prefDotSize = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_DOTSIZE);
@@ -675,11 +681,11 @@ Visualisation.prototype.drawArc = function(colour, vPosition, height, left,
         THREADVIS.preferences.PREF_VIS_ARC_WIDTH);
 
     if (THREADVIS.SVG) {
-        var arc = new ArcVisualisationSVG(this.stack, prefDotSize, this.resize,
+        var arc = new ThreadVisNS.ArcVisualisationSVG(this.stack, prefDotSize, this.resize,
             prefArcMinHeight, prefArcDifference, prefArcRadius, prefArcWidth,
             colour, vPosition, height, left, right, top, opacity);
     } else {
-        var arc = new ArcVisualisation(this.stack, prefDotSize, this.resize,
+        var arc = new ThreadVisNS.ArcVisualisation(this.stack, prefDotSize, this.resize,
             prefArcMinHeight, prefArcDifference, prefArcRadius, prefArcWidth,
             colour, vPosition, height, left, right, top, opacity);
     }
@@ -692,7 +698,7 @@ Visualisation.prototype.drawArc = function(colour, vPosition, height, left,
 /** ****************************************************************************
  * Export an arc to SVG
  ******************************************************************************/
-Visualisation.prototype.drawArcSVG = function(colour, vPosition, height, left, 
+ThreadVisNS.Visualisation.prototype.drawArcSVG = function(colour, vPosition, height, left, 
     right, top, opacity, resize, counter) {
     var prefDotSize = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_DOTSIZE);
@@ -747,7 +753,7 @@ Visualisation.prototype.drawArcSVG = function(colour, vPosition, height, left,
 /** ****************************************************************************
  * Draw a dot
  ******************************************************************************/
-Visualisation.prototype.drawDot = function(container, colour, left, top, 
+ThreadVisNS.Visualisation.prototype.drawDot = function(container, colour, left, top, 
     selected, circle, flash, opacity) {
     var prefDotSize = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_DOTSIZE);
@@ -757,11 +763,11 @@ Visualisation.prototype.drawDot = function(container, colour, left, top,
         THREADVIS.preferences.PREF_VIS_MESSAGE_CIRCLES);
 
     if (THREADVIS.SVG) {
-        var msg = new ContainerVisualisationSVG(this.stack, this.strings, container,
+        var msg = new ThreadVisNS.ContainerVisualisationSVG(this.stack, this.strings, container,
             colour, left, top, selected, prefDotSize, this.resize, circle, flash,
             prefSpacing, opacity, prefMessageCircles);
     } else {
-        var msg = new ContainerVisualisation(this.stack, this.strings, container,
+        var msg = new ThreadVisNS.ContainerVisualisation(this.stack, this.strings, container,
             colour, left, top, selected, prefDotSize, this.resize, circle, flash,
             prefSpacing, opacity, prefMessageCircles);
     }
@@ -774,7 +780,7 @@ Visualisation.prototype.drawDot = function(container, colour, left, top,
 /** ****************************************************************************
  * Export a dot to SVG
  ******************************************************************************/
-Visualisation.prototype.drawDotSVG = function(container, colour, left, top, 
+ThreadVisNS.Visualisation.prototype.drawDotSVG = function(container, colour, left, top, 
     selected, circle, flash, opacity, resize, counter) {
     var prefDotSize = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_DOTSIZE);
@@ -815,7 +821,7 @@ Visualisation.prototype.drawDotSVG = function(container, colour, left, top,
 /** ****************************************************************************
  * Get the size of the available viewbox
  ******************************************************************************/
-Visualisation.prototype.getBoxSize = function() {
+ThreadVisNS.Visualisation.prototype.getBoxSize = function() {
     return {
             height: this.box.boxObject.height,
             width: this.box.boxObject.width
@@ -827,7 +833,7 @@ Visualisation.prototype.getBoxSize = function() {
 /** ****************************************************************************
  * Get a colour for the arc
  ******************************************************************************/
-Visualisation.prototype.getColour = function(hue, saturation, value) {
+ThreadVisNS.Visualisation.prototype.getColour = function(hue, saturation, value) {
     var rgb = this.convertHSVtoRGB(hue, saturation, value);
 
     return "#" + this.DECtoHEX(Math.floor(rgb.r)) + 
@@ -840,7 +846,7 @@ Visualisation.prototype.getColour = function(hue, saturation, value) {
 /** ****************************************************************************
  * Get a new colour for the arc
  ******************************************************************************/
-Visualisation.prototype.getNewColour = function(sent) {
+ThreadVisNS.Visualisation.prototype.getNewColour = function(sent) {
     // display sent emails always in the same colour
     if (sent) {
         var hex = THREADVIS.preferences.getPreference(
@@ -868,7 +874,7 @@ Visualisation.prototype.getNewColour = function(sent) {
  * calculate from box width and height
  * and needed width and height
  *******************************************************************************/
-Visualisation.prototype.getResize = function(xCount, yCount, sizeX, sizeY) {
+ThreadVisNS.Visualisation.prototype.getResize = function(xCount, yCount, sizeX, sizeY) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO, 
             "Visualisation.getResize()", {"action" : "start",
@@ -922,7 +928,7 @@ Visualisation.prototype.getResize = function(xCount, yCount, sizeX, sizeY) {
 /** ****************************************************************************
  * Move visualisation to show current message
  ******************************************************************************/
-Visualisation.prototype.moveVisualisation = function(container) {
+ThreadVisNS.Visualisation.prototype.moveVisualisation = function(container) {
     var prefSpacing = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_SPACING);
     /*var prefDefaultZoomHeight = parseFloat(THREADVIS.preferences.getPreference(
@@ -969,7 +975,7 @@ Visualisation.prototype.moveVisualisation = function(container) {
 /** ****************************************************************************
  * Move visualisation by given delta
  ******************************************************************************/
-Visualisation.prototype.moveVisualisationTo = function(position) {
+ThreadVisNS.Visualisation.prototype.moveVisualisationTo = function(position) {
     if (THREADVIS.SVG) {
         var matrix = this.stack.transform.baseVal.getConsolidationMatrix();
         var x = matrix.e;
@@ -997,7 +1003,7 @@ Visualisation.prototype.moveVisualisationTo = function(position) {
  * mouse click event handler
  * display message user clicked on
  ******************************************************************************/
-Visualisation.prototype.onMouseClick = function(event) {
+ThreadVisNS.Visualisation.prototype.onMouseClick = function(event) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPOMENT_VISUALISATION)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Visualisation.onMouseClick()", {});
@@ -1016,7 +1022,7 @@ Visualisation.prototype.onMouseClick = function(event) {
  * OnMouseDown event handler
  * on left mouse button down, remember mouse position and enable panning
  ******************************************************************************/
-Visualisation.prototype.onMouseDown = function(event) {
+ThreadVisNS.Visualisation.prototype.onMouseDown = function(event) {
     // only pan on left click
     if (event.button != 0) {
         return;
@@ -1052,7 +1058,7 @@ Visualisation.prototype.onMouseDown = function(event) {
  * OnMouseMove event handler
  * if panning is enabled, read new mouse position and move box accordingly
  ******************************************************************************/
-Visualisation.prototype.onMouseMove = function(event) {
+ThreadVisNS.Visualisation.prototype.onMouseMove = function(event) {
     if (this.panning) {
         var x = event.clientX;
         var y = event.clientY;
@@ -1122,7 +1128,7 @@ Visualisation.prototype.onMouseMove = function(event) {
  * OnMouseUp event handler
  * disable panning when mouse button is released
  ******************************************************************************/
-Visualisation.prototype.onMouseUp = function(event) {
+ThreadVisNS.Visualisation.prototype.onMouseUp = function(event) {
     this.panning = false;
 
     // reset mouse cursor
@@ -1135,7 +1141,7 @@ Visualisation.prototype.onMouseUp = function(event) {
  * OnScroll event handler
  * if mouse wheel is moved, zoom in and out of visualisation
  ******************************************************************************/
-Visualisation.prototype.onScroll = function(event) {
+ThreadVisNS.Visualisation.prototype.onScroll = function(event) {
     // event.detail gives number of lines to scroll
     // positive number means scroll down
     if (event.detail < 0){
@@ -1151,7 +1157,7 @@ Visualisation.prototype.onScroll = function(event) {
  * Reset stack
  * set all margins to zero
  ******************************************************************************/
-Visualisation.prototype.resetStack = function() {
+ThreadVisNS.Visualisation.prototype.resetStack = function() {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Visualisation.resetStack()", {});
@@ -1166,7 +1172,7 @@ Visualisation.prototype.resetStack = function() {
 /** ****************************************************************************
  * set the cursor
  ******************************************************************************/
-Visualisation.prototype.setCursor = function() {
+ThreadVisNS.Visualisation.prototype.setCursor = function() {
     // set cursor to dragging if currently panning
     if (this.panning) {
         this.box.style.cursor = "-moz-grabbing";
@@ -1185,7 +1191,7 @@ Visualisation.prototype.setCursor = function() {
  * set the outer box to a fixed size. if x or y is given, the size is
  * set to that size. otherwise the current size is set as a fixed size
  ******************************************************************************/
-Visualisation.prototype.setFixedSize = function(x, y) {
+ThreadVisNS.Visualisation.prototype.setFixedSize = function(x, y) {
     // total width and height of available space
     var outerWidth = 0;
     if (x) {
@@ -1218,7 +1224,7 @@ Visualisation.prototype.setFixedSize = function(x, y) {
 /** ****************************************************************************
  * remove any fixed size and set the flex flag
  ******************************************************************************/
-Visualisation.prototype.setVariableSize = function() {
+ThreadVisNS.Visualisation.prototype.setVariableSize = function() {
     if (this.scrollbar) {
         this.scrollbar.reset();
     }
@@ -1236,7 +1242,7 @@ Visualisation.prototype.setVariableSize = function() {
  * horizontal spacing is proportional to the time difference between 
  * those two messages
  ******************************************************************************/
-Visualisation.prototype.timeScaling = function(containers, 
+ThreadVisNS.Visualisation.prototype.timeScaling = function(containers, 
     minimalTimeDifference, width) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
@@ -1331,7 +1337,7 @@ Visualisation.prototype.timeScaling = function(containers,
 /** ****************************************************************************
  * Visualise a new thread
  ******************************************************************************/
-Visualisation.prototype.visualise = function(container, force) {
+ThreadVisNS.Visualisation.prototype.visualise = function(container, force) {
     if (this.disabled) {
         return;
     }
@@ -1584,11 +1590,11 @@ Visualisation.prototype.visualise = function(container, force) {
 
     if (prefTimeline) {
         if (THREADVIS.SVG) {
-            this.timeline = new TimelineSVG(this.stack, this.strings, this.containers,
+            this.timeline = new ThreadVisNS.TimelineSVG(this.stack, this.strings, this.containers,
                 this.resize, prefDotSize, topHeight,
                 prefArcMinHeight + prefDotSize - prefArcWidth - 2);
         } else {
-            this.timeline = new Timeline(this.stack, this.strings, this.containers,
+            this.timeline = new ThreadVisNS.Timeline(this.stack, this.strings, this.containers,
                 this.resize, prefDotSize, topHeight,
                 prefArcMinHeight + prefDotSize - prefArcWidth - 2);
         }
@@ -1598,7 +1604,7 @@ Visualisation.prototype.visualise = function(container, force) {
     }
 
     if (! this.scrollbar) {
-        this.scrollbar = new Scrollbar(this, this.stack, this.box);
+        this.scrollbar = new ThreadVisNS.Scrollbar(this, this.stack, this.box);
     }
     this.scrollbar.init(this.box);
     this.scrollbar.draw();
@@ -1626,7 +1632,7 @@ Visualisation.prototype.visualise = function(container, force) {
 /** ****************************************************************************
  * Visualise an existing thread
  ******************************************************************************/
-Visualisation.prototype.visualiseExisting = function(container) {
+ThreadVisNS.Visualisation.prototype.visualiseExisting = function(container) {
     var prefArcDifference = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_ARC_DIFFERENCE);
     var prefArcMinHeight = THREADVIS.preferences.getPreference(
@@ -1809,7 +1815,7 @@ Visualisation.prototype.visualiseExisting = function(container) {
 /** ****************************************************************************
  * Zoom in and draw new visualisation
  ******************************************************************************/
-Visualisation.prototype.zoomIn = function(amount) {
+ThreadVisNS.Visualisation.prototype.zoomIn = function(amount) {
     if (! isFinite(amount) || amount == 0) {
         amount = 1;
     }
@@ -1829,7 +1835,7 @@ Visualisation.prototype.zoomIn = function(amount) {
 /** ****************************************************************************
  * Zoom out and draw new visualisation
  ******************************************************************************/
-Visualisation.prototype.zoomOut = function(amount) {
+ThreadVisNS.Visualisation.prototype.zoomOut = function(amount) {
     // don't zoom out if there are no scrollbars
     if (! this.scrollbar.isShown()) {
         return;
@@ -1856,7 +1862,7 @@ Visualisation.prototype.zoomOut = function(amount) {
 /** ****************************************************************************
  * Reset Zoom level
  ******************************************************************************/
-Visualisation.prototype.zoomReset = function() {
+ThreadVisNS.Visualisation.prototype.zoomReset = function() {
     this.zoom = 1.0;
 }
 
@@ -1865,7 +1871,7 @@ Visualisation.prototype.zoomReset = function() {
 /** ****************************************************************************
  * Export to SVG
  ******************************************************************************/
-Visualisation.prototype.exportToSVG = function(container, force) {
+ThreadVisNS.Visualisation.prototype.exportToSVG = function(container, force) {
     if (typeof force == "undefined") {
         force = false;
     }

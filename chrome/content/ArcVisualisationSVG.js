@@ -11,11 +11,18 @@
 
 
 
+if (! window.ThreadVisNS) {
+    window.ThreadVisNS = {};
+}
+
+
+
 /** ****************************************************************************
  * Constructor for visualisation class
  ******************************************************************************/
-function ArcVisualisationSVG(stack, dotSize, resize, arcMinHeight, arcDifference, 
-    arcRadius, arcWidth, colour, vPosition, height, left, right, top, opacity) {
+ThreadVisNS.ArcVisualisationSVG = function(stack, dotSize, resize, arcMinHeight,
+    arcDifference, arcRadius, arcWidth, colour, vPosition, height, left, right,
+    top, opacity) {
 
     /**
      * XUL stack on which to draw
@@ -103,7 +110,7 @@ function ArcVisualisationSVG(stack, dotSize, resize, arcMinHeight, arcDifference
 /** ****************************************************************************
  * Draw arc
  ******************************************************************************/
-ArcVisualisationSVG.prototype.drawArc = function() {
+ThreadVisNS.ArcVisualisationSVG.prototype.drawArc = function() {
     //this.arc = document.createElementNS(THREADVIS.SVG_NAMESPACE, "rect");
     this.arc = document.createElementNS(THREADVIS.SVG_NAMESPACE, "path");
 
@@ -116,7 +123,7 @@ ArcVisualisationSVG.prototype.drawArc = function() {
 /** ****************************************************************************
  * Re-Draw arc
  ******************************************************************************/
-ArcVisualisationSVG.prototype.redrawArc = function(resize, left, right, top,
+ThreadVisNS.ArcVisualisationSVG.prototype.redrawArc = function(resize, left, right, top,
     colour, opacity) {
     this.resize = resize;
     this.left = left;
@@ -133,7 +140,7 @@ ArcVisualisationSVG.prototype.redrawArc = function(resize, left, right, top,
 /** ****************************************************************************
  * Visualise arc
  ******************************************************************************/
-ArcVisualisationSVG.prototype.visualise = function() {
+ThreadVisNS.ArcVisualisationSVG.prototype.visualise = function() {
 
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO, 

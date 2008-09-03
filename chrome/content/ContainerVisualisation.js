@@ -11,11 +11,18 @@
 
 
 
+if (! window.ThreadVisNS) {
+    window.ThreadVisNS = {};
+}
+
+
+
 /** ****************************************************************************
  * Constructor for visualisation class
  ******************************************************************************/
-function ContainerVisualisation(stack, strings, container, colour, left, top,
-    selected, dotSize, resize, circle, flash, spacing, opacity, messageCircles) {
+ThreadVisNS.ContainerVisualisation = function(stack, strings, container, colour,
+    left, top, selected, dotSize, resize, circle, flash, spacing, opacity,
+    messageCircles) {
     /**
      * XUL stack on which container gets drawn
      */
@@ -136,7 +143,7 @@ function ContainerVisualisation(stack, strings, container, colour, left, top,
 * create popup menu to delete, copy and cut messages
 * just create stub menu
  ******************************************************************************/
-ContainerVisualisation.prototype.createMenu = function() {
+ThreadVisNS.ContainerVisualisation.prototype.createMenu = function() {
     var menuname = "dot_popup_" + this.left;
     this.click.setAttribute("context", menuname);
 
@@ -157,7 +164,7 @@ ContainerVisualisation.prototype.createMenu = function() {
 /** ****************************************************************************
 * fill popup menu to delete, copy and cut messages
  ******************************************************************************/
-ContainerVisualisation.prototype.getMenu = function() {
+ThreadVisNS.ContainerVisualisation.prototype.getMenu = function() {
     if (this.popup.rendered == true) {
         if (THREADVIS.copyMessage) {
             this.menuitemPaste.setAttribute("disabled", false);
@@ -273,7 +280,7 @@ ContainerVisualisation.prototype.getMenu = function() {
  * Create tooltip for container containing information about container
  * just create stub menu
  ******************************************************************************/
-ContainerVisualisation.prototype.createToolTip = function() {
+ThreadVisNS.ContainerVisualisation.prototype.createToolTip = function() {
     var tooltip = document.createElementNS(THREADVIS.XUL_NAMESPACE, "tooltip");
     tooltip.setAttribute("orient", "vertical");
     tooltip.setAttribute("id", "ThreadVis_" + this.left);
@@ -292,7 +299,7 @@ ContainerVisualisation.prototype.createToolTip = function() {
 /** ****************************************************************************
  * format a datetime
  ******************************************************************************/
-ContainerVisualisation.prototype.formatDate = function(date) {
+ThreadVisNS.ContainerVisualisation.prototype.formatDate = function(date) {
     var dateFormatService = Components.classes["@mozilla.org/intl/scriptabledateformat;1"]
         .getService(Components.interfaces.nsIScriptableDateFormat);
     var dateString = dateFormatService.FormatDateTime("",
@@ -313,7 +320,7 @@ ContainerVisualisation.prototype.formatDate = function(date) {
 /** ****************************************************************************
  * fill tooltip for container containing information about container
  ******************************************************************************/
-ContainerVisualisation.prototype.getToolTip = function() {
+ThreadVisNS.ContainerVisualisation.prototype.getToolTip = function() {
     if (this.tooltip.rendered == true) {
         return;
     }
@@ -405,7 +412,7 @@ ContainerVisualisation.prototype.getToolTip = function() {
  * don't do anything until we paste the message
  * just remember which message we have to cut
  ******************************************************************************/
-ContainerVisualisation.prototype.cut = function() {
+ThreadVisNS.ContainerVisualisation.prototype.cut = function() {
     THREADVIS.copyMessage = this.container;
     var msgKey = THREADVIS.copyMessage.isDummy() ? "DUMMY" : 
                     THREADVIS.copyMessage.getMessage().getKey();
@@ -419,7 +426,7 @@ ContainerVisualisation.prototype.cut = function() {
  * delete the parent-child relationship for this message
  * (i.e. delete the reference to the parent)
  ******************************************************************************/
-ContainerVisualisation.prototype.deleteParent = function() {
+ThreadVisNS.ContainerVisualisation.prototype.deleteParent = function() {
     var parent = this.container.getParent();
     parent.removeChild(this.container);
     parent.getTopContainer().pruneEmptyContainers();
@@ -444,7 +451,7 @@ ContainerVisualisation.prototype.deleteParent = function() {
 /** ****************************************************************************
  * Draw circle around container if container is selected
  ******************************************************************************/
-ContainerVisualisation.prototype.drawCircle = function(colour) {
+ThreadVisNS.ContainerVisualisation.prototype.drawCircle = function(colour) {
     if (! this.circle) {
         this.circle = document.createElementNS(THREADVIS.XUL_NAMESPACE, "box");
     }
@@ -459,7 +466,7 @@ ContainerVisualisation.prototype.drawCircle = function(colour) {
 /** ****************************************************************************
  * Draw container around dot to catch click events and show tooltip
  ******************************************************************************/
-ContainerVisualisation.prototype.drawClick = function() {
+ThreadVisNS.ContainerVisualisation.prototype.drawClick = function() {
     if (! this.click) {
         this.click = document.createElementNS(THREADVIS.XUL_NAMESPACE, "box");
     }
@@ -486,7 +493,7 @@ ContainerVisualisation.prototype.drawClick = function() {
 /** ****************************************************************************
  * Draw dot for container
  ******************************************************************************/
-ContainerVisualisation.prototype.drawDot = function() {
+ThreadVisNS.ContainerVisualisation.prototype.drawDot = function() {
     this.dot = document.createElementNS(THREADVIS.XUL_NAMESPACE, "box");
 
     this.visualiseDot();
@@ -499,7 +506,7 @@ ContainerVisualisation.prototype.drawDot = function() {
 /** ****************************************************************************
  * Flash (show and hide) circle to draw attention to selected container
  ******************************************************************************/
-ContainerVisualisation.prototype.flash = function() {
+ThreadVisNS.ContainerVisualisation.prototype.flash = function() {
     if (this.flashCount == 0) {
         clearTimeout(this.flashTimeout);
         return;
@@ -516,7 +523,7 @@ ContainerVisualisation.prototype.flash = function() {
 /** ****************************************************************************
  * Hide circle
  ******************************************************************************/
-ContainerVisualisation.prototype.flashOff = function(old) {
+ThreadVisNS.ContainerVisualisation.prototype.flashOff = function(old) {
     this.showCircle();
     var ref = this;
     this.flashTimeout = setTimeout(function() {ref.flash();}, 500);
@@ -527,7 +534,7 @@ ContainerVisualisation.prototype.flashOff = function(old) {
 /** ****************************************************************************
  * Show circle
  ******************************************************************************/
-ContainerVisualisation.prototype.flashOn = function() {
+ThreadVisNS.ContainerVisualisation.prototype.flashOn = function() {
     this.hideCircle();
     var ref = this;
     this.flashOffTimeout = setTimeout(function() {ref.flashOff();}, 500);
@@ -538,7 +545,7 @@ ContainerVisualisation.prototype.flashOn = function() {
 /** ****************************************************************************
  * Hide circle
  ******************************************************************************/
-ContainerVisualisation.prototype.hideCircle = function() {
+ThreadVisNS.ContainerVisualisation.prototype.hideCircle = function() {
     this.circle.hidden = true;
 }
 
@@ -548,7 +555,7 @@ ContainerVisualisation.prototype.hideCircle = function() {
  * mouse click event handler
  * display message user clicked on
  ******************************************************************************/
-ContainerVisualisation.prototype.onMouseClick = function(event) {
+ThreadVisNS.ContainerVisualisation.prototype.onMouseClick = function(event) {
     // only react to left mouse click
     if (event.button != 0) {
         return;
@@ -575,7 +582,7 @@ ContainerVisualisation.prototype.onMouseClick = function(event) {
 /** ****************************************************************************
  * mouse click delayed, to catch for double click
  ******************************************************************************/
-ContainerVisualisation.prototype.onMouseClickDelayed = function(event) {
+ThreadVisNS.ContainerVisualisation.prototype.onMouseClickDelayed = function(event) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Visualisation.onMouseClick()", {});
@@ -605,7 +612,7 @@ ContainerVisualisation.prototype.onMouseClickDelayed = function(event) {
 /** ****************************************************************************
  * paste a previously cut message in this thread
  ******************************************************************************/
-ContainerVisualisation.prototype.paste = function() {
+ThreadVisNS.ContainerVisualisation.prototype.paste = function() {
     if (THREADVIS.copyMessage) {
         // check to see if user creates a loop
         //if (THREADVIS.copyMessage.findChild(this.container)) {
@@ -653,7 +660,7 @@ ContainerVisualisation.prototype.paste = function() {
 /** ****************************************************************************
  * Re-Draw all elements
  ******************************************************************************/
-ContainerVisualisation.prototype.redraw = function(resize, left, top, selected,
+ThreadVisNS.ContainerVisualisation.prototype.redraw = function(resize, left, top, selected,
     flash, colour, opacity) {
     this.resize = resize;
     this.left = left;
@@ -683,7 +690,7 @@ ContainerVisualisation.prototype.redraw = function(resize, left, top, selected,
 /** ****************************************************************************
  * Re-Draw circle around container if container is selected
  ******************************************************************************/
-ContainerVisualisation.prototype.redrawCircle = function(colour) {
+ThreadVisNS.ContainerVisualisation.prototype.redrawCircle = function(colour) {
     this.visualiseCircle(colour);
 }
 
@@ -692,7 +699,7 @@ ContainerVisualisation.prototype.redrawCircle = function(colour) {
 /** ****************************************************************************
  * Re-Draw container around dot to catch click events and show tooltip
  ******************************************************************************/
-ContainerVisualisation.prototype.redrawClick = function() {
+ThreadVisNS.ContainerVisualisation.prototype.redrawClick = function() {
     this.visualiseClick();
 }
 
@@ -701,7 +708,7 @@ ContainerVisualisation.prototype.redrawClick = function() {
 /** ****************************************************************************
  * Re-Draw dot for container
  ******************************************************************************/
-ContainerVisualisation.prototype.redrawDot = function() {
+ThreadVisNS.ContainerVisualisation.prototype.redrawDot = function() {
     this.visualiseDot();
 }
 
@@ -710,7 +717,7 @@ ContainerVisualisation.prototype.redrawDot = function() {
 /** ****************************************************************************
  * Show circle
  ******************************************************************************/
-ContainerVisualisation.prototype.showCircle = function() {
+ThreadVisNS.ContainerVisualisation.prototype.showCircle = function() {
     this.circle.hidden = false;
 }
 
@@ -719,7 +726,7 @@ ContainerVisualisation.prototype.showCircle = function() {
 /** ****************************************************************************
  * Flash (show and hide) circle to draw attention to selected container
  ******************************************************************************/
-ContainerVisualisation.prototype.startFlash = function() {
+ThreadVisNS.ContainerVisualisation.prototype.startFlash = function() {
     this.flashCount = 3;
     this.flash();
 }
@@ -729,7 +736,7 @@ ContainerVisualisation.prototype.startFlash = function() {
 /** ****************************************************************************
  * Stop flashing
  ******************************************************************************/
-ContainerVisualisation.prototype.stopFlash = function() {
+ThreadVisNS.ContainerVisualisation.prototype.stopFlash = function() {
     clearInterval(this.flashInterval);
     clearTimeout(this.flashOnTimeout);
     clearTimeout(this.flashOffTimeout);
@@ -741,7 +748,7 @@ ContainerVisualisation.prototype.stopFlash = function() {
 /** ****************************************************************************
  * Visualise circle around container if container is selected
  ******************************************************************************/
-ContainerVisualisation.prototype.visualiseCircle = function(colour) {
+ThreadVisNS.ContainerVisualisation.prototype.visualiseCircle = function(colour) {
     var styleTop = ((this.top - (this.dotSize * 4/6)) * this.resize) + "px";
     var styleLeft = ((this.left - (this.dotSize * 4/6)) * this.resize) + "px";
     var styleHeight = (this.dotSize * 8/6 * this.resize) + "px";
@@ -777,7 +784,7 @@ ContainerVisualisation.prototype.visualiseCircle = function(colour) {
 /** ****************************************************************************
  * Visualise container around dot to catch click events and show tooltip
  ******************************************************************************/
-ContainerVisualisation.prototype.visualiseClick = function() {
+ThreadVisNS.ContainerVisualisation.prototype.visualiseClick = function() {
     var styleTop = ((this.top - (this.spacing / 2)) * this.resize) + "px";
     var styleLeft = ((this.left - this.spacing / 2) * this.resize) + "px";
     var styleHeight = (this.spacing * this.resize) + "px";
@@ -812,7 +819,7 @@ ContainerVisualisation.prototype.visualiseClick = function() {
 /** ****************************************************************************
  * Draw dot for container
  ******************************************************************************/
-ContainerVisualisation.prototype.visualiseDot = function() {
+ThreadVisNS.ContainerVisualisation.prototype.visualiseDot = function() {
     var styleTop = ((this.top - (this.dotSize / 2)) * this.resize);
     var styleLeft = ((this.left - (this.dotSize / 2)) * this.resize);
     var styleHeight = (this.dotSize * this.resize);

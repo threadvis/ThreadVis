@@ -11,11 +11,17 @@
 
 
 
+if (! window.ThreadVisNS) {
+    window.ThreadVisNS = {};
+}
+
+
+
 /** ****************************************************************************
  * Constructor
  * references == string of references
  ******************************************************************************/
-function References(references) {
+ThreadVisNS.References = function(references) {
     // Store message ids of references
     this.references = new Object();
 
@@ -27,7 +33,7 @@ function References(references) {
 /** ****************************************************************************
  * build references array
  ******************************************************************************/
-References.prototype.buildReferences = function(references) {
+ThreadVisNS.References.prototype.buildReferences = function(references) {
     if (references != null && references != "") {
         var result = references.match(/[^<>\s]+/g);
 
@@ -59,7 +65,7 @@ References.prototype.buildReferences = function(references) {
 /** ****************************************************************************
  * get references array
  ******************************************************************************/
-References.prototype.getReferences = function() {
+ThreadVisNS.References.prototype.getReferences = function() {
     return this.references;
 }
 
@@ -68,7 +74,7 @@ References.prototype.getReferences = function() {
 /** ****************************************************************************
  * get string representation of object
  ******************************************************************************/
-References.prototype.toString = function() {;
+ThreadVisNS.References.prototype.toString = function() {;
     var string = "";
     for (referenceskey in this.references) {
         string += ", " + this.references[referenceskey];

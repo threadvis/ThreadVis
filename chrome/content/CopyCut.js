@@ -11,11 +11,17 @@
 
 
 
+if (! window.ThreadVisNS) {
+    window.ThreadVisNS = {};
+}
+
+
+
 /** ****************************************************************************
  * constructor
  * create new object, create file pointers
  ******************************************************************************/
-function CopyCut() {
+ThreadVisNS.CopyCut = function() {
     this.EXTENSION_PATH = "extensions";
     this.EXTENSION_GUID = "{A23E4120-431F-4753-AE53-5D028C42CFDC}";
     this.FILENAME = "threadvis.copycut";
@@ -52,7 +58,7 @@ function CopyCut() {
  * if we are adding a copy for a pair that was previously cut,
  * just remove the cut
  ******************************************************************************/
-CopyCut.prototype.addCopy = function(msgMsg) {
+ThreadVisNS.CopyCut.prototype.addCopy = function(msgMsg) {
     var splits = msgMsg.split(" ");
     if (splits[0] != "" && splits[1] != "") {
         if (this.cuts[splits[0]] == splits[1]) {
@@ -71,7 +77,7 @@ CopyCut.prototype.addCopy = function(msgMsg) {
  * if we are adding a cut for a pair that was previously copied,
  * just remove the copy
  ******************************************************************************/
-CopyCut.prototype.addCut= function(msgMsg) {
+ThreadVisNS.CopyCut.prototype.addCut= function(msgMsg) {
     var splits = msgMsg.split(" ");
     if (splits[0] != "" && splits[1] != "") {
         if (this.copies[splits[0]] == splits[1]) {
@@ -87,7 +93,7 @@ CopyCut.prototype.addCut= function(msgMsg) {
 /** ****************************************************************************
  * close the file
  ******************************************************************************/
-CopyCut.prototype.close = function() {
+ThreadVisNS.CopyCut.prototype.close = function() {
     // if file is open, close it
     if (this.ready) {
         this.ready = false;
@@ -103,7 +109,7 @@ CopyCut.prototype.close = function() {
  * get copy for message
  * (return msg_id of new parent)
  ******************************************************************************/
-CopyCut.prototype.getCopy = function(msg) {
+ThreadVisNS.CopyCut.prototype.getCopy = function(msg) {
     return this.copies[msg];
 }
 
@@ -113,7 +119,7 @@ CopyCut.prototype.getCopy = function(msg) {
  * get cut for message
  * (return msg_id of old parent)
  ******************************************************************************/
-CopyCut.prototype.getCut = function(msg) {
+ThreadVisNS.CopyCut.prototype.getCut = function(msg) {
     return this.cuts[msg];
 }
 
@@ -122,7 +128,7 @@ CopyCut.prototype.getCut = function(msg) {
 /** ****************************************************************************
  * return the file object
  ******************************************************************************/
-CopyCut.prototype.getFile = function() {
+ThreadVisNS.CopyCut.prototype.getFile = function() {
     return this.file;
 }
 
@@ -132,7 +138,7 @@ CopyCut.prototype.getFile = function() {
  * open the file
  * create streams
  ******************************************************************************/
-CopyCut.prototype.open = function() {
+ThreadVisNS.CopyCut.prototype.open = function() {
     this.ready = false;
 
     if (! this.file.exists()) {
@@ -164,7 +170,7 @@ CopyCut.prototype.open = function() {
 /** ****************************************************************************
  * read copies and cuts from file
  ******************************************************************************/
-CopyCut.prototype.read = function() {
+ThreadVisNS.CopyCut.prototype.read = function() {
     if (! this.ready) {
         this.open();
     }
@@ -202,7 +208,7 @@ CopyCut.prototype.read = function() {
 /** ****************************************************************************
  * reset the file (i.e. delete)
  ******************************************************************************/
-CopyCut.prototype.reset = function() {
+ThreadVisNS.CopyCut.prototype.reset = function() {
     if (this.ready) {
         this.close();
     }
@@ -221,7 +227,7 @@ CopyCut.prototype.reset = function() {
  * write copies and cuts to file
  * write one per line
  ******************************************************************************/
-CopyCut.prototype.write = function() {
+ThreadVisNS.CopyCut.prototype.write = function() {
     this.reset();
 
     if (! this.ready) {

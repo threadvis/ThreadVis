@@ -11,11 +11,18 @@
 
 
 
+if (! window.ThreadVisNS) {
+    window.ThreadVisNS = {};
+}
+
+
+
 /** ****************************************************************************
  * Constructor for visualisation class
  ******************************************************************************/
-function ArcVisualisation(stack, dotSize, resize, arcMinHeight, arcDifference, 
-    arcRadius, arcWidth, colour, vPosition, height, left, right, top, opacity) {
+ThreadVisNS.ArcVisualisation = function(stack, dotSize, resize, arcMinHeight,
+    arcDifference, arcRadius, arcWidth, colour, vPosition, height, left, right,
+    top, opacity) {
 
     /**
      * XUL stack on which to draw
@@ -103,7 +110,7 @@ function ArcVisualisation(stack, dotSize, resize, arcMinHeight, arcDifference,
 /** ****************************************************************************
  * Draw arc
  ******************************************************************************/
-ArcVisualisation.prototype.drawArc = function() {
+ThreadVisNS.ArcVisualisation.prototype.drawArc = function() {
     this.arc = document.createElementNS(THREADVIS.XUL_NAMESPACE, "box");
 
     this.visualise();
@@ -115,7 +122,7 @@ ArcVisualisation.prototype.drawArc = function() {
 /** ****************************************************************************
  * Re-Draw arc
  ******************************************************************************/
-ArcVisualisation.prototype.redrawArc = function(resize, left, right, top,
+ThreadVisNS.ArcVisualisation.prototype.redrawArc = function(resize, left, right, top,
     colour, opacity) {
     this.resize = resize;
     this.left = left;
@@ -132,7 +139,7 @@ ArcVisualisation.prototype.redrawArc = function(resize, left, right, top,
 /** ****************************************************************************
  * Visualise arc
  ******************************************************************************/
-ArcVisualisation.prototype.visualise = function() {
+ThreadVisNS.ArcVisualisation.prototype.visualise = function() {
     var arcTop = 0;
     var fillTop = 0;
     if (this.vPosition == "top") {

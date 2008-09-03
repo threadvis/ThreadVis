@@ -12,10 +12,16 @@
 
 
 
+if (! window.ThreadVisNS) {
+    window.ThreadVisNS = {};
+}
+
+
+
 /** ****************************************************************************
  * Constructor
  ******************************************************************************/
-function Threader() {
+ThreadVisNS.Threader = function() {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_THREADER)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Threader()", {});
@@ -34,12 +40,12 @@ function Threader() {
     /**
      * The set of all root threads
      */
-    this.rootSet = new Container(true);
+    this.rootSet = new ThreadVisNS.Container(true);
 
     this.subjectTable = new Object();
 
     // copy/cut object
-    this.copycut = new CopyCut();
+    this.copycut = new ThreadVisNS.CopyCut();
 }
 
 
@@ -48,7 +54,7 @@ function Threader() {
  * Add a new message
  * @param message The new Message to add
  ******************************************************************************/
-Threader.prototype.addMessage = function(message) {
+ThreadVisNS.Threader.prototype.addMessage = function(message) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_THREADER)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Threader.addMessage()", {"message" : message});
@@ -62,9 +68,9 @@ Threader.prototype.addMessage = function(message) {
  * Add a new message
  * construct message here
  ******************************************************************************/
-Threader.prototype.addMessageDetail = function(subject, author, messageId,
+ThreadVisNS.Threader.prototype.addMessageDetail = function(subject, author, messageId,
     messageKey, date, uri, references, issent) {
-    this.addMessage(new Message(subject, author, messageId, messageKey, date, 
+    this.addMessage(new ThreadVisNS.Message(subject, author, messageId, messageKey, date, 
         uri, references, issent));
 }
 
@@ -73,7 +79,7 @@ Threader.prototype.addMessageDetail = function(subject, author, messageId,
 /** ****************************************************************************
  * Close the copy/cut file (but write info first)
  ******************************************************************************/
-Threader.prototype.closeCopyCut = function() {
+ThreadVisNS.Threader.prototype.closeCopyCut = function() {
     this.copycut.write();
     this.copycut.close();
 }
@@ -83,7 +89,7 @@ Threader.prototype.closeCopyCut = function() {
 /** ****************************************************************************
  * Find a message
  ******************************************************************************/
-Threader.prototype.findContainer = function(messageId) {
+ThreadVisNS.Threader.prototype.findContainer = function(messageId) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_THREADER)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO, 
             "Threader.findContainer()", {"messageId" : messageId,
@@ -97,7 +103,7 @@ Threader.prototype.findContainer = function(messageId) {
 /** ****************************************************************************
  * Get root container
  ******************************************************************************/
-Threader.prototype.getRoot = function() {
+ThreadVisNS.Threader.prototype.getRoot = function() {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_THREADER)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Threader.getRoot()", {});
@@ -111,7 +117,7 @@ Threader.prototype.getRoot = function() {
  * put all messages in a container
  * loop over all messages
  ******************************************************************************/
-Threader.prototype.putMessagesInContainer = function() {
+ThreadVisNS.Threader.prototype.putMessagesInContainer = function() {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_THREADER)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Threader.putMessagesInContainer()", {"action" : 
@@ -143,7 +149,7 @@ Threader.prototype.putMessagesInContainer = function() {
 /** ****************************************************************************
  * put this message in a container
  ******************************************************************************/
-Threader.prototype.putMessageInContainer = function(message) {
+ThreadVisNS.Threader.prototype.putMessageInContainer = function(message) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_THREADER)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO, 
             "Threader.putMessageInContainer()", {"looking at" : message});
@@ -197,7 +203,7 @@ Threader.prototype.putMessageInContainer = function(message) {
         }
 
         // no suitable container found, create new one
-        messageContainer = new Container();
+        messageContainer = new ThreadVisNS.Container();
         messageContainer.setMessage(message);
         // index container in hashtable
         this.idTable[message.getId()] = messageContainer;
@@ -231,7 +237,7 @@ Threader.prototype.putMessageInContainer = function(message) {
             }
 
             // no container found, create new one
-            referenceContainer = new Container();
+            referenceContainer = new ThreadVisNS.Container();
             // index container
             this.idTable[referenceId] = referenceContainer;
         }
@@ -319,7 +325,7 @@ Threader.prototype.putMessageInContainer = function(message) {
             }
 
             // no container found, create new one
-            parentContainer = new Container();
+            parentContainer = new ThreadVisNS.Container();
             // index container
             this.idTable[copyId] = parentContainer;
         }
@@ -353,7 +359,7 @@ Threader.prototype.putMessageInContainer = function(message) {
  * Find the root set
  * These are all containers which have no parent
  ******************************************************************************/
-Threader.prototype.findRootSet = function() {
+ThreadVisNS.Threader.prototype.findRootSet = function() {
     var rootKey = null;
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_THREADER)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
@@ -374,7 +380,7 @@ Threader.prototype.findRootSet = function() {
 /** ****************************************************************************
  * Find a message
  ******************************************************************************/
-Threader.prototype.hasMessage = function(messageId) {
+ThreadVisNS.Threader.prototype.hasMessage = function(messageId) {
     if (this.messages[messageId]) {
         return true;
     }
@@ -392,7 +398,7 @@ Threader.prototype.hasMessage = function(messageId) {
  * Prune all empty containers
  * do recursive pruneing on all containers
  ******************************************************************************/
-Threader.prototype.pruneEmptyContainers = function() {
+ThreadVisNS.Threader.prototype.pruneEmptyContainers = function() {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_THREADER)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Threader.pruneEmptyContainers()",
@@ -436,7 +442,7 @@ Threader.prototype.pruneEmptyContainers = function() {
  * always put topmost container in subject table
  * (i.e. container which is "least" reply
  ******************************************************************************/
-Threader.prototype.putContainersInSubjectTable = function() {
+ThreadVisNS.Threader.prototype.putContainersInSubjectTable = function() {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_THREADER)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Threader.putContainersInSubjectTable()",
@@ -484,7 +490,7 @@ Threader.prototype.putContainersInSubjectTable = function() {
 /** ****************************************************************************
  * Group all containers by subject
  ******************************************************************************/
-Threader.prototype.groupBySubject = function() {
+ThreadVisNS.Threader.prototype.groupBySubject = function() {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_THREADER)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Threader.groupBySubject()", {"action" : "loop over root set"});
@@ -565,7 +571,7 @@ Threader.prototype.groupBySubject = function() {
                 }
                 // otherwise create dummy container
                 else {
-                    newContainer = new Container();
+                    newContainer = new ThreadVisNS.Container();
                     top.addChild(newContainer);
                 }
                 top = newContainer;
@@ -610,7 +616,7 @@ Threader.prototype.groupBySubject = function() {
                 }
                 // otherwise create dummy container
                 else {
-                    newContainer = new Container();
+                    newContainer = new ThreadVisNS.Container();
                     top.addChild(newContainer);
                 }
                 top = newContainer;
@@ -630,7 +636,7 @@ Threader.prototype.groupBySubject = function() {
         // if none of the above, create new dummy container and add both as children
         else {
             // remove both from list of siblings
-            var newContainer = new Container();
+            var newContainer = new ThreadVisNS.Container();
 
             var tmp = container.getPrevious();
             newContainer.addChild(container);
@@ -646,7 +652,7 @@ Threader.prototype.groupBySubject = function() {
 /** ****************************************************************************
  * Thread all messages
  ******************************************************************************/
-Threader.prototype.thread = function() {
+ThreadVisNS.Threader.prototype.thread = function() {
     THREADVIS.setStatus("Threading ...");
     // open copy/cut database
     this.copycut.read();
@@ -695,7 +701,7 @@ Threader.prototype.thread = function() {
 /** ****************************************************************************
  * Output root set as string
  ******************************************************************************/
-Threader.prototype.toString = function() {
+ThreadVisNS.Threader.prototype.toString = function() {
     var string = "\n-----\n";
     string += this.rootSet.toString("\n");
     return string;
@@ -706,7 +712,7 @@ Threader.prototype.toString = function() {
 /** ****************************************************************************
  * Log info about threading
  ******************************************************************************/
-Threader.prototype.logInfo = function() {
+ThreadVisNS.Threader.prototype.logInfo = function() {
     if (! THREADVIS.logger.doLogging()) {
         return;
     }
@@ -727,7 +733,7 @@ Threader.prototype.logInfo = function() {
 /** ****************************************************************************
  * get statistical info about message distribution
  ******************************************************************************/
-Threader.prototype.getThreadDistribution = function() {
+ThreadVisNS.Threader.prototype.getThreadDistribution = function() {
     var distribution = new Array();
     var container = null;
     for (container = this.rootSet.getChild(); container != null;
@@ -747,7 +753,7 @@ Threader.prototype.getThreadDistribution = function() {
 /** ****************************************************************************
  * Thread all messages
  ******************************************************************************/
-Threader.prototype.removeThread = function(topContainer) {
+ThreadVisNS.Threader.prototype.removeThread = function(topContainer) {
     if (topContainer) {
         this.rootSet.removeChild(topContainer);
         var children = topContainer.getChildren();
@@ -765,7 +771,7 @@ Threader.prototype.removeThread = function(topContainer) {
 /** ****************************************************************************
  * Thread all messages in background
  ******************************************************************************/
-Threader.prototype.threadBackground = function(continueFunction) {
+ThreadVisNS.Threader.prototype.threadBackground = function(continueFunction) {
     THREADVIS.setStatus("Threading ...");
     // open copy/cut database
     this.copycut.read();
@@ -818,11 +824,11 @@ Threader.prototype.threadBackground = function(continueFunction) {
 /** ****************************************************************************
  * reset in-memory data
  ******************************************************************************/
-Threader.prototype.reset = function() {
+ThreadVisNS.Threader.prototype.reset = function() {
     delete this.idTable;
     this.idTable = new Object();
     delete this.rootSet;
-    this.rootSet = new Container(true);
+    this.rootSet = new ThreadVisNS.Container(true);
     delete this.messages;
     this.messages = new Object();
 }
@@ -833,14 +839,14 @@ Threader.prototype.reset = function() {
  * put all messages in a container
  * loop over all messages
  ******************************************************************************/
-Threader.prototype.putMessagesInContainerBackground = function(continueFunction) {
+ThreadVisNS.Threader.prototype.putMessagesInContainerBackground = function(continueFunction) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_THREADER)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Threader.putMessagesInContainer()", {"action" : 
             "loop over all messages"});
     }
 
-    var util = new Util();
+    var util = new ThreadVisNS.Util();
     var ref = this;
     var count = 0;
     var msgArray = new Array();

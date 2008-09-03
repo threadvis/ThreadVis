@@ -11,12 +11,18 @@
 
 
 
+if (! window.ThreadVisNS) {
+    window.ThreadVisNS = {};
+}
+
+
+
 /** ****************************************************************************
  * constructor
  * read preferences
  * open file if necessary
  ******************************************************************************/
-function Logger() {
+ThreadVisNS.Logger = function() {
     this.EXTENSION_PATH = "extensions";
     this.EXTENSION_GUID = "{A23E4120-431F-4753-AE53-5D028C42CFDC}";
     this.LOGFILENAME = "threadvis.log.xml";
@@ -74,7 +80,7 @@ function Logger() {
 /** ****************************************************************************
  * close the logfile
  ******************************************************************************/
-Logger.prototype.close = function() {
+ThreadVisNS.Logger.prototype.close = function() {
     // if file is open, close it
     // but write end tag to log first
     if (this.ready) {
@@ -89,7 +95,7 @@ Logger.prototype.close = function() {
 /** ****************************************************************************
  * convert an object to xml
  ******************************************************************************/
-Logger.prototype.decode = function(object) {
+ThreadVisNS.Logger.prototype.decode = function(object) {
     var logtext = "";
     for (var key in object) {
         logtext += '<info key="' + key + '">';
@@ -110,7 +116,7 @@ Logger.prototype.decode = function(object) {
  * this method is called in debug mode
  * so use CDATA blocks to escape
  ******************************************************************************/
-Logger.prototype.decodeDebug = function(object) {
+ThreadVisNS.Logger.prototype.decodeDebug = function(object) {
     var logtext = "";
     for (var key in object) {
         logtext += '<info key="' + key + '">';
@@ -127,7 +133,7 @@ Logger.prototype.decodeDebug = function(object) {
 /** ****************************************************************************
  * Return if we do logging
  ******************************************************************************/
-Logger.prototype.doLogging = function() {
+ThreadVisNS.Logger.prototype.doLogging = function() {
     return THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_LOGGING);
 }
@@ -137,7 +143,7 @@ Logger.prototype.doLogging = function() {
 /** ****************************************************************************
  * return the logfile file object
  ******************************************************************************/
-Logger.prototype.getFile = function() {
+ThreadVisNS.Logger.prototype.getFile = function() {
     return this.file;
 }
 
@@ -146,7 +152,7 @@ Logger.prototype.getFile = function() {
 /** ****************************************************************************
  * check to see if debug to console is enabled
  ******************************************************************************/
-Logger.prototype.isConsole = function() {
+ThreadVisNS.Logger.prototype.isConsole = function() {
     return (THREADVIS.preferences.getPreference(
             THREADVIS.preferences.PREF_LOGGING_CONSOLE));
 }
@@ -156,7 +162,7 @@ Logger.prototype.isConsole = function() {
 /** ****************************************************************************
  * check to see if debug logging is enabled for this component
  ******************************************************************************/
-Logger.prototype.isDebug = function(component) {
+ThreadVisNS.Logger.prototype.isDebug = function(component) {
     return (THREADVIS.preferences.getPreference(
             THREADVIS.preferences.PREF_LOGGING_DEBUG)
         && THREADVIS.preferences.getPreference(
@@ -168,7 +174,7 @@ Logger.prototype.isDebug = function(component) {
 /** ****************************************************************************
  * log an info message
  ******************************************************************************/
-Logger.prototype.log = function(item, infos) {
+ThreadVisNS.Logger.prototype.log = function(item, infos) {
     if (this.isConsole()) {
         this.logConsole(this.LEVEL_INFO, item, infos);
     } else {
@@ -188,7 +194,7 @@ Logger.prototype.log = function(item, infos) {
 /** ****************************************************************************
  * write string to error console
  ******************************************************************************/
-Logger.prototype.logConsole = function(severity, item, infos) {
+ThreadVisNS.Logger.prototype.logConsole = function(severity, item, infos) {
     var msg = item;
     for (var i in infos) {
         msg += "\n" + i + ": " + infos[i];
@@ -219,7 +225,7 @@ Logger.prototype.logConsole = function(severity, item, infos) {
 /** ****************************************************************************
  * write a string to the file in debug mode
  ******************************************************************************/
-Logger.prototype.logDebug = function(severity, item, infos) {
+ThreadVisNS.Logger.prototype.logDebug = function(severity, item, infos) {
     if (this.isConsole()) {
         this.logConsole(severity, item, infos);
     } else {
@@ -239,7 +245,7 @@ Logger.prototype.logDebug = function(severity, item, infos) {
 /** ****************************************************************************
  * observe preferences changes
  ******************************************************************************/
-Logger.prototype.observe = function(enabled) {
+ThreadVisNS.Logger.prototype.observe = function(enabled) {
     // if logging is enabled, but not ready:
     // this means it was just enabled, so open logfile
     if (enabled && ! this.ready) {
@@ -258,7 +264,7 @@ Logger.prototype.observe = function(enabled) {
 /** ****************************************************************************
  * open the logfile
  ******************************************************************************/
-Logger.prototype.open = function() {
+ThreadVisNS.Logger.prototype.open = function() {
     this.ready = false;
 
     if (! this.file.exists())
@@ -280,7 +286,7 @@ Logger.prototype.open = function() {
 /** ****************************************************************************
  * reset the logfile
  ******************************************************************************/
-Logger.prototype.reset = function(deleteFile) {
+ThreadVisNS.Logger.prototype.reset = function(deleteFile) {
     if (this.ready) {
         this.close();
     }

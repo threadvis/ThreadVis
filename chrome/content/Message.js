@@ -11,11 +11,17 @@
 
 
 
+if (! window.ThreadVisNS) {
+    window.ThreadVisNS = {};
+}
+
+
+
 /** ****************************************************************************
  * Constructor
  ******************************************************************************/
-function Message(subject, from, messageId, messageKey, date, folder, references,
-    sent) {
+ThreadVisNS.Message = function(subject, from, messageId, messageKey, date,
+    folder, references, sent) {
     /**
      * Message date
      */
@@ -49,7 +55,7 @@ function Message(subject, from, messageId, messageKey, date, folder, references,
     /**
      * References of this message
      */
-    this.references = new References(references);
+    this.references = new ThreadVisNS.References(references);
 
     /**
      * Depth of reply of this message
@@ -76,7 +82,7 @@ function Message(subject, from, messageId, messageKey, date, folder, references,
 /** ****************************************************************************
  * Get date of message
  ******************************************************************************/
-Message.prototype.getDate = function() {
+ThreadVisNS.Message.prototype.getDate = function() {
     return this.date;
 }
 
@@ -85,7 +91,7 @@ Message.prototype.getDate = function() {
 /** ****************************************************************************
  * Get folder message is in
  ******************************************************************************/
-Message.prototype.getFolder = function() {
+ThreadVisNS.Message.prototype.getFolder = function() {
     return this.folder;
 }
 
@@ -94,7 +100,7 @@ Message.prototype.getFolder = function() {
 /** ****************************************************************************
  * Get sender of message
  ******************************************************************************/
-Message.prototype.getFrom = function() {
+ThreadVisNS.Message.prototype.getFrom = function() {
     return this.from;
 }
 
@@ -103,7 +109,7 @@ Message.prototype.getFrom = function() {
 /** ****************************************************************************
  * Get sender-email of message
  ******************************************************************************/
-Message.prototype.getFromEmail = function() {
+ThreadVisNS.Message.prototype.getFromEmail = function() {
     // parse email address
     var email = this.getFrom();
     email = Components.classes["@mozilla.org/messenger/headerparser;1"]
@@ -117,7 +123,7 @@ Message.prototype.getFromEmail = function() {
 /** ****************************************************************************
  * Get message id
  ******************************************************************************/
-Message.prototype.getId = function() {
+ThreadVisNS.Message.prototype.getId = function() {
     return this.messageId;
 }
 
@@ -126,7 +132,7 @@ Message.prototype.getId = function() {
 /** ****************************************************************************
  * Get message key
  ******************************************************************************/
-Message.prototype.getKey = function() {
+ThreadVisNS.Message.prototype.getKey = function() {
     return this.messageKey;
 }
 
@@ -135,7 +141,7 @@ Message.prototype.getKey = function() {
 /** ****************************************************************************
  * Get references
  ******************************************************************************/
-Message.prototype.getReferences = function() {
+ThreadVisNS.Message.prototype.getReferences = function() {
     return this.references;
 }
 
@@ -144,7 +150,7 @@ Message.prototype.getReferences = function() {
 /** ****************************************************************************
  * Get reply count of this message
  ******************************************************************************/
-Message.prototype.getReplyCount = function() {
+ThreadVisNS.Message.prototype.getReplyCount = function() {
     return this.replyCount;
 }
 
@@ -153,7 +159,7 @@ Message.prototype.getReplyCount = function() {
 /** ****************************************************************************
  * Get simplified subject
  ******************************************************************************/
-Message.prototype.getSimplifiedSubject = function() {
+ThreadVisNS.Message.prototype.getSimplifiedSubject = function() {
     return this.simplifiedSubject;
 }
 
@@ -162,7 +168,7 @@ Message.prototype.getSimplifiedSubject = function() {
 /** ****************************************************************************
  * Get original subject
  ******************************************************************************/
-Message.prototype.getSubject = function() {
+ThreadVisNS.Message.prototype.getSubject = function() {
     return this.subject;
 }
 
@@ -171,7 +177,7 @@ Message.prototype.getSubject = function() {
 /** ****************************************************************************
  * See if this message is a reply
  ******************************************************************************/
-Message.prototype.isReply = function() {
+ThreadVisNS.Message.prototype.isReply = function() {
     return (this.replyCount > 0);
 }
 
@@ -180,7 +186,7 @@ Message.prototype.isReply = function() {
 /** ****************************************************************************
  * See if message is sent (i.e. in sent-mail folder)
  ******************************************************************************/
-Message.prototype.isSent = function() {
+ThreadVisNS.Message.prototype.isSent = function() {
     return this.sent;
 }
 
@@ -234,7 +240,7 @@ private String simplifySubject(String subject)
 /** ****************************************************************************
  * Set if message is sent (i.e. in sent-mail folder)
  ******************************************************************************/
-Message.prototype.setSent = function(sent) {
+ThreadVisNS.Message.prototype.setSent = function(sent) {
     this.sent = sent;
 }
 
@@ -243,7 +249,7 @@ Message.prototype.setSent = function(sent) {
 /** ****************************************************************************
  * Return message as string
  ******************************************************************************/
-Message.prototype.toString = function() {
+ThreadVisNS.Message.prototype.toString = function() {
     return "Message: Subject: '" + this.subject + "'. From: '" + this.from +
         "'. MsgId: '" + this.messageId + "'. MsgKey: '" + this.messageKey +
         "'. Date: '" + this.date + "'. Folder: '" + this.folder +

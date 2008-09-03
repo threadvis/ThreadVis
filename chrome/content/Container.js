@@ -11,10 +11,16 @@
 
 
 
+if (! window.ThreadVisNS) {
+    window.ThreadVisNS = {};
+}
+
+
+
 /** ****************************************************************************
  * Constructor
  ******************************************************************************/
-function Container(root) {
+ThreadVisNS.Container = function(root) {
     /**
      * First container in child list
      */
@@ -58,7 +64,7 @@ function Container(root) {
  * Removes child from old sibling list
  * Inserts child and all its children
  ******************************************************************************/
-Container.prototype.addChild = function(child) {
+ThreadVisNS.Container.prototype.addChild = function(child) {
     // check if child is already our child
     // if so, do nothing
     if (child.getParent() == this)
@@ -106,7 +112,7 @@ Container.prototype.addChild = function(child) {
  * Inserts children into child list
  * Children have to be removed from old position first!
  ******************************************************************************/
-Container.prototype.addChildren = function(child) {
+ThreadVisNS.Container.prototype.addChildren = function(child) {
     // we always want to be passed the first child in list
     if (child.getPrevious() != null) {
         // fixxme
@@ -126,7 +132,7 @@ Container.prototype.addChildren = function(child) {
 /** ****************************************************************************
  * Insert a container into sibling list
  ******************************************************************************/
-Container.prototype.addSibling = function(sibling) {
+ThreadVisNS.Container.prototype.addSibling = function(sibling) {
     if (this.hasNext()) {
         this.getNext().setPrevious(sibling);
     }
@@ -143,7 +149,7 @@ Container.prototype.addSibling = function(sibling) {
 /** ****************************************************************************
  * Low level check if tree is valid
  ******************************************************************************/
-Container.prototype.check = function() {
+ThreadVisNS.Container.prototype.check = function() {
     // check if prev-next relationship holds
     if (this.hasPrevious()) {
         if (this.getPrevious().getNext() != this) {
@@ -187,7 +193,7 @@ Container.prototype.check = function() {
  * See if this container or any of its parents
  * contains a specific container
  ******************************************************************************/
-Container.prototype.findParent = function(target) {
+ThreadVisNS.Container.prototype.findParent = function(target) {
     var container = this.getParent();
 
     if (container == null) {
@@ -206,7 +212,7 @@ Container.prototype.findParent = function(target) {
 /** ****************************************************************************
  * Get first child in child list
  ******************************************************************************/
-Container.prototype.getChild = function() {
+ThreadVisNS.Container.prototype.getChild = function() {
     return this.child;
 }
 
@@ -215,7 +221,7 @@ Container.prototype.getChild = function() {
 /** ****************************************************************************
  * Get child count
  ******************************************************************************/
-Container.prototype.getChildCount = function() {
+ThreadVisNS.Container.prototype.getChildCount = function() {
     var count = 0;
     var container = null;
     for (container = this.getChild(); container != null;
@@ -230,7 +236,7 @@ Container.prototype.getChildCount = function() {
 /** ****************************************************************************
  * return at which position child is in child list
  ******************************************************************************/
-Container.prototype.getChildPosition = function(child) {
+ThreadVisNS.Container.prototype.getChildPosition = function(child) {
     var count = 0;
     var container = 0;
     for (container = this.getChild(); container != null;
@@ -248,7 +254,7 @@ Container.prototype.getChildPosition = function(child) {
 /** ****************************************************************************
  * Get all children of this container as array
  ******************************************************************************/
-Container.prototype.getChildren = function() {
+ThreadVisNS.Container.prototype.getChildren = function() {
     var containers = new Array();
     var container = null;
     for (container = this.getChild(); container != null;
@@ -264,7 +270,7 @@ Container.prototype.getChildren = function() {
 /** ****************************************************************************
  * Get recursive container count
  ******************************************************************************/
-Container.prototype.getCountRecursive = function() {
+ThreadVisNS.Container.prototype.getCountRecursive = function() {
     var count = 1;
     var container = null;
     for (container = this.getChild(); container != null;
@@ -279,7 +285,7 @@ Container.prototype.getCountRecursive = function() {
 /** ****************************************************************************
  * Get date of message
  ******************************************************************************/
-Container.prototype.getDate = function() {
+ThreadVisNS.Container.prototype.getDate = function() {
     if (! this.isDummy()) {
         return this.getMessage().getDate();
     }
@@ -299,7 +305,7 @@ Container.prototype.getDate = function() {
 /** ****************************************************************************
  * Get depth of message in tree
  ******************************************************************************/
-Container.prototype.getDepth = function() {
+ThreadVisNS.Container.prototype.getDepth = function() {
     if (this.hasParent()) {
         if (this.getParent().isRoot()) {
             return 0;
@@ -316,7 +322,7 @@ Container.prototype.getDepth = function() {
 /** ****************************************************************************
  * Get first dummy child
  ******************************************************************************/
-Container.prototype.getDummy = function() {
+ThreadVisNS.Container.prototype.getDummy = function() {
     var container = null;
     for (container = this.getChild(); container != null;
         container = container.getNext()) {
@@ -332,7 +338,7 @@ Container.prototype.getDummy = function() {
 /** ****************************************************************************
  * Get last sibling in list
  ******************************************************************************/
-Container.prototype.getLast = function() {
+ThreadVisNS.Container.prototype.getLast = function() {
     var current = this;
     while (current.hasNext()) {
         current = current.getNext();
@@ -345,7 +351,7 @@ Container.prototype.getLast = function() {
 /** ****************************************************************************
  * Get next sibling in list
  ******************************************************************************/
-Container.prototype.getNext = function() {
+ThreadVisNS.Container.prototype.getNext = function() {
     return this.next;
 }
 
@@ -354,7 +360,7 @@ Container.prototype.getNext = function() {
 /** ****************************************************************************
  * Get message of this container
  ******************************************************************************/
-Container.prototype.getMessage = function() {
+ThreadVisNS.Container.prototype.getMessage = function() {
     return this.message;
 }
 
@@ -363,7 +369,7 @@ Container.prototype.getMessage = function() {
 /** ****************************************************************************
  * Set parent of this container
  ******************************************************************************/
-Container.prototype.getParent = function() {
+ThreadVisNS.Container.prototype.getParent = function() {
     return this.parent;
 }
 
@@ -372,7 +378,7 @@ Container.prototype.getParent = function() {
 /** ****************************************************************************
  * Get previous sibling in list
  ******************************************************************************/
-Container.prototype.getPrevious = function() {
+ThreadVisNS.Container.prototype.getPrevious = function() {
     return this.previous;
 }
 
@@ -381,7 +387,7 @@ Container.prototype.getPrevious = function() {
 /** ****************************************************************************
  * Get reply count of message of this container
  ******************************************************************************/
-Container.prototype.getReplyCount = function() {
+ThreadVisNS.Container.prototype.getReplyCount = function() {
     return (this.isDummy() ? 0 : this.getMessage().getReplyCount());
 }
 
@@ -390,7 +396,7 @@ Container.prototype.getReplyCount = function() {
 /** ****************************************************************************
  * Get simplified subject of this thread
  ******************************************************************************/
-Container.prototype.getSimplifiedSubject = function() {
+ThreadVisNS.Container.prototype.getSimplifiedSubject = function() {
     if (! this.isDummy()) {
         return this.getMessage().getSimplifiedSubject();
     } else if (this.hasChild()) {
@@ -405,7 +411,7 @@ Container.prototype.getSimplifiedSubject = function() {
 /** ****************************************************************************
  * Get subject of message of this thread
  ******************************************************************************/
-Container.prototype.getSubject = function() {
+ThreadVisNS.Container.prototype.getSubject = function() {
     if (! this.isDummy()) {
         return this.getMessage().getSubject();
     } else if (this.getChild() != null) {
@@ -420,7 +426,7 @@ Container.prototype.getSubject = function() {
 /** ****************************************************************************
  * Get topmost container that is not the root container
  ******************************************************************************/
-Container.prototype.getTopContainer = function() {
+ThreadVisNS.Container.prototype.getTopContainer = function() {
     if (this.hasParent()) {
         if (! this.getParent().isRoot()) {
             return this.getParent().getTopContainer();
@@ -436,7 +442,7 @@ Container.prototype.getTopContainer = function() {
 /** ****************************************************************************
  * See if this container has at least 1 child
  ******************************************************************************/
-Container.prototype.hasChild = function() {
+ThreadVisNS.Container.prototype.hasChild = function() {
     return (this.getChild() != null);
 }
 
@@ -445,7 +451,7 @@ Container.prototype.hasChild = function() {
 /** ****************************************************************************
  * See if this container contains at least 2 children
  ******************************************************************************/
-Container.prototype.hasChildren = function() {
+ThreadVisNS.Container.prototype.hasChildren = function() {
     return (this.hasChild() ? this.getChild().hasSiblings() : false);
 }
 
@@ -454,7 +460,7 @@ Container.prototype.hasChildren = function() {
 /** ****************************************************************************
  * See if this container has a dummy child
  ******************************************************************************/
-Container.prototype.hasDummy = function() {
+ThreadVisNS.Container.prototype.hasDummy = function() {
     var container = null;
     for (container = this.getChild(); container != null;
         container = container.getNext()) {
@@ -470,7 +476,7 @@ Container.prototype.hasDummy = function() {
 /** ****************************************************************************
  * See if we have a next sibling in list
  ******************************************************************************/
-Container.prototype.hasNext = function() {
+ThreadVisNS.Container.prototype.hasNext = function() {
     return (this.getNext() != null);
 }
 
@@ -479,7 +485,7 @@ Container.prototype.hasNext = function() {
 /** ****************************************************************************
  * See if this container has exactly 1 child
  ******************************************************************************/
-Container.prototype.hasOneChild = function() {
+ThreadVisNS.Container.prototype.hasOneChild = function() {
     return (this.hasChild() ? (! this.getChild().hasNext()) : false);
 }
 
@@ -488,7 +494,7 @@ Container.prototype.hasOneChild = function() {
 /** ****************************************************************************
  * See if this container has a parent
  ******************************************************************************/
-Container.prototype.hasParent = function() {
+ThreadVisNS.Container.prototype.hasParent = function() {
     return (this.getParent() != null);
 }
 
@@ -497,7 +503,7 @@ Container.prototype.hasParent = function() {
 /** ****************************************************************************
  * See if we have a previous sibling in list
  ******************************************************************************/
-Container.prototype.hasPrevious = function() {
+ThreadVisNS.Container.prototype.hasPrevious = function() {
     return (this.getPrevious() != null);
 }
 
@@ -506,7 +512,7 @@ Container.prototype.hasPrevious = function() {
 /** ****************************************************************************
  * See if we have other containers in sibling list
  ******************************************************************************/
-Container.prototype.hasSiblings = function() {
+ThreadVisNS.Container.prototype.hasSiblings = function() {
     return (this.hasNext() || this.hasPrevious());
 }
 
@@ -515,7 +521,7 @@ Container.prototype.hasSiblings = function() {
 /** ****************************************************************************
  * See if this container contains a message
  ******************************************************************************/
-Container.prototype.isDummy = function() {
+ThreadVisNS.Container.prototype.isDummy = function() {
     return (this.getMessage() == null);
 }
 
@@ -524,7 +530,7 @@ Container.prototype.isDummy = function() {
 /** ****************************************************************************
  * See if this container is a reply
  ******************************************************************************/
-Container.prototype.isReply = function() {
+ThreadVisNS.Container.prototype.isReply = function() {
     return (this.isDummy() ? false : this.getMessage().isReply());
 }
 
@@ -533,7 +539,7 @@ Container.prototype.isReply = function() {
 /** ****************************************************************************
  * Return if this container is the topmost container
  ******************************************************************************/
-Container.prototype.isRoot = function() {
+ThreadVisNS.Container.prototype.isRoot = function() {
     return this.root;
 }
 
@@ -543,7 +549,7 @@ Container.prototype.isRoot = function() {
  * Return if this container is a top container
  * (topmost container that is not the root container)
  ******************************************************************************/
-Container.prototype.isTopContainer = function() {
+ThreadVisNS.Container.prototype.isTopContainer = function() {
     if (this.hasParent()) {
         if (this.getParent().isRoot()) {
             return true;
@@ -559,7 +565,7 @@ Container.prototype.isTopContainer = function() {
  * add children as this children
  * set message as this message
  ******************************************************************************/
-Container.prototype.mergeChild = function(dummy, child) {
+ThreadVisNS.Container.prototype.mergeChild = function(dummy, child) {
     dummy.addChildren(child.getChild());
     dummy.setMessage(child.message.getMessage());
 }
@@ -569,7 +575,7 @@ Container.prototype.mergeChild = function(dummy, child) {
 /** ****************************************************************************
  * Prune empty containers in this container
  ******************************************************************************/
-Container.prototype.pruneEmptyContainers = function() {
+ThreadVisNS.Container.prototype.pruneEmptyContainers = function() {
     /* 4. Prune empty containers
      * prune if this container is dummy (empty)
      * and does not have a child and has a parent
@@ -595,7 +601,7 @@ Container.prototype.pruneEmptyContainers = function() {
 /** ****************************************************************************
  * Unlink all children
  ******************************************************************************/
-Container.prototype.removeChildren = function() {
+ThreadVisNS.Container.prototype.removeChildren = function() {
     this.removeChild();
 }
 
@@ -604,7 +610,7 @@ Container.prototype.removeChildren = function() {
 /** ****************************************************************************
  * Remove a child from the list
  ******************************************************************************/
-Container.prototype.removeChild = function(child) {
+ThreadVisNS.Container.prototype.removeChild = function(child) {
     // check if child is in fact our child
     if (child.getParent() != this) {
         return;
@@ -647,7 +653,7 @@ Container.prototype.removeChild = function(child) {
 /** ****************************************************************************
  * Unlink next sibling in list
  ******************************************************************************/
-Container.prototype.removeNext = function() {
+ThreadVisNS.Container.prototype.removeNext = function() {
     this.setNext(null);
 }
 
@@ -656,7 +662,7 @@ Container.prototype.removeNext = function() {
 /** ****************************************************************************
  * Unlink parent
  ******************************************************************************/
-Container.prototype.removeParent = function() {
+ThreadVisNS.Container.prototype.removeParent = function() {
     this.setParent(null);
 }
 
@@ -665,7 +671,7 @@ Container.prototype.removeParent = function() {
 /** ****************************************************************************
  * Unlink previous sibling in list
  ******************************************************************************/
-Container.prototype.removePrevious = function() {
+ThreadVisNS.Container.prototype.removePrevious = function() {
     this.setPrevious(null);
 }
 
@@ -674,7 +680,7 @@ Container.prototype.removePrevious = function() {
 /** ****************************************************************************
  * Set first child in list
  ******************************************************************************/
-Container.prototype.setChild = function(child) {
+ThreadVisNS.Container.prototype.setChild = function(child) {
     this.child = child;
 }
 
@@ -683,7 +689,7 @@ Container.prototype.setChild = function(child) {
 /** ****************************************************************************
  * Set next sibling in list
  ******************************************************************************/
-Container.prototype.setNext = function(next) {
+ThreadVisNS.Container.prototype.setNext = function(next) {
     this.next = next;
 }
 
@@ -692,7 +698,7 @@ Container.prototype.setNext = function(next) {
 /** ****************************************************************************
  * Set message of this container
  ******************************************************************************/
-Container.prototype.setMessage = function(message) {
+ThreadVisNS.Container.prototype.setMessage = function(message) {
     this.message = message;
 }
 
@@ -701,7 +707,7 @@ Container.prototype.setMessage = function(message) {
 /** ****************************************************************************
  * Set parent of this container
  ******************************************************************************/
-Container.prototype.setParent = function(parent) {
+ThreadVisNS.Container.prototype.setParent = function(parent) {
     this.parent = parent;
 }
 
@@ -710,7 +716,7 @@ Container.prototype.setParent = function(parent) {
 /** ****************************************************************************
  * Set parent for all containers in list
  ******************************************************************************/
-Container.prototype.setParentForContainer = function(sibling, parent) {
+ThreadVisNS.Container.prototype.setParentForContainer = function(sibling, parent) {
     var container = null;
     for (container = sibling; container != null;
         container = container.getNext()) {
@@ -723,7 +729,7 @@ Container.prototype.setParentForContainer = function(sibling, parent) {
 /** ****************************************************************************
  * Set previous sibling in list
   ******************************************************************************/
-Container.prototype.setPrevious = function(prev) {
+ThreadVisNS.Container.prototype.setPrevious = function(prev) {
     this.previous = prev;
 }
 
@@ -762,7 +768,7 @@ function Container_sortFunction(one, two) {
 /** ****************************************************************************
  * Output string representation of this container
  ******************************************************************************/
-Container.prototype.toString = function(prefix) {
+ThreadVisNS.Container.prototype.toString = function(prefix) {
     if (prefix == null) {
         prefix = "\n";
     }
@@ -793,7 +799,7 @@ Container.prototype.toString = function(prefix) {
 /** ****************************************************************************
  * Output string representation of this container
  ******************************************************************************/
-Container.prototype.toStringThread = function() {
+ThreadVisNS.Container.prototype.toStringThread = function() {
     if (! this.isDummy()) {
         if (! this.getParent().isDummy()) {
             return this.getParent().toStringThread();
@@ -808,7 +814,7 @@ Container.prototype.toStringThread = function() {
 /** ****************************************************************************
  * Get string cache
  ******************************************************************************/
-Container.prototype.getCache = function() {
+ThreadVisNS.Container.prototype.getCache = function() {
     var cache = [];
 
     if (! this.isDummy()) {

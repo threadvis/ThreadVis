@@ -9,10 +9,16 @@
 
 
 
+if (! window.ThreadVisNS) {
+    window.ThreadVisNS = {};
+}
+
+
+
 /** ****************************************************************************
  * Constructor for timeline class
  ******************************************************************************/
-function Timeline(stack, strings, containers, resize, dotSize, top, topDelta) {
+ThreadVisNS.Timeline = function(stack, strings, containers, resize, dotSize, top, topDelta) {
     /**
      * XUL stack to draw timeline on
      */
@@ -56,7 +62,7 @@ function Timeline(stack, strings, containers, resize, dotSize, top, topDelta) {
 /** ****************************************************************************
  * Draw the timeline
  ******************************************************************************/
-Timeline.prototype.draw = function() {
+ThreadVisNS.Timeline.prototype.draw = function() {
     // start with second container
     for (var i = 1; i < this.containers.length; i++) {
         // look at two adjacent containers
@@ -84,7 +90,7 @@ Timeline.prototype.draw = function() {
 /** ****************************************************************************
  * Draw the label and the tooltip
  ******************************************************************************/
-Timeline.prototype.drawTime = function(container, left, right, string,
+ThreadVisNS.Timeline.prototype.drawTime = function(container, left, right, string,
     toolTip) {
     // check to see if we already created the label and the tooltip
     var elem = null;
@@ -148,7 +154,7 @@ Timeline.prototype.drawTime = function(container, left, right, string,
 /** ****************************************************************************
  * Format the time difference for the label and the tooltip
  ******************************************************************************/
-Timeline.prototype.formatTime = function(timeDifference) {
+ThreadVisNS.Timeline.prototype.formatTime = function(timeDifference) {
     // timedifference is in miliseconds
     timeDifference = timeDifference - (timeDifference % 1000);
     timeDifference = timeDifference / 1000;
@@ -234,7 +240,7 @@ Timeline.prototype.formatTime = function(timeDifference) {
 /** ****************************************************************************
  * Re-Draw the timeline
  ******************************************************************************/
-Timeline.prototype.redraw = function(resize, top) {
+ThreadVisNS.Timeline.prototype.redraw = function(resize, top) {
     this.resize = resize;
     this.top = top;
     this.draw();
