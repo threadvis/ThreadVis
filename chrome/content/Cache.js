@@ -528,7 +528,9 @@ ThreadVisNS.Cache.prototype.updateNewMessagesInternal = function(message, doVisu
     var newUpdateTimestamp = (new Date()).getTime() * 1000;
     var ref = this;
     var count = 0;
-    searchSession.registerListener({
+
+    // this is the search listener
+    var listener = {
         onNewSearch: function() {
             try {
                 if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
@@ -541,6 +543,7 @@ ThreadVisNS.Cache.prototype.updateNewMessagesInternal = function(message, doVisu
             ref.cacheBuildCount++;
         },
         onSearchDone: function(status) {
+            clearTimeout(searchTimeout);
             try {
                 if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
                     THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
@@ -623,6 +626,14 @@ ThreadVisNS.Cache.prototype.updateNewMessagesInternal = function(message, doVisu
         },
         onSearchHit: function(header, folder) {
             try {
+                // on every search hit, reset the search timeout and start again
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(function() {
+                    THREADVIS.logger.log("Search for new messages timed out after 10 seconds.", {});
+                    searchSession.interruptSearch();
+                    listener.onSearchDone("TIMEOUT");
+                }, 10000)
+
                 if (count % 10 == 0) {
                     ref.threadvis.setStatus(
                         ref.threadvis.strings.getString("cache.building.status") + count);
@@ -638,8 +649,19 @@ ThreadVisNS.Cache.prototype.updateNewMessagesInternal = function(message, doVisu
                 THREADVIS.logger.log("exception pushing headers", {"exception" : ex});
             }
         }
-    });
+    };
 
+    // in case the search does not complete (which it currently does if any
+    // of the search scopes returns an error, as the callback onSearchDone
+    // is never called), enforce a strict timeout 10 seconds after the last
+    // search hit, cancel the search and call onSearchDone ourselves
+    var searchTimeout = setTimeout(function() {
+        THREADVIS.logger.log("Search for new messages timed out after 10 seconds.", {});
+        searchSession.interruptSearch();
+        listener.onSearchDone("TIMEOUT");
+    }, 10000)
+
+    searchSession.registerListener(listener);
     searchSession.search(null);
 }
 
