@@ -711,6 +711,23 @@ ThreadVisNS.Cache.prototype.finishCache = function(message, doVisualise, account
             // reset in-memory data
             this.clearData();
 
+            if (this.cacheBuildCount > 2) {
+                this.threadvis.setStatus(
+                    this.threadvis.strings.getString("cache.error"));
+                if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+                    THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_ERROR,
+                            "updateNewMessages", {
+                                "action" : "cache error, message is dummy.",
+                                "subject" : message.mime2DecodedSubject,
+                                "autor" : message.mime2DecodedAutor,
+                                "messageId" : message.messageId
+                    });
+                }
+                this.cacheBuildCount = 0;
+                this.updatingCache = false;
+                return;
+            }
+
             // set last update timestamp just before this message
             // set -10 minutes
             var messageUpdateTimestamp = message.date - 1000000*60*10;
