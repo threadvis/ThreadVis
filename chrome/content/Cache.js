@@ -403,10 +403,15 @@ ThreadVisNS.Cache.prototype.searchInSubFolder = function(folder, messageId) {
                             msgDB = subfolder.getMsgDatabase(msgWindow);
                         } catch (ex) {
                             // can we do this here?
-                            subfolder.updateFolder(msgWindow);
-                            msgDB = subfolder.getMsgDatabase(msgWindow);
+                            try {
+                                subfolder.updateFolder(msgWindow);
+                                msgDB = subfolder.getMsgDatabase(msgWindow);
+                            } catch (ex) {
+                            }
                         }
-                        msgHdr = msgDB.getMsgHdrForMessageID(messageId);
+                        if (msgDB) {
+                            msgHdr = msgDB.getMsgHdrForMessageID(messageId);
+                        }
                     }
 
                     delete msgDB;
@@ -833,8 +838,27 @@ ThreadVisNS.Cache.prototype.addSubFolders = function(searchSession, folder) {
                     Components.interfaces.nsIMsgFolder);
                 if (nextFolder && ! (nextFolder.flags 
                     & MSG_FOLDER_FLAG_VIRTUAL)) {
+
+                    // check if folder is valid
+                    var folderValid = false;
+                    try {
+                        var tmpDB = nextFolder.getMsgDatabase(null);
+                        if (tmpDB) {
+                            folderValid = true;
+                            delete tmpDB;
+                        } else {
+                            THREADVIS.logger.log("Folder is not valid", {
+                                "folder" : nextFolder.URI});
+                        }
+                    } catch (ex) {
+                        THREADVIS.logger.log("Folder is not valid", {
+                            "exception": ex,
+                            "folder" : nextFolder.URI});
+                    }
+
                     if (!nextFolder.noSelect &&
-                        this.threadvis.checkEnabledAccountOrFolder(nextFolder)) {
+                        this.threadvis.checkEnabledAccountOrFolder(nextFolder) &&
+                        folderValid) {
                         // NS_ERROR_NOT_INITIALIZED can happen here
                         // i suppose we shouldn't do that at all
                         //nextFolder.updateFolder(msgWindow);
