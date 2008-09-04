@@ -920,9 +920,10 @@ ThreadVisNS.ThreadVis.prototype.visualiseMessage = function(message, force) {
             this.logger.logDebug(this.logger.LEVEL_INFO,
                 "ThreadVis.visualiseMessage()", {"return" : "cache is still updating"});
         }
+        // reset visualisation, show loading message
+        this.clearVisualisation();
         return;
     }
-
 
     if (this.logger.isDebug(this.logger.COMPONENT_VISUALISATION)) {
         this.logger.logDebug(this.logger.LEVEL_INFO,
@@ -961,6 +962,7 @@ ThreadVisNS.ThreadVis.prototype.visualiseMessage = function(message, force) {
                 "visualise", {"action" : "message not in cache, update new messages"});
         }
         this.cache.updateNewMessages(message, true);
+        this.clearVisualisation();
         return;
     }
 
