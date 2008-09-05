@@ -41,3 +41,5 @@ pref("extensions.threadvis.visualisation.zoom", "full");
 pref("extensions.threadvis.cache.updatetimestamp", "");
 pref("extensions.threadvis.svg.height", 1000);
 pref("extensions.threadvis.svg.width", 1000);
+pref("extensions.threadvis.cache.updatefolders", false);
+pref("extensions.threadvis.cache.skipinvalidfolders", false);

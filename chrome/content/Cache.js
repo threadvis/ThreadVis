@@ -328,11 +328,51 @@ ThreadVisNS.Cache.prototype.addToThreaderFromCache = function(cache, rootFolder)
     for (var i = 0; i < cache.length; i++) {
         var msgId = cache[i];
         if (this.threadvis.getThreader().hasMessage(msgId)) {
+            try {
+                if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+                    THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+                        "addToThreaderFromCache", {"action" : "threader.hasMessage",
+                        "message" : "message already in threader",
+                        "msgid" : msgId,
+                        "rootFolder" : rootFolder.URI});
+                }
+            } catch (ex) {
+                THREADVIS.logger.log("Error creating log entry.", {
+                    "exception": ex,
+                    "method" : "addToThreaderFromCache"});
+            }
             continue;
         }
         var msg = this.searchMessageByMsgId(msgId, rootFolder);
         if (msg != null) {
+            try {
+                if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+                    THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+                        "addToThreaderFromCache", {"action" : "searchMessageByMsgId",
+                        "message" : "message found",
+                        "msgid" : msgId,
+                        "rootFolder" : rootFolder.URI});
+                }
+            } catch (ex) {
+                THREADVIS.logger.log("Error creating log entry.", {
+                    "exception": ex,
+                    "method" : "addToThreaderFromCache"});
+            }
             this.threadvis.addMessage(msg);
+        } else {
+            try {
+                if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+                    THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_ERROR,
+                        "addToThreaderFromCache", {"action" : "searchMessageByMsgId",
+                        "message" : "message not found",
+                        "msgid" : msgId,
+                        "rootFolder" : rootFolder.URI});
+                }
+            } catch (ex) {
+                THREADVIS.logger.log("Error creating log entry.", {
+                    "exception": ex,
+                    "method" : "addToThreaderFromCache"});
+            }
         }
     }
 
@@ -348,15 +388,47 @@ ThreadVisNS.Cache.prototype.addToThreaderFromCache = function(cache, rootFolder)
  * Search for message id in current account
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.searchMessageByMsgId = function(messageId, rootFolder) {
-    return this.searchInSubFolder(rootFolder, messageId);
+    return this.searchInFolder(rootFolder, messageId);
 }
 
 
 
 /** ****************************************************************************
- * Search for message id in subfolder
+ * Search for message id in folder
  ******************************************************************************/
-ThreadVisNS.Cache.prototype.searchInSubFolder = function(folder, messageId) {
+ThreadVisNS.Cache.prototype.searchInFolder = function(folder, messageId) {
+    // first, search in this folder
+    // check for enabled/disabled folders
+    if (THREADVIS.checkEnabledAccountOrFolder(folder)) {
+        // exclude virtual folders in search
+        if (! (folder.flags & MSG_FOLDER_FLAG_VIRTUAL) &&
+            !folder.noSelect) {
+            // again, do not call updateFolder, this is bad
+            //subfolder.updateFolder(null);
+            try {
+                msgDB = folder.getMsgDatabase(null);
+            } catch (ex) {
+                // can we do this here?
+                try {
+                    folder.updateFolder(null);
+                    msgDB = folder.getMsgDatabase(null);
+                } catch (ex) {
+                }
+            }
+
+            if (msgDB) {
+                msgHdr = msgDB.getMsgHdrForMessageID(messageId);
+                msgDB = null;
+                delete msgDB;
+            }
+
+            if (msgHdr) {
+                return msgHdr;
+            }
+        }
+    }
+
+    // if not found, loop over subfolders and search them
     if (folder.hasSubFolders) {
         // Seamonkey < 2 and Thunderbird <= 2 use GetSubFolders
         // (which returns a nsIEnumerator)
@@ -388,38 +460,11 @@ ThreadVisNS.Cache.prototype.searchInSubFolder = function(folder, messageId) {
                 .QueryInterface(Components.interfaces.nsIRDFResource).Value;
             subfolder = GetMsgFolderFromUri(currentFolderURI);
 
-            // check for enabled/disabled folders
-            if (THREADVIS.checkEnabledAccountOrFolder(subfolder)) {
-                // exclude virtual folders in search
-                if (! (subfolder.flags & MSG_FOLDER_FLAG_VIRTUAL)) {
-                    if (currentFolderURI.substring(1,7) != "news://") {
-                        msgHdr = this.searchInSubFolder(subfolder, messageId);
-                    }
-
-                    if (!msgHdr) {
-                        // again, do not call updateFolder, this is bad
-                        //subfolder.updateFolder(msgWindow);
-                        try {
-                            msgDB = subfolder.getMsgDatabase(msgWindow);
-                        } catch (ex) {
-                            // can we do this here?
-                            try {
-                                subfolder.updateFolder(msgWindow);
-                                msgDB = subfolder.getMsgDatabase(msgWindow);
-                            } catch (ex) {
-                            }
-                        }
-                        if (msgDB) {
-                            msgHdr = msgDB.getMsgHdrForMessageID(messageId);
-                        }
-                    }
-
-                    delete msgDB;
-
-                    if (msgHdr) {
-                        return msgHdr;
-                    }
-                }
+            var foundHeader = this.searchInFolder(subfolder, messageId);
+            subfolder = null;
+            delete subfolder;
+            if (foundHeader) {
+                return foundHeader;
             }
 
             try {
@@ -879,28 +924,44 @@ ThreadVisNS.Cache.prototype.addSubFolders = function(searchSession, folder) {
                     & MSG_FOLDER_FLAG_VIRTUAL)) {
 
                     // check if folder is valid
-                    var folderValid = false;
-                    try {
-                        var tmpDB = nextFolder.getMsgDatabase(null);
-                        if (tmpDB) {
-                            folderValid = true;
-                            delete tmpDB;
-                        } else {
+                    var checkFolder = this.threadvis.preferences.getPreference(
+                        this.threadvis.preferences.PREF_CACHE_SKIP_INVALID_FOLDERS);
+
+                    var folderValid = true;
+                    if (checkFolder) {
+                        folderValid = false;
+                        try {
+                            var tmpDB = nextFolder.getMsgDatabase(null);
+                            if (tmpDB) {
+                                folderValid = true;
+                                delete tmpDB;
+                            } else {
+                                THREADVIS.logger.log("Folder is not valid", {
+                                    "folder" : nextFolder.URI});
+                            }
+                        } catch (ex) {
                             THREADVIS.logger.log("Folder is not valid", {
+                                "exception": ex,
                                 "folder" : nextFolder.URI});
                         }
-                    } catch (ex) {
-                        THREADVIS.logger.log("Folder is not valid", {
-                            "exception": ex,
-                            "folder" : nextFolder.URI});
                     }
 
                     if (!nextFolder.noSelect &&
                         this.threadvis.checkEnabledAccountOrFolder(nextFolder) &&
                         folderValid) {
-                        // NS_ERROR_NOT_INITIALIZED can happen here
-                        // i suppose we shouldn't do that at all
-                        //nextFolder.updateFolder(msgWindow);
+                        // NS_ERROR_NOT_INITIALIZED can happen here, so only do
+                        // if preference is enabled, and only do in try-catch block
+                        var updateFolder = this.threadvis.preferences.getPreference(
+                        this.threadvis.preferences.PREF_CACHE_UPDATE_FOLDERS);
+                        if (updateFolder) {
+                            try {
+                                nextFolder.updateFolder(null);
+                            } catch (ex) {
+                                THREADVIS.logger.log("Updating folder in addSubFolders threw exception.", {
+                                    "folder" : nextFolder.URI,
+                                    "exception" : ex});
+                            }
+                        }
                         var searchScope = nextFolder.server.searchScope;
                         
                         if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {

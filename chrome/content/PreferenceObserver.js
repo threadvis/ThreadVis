@@ -54,6 +54,8 @@ ThreadVisNS.PreferenceObserver = function() {
     this.PREF_VIS_SVG = "visualisation.svg";
     this.PREF_VIS_ZOOM = "visualisation.zoom";
     this.PREF_VIS_HIDE_ON_DISABLE = "visualisation.hideondisable";
+    this.PREF_CACHE_UPDATE_FOLDERS = "cache.updatefolders";
+    this.PREF_CACHE_SKIP_INVALID_FOLDERS = "cache.skipinvalidfolders";
 
     // save cache update timestamps per account
     this.PREF_CACHE_LASTUPDATETIMESTAMP = "cache.updatetimestamp";
@@ -209,6 +211,10 @@ ThreadVisNS.PreferenceObserver.prototype.preferenceReload = function() {
         this.prefBranch.PREF_BOOL, true);
     this.loadPreference(this.PREF_CACHE_LASTUPDATETIMESTAMP,
         this.prefBranch.PREF_STRING, "");
+    this.loadPreference(this.PREF_CACHE_UPDATE_FOLDERS,
+        this.prefBranch.PREF_BOOL, false);
+    this.loadPreference(this.PREF_CACHE_SKIP_INVALID_FOLDERS,
+        this.prefBranch.PREF_BOOL, false);
 }
 
 
