@@ -30,5 +30,5 @@
 <!ENTITY wizard.end.title                                   "">
 <!ENTITY wizard.end.1                                       "Alle hier getroffenen Einstellungen und noch weitere k&#xF6;nnen jederzeit in den Settings des Add-ons ge&#xE4;ndert werden. &#xD6;ffnen Sie daf&#xFC;r entweder den Einstellungs-Dialog oder klicken Sie rechts auf die Visualisierung und w&#xE4;hlen Sie 'Einstellungen'.">
 <!ENTITY wizard.end.showagain                               "Diese Nachricht nicht wieder anzeigen">
-<!ENTITY loggingthankyou.title                              "Danke">
+<!ENTITY loggingthankyou.title                              "ThreadVis">
 <!ENTITY loggingthankyou.thankyou                           "Danke, dass Sie Logging aktiviert und mir Log-Dateien geschickt haben. Meine Masterarbeit ist abgeschlossen, die anonyme Usage-Studie beendet. Logging wurde automatisch deaktiviert.">

@@ -30,5 +30,5 @@
 <!ENTITY wizard.end.title                                   "">
 <!ENTITY wizard.end.1                                       "All settings can be changed at any time in the settings dialog of the add-on, which can be found in the general settings dialog of the mail client or by right clicking the visualisation and choosing 'Settings'.">
 <!ENTITY wizard.end.showagain                               "Do not show this message again.">
-<!ENTITY loggingthankyou.title                              "Thank You">
+<!ENTITY loggingthankyou.title                              "ThreadVis">
 <!ENTITY loggingthankyou.thankyou                           "Thank you for enabling logging and sending me the logfiles. My Master's Thesis is now finished, the anonymous usage study has ended. Logging has been automatically disabled.">
