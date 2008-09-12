@@ -2,7 +2,7 @@
 /* *******************************************************
  * ThreadVisAbout.dtd
  *
- * (c) 2007 Alexander C. Hubmann-Haidvogel
+ * (c) 2007-2008 Alexander C. Hubmann-Haidvogel
  *
  * DTD file containing EN localisation of UI elements
  *
@@ -27,11 +27,8 @@
 <!ENTITY wizard.workings.2                                  "Additionally, the accounts and folders the extension should analyze can be selected in the next step.">
 <!ENTITY wizard.accounts.title                              "Enabled Accounts and Folders">
 <!ENTITY wizard.accounts.1                                  "Please select all accounts and folders in which the extension should look for messages to analyze:">
-<!ENTITY wizard.thesis.title                                "My Master's Thesis">
-<!ENTITY wizard.thesis.1                                    "This add-on is part of my master's thesis, as well as an anonymous study about the usage of the extension.">
-<!ENTITY wizard.thesis.2                                    "For that I need your help: Please activate the logging feature below which stores anonymous data about your usage of the extension in a log file. Please send me this file periodically (the add-on will remind you).">
-<!ENTITY wizard.thesis.3                                    "If the checkbox is not activated, no information will be collected">
-<!ENTITY wizard.thesis.logging                              "Enable logging">
 <!ENTITY wizard.end.title                                   "">
 <!ENTITY wizard.end.1                                       "All settings can be changed at any time in the settings dialog of the add-on, which can be found in the general settings dialog of the mail client or by right clicking the visualisation and choosing 'Settings'.">
 <!ENTITY wizard.end.showagain                               "Do not show this message again.">
+<!ENTITY loggingthankyou.title                              "Thank You">
+<!ENTITY loggingthankyou.thankyou                           "Thank you for enabling logging and sending me the logfiles. My Master's Thesis is now finished, the anonymous usage study has ended. Logging has been automatically disabled.">

@@ -375,17 +375,18 @@ ThreadVis.prototype.displayAbout = function() {
             "ThreadVisAbout", "chrome=yes,resizable=true;alwaysRaised=false,dependent=yes");
     }
 
-    // remind to send email with log files
-    // when last email is more than 3 days old
-    var lastEmail = parseInt(this.preferences
-        .getPreference(this.preferences.PREF_LOGGING_EMAIL));
+    // check if user has logging enabled
     var logging = this.preferences
         .getPreference(this.preferences.PREF_LOGGING);
+    var loggingDebug = this.preferences
+        .getPreference(this.preferences.PREF_LOGGING_DEBUG);
 
-    if (logging &&
-        lastEmail + 3 * 24 * 60 * 60 * 1000 < (new Date()).getTime()) {
-        window.openDialog("chrome://threadvis/content/Email.xul",
-            "ThreadVisEmail", "chrome=yes,resizable=false;alwaysRaised=false,dependent=yes");
+    // if logging is enabled, disable it and display a thank you note
+    if (logging && ! loggingDebug) {
+        this.preferences.setPreference(this.preferences.PREF_LOGGING,
+            false, this.preferences.PREF_BOOL);
+        window.openDialog("chrome://threadvis/content/LoggingThankyou.xul",
+            "ThreadVisAbout", "chrome=yes,resizable=true;alwaysRaised=false,dependent=yes");
     }
 }
 

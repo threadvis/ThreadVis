@@ -4,7 +4,7 @@
 /** ****************************************************************************
  * About.xul
  *
- * (c) 2007 Alexander C. Hubmann-Haidvogel
+ * (c) 2007-2008 Alexander C. Hubmann-Haidvogel
  *
  * XUL file to display information about ThreadVis
  *
@@ -77,13 +77,6 @@
                 preference="extensions.threadvis.disabledfolders"
                 hidden="true" />
         </groupbox>
-    </wizardpage>
-
-    <wizardpage description="&wizard.thesis.title;">
-        <description>&wizard.thesis.1;</description>
-        <description>&wizard.thesis.2;</description>
-        <description>&wizard.thesis.3;</description>
-        <checkbox id="logging" label="&wizard.thesis.logging;" checked="false" />
     </wizardpage>
 
     <wizardpage description="&wizard.end.title;">
