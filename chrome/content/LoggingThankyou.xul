@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+
+<!--
+/** ****************************************************************************
+ * LoggingThankyou.xul
+ *
+ * (c) 2008 Alexander C. Hubmann-Haidvogel
+ *
+ * XUL file to display thank you note for enabling logging
+ *
+ * $Id$
+ ******************************************************************************/
+-->
+
+
+
+<!DOCTYPE overlay SYSTEM "chrome://threadvis/locale/ThreadVisAbout.dtd">
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<dialog id="ThreadVisLoggingThankyou" title="&loggingthankyou.title;"
+    buttons="accept"
+    width="200"
+    height="200"
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+    <vbox>
+        <label>&loggingthankyou.thankyou;</label>
+    </vbox>
+
+</dialog>
