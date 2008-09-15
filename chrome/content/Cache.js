@@ -1,8 +1,8 @@
 /** ****************************************************************************
  * Cache.js
  *
- * (c) 2007 Alexander C. Hubmann
- * (c) 2007-2008 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007 Alexander C. Hubmann
+ * Copyright (C) 2007-2008 Alexander C. Hubmann-Haidvogel
  *
  * Implements cache for threaded messages
  * Store message ids of thread via setStringProperty in msf file

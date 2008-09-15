@@ -1,8 +1,8 @@
 /* *******************************************************
  * install.js
  *
- * (c) 2005-2007 Alexander C. Hubmann
- * (c) 2007-2008 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2005-2007 Alexander C. Hubmann
+ * Copyright (C) 2007-2008 Alexander C. Hubmann-Haidvogel
  *
  * javascript install script for mozilla
  *

@@ -1,8 +1,8 @@
 /** ****************************************************************************
  * Scrollbar.js
  *
- * (c) 2006-2007 Alexander C. Hubmann
- * (c) 2007-2008 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2006-2007 Alexander C. Hubmann
+ * Copyright (C) 2007-2008 Alexander C. Hubmann-Haidvogel
  *
  * $Id$
  ******************************************************************************/

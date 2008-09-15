@@ -1,8 +1,8 @@
 /* *****************************************************************************
  * CopyCut.js
  *
- * (c) 2005-2007 Alexander C. Hubmann
- * (c) 2007 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2005-2007 Alexander C. Hubmann
+ * Copyright (C) 2007-2008 Alexander C. Hubmann-Haidvogel
  *
  * JavaScript file to copy and cut messages
  *

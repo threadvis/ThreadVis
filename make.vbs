@@ -1,7 +1,7 @@
 ' ========================================================================
 ' Makefile for extension
 ' 
-' (c) 2007-2008 Alexander C. Hubmann-Haidvogel
+' Copyright (C) 2007-2008 Alexander C. Hubmann-Haidvogel
 ' 
 ' $Id$
 ' ========================================================================

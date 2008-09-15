@@ -1,8 +1,8 @@
 /** ****************************************************************************
  * TimelineSVG.js
  *
- * (c) 2006-2007 Alexander C. Hubmann
- * (c) 2007 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2006-2007 Alexander C. Hubmann
+ * Copyright (C) 2007-2008 Alexander C. Hubmann-Haidvogel
  *
  * $Id: TimelineSVG.js 378 2007-06-09 14:27:00Z sascha $
  ******************************************************************************/
