@@ -916,17 +916,6 @@ ThreadVisNS.ThreadVis.prototype.visualiseMessage = function(message, force) {
         return;
     }
 
-/*    // if cache is running an update, return
-    if (this.cache.isUpdating()) {
-        if (this.logger.isDebug(this.logger.COMPONENT_CACHE)) {
-            this.logger.logDebug(this.logger.LEVEL_INFO,
-                "ThreadVis.visualiseMessage()", {"return" : "cache is still updating"});
-        }
-        // reset visualisation, show loading message
-        this.clearVisualisation();
-        return;
-    }
-*/
     if (this.logger.isDebug(this.logger.COMPONENT_VISUALISATION)) {
         this.logger.logDebug(this.logger.LEVEL_INFO,
             "ThreadVis.visualiseMessage()", {"message-id" : message.messageId});
@@ -934,35 +923,6 @@ ThreadVisNS.ThreadVis.prototype.visualiseMessage = function(message, force) {
 
     // try to find in threader
     var container = this.getThreader().findContainer(message.messageId);
-    var cache = [];
-
-    if (container != null && ! container.isDummy()) {
-        cache = container.getTopContainer().getCache();
-        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-                "visualise", {"action" : "container already in threader",
-                    "cache" : cache});
-        }
-    }
-
-
-
-
-    // hack
-    var server = message.folder.server;
-    var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
-        .getService(Components.interfaces.nsIMsgAccountManager))
-        .FindAccountForServer(server);
-
-    /*
-    this.accountCache = new ThreadVisNS.AccountCache(this.cache, account);*/
-    //this.accountCache.check();
-    //window.openDialog("chrome://threadvis/content/Cache.xul", "ThreadVisCache");
-    //this.cache.checkAllAccounts();
-    this.cache.checkAccount(account);
-
-
-
 
     // if not in threader, try to get from cache
     if (container == null || container.isDummy()) {
@@ -975,29 +935,36 @@ ThreadVisNS.ThreadVis.prototype.visualiseMessage = function(message, force) {
         this.getThreader().thread();
         container = this.getThreader().findContainer(message.messageId);
     }
-/*
-    // not in threader, not in cache. add to threader
+
+    // not in threader, not in cache, start caching
     if (container == null || container.isDummy()) {
-        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_WARNING,
-                "visualise", {"action" : "message not in cache, update new messages"});
-        }
-        this.cache.updateNewMessages(message, true);
+        var server = message.folder.server;
+        var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
+            .getService(Components.interfaces.nsIMsgAccountManager))
+            .FindAccountForServer(server);
+        var accountKey = account.key;
+        account = null;
+        delete account;
+        server = null;
+        delete server;
+
+        this.cache.checkAccount(accountKey);
         this.clearVisualisation();
+        // register for event
+        var ref = this;
+        this.cache.register("onCacheDone", function() {
+            // check if message is now in cache
+            if (! ref.cache.isCached(message.messageId, accountKey)) {
+                ref.cache.cacheMessage(message, accountKey);
+                if (! ref.cache.isCached(message.messageId, accountKey)) {
+                    this.setStatus("Cache error");
+                    return;
+                }
+            }
+            ref.setSelectedMessage(force);
+        });
         return;
     }
-
-    var newCache = container.getTopContainer().getCache();
-    // TODO fix comparison for arrays
-    if (cache != newCache) {
-        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_WARNING,
-                "visualise", {"action" : "cache changed, writing new",
-                    "old" : cache,
-                    "new" : newCache});
-        }
-        this.cache.updateCache(container, message);
-    }*/
 
     this.visualisedMsgId = message.messageId;
 
