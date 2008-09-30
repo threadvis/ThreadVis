@@ -23,7 +23,7 @@ if (! window.ThreadVisNS) {
  ******************************************************************************/
 ThreadVisNS.References = function(references) {
     // Store message ids of references
-    this.references = new Object();
+    this.references = [];
 
     this.buildReferences(references);
 }

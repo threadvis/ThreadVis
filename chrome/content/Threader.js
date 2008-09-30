@@ -846,7 +846,7 @@ ThreadVisNS.Threader.prototype.putMessagesInContainerBackground = function(conti
             "loop over all messages"});
     }
 
-    var util = new ThreadVisNS.Util();
+    var util = new ThreadVisNS.Util.Processor();
     var ref = this;
     var count = 0;
     var msgArray = new Array();

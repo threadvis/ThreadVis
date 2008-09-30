@@ -5,7 +5,6 @@
  * Copyright (C) 2007-2008 Alexander C. Hubmann-Haidvogel
  *
  * Implements cache for threaded messages
- * Store message ids of thread via setStringProperty in msf file
  *
  * $Id$
  ******************************************************************************/
@@ -23,11 +22,9 @@ if (! window.ThreadVisNS) {
  ******************************************************************************/
 ThreadVisNS.Cache = function(threadvis) {
     this.threadvis = threadvis;
-    this.cacheBuildCount = 0;
-    this.updatingCache = false;
-    this.addedMessages = new Array();
-    this.newMessages = new Array();
     this.openDatabases();
+    this.accountCaches = [];
+    this.createAccountCaches();
 }
 
 
@@ -116,7 +113,7 @@ ThreadVisNS.Cache.prototype.getCacheInternal = function(msg, accountKey, referen
             "getCacheInternal", {"read cache" : cache});
     }
     if (cache.length > 0) {
-        this.addToThreaderFromCache(cache, msg.folder.rootFolder);
+        //this.addToThreaderFromCache(cache, msg.folder.rootFolder);
     } else {
         if (references) {
             this.addToThreaderFromReferences(msg, accountKey);
@@ -162,155 +159,6 @@ ThreadVisNS.Cache.prototype.addToThreaderFromReferences = function(msg, accountK
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "addToThreaderFromReferences", {"action" : "end"});
-    }
-}
-
-
-
-/** ****************************************************************************
- * Get cache string for container, store for all messages in thread
- ******************************************************************************/
-ThreadVisNS.Cache.prototype.updateCache = function(container, msg) {
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "updateCache", {"action" : "start"});
-    }
-    var topcontainer = container.getTopContainer();
-    var cache = topcontainer.getCache();
-
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "updateCache", {"cache" : cache});
-    }
-
-    var server = msg.folder.server;
-    var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
-        .getService(Components.interfaces.nsIMsgAccountManager))
-        .FindAccountForServer(server);
-
-    this.putCache(cache, account.key);
-
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "updateCache", {"action" : "end"});
-    }
-}
-
-
-
-/** ****************************************************************************
- * Recursivly put cache string in all messages
- ******************************************************************************/
-ThreadVisNS.Cache.prototype.putCache = function(cache, accountKey) {
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "putCache", {"action" : "start",
-            "cache" : cache,
-            "accountKey" : accountKey});
-    }
-
-    if (cache.length == 0) {
-        return;
-    }
-
-    var connection = this.getDatabaseConnection(accountKey);
-    var msgId = cache[0];
-    var statement = connection.createStatement(
-        "SELECT threadid FROM threads WHERE msgid = ?");
-    statement.bindStringParameter(0, msgId);
-
-    var threadId = null;
-    try {
-        if (statement.executeStep()) {
-            threadId = statement.getInt32(0);
-        }
-    } catch (ex) {
-        THREADVIS.logger.log("Error while performing SQL statement", {
-            "exception": ex});
-    } finally {
-        statement.reset();
-        statement = null;
-    }
-
-    // if threadId exists, reuse it, otherwise create a new id
-    if (threadId == null) {
-        statement = connection.createStatement(
-            "SELECT threadid FROM threadcounter");
-        try {
-            if (statement.executeStep()) {
-                threadId = statement.getInt32(0);
-            }
-        } catch (ex) {
-            THREADVIS.logger.log("Error while performing SQL statement", {
-                "exception": ex});
-        } finally {
-            statement.reset();
-            statement = null;
-        }
-        var exists = true;
-        if (threadId == null) {
-            threadId = 0;
-            exists = false;
-        }
-        threadId++;
-
-        if (exists) {
-            statement = connection.createStatement(
-                "UPDATE threadcounter SET threadid = ?");
-        } else {
-            statement = connection.createStatement(
-                "INSERT INTO threadcounter (threadid) VALUES (?)");
-        }
-        statement.bindInt32Parameter(0, threadId);
-        try {
-            statement.execute();
-        } catch (ex) {
-            THREADVIS.logger.log("Error while performing SQL statement", {
-                "exception": ex});
-        } finally {
-            statement.reset();
-            statement = null;
-        }
-    }
-
-    // clear cache for this threadid
-    statement = connection.createStatement(
-        "DELETE FROM threads WHERE threadid = ?");
-    try {
-        statement.bindInt32Parameter(0, threadId);
-        statement.execute();
-    } catch (ex) {
-        THREADVIS.logger.log("Error while performing SQL statement", {
-            "exception": ex});
-    } finally {
-        statement.reset();
-        statement = null;
-    }
-
-    // for all message ids in the cache, write to database
-    statement = connection.createStatement(
-        "INSERT INTO threads (msgid, threadid) VALUES (?, ?)");
-        var msgId = null;
-    try {
-        while ((msgId = cache.pop()) != null) {
-            statement.bindStringParameter(0, msgId);
-            statement.bindInt32Parameter(1, threadId);
-            statement.execute();
-        }
-    } catch (ex) {
-        THREADVIS.logger.log("Error while performing SQL statement", {
-            "exception": ex});
-    } finally {
-        statement.reset();
-        statement = null;
-    }
-
-    connection = null;
-    delete connection;
-
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "putCache", {"action" : "end"});
     }
 }
 
@@ -485,579 +333,15 @@ ThreadVisNS.Cache.prototype.searchInFolder = function(folder, messageId) {
 
 
 /** ****************************************************************************
- * Periodically update cache with new messages
- ******************************************************************************/
-ThreadVisNS.Cache.prototype.updateNewMessages = function(message, doVisualise) {
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "updateNewMessages", {"action" : "start",
-                "message" : message.messageId});
-    }
-
-    var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
-        .getService(Components.interfaces.nsIMsgAccountManager))
-        .FindAccountForServer(message.folder.server);
-
-    this.updateNewMessagesInternal(message, doVisualise, 
-        account.key, message.folder.rootFolder);
-
-    delete account;
-
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "updateNewMessages", {"action" : "end"});
-    }
-}
-
-
-
-/** ****************************************************************************
- * Periodically update cache with new messages
- ******************************************************************************/
-ThreadVisNS.Cache.prototype.updateNewMessagesInternal = function(message, doVisualise,
-    accountKey, rootFolder) {
-
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "updateNewMessagesInternal", {"action" : "start",
-            "message" : message.messageId});
-    }
-
-    this.threadvis.setStatus(null, {updateCache: {message: message,
-        accountKey: accountKey}});
-
-    // check for already running update
-    var ref = this;
-    if (this.updatingCache) {
-        return;
-    }
-
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "updateNewMessagesInternal", {"action" : "start2"});
-    }
-
-    this.updatingCache = true;
-
-    this.threadvis.setStatus(
-        this.threadvis.strings.getString("cache.building.start"));
-    var searchSession = 
-        Components.classes["@mozilla.org/messenger/searchSession;1"]
-        .createInstance(Components.interfaces.nsIMsgSearchSession);
-    var searchTerm = searchSession.createTerm();
-    searchTerm.attrib = Components.interfaces.nsMsgSearchAttrib.Date;
-    searchTerm.op = Components.interfaces.nsMsgSearchOp.IsAfter;
-
-    var termValue = searchTerm.value;
-    termValue.attrib = searchTerm.attrib;
-
-    // get last update timestamp from preferences
-    var updateTimestamp = this.getLastUpdateTimestamp(accountKey);
-
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_WARNING,
-            "updateNewMessagesInternal", {
-                "updatetimestamp" : updateTimestamp,
-                "updatedate" : new Date(updateTimestamp / 1000),
-                "looking for message date" : message.date,
-                "messagedate" : new Date(message.date / 1000)
-            });
-    }
-
-    termValue.date = updateTimestamp;
-    searchTerm.value = termValue;
-
-    searchSession.appendTerm(searchTerm);
-    this.addSubFolders(searchSession, rootFolder);
-
-    var newUpdateTimestamp = (new Date()).getTime() * 1000;
-    var ref = this;
-    var count = 0;
-
-    // this is the search listener
-    var listener = {
-        onNewSearch: function() {
-            try {
-                if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-                    THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-                        "updateNewMessagesInternal", {"action" : "new search"});
-                }
-            } catch (ex) {
-                THREADVIS.logger.log("exception", {"exception" : ex});
-            }
-            ref.cacheBuildCount++;
-        },
-        onSearchDone: function(status) {
-            clearTimeout(searchTimeout);
-            try {
-                if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-                    THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-                        "updateNewMessagesInternal", {"action" : "search done",
-                            "count" : count,
-                            "status" : status});
-                }
-            } catch (ex) {
-                THREADVIS.logger.log("exception", {"exception" : ex});
-            }
-            delete searchSession;
-            var util = new ThreadVisNS.Util();
-            util.registerListener({
-                onItem: function(item, count, remaining, timeRemaining) {
-                    try {
-                        if (count % 10 == 0) {
-                            ref.threadvis.setStatus("Adding: " + count + " [" + remaining +
-                                "] " + timeRemaining);
-                        }
-                    } catch (ex) {
-                        THREADVIS.logger.log("exception", {"exception" : ex});
-                    }
-                    // if item is invalid
-                    if (! (item instanceof Components.interfaces.nsIMsgDBHdr)) {
-                        THREADVIS.logger.log("updateNewMessagesInternal", {
-                            "error" : "not a valid item"});
-                        return;
-                    }
-                    try {
-                        ref.threadvis.addMessage(item);
-                    } catch (ex) {
-                        THREADVIS.logger.log("exception", {"exception" : ex});
-                    }
-                    // also add messages from cache to threader, since we re-write
-                    // the cache
-                    // TODO: this is bad as it works around the queue we set up
-                    // don't add messages to the threader within the function, but return
-                    // a list of messages and add them to the queue here!
-                    try {
-                        ref.getCacheInternal(item, accountKey, true);
-                    } catch (ex) {
-                        THREADVIS.logger.log("exception", {"exception" : ex});
-                    }
-                    if (ref.cacheBuildCount <=1) {
-                        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-                            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_WARNING,
-                                "updateNewMessages", {"action" : "hit",
-                                "subject" : item.mime2DecodedSubject,
-                                "author" : item.mime2DecodedAuthor,
-                                "messageId" : item.messageId});
-                        }
-                    }
-                    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-                        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-                            "updateNewMessages", {"action" : "hit",
-                            "subject" : item.mime2DecodedSubject,
-                            "author" : item.mime2DecodedAuthor,
-                            "messageId" : item.messageId});
-                    }
-                },
-                onFinished: function() {
-                    try {
-                        ref.onSearchDone(message, doVisualise, accountKey,
-                            rootFolder, newUpdateTimestamp);
-                    } catch (ex) {
-                        THREADVIS.logger.log("exception", {"exception" : ex});
-                    }
-                }
-            });
-            try {
-                if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-                    THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-                        "updateNewMessagesInternal", {"action" : "process",
-                        "count" : ref.addedMessages.length});
-                }
-            } catch (ex) {
-                THREADVIS.logger.log("exception", {"exception" : ex});
-            }
-            util.process(ref.addedMessages);
-        },
-        onSearchHit: function(header, folder) {
-            try {
-                // on every search hit, reset the search timeout and start again
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(function() {
-                    THREADVIS.logger.log("Search for new messages timed out after 10 seconds.", {});
-                    searchSession.interruptSearch();
-                    listener.onSearchDone("TIMEOUT");
-                }, 10000)
-
-                if (count % 10 == 0) {
-                    ref.threadvis.setStatus(
-                        ref.threadvis.strings.getString("cache.building.status") + count);
-                }
-            } catch (ex) {
-                THREADVIS.logger.log("exception", {"exception" : ex});
-            }
-            count++;
-            try {
-                ref.newMessages.push(header);
-                ref.addedMessages.push(header);
-            } catch (ex) {
-                THREADVIS.logger.log("exception pushing headers", {"exception" : ex});
-            }
-        }
-    };
-
-    // in case the search does not complete (which it currently does if any
-    // of the search scopes returns an error, as the callback onSearchDone
-    // is never called), enforce a strict timeout 10 seconds after the last
-    // search hit, cancel the search and call onSearchDone ourselves
-    var searchTimeout = setTimeout(function() {
-        THREADVIS.logger.log("Search for new messages timed out after 10 seconds.", {});
-        searchSession.interruptSearch();
-        listener.onSearchDone("TIMEOUT");
-    }, 10000)
-
-    searchSession.registerListener(listener);
-    searchSession.search(null);
-}
-
-
-
-/** ****************************************************************************
- * Search for new messages is done, start threading
- ******************************************************************************/
-ThreadVisNS.Cache.prototype.onSearchDone = function(message, doVisualise,
-    accountKey, rootFolder, newUpdateTimestamp) {
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "updateNewMessagesInternal", {"action" : "search done"});
-    }
-    this.threadvis.setStatus("");
-    this.setLastUpdateTimestamp(accountKey, newUpdateTimestamp);
-
-    var ref = this;
-    this.threadvis.threader.threadBackground(function() {
-        ref.finishCache(message, doVisualise, accountKey, rootFolder,
-            newUpdateTimestamp);
-    });
-}
-
-
-/** ****************************************************************************
- * After messages have been threaded, check to see if message exists
- ******************************************************************************/
-ThreadVisNS.Cache.prototype.finishCache = function(message, doVisualise, accountKey,
-    rootFolder, newUpdateTimestamp) {
-
-    var container = this.threadvis.getThreader()
-        .findContainer(message.messageId);
-
-    if (container) {
-        if (container.isDummy()) {
-            if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-                THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_WARNING,
-                    "updateNewMessages", {"action" : "dummy container found"});
-            }
-            // current message still not found
-            // somehow it is not cached altough it should have been
-            // reset last update timestamp to date if this message
-            this.threadvis.setStatus(
-                this.threadvis.strings.getString("cache.error"));
-
-            // reset in-memory data
-            this.clearData();
-
-            if (this.cacheBuildCount > 2) {
-                this.threadvis.setStatus(
-                    this.threadvis.strings.getString("cache.error"));
-                if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-                    THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_ERROR,
-                            "updateNewMessages", {
-                                "action" : "cache error, message is dummy.",
-                                "subject" : message.mime2DecodedSubject,
-                                "autor" : message.mime2DecodedAutor,
-                                "messageId" : message.messageId
-                    });
-                }
-                this.cacheBuildCount = 0;
-                this.updatingCache = false;
-                return;
-            }
-
-            // set last update timestamp just before this message
-            // set -10 minutes
-            var messageUpdateTimestamp = message.date - 1000000*60*10;
-            this.setLastUpdateTimestamp(accountKey,
-                messageUpdateTimestamp);
-
-            this.threadvis.setStatus(null, {updateCache: {rethread: true}});
-
-            this.updatingCache = false;
-            this.updateNewMessagesInternal(message, doVisualise,
-                accountKey, rootFolder);
-            return;
-        }
-
-        var ref = this;
-        this.updateNewMessagesWriteCache(accountKey, function() {
-            if (doVisualise) {
-                ref.threadvis.setSelectedMessage();
-            }
-            ref.updatingCache = false;
-            ref.cacheBuildCount = 0;
-        });
-
-    } else {
-        // current message still not found
-        // somehow it is not cached altough it should have been
-        // reset last update timestamp to date if this message
-        this.threadvis.setStatus(
-            this.threadvis.strings.getString("cache.error"));
-
-        // clear in-memory data
-        this.clearData();
-
-        // set last update timestamp just before this message
-        // -10 minutes
-        var messageUpdateTimestamp = message.date - 1000000 * 60;
-
-        if (this.cacheBuildCount > 2) {
-            this.threadvis.setStatus(
-                this.threadvis.strings.getString("cache.error"));
-            if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-                THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_ERROR,
-                        "updateNewMessages", {
-                            "action" : "cache error, message not found.",
-                            "subject" : message.mime2DecodedSubject,
-                            "autor" : message.mime2DecodedAutor,
-                            "messageId" : message.messageId
-                });
-            }
-            this.cacheBuildCount = 0;
-            this.updatingCache = false;
-            return;
-        }
-
-        this.threadvis.setStatus(null, {updateCache: {rethread: true}});
-
-        this.updatingCache = false;
-        this.setLastUpdateTimestamp(accountKey, messageUpdateTimestamp);
-        this.updateNewMessagesInternal(message, doVisualise, accountKey,
-            rootFolder);
-    }
-}
-
-
-/** ****************************************************************************
- * Get the last update timestamp for the given account
- ******************************************************************************/
-ThreadVisNS.Cache.prototype.getLastUpdateTimestamp = function(accountKey) {
-    var pref = this.threadvis.preferences.getPreference(
-        this.threadvis.preferences.PREF_CACHE_LASTUPDATETIMESTAMP);
-    var entries = pref.split(",");
-    var timestamps = new Object();
-    for (var key in entries) {
-        var entry = entries[key];
-        if (entry) {
-            var splits = entry.split("=");
-            timestamps[splits[0]] = splits[1];
-        }
-    }
-    if (timestamps[accountKey]) {
-        return timestamps[accountKey];
-    } else {
-        return 0;
-    }
-}
-
-
-
-/** ****************************************************************************
- * Set the last update timestamp for the given account
- ******************************************************************************/
-ThreadVisNS.Cache.prototype.setLastUpdateTimestamp = function(accountKey, timestamp) {
-    var pref = this.threadvis.preferences.getPreference(
-        this.threadvis.preferences.PREF_CACHE_LASTUPDATETIMESTAMP);
-    var entries = pref.split(",");
-    var timestamps = new Object();
-    for (var key in entries) {
-        var entry = entries[key];
-        var splits = entry.split("=");
-        timestamps[splits[0]] = splits[1];
-    }
-    timestamps[accountKey] = timestamp;
-
-    var output = "";
-    for (var key in timestamps) {
-        if (key) {
-            output += key + "=" + timestamps[key] + ",";
-        }
-    }
-
-    output = output.substring(0, output.length - 1);
-    this.threadvis.preferences.setPreference(
-        this.threadvis.preferences.PREF_CACHE_LASTUPDATETIMESTAMP,
-        output, this.threadvis.preferences.PREF_STRING);
-}
-
-
-
-/** ****************************************************************************
- * Add all subfolders of account to searchquery
- ******************************************************************************/
-ThreadVisNS.Cache.prototype.addSubFolders = function(searchSession, folder) {
-    if (folder.hasSubFolders) {
-        // Seamonkey < 2 and Thunderbird <= 2 use GetSubFolders
-        // (which returns a nsIEnumerator)
-        // so we have to use .currentItem() and .next()
-        // Thunderbird 3 and Seamonkey 2 use subFolders (which returns a nsISimpleEnumerator
-        // so we have to use .getNext() and .hasMoreElements()
-        var subFolderEnumerator = null;
-        if (folder.GetSubFolders) {
-            subFolderEnumerator = folder.GetSubFolders();
-        }
-        if (folder.subFolders) {
-            subFolderEnumerator = folder.subFolders;
-        }
-        var done = false;
-        while (! done) {
-            var next = null;
-            if (subFolderEnumerator.currentItem) {
-                next = subFolderEnumerator.currentItem();
-            }
-            if (subFolderEnumerator.getNext) {
-                next = subFolderEnumerator.getNext();
-            }
-            if (next) {
-                var nextFolder = next.QueryInterface(
-                    Components.interfaces.nsIMsgFolder);
-                if (nextFolder && ! (nextFolder.flags 
-                    & MSG_FOLDER_FLAG_VIRTUAL)) {
-
-                    // check if folder is valid
-                    var checkFolder = this.threadvis.preferences.getPreference(
-                        this.threadvis.preferences.PREF_CACHE_SKIP_INVALID_FOLDERS);
-
-                    var folderValid = true;
-                    if (checkFolder) {
-                        folderValid = false;
-                        try {
-                            var tmpDB = nextFolder.getMsgDatabase(null);
-                            if (tmpDB) {
-                                folderValid = true;
-                                delete tmpDB;
-                            } else {
-                                THREADVIS.logger.log("Folder is not valid", {
-                                    "folder" : nextFolder.URI});
-                            }
-                        } catch (ex) {
-                            THREADVIS.logger.log("Folder is not valid", {
-                                "exception": ex,
-                                "folder" : nextFolder.URI});
-                        }
-                    }
-
-                    if (!nextFolder.noSelect &&
-                        this.threadvis.checkEnabledAccountOrFolder(nextFolder) &&
-                        folderValid) {
-                        // NS_ERROR_NOT_INITIALIZED can happen here, so only do
-                        // if preference is enabled, and only do in try-catch block
-                        var updateFolder = this.threadvis.preferences.getPreference(
-                        this.threadvis.preferences.PREF_CACHE_UPDATE_FOLDERS);
-                        if (updateFolder) {
-                            try {
-                                nextFolder.updateFolder(null);
-                            } catch (ex) {
-                                THREADVIS.logger.log("Updating folder in addSubFolders threw exception.", {
-                                    "folder" : nextFolder.URI,
-                                    "exception" : ex});
-                            }
-                        }
-                        var searchScope = nextFolder.server.searchScope;
-                        
-                        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-                            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-                            "addSubFolders", {"URI" : nextFolder.URI,
-                                "flags" : nextFolder.flags});
-                        }
-                        
-                        if (searchScope == nsMsgSearchScope.onlineMail) {
-                            // ??? FIXXME
-                            // imap messages are only found when using offline mail
-                            searchSession.addScopeTerm(nsMsgSearchScope.offlineMail,
-                                nextFolder);
-                        } else if (searchScope == nsMsgSearchScope.news) {
-                            // ??? FIXME
-                            // newsgroups messages are only found when using localNews
-                            searchSession.addScopeTerm(nsMsgSearchScope.localNews,
-                                nextFolder);
-                        } else {
-                            searchSession.addScopeTerm(searchScope, nextFolder);
-                        }
-                    }
-                    this.addSubFolders(searchSession, nextFolder);
-                }
-            }
-            try {
-                if (subFolderEnumerator.next) {
-                    subFolderEnumerator.next();
-                }
-                if (subFolderEnumerator.hasMoreElements) {
-                    done = ! subFolderEnumerator.hasMoreElements();
-                }
-            } catch (ex) {
-                done = true;
-            }
-        }
-    }
-}
-
-
-
-/** ****************************************************************************
  * Reset all caches for all messages in account
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.reset = function(accountKey) {
     // reset update timestamp
-    this.setLastUpdateTimestamp(accountKey, 0);
+    //this.setLastUpdateTimestamp(accountKey, 0);
 
     // reset the cache for the account, i.e. delete the cache file and
     // re-create it
     this.openDatabase(accountKey, true);
-}
-
-
-
-/** ****************************************************************************
- * Write cache to disk for all new messages
- ******************************************************************************/
-ThreadVisNS.Cache.prototype.updateNewMessagesWriteCache = function(accountKey, callback) {
-    var util = new ThreadVisNS.Util();
-    var ref = this;
-    this.updatedTopContainers = new Object();
-    util.registerListener({
-        onItem: function(item, count, remaining, timeRemaining) {
-            var container = ref.threadvis.getThreader().findContainer(item.messageId);
-            if (container == null) {
-                return;
-            }
-            var topContainer = container.getTopContainer();
-            if (count % 10 == 0) {
-                ref.threadvis.setStatus(
-                    ref.threadvis.strings.getString("cache.update.status")
-                        + count + " [" + remaining + "] " + timeRemaining);
-            }
-            var cache = topContainer.getCache();
-            if (! ref.updatedTopContainers[cache]) {
-                ref.updatedTopContainers[cache] = true;
-                ref.updateCache(container, item, accountKey);
-                ref.threadvis.getThreader().removeThread(topContainer);
-            }
-            cache = null;
-            delete cache;
-            delete container;
-            delete topContainer;
-        },
-        onFinished: function() {
-            ref.threadvis.setStatus("Cache done");
-            ref.commitDatabaseTransaction(accountKey);
-            ref.clearData();
-            ref.threadvis.setStatus(null, {updateCache: null});
-            callback();
-        }
-    });
-    // start transaction before writing messages
-    this.beginDatabaseTransaction(accountKey);
-    util.process(this.newMessages);
 }
 
 
@@ -1101,12 +385,7 @@ ThreadVisNS.Cache.prototype.openDatabase = function(accountKey, forceRecreate) {
         .getService(Components.interfaces.nsIProperties)
         .get("ProfD", Components.interfaces.nsIFile);
 
-    file.append("extensions");
-    if (! file.exists()) {
-        file.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
-    }
-
-    file.append("{A23E4120-431F-4753-AE53-5D028C42CFDC}");
+    file.append("ThreadVis");
     if (! file.exists()) {
         file.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
     }
@@ -1130,6 +409,9 @@ ThreadVisNS.Cache.prototype.openDatabase = function(accountKey, forceRecreate) {
         if (connection.tableExists("threadcounter")) {
             connection.executeSimpleSQL("DROP TABLE threadcounter");
         }
+        if (connection.tableExists("updatetimestamps")) {
+            connection.executeSimpleSQL("DROP TABLE updatetimestamps");
+        }
     }
 
     var newCache = false;
@@ -1144,11 +426,14 @@ ThreadVisNS.Cache.prototype.openDatabase = function(accountKey, forceRecreate) {
         connection.createTable("threadcounter", "threadid int");
         newCache = true;
     }
+    if (! connection.tableExists("updatetimestamps")) {
+        connection.createTable("updatetimestamps", "folderuri string, updatetimestamp string");
+    }
 
     // if new cache file, reset update timestamp so that all messages get
     // re-cached
     if (newCache) {
-        this.setLastUpdateTimestamp(accountKey, 0);
+        //this.setLastUpdateTimestamp(accountKey, 0);
     }
     this.databaseConnections[accountKey] = connection;
 }
@@ -1159,7 +444,10 @@ ThreadVisNS.Cache.prototype.openDatabase = function(accountKey, forceRecreate) {
  * Start a database transaction
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.beginDatabaseTransaction = function(accountKey) {
-    this.getDatabaseConnection(accountKey).beginTransaction();
+    try {
+        this.getDatabaseConnection(accountKey).beginTransaction();
+    } catch (ex) {
+    }
 }
 
 
@@ -1168,7 +456,10 @@ ThreadVisNS.Cache.prototype.beginDatabaseTransaction = function(accountKey) {
  * End a database transaction
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.commitDatabaseTransaction = function(accountKey) {
-    this.getDatabaseConnection(accountKey).commitTransaction();
+    try {
+        this.getDatabaseConnection(accountKey).commitTransaction();
+    } catch (ex) {
+    }
 }
 
 
@@ -1177,137 +468,452 @@ ThreadVisNS.Cache.prototype.commitDatabaseTransaction = function(accountKey) {
  * Clear in-memory data
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.clearData = function() {
-    delete this.newMessages;
-    delete this.addedMessages;
-    delete this.updatedTopContainers;
-    this.newMessages = new Array();
-    this.addedMessages = new Array();
-    this.updatedTopContainers = new Object();
     this.threadvis.getThreader().reset();
 }
 
 
 
 /** ****************************************************************************
- * Return if cache is currently updating
+ * Check if message is already cached
+ * @param msgId
+ *          The message id to be checked.
+ * @param accountKey
+ *          The accountKey of the account in which the message is stored.
+ * @return
+ *          True if message exists in database, false if not.
  ******************************************************************************/
-ThreadVisNS.Cache.prototype.isUpdating = function() {
-    return this.updatingCache;
-}
+ThreadVisNS.Cache.prototype.isCached = function(msgId, accountKey) {
+    var connection = this.getDatabaseConnection(accountKey);
+    var statement = connection.createStatement(
+        "SELECT threadid FROM threads WHERE msgid = ?");
+    statement.bindStringParameter(0, msgId);
 
-
-
-/** ****************************************************************************
- * Utility class that provides background processing
- ******************************************************************************/
-ThreadVisNS.Util = function() {
-    this.listener = null;
-    this.count = 0;
-    this.startTime = 0;
-}
-
-
-
-/** ****************************************************************************
- * Register listener
- ******************************************************************************/
-ThreadVisNS.Util.prototype.registerListener = function(listener) {
-    this.listener = listener;
-}
-
-
-
-/** ****************************************************************************
- * Process an array of elements
- ******************************************************************************/
-ThreadVisNS.Util.prototype.process = function(array) {
-    if (this.startTime == 0) {
-        this.startTime = (new Date()).getTime();
+    var threadId = null;
+    try {
+        if (statement.executeStep()) {
+            threadId = statement.getInt32(0);
+        }
+    } catch (ex) {
+        THREADVIS.logger.log("Error while performing SQL statement", {
+            "exception": ex});
     }
-    var currentTime = (new Date()).getTime();
-    var elem = array.pop();
-    var remaining = array.length;
-    var timeRemaining = ((currentTime - this.startTime) / this.count) * remaining;
-    var ref = this;
-    if (elem) {
-        this.count++;
-        this.listener.onItem(elem, this.count, remaining,
-            this.formatTimeRemaining(timeRemaining));
-        setTimeout(function() {ref.process(array);}, 0);
+    statement.reset();
+    statement = null;
+    delete statement;
+    connection = null;
+    delete connection;
+
+    var isCached = threadId != null;
+
+    return isCached;
+}
+
+
+
+/** ****************************************************************************
+ * Check if any of the passed message ids exists in the database
+ * if so, return the thread key
+ * @param accountKey
+ *          The account key to create the database connection.
+ * @param messageIds
+ *          The array of all message ids in the thread.
+ * @return
+ *          An array of all thread ids, if they exists. Emtpty array otherwise.
+ ******************************************************************************/
+ThreadVisNS.Cache.prototype.getThreadIdsForMessageIds = function(accountKey,
+    messageIds) {
+
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "getThreadIdsForMessageIds", {"action" : "start"});
+    }
+
+    var connection = this.getDatabaseConnection(accountKey);
+    var statement = connection.createStatement(
+        "SELECT threadid FROM threads WHERE msgid = ?");
+
+    var count = 0;
+    var threadIds = [];
+    try {
+        for (var i = 0; i < messageIds.length; i++) {
+            count++;
+            statement.bindStringParameter(0, messageIds[i]);
+            if (statement.executeStep()) {
+                var threadId = statement.getInt32(0);
+                if (threadId) {
+                    threadIds.push(threadId);
+                }
+            }
+            statement.reset();
+        }
+    } catch (ex) {
+        THREADVIS.logger.log("Error while performing SQL statement", {
+            "exception": ex});
+    } finally {
+        statement.reset();
+        statement = null;
+        delete statement;
+        connection = null;
+        delete connection;
+    }
+
+    return threadIds;
+}
+
+
+
+/** ****************************************************************************
+ * Create a new thread id
+ * @param accountKey
+ *          The account key to create the database connection.
+ * @return
+ *          The new thread id.
+ ******************************************************************************/
+ThreadVisNS.Cache.prototype.createNewThreadId = function(accountKey) {
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "createNewThreadId", {"action" : "start"});
+    }
+
+    var connection = this.getDatabaseConnection(accountKey);
+    var statement = connection.createStatement(
+        "SELECT threadid FROM threadcounter");
+
+    var threadId = null;
+    try {
+        if (statement.executeStep()) {
+            threadId = statement.getInt32(0);
+        }
+    } catch (ex) {
+        THREADVIS.logger.log("Error while performing SQL statement", {
+            "exception": ex});
+    } finally {
+        statement.reset();
+        statement = null;
+        delete statement;
+    }
+
+    // check if thread id exists
+    var exists = true;
+    if (threadId == null) {
+        threadId = 0;
+        exists = false;
+    }
+
+    // increment thread id
+    threadId++;
+
+    // if thread id already existed, update to new value, otherwise
+    // insert the first id
+    if (exists) {
+        statement = connection.createStatement(
+            "UPDATE threadcounter SET threadid = ?");
     } else {
-        delete array;
-        delete elem;
-        this.listener.onFinished();
+        statement = connection.createStatement(
+        "INSERT INTO threadcounter (threadid) VALUES (?)");
+    }
+    statement.bindInt32Parameter(0, threadId);
+    try {
+        statement.execute();
+    } catch (ex) {
+        THREADVIS.logger.log("Error while performing SQL statement", {
+            "exception": ex});
+    } finally {
+        statement.reset();
+        statement = null;
+        delete statement;
+    }
+
+    connection = null;
+    delete connection;
+
+    return threadId;
+}
+
+
+
+/** ****************************************************************************
+ * Write thread to database
+ * @param accountKey
+ *          The account key to create the database connection.
+ * @param threadId
+ *          The thread id to write
+ * @param threadIds
+ *          Other thread ids to use. Add all messages from those
+ *          thread ids as well.
+ * @param messageIds
+ *          The array of message ids to add to the thread
+ ******************************************************************************/
+ThreadVisNS.Cache.prototype.storeThread = function(accountKey, threadId,
+    threadIds, messageIds) {
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "storeThread", {"action" : "start"});
+    }
+
+    var connection = this.getDatabaseConnection(accountKey);
+    var statement = null;
+
+    // first, fetch all additional messages from threadIds
+    statement = connection.createStatement(
+        "SELECT msgid FROM threads WHERE threadid = ?");
+    for (var i = 0; i < threadIds.length; i++) {
+        statement.bindInt32Parameter(0, threadIds[i]);
+        try {
+            while (statement.executeStep()) {
+                var msgid = statement.getString(0);
+                messageIds.push(msgid);
+            }
+        } catch (ex) {
+            THREADVIS.logger.log("Error while performing SQL statement", {
+                "exception": ex});
+        }
+        statement.reset();
+    }
+    statement.reset();
+    statement = null;
+
+    // delete all unused thread ids
+    statement = connection.createStatement(
+        "DELETE FROM threads WHERE threadid = ?");
+    for (var i = 0; i < threadIds.length; i++) {
+        try {
+            statement.bindInt32Parameter(0, threadIds[i]);
+            statement.execute();
+            statement.reset();
+        } catch (ex) {
+            THREADVIS.logger.log("Error while performing SQL statement", {
+                "exception": ex});
+        }
+    }
+    statement.reset();
+    statement = null;
+
+    // for all message ids in the cache, write to database
+    statement = connection.createStatement(
+        "INSERT INTO threads (msgid, threadid) VALUES (?, ?)");
+    try {
+        var msgId = null;
+        for (var i = 0; i < messageIds.length; i++) {
+            statement.bindStringParameter(0, messageIds[i]);
+            statement.bindInt32Parameter(1, threadId);
+            statement.execute();
+        }
+    } catch (ex) {
+        // ignore any exceptions, as we might insert message ids multiple times
+    } finally {
+        statement.reset();
+        statement = null;
     }
 }
 
 
 
+/** ****************************************************************************
+ * Get the update timestamp for a folder
+ * @param accountKey
+ *          The account key to create the database connection.
+ * @param folderuri
+ *          The folder URI.
+ * @return
+ *          The last update timestamp.
+ ******************************************************************************/
+ThreadVisNS.Cache.prototype.getFolderUpdateTimestamp = function(accountKey,
+    folderuri) {
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "getFolderUpdateTimestamp", {"action" : "start"});
+    }
+
+    var connection = this.getDatabaseConnection(accountKey);
+    var statement = connection.createStatement(
+        "SELECT updatetimestamp FROM updatetimestamps WHERE folderuri = ?");
+
+    var updatetimestamp = 0;
+    try {
+        statement.bindStringParameter(0, folderuri);
+        if (statement.executeStep()) {
+            updatetimestamp = parseInt(statement.getString(0));
+        }
+    } catch (ex) {
+        THREADVIS.logger.log("Error while performing SQL statement", {
+            "exception": ex});
+    } finally {
+        statement.reset();
+        statement = null;
+        delete statement;
+        connection = null;
+        delete connection;
+    }
+
+    return updatetimestamp;
+}
+
+
 
 /** ****************************************************************************
- * Format remaining time to process array
+ * Set the update timestamp for a folder
+ * @param accountKey
+ *          The account key to create the database connection.
+ * @param folderuri
+ *          The folder URI.
+ * @param timestamp
+ *          The timestamp to set.
  ******************************************************************************/
-ThreadVisNS.Util.prototype.formatTimeRemaining = function(remaining) {
-    // remaining is in miliseconds
-    remaining = remaining - (remaining % 1000);
-    remaining = remaining / 1000;
-    var seconds = remaining % 60;
-    remaining = remaining - seconds;
-    remaining = remaining / 60;
-    var minutes = remaining % 60;
-    remaining = remaining - minutes;
-    remaining = remaining / 60;
-    var hours = remaining % 24;
-    remaining = remaining - hours;
-    remaining = remaining / 24;
-    var days = remaining % 365;
-    remaining = remaining - days;
-    remaining = remaining / 365;
-    var years = remaining;
-
-    var strings = THREADVIS.strings;
-
-    var label = "";
-    if (years == 1) {
-        label += years + " " +
-            strings.getString("visualisation.timedifference.year");
-    }
-    if (years > 1) {
-        label += years + " " +
-            strings.getString("visualisation.timedifference.years");
-    }
-    if (days == 1) {
-        label += " " + days + " " +
-            strings.getString("visualisation.timedifference.day");
-    }
-    if (days > 1) {
-        label += " " + days + " " +
-            strings.getString("visualisation.timedifference.days");
-    }
-    if (hours == 1) {
-        label += " " + hours + " " +
-            strings.getString("visualisation.timedifference.hour");
-    }
-    if (hours > 1) {
-        label += " " + hours + " " +
-            strings.getString("visualisation.timedifference.hours");
-    }
-    if (minutes == 1) {
-        label += " " + minutes + " " +
-            strings.getString("visualisation.timedifference.minute");
-    }
-    if (minutes > 1) {
-        label += " " + minutes + " " +
-            strings.getString("visualisation.timedifference.minutes");
-    }
-    if (seconds == 1) {
-        label += " " + seconds + " " +
-            strings.getString("visualisation.timedifference.second");
-    }
-    if (seconds > 1) {
-        label += " " + seconds + " " +
-            strings.getString("visualisation.timedifference.seconds");
+ThreadVisNS.Cache.prototype.setFolderUpdateTimestamp = function(accountKey,
+    folderuri, timestamp) {
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "setFolderUpdateTimestamp", {"action" : "start"});
     }
 
-    return label;
+    var connection = this.getDatabaseConnection(accountKey);
+
+    var statement = connection.createStatement(
+        "DELETE FROM updatetimestamps WHERE folderuri = ?");
+    try {
+        statement.bindStringParameter(0, folderuri);
+        statement.execute();
+    } catch (ex) {
+        THREADVIS.logger.log("Error while performing SQL statement", {
+            "exception": ex});
+    } finally {
+        statement.reset();
+        statement = null;
+        delete statement;
+    }
+
+    statement = connection.createStatement(
+        "INSERT INTO updatetimestamps (folderuri, updatetimestamp) VALUES (?,?)");
+
+    var updatetimestamp = 0;
+    try {
+        statement.bindStringParameter(0, folderuri);
+        statement.bindStringParameter(1, timestamp);
+        statement.execute();
+    } catch (ex) {
+        THREADVIS.logger.log("Error while performing SQL statement", {
+            "exception": ex});
+    } finally {
+        statement.reset();
+        statement = null;
+        delete statement;
+        connection = null;
+        delete connection;
+    }
+
+    return updatetimestamp;
+}
+
+
+
+/** ****************************************************************************
+ * Create account caches for all accounts
+ ******************************************************************************/
+ThreadVisNS.Cache.prototype.createAccountCaches = function() {
+    // loop over all accounts
+    var accountManager = Components.classes["@mozilla.org/messenger/account-manager;1"]
+        .getService(Components.interfaces.nsIMsgAccountManager);
+    var accounts = accountManager.accounts;
+
+    for (var i = 0; i < accounts.Count(); i++) {
+        // check enabled account
+        if (this.isAccountEnabled(accounts.GetElementAt(i))) {
+            this.accountCaches.push(
+                new ThreadVisNS.AccountCache(this, accounts.GetElementAt(i)));
+        }
+    }
+    accounts = null;
+    delete accounts;
+    accountManager = null;
+    delete accountManager;
+}
+
+
+
+/** ****************************************************************************
+ * Get all account caches
+ ******************************************************************************/
+ThreadVisNS.Cache.prototype.getAccountCaches = function() {
+    return this.accountCaches;
+}
+
+
+
+/** ****************************************************************************
+ * Check all accounts
+ ******************************************************************************/
+ThreadVisNS.Cache.prototype.checkAllAccounts= function() {
+    var accountCache = null;
+    for (var i = 0; i < this.accountCaches.length; i++) {
+        var status = this.accountCaches[i].status();
+        if (status.doneChecking || status.working) {
+            continue;
+        }
+        accountCache = this.accountCaches[i];
+        break;
+    }
+
+    if (accountCache) {
+        var ref = this;
+        accountCache.register("onCheckDone", function() {
+            ref.checkAllAccounts();
+        });
+        accountCache.check();
+    } else {
+        // check done
+        alert("check for all accounts done");
+    }
+}
+
+
+
+/** ****************************************************************************
+ * Check account
+ * @param account
+ *          The account to check
+ * @param folder
+ *          An optional folder to check. If not set, all folders are checked.
+ ******************************************************************************/
+ThreadVisNS.Cache.prototype.checkAccount= function(account) {
+    var accountCache = null;
+    for (var i = 0; i < this.accountCaches.length; i++) {
+        if (this.accountCaches[i].account = account) {
+            accountCache = this.accountCaches[i];
+            break;
+        }
+    }
+
+    if (accountCache) {
+        var ref = this;
+        accountCache.register("onCheckDone", function() {
+            accountCache.cacheUncachedMessages();
+        });
+        accountCache.check();
+    }
+}
+
+
+
+/** ****************************************************************************
+ * Is account enabled
+ ******************************************************************************/
+ThreadVisNS.Cache.prototype.isAccountEnabled = function(account) {
+    if (this.threadvis.preferences.getPreference(
+        this.threadvis.preferences.PREF_DISABLED_ACCOUNTS) != ""
+            && this.threadvis.preferences.getPreference(this.threadvis.preferences.PREF_DISABLED_ACCOUNTS).indexOf(" " + account.key + " ") > -1) {
+        return false;
+    }
+    return true;
+}
+
+
+
+/** ****************************************************************************
+ * Cancel all caching activity
+ ******************************************************************************/
+ThreadVisNS.Cache.prototype.cancel = function() {
+    for (var i = 0; i < this.accountCaches.length; i++) {
+        this.accountCaches[i].cancel();
+    }
 }

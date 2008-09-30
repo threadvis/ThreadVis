@@ -690,9 +690,10 @@ ThreadVisNS.ThreadVis.prototype.onItemAdded = function(parentItem, item, view) {
     if (item instanceof Components.interfaces.nsIMsgDBHdr) {
         // check if added to folder or account that is disabled
         if (this.checkEnabledAccountOrFolder(item.folder)) {
-            this.timeoutItemAdded = setTimeout(function() {
+            /*this.timeoutItemAdded = setTimeout(function() {
                 ref.cache.updateNewMessages(item, false);
-            }, 1000);
+            }, 1000);*/
+            // TODO recheck account!
         } else {
             if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
                 THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
@@ -856,6 +857,7 @@ ThreadVisNS.ThreadVis.prototype.unloadHandler = function() {
     this.logger.log("threadvis", {"action": "unload"});
     this.logger.close();
     this.threader.closeCopyCut();
+    this.cache.cancel();
 }
 
 
@@ -914,7 +916,7 @@ ThreadVisNS.ThreadVis.prototype.visualiseMessage = function(message, force) {
         return;
     }
 
-    // if cache is running an update, return
+/*    // if cache is running an update, return
     if (this.cache.isUpdating()) {
         if (this.logger.isDebug(this.logger.COMPONENT_CACHE)) {
             this.logger.logDebug(this.logger.LEVEL_INFO,
@@ -924,7 +926,7 @@ ThreadVisNS.ThreadVis.prototype.visualiseMessage = function(message, force) {
         this.clearVisualisation();
         return;
     }
-
+*/
     if (this.logger.isDebug(this.logger.COMPONENT_VISUALISATION)) {
         this.logger.logDebug(this.logger.LEVEL_INFO,
             "ThreadVis.visualiseMessage()", {"message-id" : message.messageId});
@@ -943,6 +945,25 @@ ThreadVisNS.ThreadVis.prototype.visualiseMessage = function(message, force) {
         }
     }
 
+
+
+
+    // hack
+    var server = message.folder.server;
+    var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
+        .getService(Components.interfaces.nsIMsgAccountManager))
+        .FindAccountForServer(server);
+
+    /*
+    this.accountCache = new ThreadVisNS.AccountCache(this.cache, account);*/
+    //this.accountCache.check();
+    //window.openDialog("chrome://threadvis/content/Cache.xul", "ThreadVisCache");
+    //this.cache.checkAllAccounts();
+    this.cache.checkAccount(account);
+
+
+
+
     // if not in threader, try to get from cache
     if (container == null || container.isDummy()) {
         if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
@@ -954,7 +975,7 @@ ThreadVisNS.ThreadVis.prototype.visualiseMessage = function(message, force) {
         this.getThreader().thread();
         container = this.getThreader().findContainer(message.messageId);
     }
-
+/*
     // not in threader, not in cache. add to threader
     if (container == null || container.isDummy()) {
         if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
@@ -976,7 +997,7 @@ ThreadVisNS.ThreadVis.prototype.visualiseMessage = function(message, force) {
                     "new" : newCache});
         }
         this.cache.updateCache(container, message);
-    }
+    }*/
 
     this.visualisedMsgId = message.messageId;
 
