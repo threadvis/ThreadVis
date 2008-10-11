@@ -1,5 +1,8 @@
 /** ****************************************************************************
- * FolderCache.js
+ * This file is part of ThreadVis.
+ * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
+ * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
+ * Mozilla Thunderbird Email Client" at Graz University of Technology, Austria.
  *
  * Copyright (C) 2008 Alexander C. Hubmann-Haidvogel
  *
@@ -26,6 +29,8 @@ if (! window.ThreadVisNS) {
  * @param accountKey
  *          The key of the account of the folder (needed to open a database
  *          connection)
+ * @return
+ *          A new folder cache object
  ******************************************************************************/
 ThreadVisNS.FolderCache = function(cache, folder, accountKey) {
     this.SEARCH_TIMEOUT = 10000;
@@ -58,6 +63,8 @@ ThreadVisNS.FolderCache = function(cache, folder, accountKey) {
  * @param timestamp
  *          Optional timestamp to use when checking for messages. Used
  *          instead of stored last update timestamp.
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.FolderCache.prototype.check = function(timestamp) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
@@ -128,6 +135,9 @@ ThreadVisNS.FolderCache.prototype.check = function(timestamp) {
 
 /** ****************************************************************************
  * Reset the search session
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.FolderCache.prototype.resetSearchSession = function() {
     if (this.searchSession) {
@@ -142,6 +152,9 @@ ThreadVisNS.FolderCache.prototype.resetSearchSession = function() {
 
 /** ****************************************************************************
  * Reset the message processor
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.FolderCache.prototype.resetMessageProcessor = function() {
     if (this.messageProcessor) {
@@ -155,6 +168,9 @@ ThreadVisNS.FolderCache.prototype.resetMessageProcessor = function() {
 
 /** ****************************************************************************
  * Callback from nsIMsgSearchSession when a new search has been started.
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.FolderCache.prototype.onNewSearch = function() {
     this.handleSearchTimeout(true);
@@ -167,6 +183,8 @@ ThreadVisNS.FolderCache.prototype.onNewSearch = function() {
  *
  * @param header
  *          The found message header
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.FolderCache.prototype.onSearchHit = function(header) {
     this.messages.push(header);
@@ -184,6 +202,9 @@ ThreadVisNS.FolderCache.prototype.onSearchHit = function(header) {
 
 /** ****************************************************************************
  * Callback from nsIMsgSearchSession when the search has finished
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.FolderCache.prototype.onSearchDone = function() {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
@@ -206,6 +227,8 @@ ThreadVisNS.FolderCache.prototype.onSearchDone = function() {
  *
  * @param restart
  *          True to restart timer
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.FolderCache.prototype.handleSearchTimeout = function(restart) {
     clearTimeout(this.searchTimeout);
@@ -223,6 +246,9 @@ ThreadVisNS.FolderCache.prototype.handleSearchTimeout = function(restart) {
 
 /** ****************************************************************************
  * Process collected messages from search
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.FolderCache.prototype.processMessages = function() {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
@@ -265,6 +291,8 @@ ThreadVisNS.FolderCache.prototype.processMessages = function() {
  *          An estimate of the remaining time
  * @param callback
  *          Call this when processing of the message is done
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.FolderCache.prototype.onItem = function(item, count, remaining,
     timeRemaining, callback) {
@@ -302,6 +330,8 @@ ThreadVisNS.FolderCache.prototype.onItem = function(item, count, remaining,
  *
  * @param totalCount
  *          The total count of processed messages
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.FolderCache.prototype.onFinished = function(totalCount) {
     this.messageCount = totalCount;
@@ -312,6 +342,9 @@ ThreadVisNS.FolderCache.prototype.onFinished = function(totalCount) {
 
 /** ****************************************************************************
  * Processing done
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.FolderCache.prototype.processingDone = function() {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
@@ -330,6 +363,22 @@ ThreadVisNS.FolderCache.prototype.processingDone = function() {
 
 /** ****************************************************************************
  * Check the status
+ *
+ * @return
+ *          object.working
+ *              True if cache is currently updating
+ *          object.doneSearching
+ *              True if searching is done
+ *          object.doneProcessing
+ *              True if processing is done
+ *          object.messages
+ *              The array of all found messages
+ *          object.processingDome
+ *              Number of already processed messages
+ *          object.processingRemaining
+ *              Number of remaining messages to be processed
+ *          object.processingRemainingTime
+ *              Time reamining until all messages are processed
  ******************************************************************************/
 ThreadVisNS.FolderCache.prototype.status = function() {
     return {
@@ -352,6 +401,8 @@ ThreadVisNS.FolderCache.prototype.status = function() {
  *          The event to listen to
  * @param callback
  *          The method to call
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.FolderCache.prototype.register = function(event, callback) {
     if (! this.callbacks[event]) {
@@ -366,7 +417,9 @@ ThreadVisNS.FolderCache.prototype.register = function(event, callback) {
  * Notify callbacks. Delete any registered callbacks after firing the event.
  *
  * @param event
- *      The event to notify
+ *          The event to notify
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.FolderCache.prototype.notify = function(event) {
     if (! this.callbacks[event]) {
@@ -386,6 +439,8 @@ ThreadVisNS.FolderCache.prototype.notify = function(event) {
  *
  * @param message
  *          The message to cache
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.FolderCache.prototype.cacheUncachedMessage = function(message) {
     // get the references header
@@ -434,6 +489,8 @@ ThreadVisNS.FolderCache.prototype.getUpdateTimestamp = function() {
  *
  * @param timestamp
  *          The timestamp to set.
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.FolderCache.prototype.setUpdateTimestamp = function(timestamp,
     message) {
@@ -453,6 +510,9 @@ ThreadVisNS.FolderCache.prototype.setUpdateTimestamp = function(timestamp,
 
 /** ****************************************************************************
  * Cancel a running cache
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.FolderCache.prototype.cancel = function() {
     this.resetMessageProcessor();

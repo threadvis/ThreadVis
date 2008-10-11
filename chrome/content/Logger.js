@@ -1,10 +1,13 @@
 /* *****************************************************************************
- * Logger.js
+ * This file is part of ThreadVis.
+ * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
+ * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
+ * Mozilla Thunderbird Email Client" at Graz University of Technology, Austria.
  *
  * Copyright (C) 2005-2007 Alexander C. Hubmann
  * Copyright (C) 2007-2008 Alexander C. Hubmann-Haidvogel
  *
- * JavaScript file to log events
+ * Log events to the error console or to a file
  *
  * $Id$
  ******************************************************************************/
@@ -18,9 +21,12 @@ if (! window.ThreadVisNS) {
 
 
 /** ****************************************************************************
- * constructor
- * read preferences
- * open file if necessary
+ * Constructor
+ * Read preferences
+ * Open file if necessary
+ *
+ * @return
+ *          A new logger object
  ******************************************************************************/
 ThreadVisNS.Logger = function() {
     this.EXTENSION_PATH = "extensions";
@@ -78,7 +84,10 @@ ThreadVisNS.Logger = function() {
 
 
 /** ****************************************************************************
- * close the logfile
+ * Close the logfile
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Logger.prototype.close = function() {
     // if file is open, close it
@@ -93,7 +102,12 @@ ThreadVisNS.Logger.prototype.close = function() {
 
 
 /** ****************************************************************************
- * convert an object to xml
+ * Convert an object to xml
+ *
+ * @param object
+ *          The object which is logged
+ * @return
+ *          The log text
  ******************************************************************************/
 ThreadVisNS.Logger.prototype.decode = function(object) {
     var logtext = "";
@@ -112,9 +126,13 @@ ThreadVisNS.Logger.prototype.decode = function(object) {
 
 
 /** ****************************************************************************
- * convert an object to xml
- * this method is called in debug mode
- * so use CDATA blocks to escape
+ * Convert an object to xml
+ * This method is called in debug mode, so use CDATA blocks to escape
+ *
+ * @param object
+ *          The object to log
+ * @return
+ *          The log text
  ******************************************************************************/
 ThreadVisNS.Logger.prototype.decodeDebug = function(object) {
     var logtext = "";
@@ -132,6 +150,9 @@ ThreadVisNS.Logger.prototype.decodeDebug = function(object) {
 
 /** ****************************************************************************
  * Return if we do logging
+ *
+ * @return
+ *          True if logging is enabled
  ******************************************************************************/
 ThreadVisNS.Logger.prototype.doLogging = function() {
     return THREADVIS.preferences.getPreference(
@@ -141,7 +162,10 @@ ThreadVisNS.Logger.prototype.doLogging = function() {
 
 
 /** ****************************************************************************
- * return the logfile file object
+ * Return the logfile file object
+ *
+ * @return
+ *          The log file
  ******************************************************************************/
 ThreadVisNS.Logger.prototype.getFile = function() {
     return this.file;
@@ -150,7 +174,10 @@ ThreadVisNS.Logger.prototype.getFile = function() {
 
 
 /** ****************************************************************************
- * check to see if debug to console is enabled
+ * Check to see if debug to console is enabled
+ *
+ * @return
+ *          True if logging to console is enabled, false if not
  ******************************************************************************/
 ThreadVisNS.Logger.prototype.isConsole = function() {
     return (THREADVIS.preferences.getPreference(
@@ -160,7 +187,12 @@ ThreadVisNS.Logger.prototype.isConsole = function() {
 
 
 /** ****************************************************************************
- * check to see if debug logging is enabled for this component
+ * Check to see if debug logging is enabled for this component
+ *
+ * @param component
+ *          The component for which to check if debug is enabled
+ * @return
+ *          True if debug logging is enabled for the component, false if not
  ******************************************************************************/
 ThreadVisNS.Logger.prototype.isDebug = function(component) {
     return (THREADVIS.preferences.getPreference(
@@ -172,7 +204,14 @@ ThreadVisNS.Logger.prototype.isDebug = function(component) {
 
 
 /** ****************************************************************************
- * log an info message
+ * Log an info message
+ *
+ * @param item
+ *          The item to log
+ * @param infos
+ *          Additional infos to log
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Logger.prototype.log = function(item, infos) {
     if (this.isConsole()) {
@@ -192,7 +231,16 @@ ThreadVisNS.Logger.prototype.log = function(item, infos) {
 
 
 /** ****************************************************************************
- * write string to error console
+ * Write string to error console
+ *
+ * @param severity
+ *          The severity of the error
+ * @param item
+ *          The main log item
+ * @param infos
+ *          Additional infos
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Logger.prototype.logConsole = function(severity, item, infos) {
     var msg = item;
@@ -223,7 +271,16 @@ ThreadVisNS.Logger.prototype.logConsole = function(severity, item, infos) {
 
 
 /** ****************************************************************************
- * write a string to the file in debug mode
+ * Write a string to the file in debug mode
+ *
+ * @param severity
+ *          The severity of the error
+ * @param item
+ *          The main log item
+ * @param infos
+ *          Additional log infos
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Logger.prototype.logDebug = function(severity, item, infos) {
     if (this.isConsole()) {
@@ -243,7 +300,12 @@ ThreadVisNS.Logger.prototype.logDebug = function(severity, item, infos) {
 
 
 /** ****************************************************************************
- * observe preferences changes
+ * Observe preferences changes
+ *
+ * @param enabled
+ *          True if logging is enabled, false if not
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Logger.prototype.observe = function(enabled) {
     // if logging is enabled, but not ready:
@@ -262,7 +324,10 @@ ThreadVisNS.Logger.prototype.observe = function(enabled) {
 
 
 /** ****************************************************************************
- * open the logfile
+ * Open the logfile
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Logger.prototype.open = function() {
     this.ready = false;
@@ -284,7 +349,12 @@ ThreadVisNS.Logger.prototype.open = function() {
 
 
 /** ****************************************************************************
- * reset the logfile
+ * Reset the logfile
+ *
+ * @param deleteFile
+ *          True to delete the log file
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Logger.prototype.reset = function(deleteFile) {
     if (this.ready) {

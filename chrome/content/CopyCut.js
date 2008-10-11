@@ -1,10 +1,14 @@
 /* *****************************************************************************
- * CopyCut.js
+ * This file is part of ThreadVis.
+ * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
+ * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
+ * Mozilla Thunderbird Email Client" at Graz University of Technology, Austria.
  *
  * Copyright (C) 2005-2007 Alexander C. Hubmann
  * Copyright (C) 2007-2008 Alexander C. Hubmann-Haidvogel
  *
  * JavaScript file to copy and cut messages
+ * TODO move this into database
  *
  * $Id$
  ******************************************************************************/
@@ -18,8 +22,11 @@ if (! window.ThreadVisNS) {
 
 
 /** ****************************************************************************
- * constructor
- * create new object, create file pointers
+ * Constructor
+ * Create new object, create file pointers
+ *
+ * @return
+ *          A new copycut object
  ******************************************************************************/
 ThreadVisNS.CopyCut = function() {
     this.EXTENSION_PATH = "extensions";
@@ -53,10 +60,15 @@ ThreadVisNS.CopyCut = function() {
 
 
 /** ****************************************************************************
- * add a copy
+ * Add a copy
  * format: msgid_child msgid_parent
- * if we are adding a copy for a pair that was previously cut,
+ * If we are adding a copy for a pair that was previously cut,
  * just remove the cut
+ *
+ * @param msgMsg
+ *          The new entry
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.CopyCut.prototype.addCopy = function(msgMsg) {
     var splits = msgMsg.split(" ");
@@ -72,10 +84,15 @@ ThreadVisNS.CopyCut.prototype.addCopy = function(msgMsg) {
 
 
 /** ****************************************************************************
- * add a cut
- * format: msgid_child msgid_parent
- * if we are adding a cut for a pair that was previously copied,
+ * Add a cut
+ * Format: msgid_child msgid_parent
+ * If we are adding a cut for a pair that was previously copied,
  * just remove the copy
+ *
+ * @param msgMsg
+ *          The new entry
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.CopyCut.prototype.addCut= function(msgMsg) {
     var splits = msgMsg.split(" ");
@@ -91,7 +108,10 @@ ThreadVisNS.CopyCut.prototype.addCut= function(msgMsg) {
 
 
 /** ****************************************************************************
- * close the file
+ * Close the file
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.CopyCut.prototype.close = function() {
     // if file is open, close it
@@ -106,8 +126,12 @@ ThreadVisNS.CopyCut.prototype.close = function() {
 
 
 /** ****************************************************************************
- * get copy for message
- * (return msg_id of new parent)
+ * Get copy for message
+ *
+ * @param msg
+ *          The message
+ * @return
+ *          Any copies of the message (msg id of the new parent)
  ******************************************************************************/
 ThreadVisNS.CopyCut.prototype.getCopy = function(msg) {
     return this.copies[msg];
@@ -116,8 +140,12 @@ ThreadVisNS.CopyCut.prototype.getCopy = function(msg) {
 
 
 /** ****************************************************************************
- * get cut for message
- * (return msg_id of old parent)
+ * Get cut for message
+ *
+ * @param msg
+ *          The message
+ * @return
+ *          Any cuts of the message (msg id of the old parent)
  ******************************************************************************/
 ThreadVisNS.CopyCut.prototype.getCut = function(msg) {
     return this.cuts[msg];
@@ -126,7 +154,10 @@ ThreadVisNS.CopyCut.prototype.getCut = function(msg) {
 
 
 /** ****************************************************************************
- * return the file object
+ * Return the file object
+ *
+ * @return
+ *          The file object
  ******************************************************************************/
 ThreadVisNS.CopyCut.prototype.getFile = function() {
     return this.file;
@@ -135,8 +166,11 @@ ThreadVisNS.CopyCut.prototype.getFile = function() {
 
 
 /** ****************************************************************************
- * open the file
- * create streams
+ * Open the file
+ * Create streams
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.CopyCut.prototype.open = function() {
     this.ready = false;
@@ -168,7 +202,10 @@ ThreadVisNS.CopyCut.prototype.open = function() {
 
 
 /** ****************************************************************************
- * read copies and cuts from file
+ * Read copies and cuts from file
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.CopyCut.prototype.read = function() {
     if (! this.ready) {
@@ -206,7 +243,10 @@ ThreadVisNS.CopyCut.prototype.read = function() {
 
 
 /** ****************************************************************************
- * reset the file (i.e. delete)
+ * Reset the file (i.e. delete)
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.CopyCut.prototype.reset = function() {
     if (this.ready) {
@@ -224,8 +264,11 @@ ThreadVisNS.CopyCut.prototype.reset = function() {
 
 
 /** ****************************************************************************
- * write copies and cuts to file
- * write one per line
+ * Write copies and cuts to file
+ * Write one per line
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.CopyCut.prototype.write = function() {
     this.reset();

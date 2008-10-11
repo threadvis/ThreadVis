@@ -1,8 +1,14 @@
 /** ****************************************************************************
- * Scrollbar.js
+ * This file is part of ThreadVis.
+ * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
+ * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
+ * Mozilla Thunderbird Email Client" at Graz University of Technology, Austria.
  *
  * Copyright (C) 2006-2007 Alexander C. Hubmann
  * Copyright (C) 2007-2008 Alexander C. Hubmann-Haidvogel
+ *
+ * Display a simple scrollbar. Don't use normal built-in scrollbars as they are
+ * way too large for the visualisation.
  *
  * $Id$
  ******************************************************************************/
@@ -17,6 +23,15 @@ if (! window.ThreadVisNS) {
 
 /** ****************************************************************************
  * Constructor for scrollbar class
+ *
+ * @param visualisation
+ *          The main visualisation object.
+ * @param stack
+ *          The stack on which the visualisation is drawn.
+ * @param box
+ *          The main box.
+ * @return
+ *          A new scrollbar object.
  ******************************************************************************/
 ThreadVisNS.Scrollbar = function(visualisation, stack, box) {
     /**
@@ -113,6 +128,7 @@ ThreadVisNS.Scrollbar = function(visualisation, stack, box) {
             ref.panRight();
         }, 100);
     }, false);
+
     document.addEventListener("mouseup", function(event) {
         clearInterval(ref.upPanInterval);
         clearInterval(ref.downPanInterval);
@@ -133,6 +149,10 @@ ThreadVisNS.Scrollbar = function(visualisation, stack, box) {
 
 /** ****************************************************************************
  * Calculate positions of the scrollbars
+ *
+ * @return
+ *          object.x is the x-position of the horizontal scrollbar
+ *          object.y is the y-position of the vertical scrollbar
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.calculatePosition = function() {
     if (THREADVIS.SVG) {
@@ -157,12 +177,20 @@ ThreadVisNS.Scrollbar.prototype.calculatePosition = function() {
 
 
 /** ****************************************************************************
- * Calculate size of scrollbars
- * Determine if scrollbars need to be drawn
+ * Calculate size of scrollbars.
+ * Determine if scrollbars need to be drawn.
+ *
+ * @return
+ *          object.width is the width of the horizontal scrollbar
+ *          object.height is the height of the vertical scrollbar
+ *          object.hideHorizontal is true to hide the horizontal scrollbar
+ *          object.hideVertical is true to hide the vertical scrollbar
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.calculateSize = function() {
-    var width = (this.getTotalWidth() / this.getStackWidth()) * this.getScrollBarHorizontalWidth();
-    var height = (this.getTotalHeight() / this.getStackHeight()) * this.getScrollBarVerticalHeight();
+    var width = (this.getTotalWidth() / this.getStackWidth()) *
+        this.getScrollBarHorizontalWidth();
+    var height = (this.getTotalHeight() / this.getStackHeight()) *
+        this.getScrollBarVerticalHeight();
 
     if (width > this.getScrollBarHorizontalWidth()) {
         width = this.getScrollBarHorizontalWidth();
@@ -195,6 +223,9 @@ ThreadVisNS.Scrollbar.prototype.calculateSize = function() {
 
 /** ****************************************************************************
  * Draw the scrollbar
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.draw = function() {
     this.reset();
@@ -234,6 +265,9 @@ ThreadVisNS.Scrollbar.prototype.draw = function() {
 
 /** ****************************************************************************
  * Get width of horizontal scrollbar
+ *
+ * @return
+ *          The width of the horizontal scrollbar in pixel
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.getScrollBarHorizontalWidth = function() {
     return  this.boxHorizontal.boxObject.width - 2;
@@ -243,6 +277,9 @@ ThreadVisNS.Scrollbar.prototype.getScrollBarHorizontalWidth = function() {
 
 /** ****************************************************************************
  * Get vertical scrollbar height
+ *
+ * @return
+ *          The height of the vertical scrollbar in pixel
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.getScrollBarVerticalHeight = function() {
     return this.boxVertical.boxObject.height - 2;
@@ -252,6 +289,9 @@ ThreadVisNS.Scrollbar.prototype.getScrollBarVerticalHeight = function() {
 
 /** ****************************************************************************
  * Get height of stack (visualisation)
+ *
+ * @return
+ *          The height of the visualisation stack in pixel
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.getStackHeight = function() {
     if (THREADVIS.SVG) {
@@ -265,6 +305,9 @@ ThreadVisNS.Scrollbar.prototype.getStackHeight = function() {
 
 /** ****************************************************************************
  * Get width of stack (visualisation)
+ *
+ * @return
+ *          The width of the visualisation stack in pixel
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.getStackWidth = function() {
     if (THREADVIS.SVG) {
@@ -278,6 +321,9 @@ ThreadVisNS.Scrollbar.prototype.getStackWidth = function() {
 
 /** ****************************************************************************
  * Get height of viewport (box)
+ *
+ * @return
+ *          The height of the viewport in pixel
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.getTotalHeight = function() {
     return this.box.boxObject.height;
@@ -287,6 +333,9 @@ ThreadVisNS.Scrollbar.prototype.getTotalHeight = function() {
 
 /** ****************************************************************************
  * Get width of viewport (box)
+ *
+ * @return
+ *          The width of the viewport in pixel
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.getTotalWidth = function() {
     return this.box.boxObject.width;
@@ -296,6 +345,11 @@ ThreadVisNS.Scrollbar.prototype.getTotalWidth = function() {
 
 /** ****************************************************************************
  * Init height of scrollbars
+ *
+ * @param box
+ *          The box object (viewport)
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.init = function(box) {
     this.box = box;
@@ -305,6 +359,9 @@ ThreadVisNS.Scrollbar.prototype.init = function(box) {
 
 /** ****************************************************************************
  * Return true if scrollbar is shown
+ *
+ * @return
+ *          True if any scrollbar (either horizontal or vertical) is shown
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.isShown = function() {
     return this.verticalShown || this.horizontalShown;
@@ -313,7 +370,10 @@ ThreadVisNS.Scrollbar.prototype.isShown = function() {
 
 
 /** ****************************************************************************
- * Return true if scrollbar is shown
+ * Return true if vertical scrollbar is shown
+ *
+ * @return
+ *          True if the vertical scrollbar is shown, false otherwise
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.isShownVertical = function() {
     return this.verticalShown;
@@ -322,7 +382,10 @@ ThreadVisNS.Scrollbar.prototype.isShownVertical = function() {
 
 
 /** ****************************************************************************
- * Return true if scrollbar is shown
+ * Return true if horizontal scrollbar is shown
+ *
+ * @return
+ *          True if the horizontal scrollbar is show, false otherwise
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.isShownHorizontal= function() {
     return this.horizontalShown;
@@ -333,6 +396,11 @@ ThreadVisNS.Scrollbar.prototype.isShownHorizontal= function() {
 /** ****************************************************************************
  * React to mousemovement over horizontal scrollbar
  * Do actual scrolling
+ *
+ * @param event
+ *          The event object
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.onMouseMoveHorizontal = function(event) {
     if (this.panningHorizontal) {
@@ -348,6 +416,11 @@ ThreadVisNS.Scrollbar.prototype.onMouseMoveHorizontal = function(event) {
 /** ****************************************************************************
  * React to mousedown event on horizontal scrollbar
  * Start scrolling
+ *
+ * @param event
+ *          The event object
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.onMouseDownHorizontal = function(event) {
     // only react to left mousebutton
@@ -364,6 +437,11 @@ ThreadVisNS.Scrollbar.prototype.onMouseDownHorizontal = function(event) {
 /** ****************************************************************************
  * React to mouseup event on horizontal scrollbar
  * Stop scrolling
+ *
+ * @param event
+ *          The event object
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.onMouseUpHorizontal = function(event) {
     this.panningHorizontal = false;
@@ -374,6 +452,11 @@ ThreadVisNS.Scrollbar.prototype.onMouseUpHorizontal = function(event) {
 /** ****************************************************************************
  * React to mousemovement over vertical scrollbar
  * Do actual scrolling
+ *
+ * @param event
+ *          The event object
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.onMouseMoveVertical = function(event) {
     if (this.panningVertical) {
@@ -390,6 +473,11 @@ ThreadVisNS.Scrollbar.prototype.onMouseMoveVertical = function(event) {
 /** ****************************************************************************
  * React to mousedown event on vertical scrollbar
  * Start scrolling
+ *
+ * @param event
+ *          The event object
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.onMouseDownVertical = function(event) {
     if (event.button != 0) {
@@ -405,6 +493,11 @@ ThreadVisNS.Scrollbar.prototype.onMouseDownVertical = function(event) {
 /** ****************************************************************************
  * React to mouseup event on vertical scrollbar
  * Stop scrolling
+ *
+ * @param event
+ *          The event object
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.onMouseUpVertical = function(event) {
     this.panningVertical = false;
@@ -414,6 +507,10 @@ ThreadVisNS.Scrollbar.prototype.onMouseUpVertical = function(event) {
 
 /** ****************************************************************************
  * React on click on "down" button
+ * Pan vertically by one pixel
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.panDown = function() {
     this.panVertical(1);
@@ -422,7 +519,12 @@ ThreadVisNS.Scrollbar.prototype.panDown = function() {
 
 
 /** ****************************************************************************
- * Do horizontal panning by dx
+ * Do horizontal panning by dx pixel
+ *
+ * @param dx
+ *          Amount of panning in pixel
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.panHorizontal = function(dx) {
     var currentX = parseFloat(this.horizontal.style.left);
@@ -453,6 +555,10 @@ ThreadVisNS.Scrollbar.prototype.panHorizontal = function(dx) {
 
 /** ****************************************************************************
  * React on click on "left" button
+ * Pan left by one pixel
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.panLeft = function() {
     this.panHorizontal(-1);
@@ -462,6 +568,10 @@ ThreadVisNS.Scrollbar.prototype.panLeft = function() {
 
 /** ****************************************************************************
  * React on click on "right" button
+ * Pan right by one pixel
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.panRight = function() {
     this.panHorizontal(1);
@@ -471,6 +581,10 @@ ThreadVisNS.Scrollbar.prototype.panRight = function() {
 
 /** ****************************************************************************
  * React on click on "up" button
+ * Pan up by one pixel
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.panUp = function() {
     this.panVertical(-1);
@@ -479,7 +593,12 @@ ThreadVisNS.Scrollbar.prototype.panUp = function() {
 
 
 /** ****************************************************************************
- * Do vertical panning by dy
+ * Do vertical panning by dy pixel
+ *
+ * @param dy
+ *          The amount to pan in pixel
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.panVertical = function(dy) {
     var currentY = parseFloat(this.vertical.style.top);
@@ -513,6 +632,9 @@ ThreadVisNS.Scrollbar.prototype.panVertical = function(dy) {
 
 /** ****************************************************************************
  * Reset size of scrollbar to 0
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.reset = function() {
     this.vertical.style.height = "0px";
@@ -528,6 +650,9 @@ ThreadVisNS.Scrollbar.prototype.reset = function() {
  * Reset size of scrollbar to 0 on window resize.
  * Otherwise, window can't be resized to a size smaller than the
  * scrollbars.
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.resize = function() {
     this.reset();

@@ -1,7 +1,10 @@
 <?xml version="1.0"?> 
 <!--
-/* *******************************************************
- * contents.rdf
+/* *****************************************************************************
+ * This file is part of ThreadVis.
+ * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
+ * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
+ * Mozilla Thunderbird Email Client" at Graz University of Technology, Austria.
  *
  * Copyright (C) 2005-2007 Alexander C. Hubmann
  * Copyright (C) 2007-2008 Alexander C. Hubmann-Haidvogel
@@ -9,7 +12,7 @@
  * RDF file describing DE localisation
  *
  * $Id$
- ********************************************************/
+ ******************************************************************************/
 -->
 <RDF:RDF xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
          xmlns:chrome="http://www.mozilla.org/rdf/chrome#"> 

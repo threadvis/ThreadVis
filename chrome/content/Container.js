@@ -385,15 +385,6 @@ ThreadVisNS.Container.prototype.getPrevious = function() {
 
 
 /** ****************************************************************************
- * Get reply count of message of this container
- ******************************************************************************/
-ThreadVisNS.Container.prototype.getReplyCount = function() {
-    return (this.isDummy() ? 0 : this.getMessage().getReplyCount());
-}
-
-
-
-/** ****************************************************************************
  * Get simplified subject of this thread
  ******************************************************************************/
 ThreadVisNS.Container.prototype.getSimplifiedSubject = function() {
@@ -523,15 +514,6 @@ ThreadVisNS.Container.prototype.hasSiblings = function() {
  ******************************************************************************/
 ThreadVisNS.Container.prototype.isDummy = function() {
     return (this.getMessage() == null);
-}
-
-
-
-/** ****************************************************************************
- * See if this container is a reply
- ******************************************************************************/
-ThreadVisNS.Container.prototype.isReply = function() {
-    return (this.isDummy() ? false : this.getMessage().isReply());
 }
 
 

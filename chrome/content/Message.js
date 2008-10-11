@@ -1,5 +1,8 @@
 /** ****************************************************************************
- * Message.js
+ * This file is part of ThreadVis.
+ * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
+ * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
+ * Mozilla Thunderbird Email Client" at Graz University of Technology, Austria.
  *
  * Copyright (C) 2005-2007 Alexander C. Hubmann
  * Copyright (C) 2007-2008 Alexander C. Hubmann-Haidvogel
@@ -19,6 +22,25 @@ if (! window.ThreadVisNS) {
 
 /** ****************************************************************************
  * Constructor
+ *
+ * @param subject
+ *          The subject of the message
+ * @param from
+ *          The "From" address
+ * @param messageId
+ *          The message id of the email
+ * @param messageKey
+ *          The message key
+ * @param date
+ *          The date of the message
+ * @param folder
+ *          The folder of the message
+ * @param references
+ *          The "References" header
+ * @param sent
+ *          True if the message was sent
+ * @return
+ *          A new message
  ******************************************************************************/
 ThreadVisNS.Message = function(subject, from, messageId, messageKey, date,
     folder, references, sent) {
@@ -63,15 +85,6 @@ ThreadVisNS.Message = function(subject, from, messageId, messageKey, date,
     this.replyCount = 0;
 
     /**
-     * Simplified subject of message
-     * (RE: is stripped)
-     *
-     * not really needed, thunderbird strips all re: already
-     * fixxme nontheless
-     */
-    this.simplifiedSubject = subject;
-
-    /**
      * Subject of message
      */
     this.subject = subject;
@@ -81,6 +94,9 @@ ThreadVisNS.Message = function(subject, from, messageId, messageKey, date,
 
 /** ****************************************************************************
  * Get date of message
+ *
+ * @return
+ *          The date of the message
  ******************************************************************************/
 ThreadVisNS.Message.prototype.getDate = function() {
     return this.date;
@@ -90,6 +106,9 @@ ThreadVisNS.Message.prototype.getDate = function() {
 
 /** ****************************************************************************
  * Get folder message is in
+ *
+ * @return
+ *          The folder of the message
  ******************************************************************************/
 ThreadVisNS.Message.prototype.getFolder = function() {
     return this.folder;
@@ -99,6 +118,9 @@ ThreadVisNS.Message.prototype.getFolder = function() {
 
 /** ****************************************************************************
  * Get sender of message
+ *
+ * @return
+ *          The sender of the message
  ******************************************************************************/
 ThreadVisNS.Message.prototype.getFrom = function() {
     return this.from;
@@ -107,7 +129,10 @@ ThreadVisNS.Message.prototype.getFrom = function() {
 
 
 /** ****************************************************************************
- * Get sender-email of message
+ * Parse email address from "From" header
+ *
+ * @return
+ *          The parsed email address
  ******************************************************************************/
 ThreadVisNS.Message.prototype.getFromEmail = function() {
     // parse email address
@@ -122,6 +147,9 @@ ThreadVisNS.Message.prototype.getFromEmail = function() {
 
 /** ****************************************************************************
  * Get message id
+ *
+ * @return
+ *          The message id
  ******************************************************************************/
 ThreadVisNS.Message.prototype.getId = function() {
     return this.messageId;
@@ -131,6 +159,9 @@ ThreadVisNS.Message.prototype.getId = function() {
 
 /** ****************************************************************************
  * Get message key
+ *
+ * @return
+ *          The message key
  ******************************************************************************/
 ThreadVisNS.Message.prototype.getKey = function() {
     return this.messageKey;
@@ -140,6 +171,9 @@ ThreadVisNS.Message.prototype.getKey = function() {
 
 /** ****************************************************************************
  * Get references
+ *
+ * @return
+ *          The referenced header
  ******************************************************************************/
 ThreadVisNS.Message.prototype.getReferences = function() {
     return this.references;
@@ -149,6 +183,9 @@ ThreadVisNS.Message.prototype.getReferences = function() {
 
 /** ****************************************************************************
  * Get reply count of this message
+ *
+ * @return
+ *          The number of replies to this message
  ******************************************************************************/
 ThreadVisNS.Message.prototype.getReplyCount = function() {
     return this.replyCount;
@@ -157,28 +194,13 @@ ThreadVisNS.Message.prototype.getReplyCount = function() {
 
 
 /** ****************************************************************************
- * Get simplified subject
- ******************************************************************************/
-ThreadVisNS.Message.prototype.getSimplifiedSubject = function() {
-    return this.simplifiedSubject;
-}
-
-
-
-/** ****************************************************************************
  * Get original subject
+ *
+ * @return
+ *          The subject
  ******************************************************************************/
 ThreadVisNS.Message.prototype.getSubject = function() {
     return this.subject;
-}
-
-
-
-/** ****************************************************************************
- * See if this message is a reply
- ******************************************************************************/
-ThreadVisNS.Message.prototype.isReply = function() {
-    return (this.replyCount > 0);
 }
 
 
@@ -193,52 +215,12 @@ ThreadVisNS.Message.prototype.isSent = function() {
 
 
 /** ****************************************************************************
- * Get simplyfied subject of message
- * Strip all Re:
- * fixxme
- ******************************************************************************/
-/*
-private String simplifySubject(String subject)
-{
-    if (subject != null)
-    {
-        String old_subject = "";
-        while (! subject.equals(old_subject))
-        {
-            old_subject = subject;
-            // trim whitespace
-            subject = subject.trim();
-
-            // try to remove single "re:"
-            if (subject.matches("^[rR][eE]:.*"))
-            {
-                subject = subject.replaceFirst("^[rR][eE](:|\\[\\d*\\]:)", "");
-                reply_count_++;
-            }
-            // try to remove "re[?]:"
-            else if (subject.matches("^[rR][eE]\\[\\d*\\]:.*"))
-            {
-                // get integer in [?], add to reply count
-                int reply_count = Integer.parseInt(subject.replaceFirst("^[rR][eE]\\[(\\d*)\\]:.*","$1"));
-                subject = subject.replaceFirst("^[rR][eE]\\[\\d*\\]:", "");
-                reply_count_ += reply_count;
-            }
-            // "(no subject)" means "";
-            if (subject == "(no subject)")
-            {
-                subject = "";
-            }
-        }
-        return subject;
-    }
-    return "";
-}
-*/
-
-
-
-/** ****************************************************************************
  * Set if message is sent (i.e. in sent-mail folder)
+ *
+ * @param sent
+ *          True if message is a sent message
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Message.prototype.setSent = function(sent) {
     this.sent = sent;
@@ -248,6 +230,9 @@ ThreadVisNS.Message.prototype.setSent = function(sent) {
 
 /** ****************************************************************************
  * Return message as string
+ *
+ * @return
+ *          The string representation of the message
  ******************************************************************************/
 ThreadVisNS.Message.prototype.toString = function() {
     return "Message: Subject: '" + this.subject + "'. From: '" + this.from +

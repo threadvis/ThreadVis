@@ -1,5 +1,8 @@
 /** ****************************************************************************
- * Settings.js
+ * This file is part of ThreadVis.
+ * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
+ * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
+ * Mozilla Thunderbird Email Client" at Graz University of Technology, Austria.
  *
  * Copyright (C) 2005-2007 Alexander C. Hubmann
  * Copyright (C) 2007-2008 Alexander C. Hubmann-Haidvogel
@@ -16,7 +19,10 @@ var XUL_NAMESPACE = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.x
 
 
 /** ****************************************************************************
- * init the dialog, read all settings, build the account list, ...
+ * Init the dialog, read all settings, build the account list, ...
+ *
+ * @return
+ *          void
  ******************************************************************************/
 function init() {
     toggleLogging();
@@ -29,7 +35,14 @@ function init() {
 
 
 /** ****************************************************************************
- * add attachments from file objects
+ * Add attachments from file objects
+ *
+ * @param composeFields
+ *          Object to add the attachments to
+ * @param attachments
+ *          List of files to attach to the message
+ * @return
+ *          void
  ******************************************************************************/
 function addAttachments(composeFields, attachments) {
     for (key in attachments) {
@@ -48,8 +61,11 @@ function addAttachments(composeFields, attachments) {
 
 
 /** ****************************************************************************
- * build the account list
- * get all accounts, display checkbox for each
+ * Build the account list
+ * Get all accounts, display checkbox for each
+ *
+ * @return
+ *          void
  ******************************************************************************/
 function buildAccountList() {
     var accountBox = document.getElementById("enableAccounts");
@@ -107,7 +123,10 @@ function buildAccountList() {
 
 
 /** ****************************************************************************
- * create a string preference of all selected accounts
+ * Create a string preference of all selected accounts
+ *
+ * @return
+ *          void
  ******************************************************************************/
 function buildAccountPreference() {
     var accountBox = document.getElementById("enableAccounts");
@@ -148,8 +167,11 @@ function buildAccountPreference() {
 
 
 /** ****************************************************************************
- * build the cache list
- * get all accounts
+ * Build the cache list
+ * Get all accounts
+ *
+ * @return
+ *          void
  ******************************************************************************/
 function buildCacheList() {
     var accountBox = document.getElementById("cacheSelectAccountMenuPopup");
@@ -172,23 +194,19 @@ function buildCacheList() {
 
 
 
-function checkFolderType(folder) {
-    var trash = folder.flags & 0x0100;
-    var drafts = folder.flags & 0x0400;
-    var templates = folder.flags & 0x400000;
-    var junk = folder.flags & 0x40000000;
-
-    if (trash || drafts || templates || junk) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-
-
 /** ****************************************************************************
- * create checkbox elements for all folders
+ * Create checkbox elements for all folders
+ *
+ * @param box
+ *          The box to which to add the checkbox elements to
+ * @param folders
+ *          All folders for which to create checkboxes
+ * @param account
+ *          The account for which the checkboxes are created
+ * @param indent
+ *          The amount of indentation
+ * @return
+ *          void
  ******************************************************************************/
 function buildFolderCheckboxes(box, folders, account, indent) {
     var pref = document.getElementById("hiddenDisabledFolders").value;
@@ -220,7 +238,10 @@ function buildFolderCheckboxes(box, folders, account, indent) {
 
 
 /** ****************************************************************************
- * create a string preference of all selected folders
+ * Create a string preference of all selected folders
+ *
+ * @return
+ *          void
  ******************************************************************************/
 function buildFolderPreference() {
     var accountBox = document.getElementById("enableAccounts");
@@ -246,7 +267,18 @@ function buildFolderPreference() {
 
 
 /** ****************************************************************************
- * compose an email
+ * Compose an email
+ *
+ * @param to
+ *          The address to which the email should be sent
+ * @param subjet
+ *          The subject of the email
+ * @param body
+ *          The body of the email
+ * @param attachments
+ *          A list of files to attach to the email
+ * @return
+ *          void
  ******************************************************************************/
 function composeEmail(to, subject, body, attachments) {
     var msgComposeType = Components.interfaces.nsIMsgCompType;
@@ -288,7 +320,12 @@ function composeEmail(to, subject, body, attachments) {
 
 
 /** ****************************************************************************
- * get all subfolders starting from "folder" as array
+ * Get all subfolders starting from "folder" as array
+ *
+ * @param folder
+ *          The folder to check
+ * @return
+ *          An array of all subfolders
  ******************************************************************************/
 function getAllFolders(folder) {
     // Seamonkey < 2 and Thunderbird <= 2 use GetSubFolders
@@ -345,7 +382,10 @@ function getAllFolders(folder) {
 
 
 /** ****************************************************************************
- * return file objects for all logfiles
+ * Return file objects for all logfiles
+ *
+ * @return
+ *          The array of all logfiles
  ******************************************************************************/
 function getLogfiles() {
     var logfiles = new Array();
@@ -368,7 +408,12 @@ function getLogfiles() {
 
 
 /** ****************************************************************************
- * get the logger object
+ * Get the logger object
+ *
+ * @param object
+ *          A window object from which to search
+ * @return
+ *          The logger object
  ******************************************************************************/
 function getLogger(object) {
     // if no object given, assume this window
@@ -399,7 +444,12 @@ function getLogger(object) {
 
 
 /** ****************************************************************************
- * get the threadvis object
+ * Get the threadvis object
+ *
+ * @param object
+ *          A window object to start searching from
+ * @return
+ *          The threadvis object
  ******************************************************************************/
 function getThreadvis(object) {
     // if no object given, assume this window
@@ -430,7 +480,12 @@ function getThreadvis(object) {
 
 
 /** ****************************************************************************
- * open a homepage
+ * Open a homepage
+ *
+ * @param url
+ *          The URL to open
+ * @return
+ *          void
  ******************************************************************************/
 function openURL(url) {
     var uri = Components.classes["@mozilla.org/network/standard-url;1"]
@@ -445,7 +500,10 @@ function openURL(url) {
 
 
 /** ****************************************************************************
- * reset the logfiles
+ * Reset the logfiles
+ *
+ * @return
+ *          void
  ******************************************************************************/
 function resetLogfiles() {
     var logger = getLogger();
@@ -462,7 +520,10 @@ function resetLogfiles() {
 
 
 /** ****************************************************************************
- * send the logfiles to the author
+ * Send the logfiles to the author
+ *
+ * @return
+ *          void
  ******************************************************************************/
 function sendLogfiles() {
     var logfiles = getLogfiles();
@@ -473,7 +534,10 @@ function sendLogfiles() {
 
 
 /** ****************************************************************************
- * enable or disable the cache reset button
+ * Enable or disable the cache reset button
+ *
+ * @return
+ *          void
  ******************************************************************************/
 function toggleCacheSelect() {
     var menulist = document.getElementById("cacheSelectAccount");
@@ -488,7 +552,10 @@ function toggleCacheSelect() {
 
 
 /** ****************************************************************************
- * enable or disable the highlight checkbox
+ * Enable or disable the highlight checkbox
+ *
+ * @return
+ *          void
  ******************************************************************************/
 function toggleHighlight() {
     var colourRadio = document.getElementById("visualisationColourAuthor");
@@ -503,7 +570,10 @@ function toggleHighlight() {
 
 
 /** ****************************************************************************
- * enable or disable the debug checkbox
+ * Enable or disable the debug checkbox
+ *
+ * @return
+ *          void
  ******************************************************************************/
 function toggleLogging() {
     var logCheckbox = document.getElementById("doLogging");
@@ -518,7 +588,10 @@ function toggleLogging() {
 
 
 /** ****************************************************************************
- * write an email to the author
+ * Write an email to the author
+ *
+ * @return
+ *          void
  ******************************************************************************/
 function writeEmail() {
     composeEmail("ahubmann@gmail.com", "[ThreadVis] <insert subject here>", null)
@@ -527,7 +600,10 @@ function writeEmail() {
 
 
 /** ****************************************************************************
- * Reset all caches
+ * Reset cache for selected account
+ *
+ * @return
+ *          void
  ******************************************************************************/
 function resetCache() {
     var menulist = document.getElementById("cacheSelectAccount");
@@ -540,7 +616,10 @@ function resetCache() {
 
 
 /** ****************************************************************************
- * load preferences in about dialog
+ * Load preferences in about dialog
+ *
+ * @return
+ *          void
  ******************************************************************************/
 function loadAboutPreference() {
     var preferences = window.opener.THREADVIS.preferences;
@@ -558,7 +637,10 @@ function loadAboutPreference() {
 
 
 /** ****************************************************************************
- * save preferences in about dialog
+ * Save preferences in about dialog
+ *
+ * @return
+ *          void
  ******************************************************************************/
 function saveAboutSettings() {
     var disabledAccounts = document
@@ -589,7 +671,12 @@ function saveAboutSettings() {
 
 
 /** ****************************************************************************
- * select all folders for an account
+ * Select all folders for an account
+ *
+ * @param element
+ *          The account element
+ * @return
+ *          void
  ******************************************************************************/
 function selectAll(element) {
     var accountKey = element.getAttribute("accountkey");
@@ -608,7 +695,12 @@ function selectAll(element) {
 
 
 /** ****************************************************************************
- * deselect all folders for an account
+ * Deselect all folders for an account
+ *
+ * @param element
+ *          The account element
+ * @return
+ *          void
  ******************************************************************************/
 function selectNone(element) {
     var accountKey = element.getAttribute("accountkey");
@@ -622,26 +714,4 @@ function selectNone(element) {
             folderCheckbox.checked = false;
         }
     }
-}
-
-
-
-/** ****************************************************************************
- * set the timestamp when sending log files
- ******************************************************************************/
-function logRemindTimestamp() {
-    var preferences = window.opener.THREADVIS.preferences;
-    var now = String((new Date()).getTime());
-    preferences.setPreference(
-        preferences.PREF_LOGGING_EMAIL, now, preferences.PREF_STRING);
-}
-
-
-
-/** ****************************************************************************
- * send the logfiles
- ******************************************************************************/
-function logRemindEmail() {
-    sendLogfiles();
-    logRemindTimestamp();
 }

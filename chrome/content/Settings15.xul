@@ -1,14 +1,17 @@
 <?xml version="1.0"?>
 <!--
 /** ****************************************************************************
- * Settings15.xul
+ * This file is part of ThreadVis.
+ * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
+ * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
+ * Mozilla Thunderbird Email Client" at Graz University of Technology, Austria.
  *
  * Copyright (C) 2005-2007 Alexander C. Hubmann
  * Copyright (C) 2007-2008 Alexander C. Hubmann-Haidvogel
  *
- * XUL file to display settings dialog in Thunderbird 1.5
+ * XUL file to display settings dialog in Thunderbird 1.5 and up
  * We need a separate file since the format for the settings dialog
- * changed dramatically for Thunderbird 1.5
+ * changed dramatically for Thunderbird 1.5 and up
  *
  * $Id$
  ******************************************************************************/

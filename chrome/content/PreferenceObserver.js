@@ -1,5 +1,8 @@
 /** ****************************************************************************
- * PreferenceObserver.js
+ * This file is part of ThreadVis.
+ * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
+ * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
+ * Mozilla Thunderbird Email Client" at Graz University of Technology, Austria.
  *
  * Copyright (C) 2005-2007 Alexander C. Hubmann
  * Copyright (C) 2007-2008 Alexander C. Hubmann-Haidvogel
@@ -19,6 +22,9 @@ if (! window.ThreadVisNS) {
 
 /** ****************************************************************************
  * Preference observer
+ *
+ * @return
+ *          A new observer object
  ******************************************************************************/
 ThreadVisNS.PreferenceObserver = function() {
     this.PREF_BRANCH = "extensions.threadvis.";
@@ -79,7 +85,12 @@ ThreadVisNS.PreferenceObserver = function() {
 
 
 /** ****************************************************************************
- * do callbacks after preference change
+ * Do callbacks after preference change
+ *
+ * @param pref
+ *          The pref that changed
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.PreferenceObserver.prototype.doCallback = function(pref) {
     var value = this.preferences[pref];
@@ -95,7 +106,11 @@ ThreadVisNS.PreferenceObserver.prototype.doCallback = function(pref) {
 
 
 /** ****************************************************************************
- * get preference value for given preference
+ * Get preference value for given preference
+ * @param pref
+ *          The preference to get
+ * @return
+ *          The value of the preference
  ******************************************************************************/
 ThreadVisNS.PreferenceObserver.prototype.getPreference = function(pref) {
     return this.preferences[pref];
@@ -104,9 +119,19 @@ ThreadVisNS.PreferenceObserver.prototype.getPreference = function(pref) {
 
 
 /** ****************************************************************************
- * load preference
+ * Load a preference from the store
+ *
+ * @param pref
+ *          The preference to load
+ * @param typ
+ *          The type of the preference (boo, string, int)
+ * @param def
+ *          The default value
+ * @return
+ *          void
  ******************************************************************************/
-ThreadVisNS.PreferenceObserver.prototype.loadPreference = function(pref, typ, def) {
+ThreadVisNS.PreferenceObserver.prototype.loadPreference = function(pref, typ,
+    def) {
     this.preferences[pref]= def;
 
     if (this.prefBranch.getPrefType(pref) != typ) {
@@ -129,9 +154,16 @@ ThreadVisNS.PreferenceObserver.prototype.loadPreference = function(pref, typ, de
 
 
 /** ****************************************************************************
- * observe preferences changes
+ * Observe preferences changes
+ *
+ * @param subject
+ * @param topic
+ * @param data
+ * @return
+ *          void
  ******************************************************************************/
-ThreadVisNS.PreferenceObserver.prototype.observe = function(subject, topic, data) {
+ThreadVisNS.PreferenceObserver.prototype.observe = function(subject, topic,
+    data) {
     if(topic != "nsPref:changed") {
         return;
     }
@@ -144,7 +176,10 @@ ThreadVisNS.PreferenceObserver.prototype.observe = function(subject, topic, data
 
 
 /** ****************************************************************************
- * reload preferences
+ * Reload preferences
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.PreferenceObserver.prototype.preferenceReload = function() {
     this.loadPreference(this.PREF_ABOUT,
@@ -220,7 +255,10 @@ ThreadVisNS.PreferenceObserver.prototype.preferenceReload = function() {
 
 
 /** ****************************************************************************
- * Preference changing observer
+ * Register as preference changing observer
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.PreferenceObserver.prototype.register =  function() {
     var pbi = this.prefBranch
@@ -231,9 +269,17 @@ ThreadVisNS.PreferenceObserver.prototype.register =  function() {
 
 
 /** ****************************************************************************
- * register a callback hook
+ * Register a callback hook
+ *
+ * @param preference
+ *          The preference
+ * @param func
+ *          The function that has to be called if the preference value changes
+ * @return
+ *          void
  ******************************************************************************/
-ThreadVisNS.PreferenceObserver.prototype.registerCallback = function(preference, func) {
+ThreadVisNS.PreferenceObserver.prototype.registerCallback = function(preference,
+    func) {
     if (this.callback[preference]) {
         this.callback[preference].push(func);
     } else {
@@ -244,9 +290,19 @@ ThreadVisNS.PreferenceObserver.prototype.registerCallback = function(preference,
 
 
 /** ****************************************************************************
- * set preference value for given preference
+ * Set preference value for given preference
+ *
+ * @param pref
+ *          The name of the preference
+ * @param val
+ *          The value of the preference
+ * @param typ
+ *          The type of the preference
+ * @return
+ *          void
  ******************************************************************************/
-ThreadVisNS.PreferenceObserver.prototype.setPreference = function(pref, val, typ) {
+ThreadVisNS.PreferenceObserver.prototype.setPreference = function(pref, val,
+    typ) {
     this.preferences[pref] = val;
     this.storePreference(pref, typ, val);
 }
@@ -254,9 +310,19 @@ ThreadVisNS.PreferenceObserver.prototype.setPreference = function(pref, val, typ
 
 
 /** ****************************************************************************
- * load preferences
+ * Store a preference to the store
+ *
+ * @param pref
+ *          The name of the preference
+ * @param typ
+ *          The type of the preference
+ * @param val
+ *          The value of the preference
+ * @return
+ *          void
  ******************************************************************************/
-ThreadVisNS.PreferenceObserver.prototype.storePreference = function(pref, typ, val) {
+ThreadVisNS.PreferenceObserver.prototype.storePreference = function(pref, typ,
+    val) {
     this.preferences[pref]= val;
 
     switch (typ) {
@@ -275,7 +341,10 @@ ThreadVisNS.PreferenceObserver.prototype.storePreference = function(pref, typ, v
 
 
 /** ****************************************************************************
- * unregister observer
+ * Unregister observer
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.PreferenceObserver.prototype.unregister = function() {
     if(!this.prefBranch) {

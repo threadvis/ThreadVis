@@ -1,10 +1,13 @@
 /** ****************************************************************************
- * ThreadVis.js
+ * This file is part of ThreadVis.
+ * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
+ * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
+ * Mozilla Thunderbird Email Client" at Graz University of Technology, Austria.
  *
  * Copyright (C) 2005-2007 Alexander C. Hubmann
  * Copyright (C) 2007-2008 Alexander C. Hubmann-Haidvogel
  *
- * JavaScript file for Mozilla part of ThreadVis Extension
+ * Main JavaScript file.
  *
  * $Id$
  ******************************************************************************/
@@ -23,7 +26,10 @@ addEventListener("load", function() {
 
 
 /** ****************************************************************************
- * create one and only one threadvis object
+ * Create one and only one threadvis object
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.createThreadVis = function() {
     var threadvisParent = ThreadVisNS.checkForThreadVis(window);
@@ -38,6 +44,11 @@ ThreadVisNS.createThreadVis = function() {
 
 /** ****************************************************************************
  * Check all openers for threadvis
+ *
+ * @param win
+ *          The window object to check
+ * @return
+ *          A found threadvis object
  ******************************************************************************/
 ThreadVisNS.checkForThreadVis = function(win) {
     if (! win) {
@@ -62,8 +73,12 @@ ThreadVisNS.checkForThreadVis = function(win) {
 
 
 /** ****************************************************************************
- * constructor
- * threadvisparent is link to parent object (if it exists)
+ * Constructor
+ *
+ * @param threadvisparent
+ *          Link to parent object (if it exists)
+ * @return
+ *          A new ThreadVis object
  ******************************************************************************/
 ThreadVisNS.ThreadVis = function(threadvisParent) {
     this.XUL_NAMESPACE =
@@ -120,6 +135,11 @@ ThreadVisNS.ThreadVis = function(threadvisParent) {
 
 /** ****************************************************************************
  * Add a message to the threader
+ *
+ * @param header
+ *          The message to add
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.addMessage = function(header) {
     if (! this.preferences.getPreference(this.preferences.PREF_ENABLED)) {
@@ -163,9 +183,15 @@ ThreadVisNS.ThreadVis.prototype.addMessage = function(header) {
 
 
 /** ****************************************************************************
- * Callback function from extension
- * called after mouse click in extension
- * select message in mail view
+ * Callback function from extension. Called after mouse click in extension
+ * Select message in mail view.
+ *
+ * @param msgKey
+ *          The message key of the selected message
+ * @param folder
+ *          The folder of the message
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.callback = function(msgKey, folder) {
     if (! this.preferences.getPreference(this.preferences.PREF_ENABLED)) {
@@ -207,6 +233,11 @@ ThreadVisNS.ThreadVis.prototype.callback = function(msgKey, folder) {
 
 /** ****************************************************************************
  * Check if current account is enabled in extension
+ *
+ * @param folder
+ *          The folder to check
+ * @return
+ *          True if the folder/account is enabled, false if not.
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.checkEnabledAccountOrFolder = function(folder) {
     if (! folder) {
@@ -262,7 +293,10 @@ ThreadVisNS.ThreadVis.prototype.checkEnabledAccountOrFolder = function(folder) {
 
 
 /** ****************************************************************************
- * clear visualisation
+ * Clear visualisation
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.clearVisualisation = function() {
     if (this.logger.isDebug(this.logger.COMPONENT_VISUALISATION)) {
@@ -301,7 +335,10 @@ ThreadVisNS.ThreadVis.prototype.clearVisualisation = function() {
 
 
 /** ****************************************************************************
- * create threadvis xul box
+ * Create threadvis XUL box
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.createBox = function() {
     var elem = document.getElementById("ThreadVis");
@@ -311,7 +348,10 @@ ThreadVisNS.ThreadVis.prototype.createBox = function() {
 
 
 /** ****************************************************************************
- * delete threadvis xul box
+ * Delete threadvis XUL box
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.deleteBox = function() {
     var elem = document.getElementById("ThreadVis");
@@ -322,6 +362,9 @@ ThreadVisNS.ThreadVis.prototype.deleteBox = function() {
 
 /** ****************************************************************************
  * Display legend popup
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.displayLegend = function() {
     if (window.opener && window.opener.THREADVIS) {
@@ -337,6 +380,9 @@ ThreadVisNS.ThreadVis.prototype.displayLegend = function() {
 
 /** ****************************************************************************
  * Display legend popup
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.displayLegendWindow = function() {
     if (this.visualisation.disabled) {
@@ -363,7 +409,10 @@ ThreadVisNS.ThreadVis.prototype.displayLegendWindow = function() {
 
 
 /** ****************************************************************************
- * Display notes and possibly remind of sending email
+ * Display about dialog when first starting ThreadVis
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.displayAbout = function() {
     var showedAbout = this.preferences
@@ -372,25 +421,15 @@ ThreadVisNS.ThreadVis.prototype.displayAbout = function() {
         window.openDialog("chrome://threadvis/content/About.xul",
             "ThreadVisAbout", "chrome=yes,resizable=true;alwaysRaised=false,dependent=yes");
     }
-
-    // remind to send email with log files
-    // when last email is more than 3 days old
-    var lastEmail = parseInt(this.preferences
-        .getPreference(this.preferences.PREF_LOGGING_EMAIL));
-    var logging = this.preferences
-        .getPreference(this.preferences.PREF_LOGGING);
-
-    if (logging &&
-        lastEmail + 3 * 24 * 60 * 60 * 1000 < (new Date()).getTime()) {
-        window.openDialog("chrome://threadvis/content/Email.xul",
-            "ThreadVisEmail", "chrome=yes,resizable=false;alwaysRaised=false,dependent=yes");
-    }
 }
 
 
 
 /** ****************************************************************************
- * display a popup window for the visualisation
+ * Display a popup window for the visualisation
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.displayVisualisationWindow = function() {
     if (this.visualisation.disabled) {
@@ -416,6 +455,9 @@ ThreadVisNS.ThreadVis.prototype.displayVisualisationWindow = function() {
 
 /** ****************************************************************************
  * Get legend object
+ *
+ * @return
+ *          The legend object, null if it doesn't exist
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.getLegend = function() {
     if (this.popupWindow && this.popupWindow.THREADVIS) {
@@ -429,6 +471,9 @@ ThreadVisNS.ThreadVis.prototype.getLegend = function() {
 
 /** ****************************************************************************
  * Return main window object
+ *
+ * @return
+ *          The main window
 ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.getMainWindow = function() {
     var w = window;
@@ -447,6 +492,9 @@ ThreadVisNS.ThreadVis.prototype.getMainWindow = function() {
 
 /** ****************************************************************************
  * Get popup visualisation
+ *
+ * @return
+ *          The popup window, null if no popup exists
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.getPopupVisualisation = function() {
     if (this.popupWindow != null && ! this.popupWindow.closed) {
@@ -461,7 +509,10 @@ ThreadVisNS.ThreadVis.prototype.getPopupVisualisation = function() {
 
 
 /** ****************************************************************************
- * return true if popup exists, false otherwise
+ * Check if a popup visualisation exists
+ *
+ * @return
+ *          True if a popup exists, false if not
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.hasPopupVisualisation = function() {
     if (this.popupWindow != null && ! this.popupWindow.closed) {
@@ -476,7 +527,10 @@ ThreadVisNS.ThreadVis.prototype.hasPopupVisualisation = function() {
 
 
 /** ****************************************************************************
- * init object
+ * Init object
+ *
+ * @return
+ *          void
 ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.init = function() {
     if (this.threadvisParent) {
@@ -628,6 +682,9 @@ ThreadVisNS.ThreadVis.prototype.init = function() {
 
 /** ****************************************************************************
  * Delay drawing of visualisation until size of box is known
+ *
+ * @return
+ *          void
 ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.delayDrawing = function() {
     var boxSize = this.visualisation.getBoxSize();
@@ -644,7 +701,10 @@ ThreadVisNS.ThreadVis.prototype.delayDrawing = function() {
 
 
 /** ****************************************************************************
- * return true if this window is a message window
+ * Check if the current window is a message window
+ *
+ * @return
+ *          True if the current window is a message window, false if not
 ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.isMessageWindow = function() {
     if (this.threadvisParent &&
@@ -658,7 +718,10 @@ ThreadVisNS.ThreadVis.prototype.isMessageWindow = function() {
 
 
 /** ****************************************************************************
- * return true if in popup
+ * Check if this window is a popup
+ *
+ * @return
+ *          True if this window is a popup, false if not
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.isPopupVisualisation = function() {
     return document.documentElement.id == "ThreadVisPopup";
@@ -667,9 +730,19 @@ ThreadVisNS.ThreadVis.prototype.isPopupVisualisation = function() {
 
 
 /** ****************************************************************************
- * log all JavaScript errors to logfile
+ * Log all JavaScript errors to logfile
+ *
+ * @param message
+ *          The message to log
+ * @param file
+ *          The file in which the error occured
+ * @param line
+ *          The line in which the error occured
+ * @return
+ *          void
  ******************************************************************************/
-ThreadVisNS.ThreadVis.prototype.logJavaScriptErrors = function(message, file, line) {
+ThreadVisNS.ThreadVis.prototype.logJavaScriptErrors = function(message, file,
+    line) {
     THREADVIS.logger.log("threadvis-jserror", {"message": message,
         "file" : file, "line" : line});
 }
@@ -677,7 +750,16 @@ ThreadVisNS.ThreadVis.prototype.logJavaScriptErrors = function(message, file, li
 
 
 /** ****************************************************************************
- * called when a new message is saved to a folder
+ * Called when a new message is saved to a folder
+ *
+ * @param parentItem
+ *          The parent item of the message which has been added
+ * @param item
+ *          The item which has been added
+ * @param view
+ *          The view
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.onItemAdded = function(parentItem, item, view) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
@@ -706,7 +788,10 @@ ThreadVisNS.ThreadVis.prototype.onItemAdded = function(parentItem, item, view) {
 
 
 /** ****************************************************************************
- * called when popup window gets closed
+ * Called when popup window gets closed
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.onVisualisationWindowClose = function() {
     this.logger.log("popupvisualisation", {"action" : "close"});
@@ -719,6 +804,9 @@ ThreadVisNS.ThreadVis.prototype.onVisualisationWindowClose = function() {
 
 /** ****************************************************************************
  * Open the options dialog for this extension
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.openThreadVisOptionsDialog = function() {
     if (typeof(this.getMainWindow().openOptionsDialog) == "undefined") {
@@ -767,7 +855,10 @@ ThreadVisNS.ThreadVis.prototype.openThreadVisOptionsDialog = function() {
 
 
 /** ****************************************************************************
- * preference changed
+ * Preference changed
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.preferenceChanged = function() {
     this.visualisation.changed = true;
@@ -784,6 +875,9 @@ ThreadVisNS.ThreadVis.prototype.preferenceChanged = function() {
 
 /** ****************************************************************************
  * Called after user resized visualisation using splitter
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.setMinimalWidth = function() {
     var width = document.getElementById("ThreadVis").boxObject.width;
@@ -796,6 +890,11 @@ ThreadVisNS.ThreadVis.prototype.setMinimalWidth = function() {
 /** ****************************************************************************
  * Called when a message is selected
  * Call visualisation with messageid to visualise
+ *
+ * @param force
+ *          True to force display of message
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.setSelectedMessage = function(force) {
     if (! this.preferences.getPreference(this.preferences.PREF_ENABLED)) {
@@ -851,7 +950,10 @@ ThreadVisNS.ThreadVis.prototype.setSelectedMessage = function(force) {
 
 
 /** ****************************************************************************
- * close log file on unload
+ * Close log file on unload, cancel any cache updates and close databases
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.unloadHandler = function() {
     this.logger.log("threadvis", {"action": "unload"});
@@ -864,6 +966,11 @@ ThreadVisNS.ThreadVis.prototype.unloadHandler = function() {
 
 /** ****************************************************************************
  * Visualise a container
+ *
+ * @param container
+ *          The container to visualise
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.visualise = function(container) {
     if (! this.preferences.getPreference(this.preferences.PREF_ENABLED)) {
@@ -900,9 +1007,14 @@ ThreadVisNS.ThreadVis.prototype.visualise = function(container) {
 
 
 /** ****************************************************************************
- * visualise a message id
- * find the container
- * call method visualise(container)
+ * Visualise a message. Find the container. Call visualise()
+ *
+ * @param message
+ *          The message to visualise
+ * @param force
+ *          True to force the display of the visualisation
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.visualiseMessage = function(message, force) {
     if (this.visualisedMsgId == message.messageId && ! force) {
@@ -982,7 +1094,7 @@ ThreadVisNS.ThreadVis.prototype.visualiseMessage = function(message, force) {
         // - message id not found, or
         // - container with id was dummy
         // this means we somehow missed to thread this message
-        // thus, thread the whole folder we are in
+        // TODO: check this error
         if (this.popupWindow && this.popupWindow.THREADVIS) {
             this.popupWindow.THREADVIS.clearVisualisation();
         } else {
@@ -996,6 +1108,9 @@ ThreadVisNS.ThreadVis.prototype.visualiseMessage = function(message, force) {
 
 /** ****************************************************************************
  * Zoom function to call from user click
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.zoomIn = function() {
     this.visualisation.zoomIn();
@@ -1005,6 +1120,9 @@ ThreadVisNS.ThreadVis.prototype.zoomIn = function() {
 
 /** ****************************************************************************
  * Zoom function to call from user click
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.zoomOut = function() {
     this.visualisation.zoomOut();
@@ -1014,6 +1132,9 @@ ThreadVisNS.ThreadVis.prototype.zoomOut = function() {
 
 /** ****************************************************************************
  * Get the threader object
+ *
+ * @return
+ *          The shared threader
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.getThreader = function() {
     return this.threader;
@@ -1023,6 +1144,13 @@ ThreadVisNS.ThreadVis.prototype.getThreader = function() {
 
 /** ****************************************************************************
  * Set the status text in the statusbar
+ *
+ * @param text
+ *          The text to display
+ * @param tooltip
+ *          Tooltip data to display
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.setStatus = function(text, tooltip) {
     if (text != null) {
@@ -1086,6 +1214,9 @@ ThreadVisNS.ThreadVis.prototype.setStatus = function(text, tooltip) {
 
 /** ****************************************************************************
  * Disable for current folder
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.disableCurrentFolder = function() {
     // get currently displayed folder
@@ -1107,6 +1238,9 @@ ThreadVisNS.ThreadVis.prototype.disableCurrentFolder = function() {
 
 /** ****************************************************************************
  * Enable for current folder
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.enableCurrentFolder = function() {
     // get currently displayed folder

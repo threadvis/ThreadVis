@@ -1,5 +1,8 @@
 /** ****************************************************************************
- * AccountCache.js
+ * This file is part of ThreadVis.
+ * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
+ * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
+ * Mozilla Thunderbird Email Client" at Graz University of Technology, Austria.
  *
  * Copyright (C) 2008 Alexander C. Hubmann-Haidvogel
  *
@@ -19,8 +22,12 @@ if (! window.ThreadVisNS) {
 /** ****************************************************************************
  * Create cache object
  *
+ * @param cache
+ *          Link to the cache object
  * @param account
  *          The account to analyse
+ * @return
+ *          A new account cache object
  ******************************************************************************/
 ThreadVisNS.AccountCache = function(cache, account) {
     this.cache = cache;
@@ -40,6 +47,8 @@ ThreadVisNS.AccountCache = function(cache, account) {
  *
  * @param folder
  *          If folder is set, only check this folder
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.AccountCache.prototype.check = function(folder) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
@@ -82,6 +91,9 @@ ThreadVisNS.AccountCache.prototype.check = function(folder) {
 
 /** ****************************************************************************
  * Pick a folder to check
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.AccountCache.prototype.checkFolders = function() {
     var nextFolder = null;
@@ -110,6 +122,9 @@ ThreadVisNS.AccountCache.prototype.checkFolders = function() {
 
 /** ****************************************************************************
  * Called when search across all folders is done
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.AccountCache.prototype.onCheckDone = function() {
     this.working = false;
@@ -122,6 +137,9 @@ ThreadVisNS.AccountCache.prototype.onCheckDone = function() {
 
 /** ****************************************************************************
  * Called when caching across all folders is done
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.AccountCache.prototype.onCachingDone = function() {
     this.working = false;
@@ -135,6 +153,7 @@ ThreadVisNS.AccountCache.prototype.onCachingDone = function() {
 
 /** ****************************************************************************
  * Get a list of all enabled and valid folders for a root folder
+ *
  * @param folder
  *          The root folder to search
  * @return
@@ -240,6 +259,9 @@ ThreadVisNS.AccountCache.prototype.getEnabledFolders = function(folder) {
 
 /** ****************************************************************************
  * Cache  uncached messages in the account
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.AccountCache.prototype.cacheUncachedMessages = function() {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
@@ -287,8 +309,11 @@ ThreadVisNS.AccountCache.prototype.cacheUncachedMessages = function() {
 
 /** ****************************************************************************
  * Cache uncached messages in a folder
+ *
  * @param folder
  *          The folder to process
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.AccountCache.prototype.cacheUncachedMessagesInFolder = function(folder) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
@@ -312,7 +337,6 @@ ThreadVisNS.AccountCache.prototype.cacheUncachedMessagesInFolder = function(fold
         } catch (ex) {
         }
         this.notify("onProcessingDone");
-        //ref.cacheUncachedMessages();
     });
 
     try {
@@ -324,7 +348,6 @@ ThreadVisNS.AccountCache.prototype.cacheUncachedMessagesInFolder = function(fold
     } catch (ex) {
     }
 
-    //folder.cacheUncachedMessages();
     folder.processMessages();
 }
 
@@ -332,6 +355,9 @@ ThreadVisNS.AccountCache.prototype.cacheUncachedMessagesInFolder = function(fold
 
 /** ****************************************************************************
  * Cancel
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.AccountCache.prototype.cancel = function() {
     for (var i = 0; i < this.folders.length; i++) {
@@ -345,6 +371,13 @@ ThreadVisNS.AccountCache.prototype.cancel = function() {
 
 /** ****************************************************************************
  * Register for callback
+ *
+ * @param event
+ *          The event to register for
+ * @param callback
+ *          The function to callback
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.AccountCache.prototype.register = function(event, callback) {
     if (! this.callbacks[event]) {
@@ -357,6 +390,11 @@ ThreadVisNS.AccountCache.prototype.register = function(event, callback) {
 
 /** ****************************************************************************
  * Notify callbacks
+ *
+ * @param event
+ *          The event
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.AccountCache.prototype.notify = function(event) {
     if (! this.callbacks[event]) {
@@ -373,6 +411,9 @@ ThreadVisNS.AccountCache.prototype.notify = function(event) {
 
 /** ****************************************************************************
  * Get the folders
+ *
+ * @return
+ *      The folders in the account
  ******************************************************************************/
 ThreadVisNS.AccountCache.prototype.getFolders = function() {
     return this.folders;
@@ -382,6 +423,14 @@ ThreadVisNS.AccountCache.prototype.getFolders = function() {
 
 /** ****************************************************************************
  * Get the status
+ *
+ * @return
+ *          object.working
+ *              True if cache update is working
+ *          object.doneChecking:
+ *              True if check is done
+ *          object.doneCaching
+ *              True if caching is done
  ******************************************************************************/
 ThreadVisNS.AccountCache.prototype.status= function() {
     return {

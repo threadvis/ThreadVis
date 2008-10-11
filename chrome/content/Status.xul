@@ -2,11 +2,14 @@
 
 <!--
 /** ****************************************************************************
- * Status.xul
+ * This file is part of ThreadVis.
+ * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
+ * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
+ * Mozilla Thunderbird Email Client" at Graz University of Technology, Austria.
  *
  * Copyright (C) 2007-2008 Alexander C. Hubmann-Haidvogel
  *
- * XUL file to display extension status
+ * XUL file to display extension status in statusbar
  *
  * $Id: ThreadVis.xul 376 2007-05-21 20:42:31Z sascha $
  ******************************************************************************/

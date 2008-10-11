@@ -1,8 +1,13 @@
 /** ****************************************************************************
- * TimelineSVG.js
+ * This file is part of ThreadVis.
+ * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
+ * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
+ * Mozilla Thunderbird Email Client" at Graz University of Technology, Austria.
  *
  * Copyright (C) 2006-2007 Alexander C. Hubmann
  * Copyright (C) 2007-2008 Alexander C. Hubmann-Haidvogel
+ *
+ * Display a timeline in SVG format.
  *
  * $Id: TimelineSVG.js 378 2007-06-09 14:27:00Z sascha $
  ******************************************************************************/
@@ -17,8 +22,26 @@ if (! window.ThreadVisNS) {
 
 /** ****************************************************************************
  * Constructor for timeline class
+ *
+ * @param stack
+ *          The stack to display the timeline on
+ * @param strings
+ *          The strings object
+ * @param containers
+ *          An array of all containers which are displayed
+ * @param resize
+ *          The resize parameter [0..1]
+ * @param dotSize
+ *          The size of a dot
+ * @param top
+ *          The top position
+ * @param topDelta
+ *          The delta position of the timeline
+ * @return
+ *          A new timeline object
  ******************************************************************************/
-ThreadVisNS.TimelineSVG = function(stack, strings, containers, resize, dotSize, top, topDelta) {
+ThreadVisNS.TimelineSVG = function(stack, strings, containers, resize, dotSize,
+    top, topDelta) {
     /**
      * XUL stack to draw timeline on
      */
@@ -61,6 +84,9 @@ ThreadVisNS.TimelineSVG = function(stack, strings, containers, resize, dotSize, 
 
 /** ****************************************************************************
  * Draw the timeline
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.TimelineSVG.prototype.draw = function() {
     // start with second container
@@ -89,9 +115,22 @@ ThreadVisNS.TimelineSVG.prototype.draw = function() {
 
 /** ****************************************************************************
  * Draw the label and the tooltip
+ *
+ * @param container
+ *          The array of containers to draw
+ * @param left
+ *          The left position
+ * @param right
+ *          The right position
+ * @param string
+ *          The string to display
+ * @param toolTip
+ *          The tooltip (not used in SVG)
+ * @return
+ *          void
  ******************************************************************************/
-ThreadVisNS.TimelineSVG.prototype.drawTime = function(container, left, right, string,
-    toolTip) {
+ThreadVisNS.TimelineSVG.prototype.drawTime = function(container, left, right,
+    string, toolTip) {
     // check to see if we already created the label and the tooltip
     var elem = null;
     var newElem = false;
@@ -116,8 +155,6 @@ ThreadVisNS.TimelineSVG.prototype.drawTime = function(container, left, right, st
     elem.setAttribute("font-size", fontSize + "px");
     elem.setAttribute("text-anchor", "middle");
 
-//    elem.setAttribute("tooltiptext", toolTip);
-
     // and add to stack only if we just created the element
     if (newElem) {
         this.stack.appendChild(elem);
@@ -141,6 +178,11 @@ ThreadVisNS.TimelineSVG.prototype.drawTime = function(container, left, right, st
 
 /** ****************************************************************************
  * Format the time difference for the label and the tooltip
+ *
+ * @param timeDifference
+ *          The time difference in milliseconds
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.TimelineSVG.prototype.formatTime = function(timeDifference) {
     // timedifference is in miliseconds
@@ -227,6 +269,13 @@ ThreadVisNS.TimelineSVG.prototype.formatTime = function(timeDifference) {
 
 /** ****************************************************************************
  * Re-Draw the timeline
+ *
+ * @param resize
+ *          The resize parameter
+ * @param vertical
+ *          The vertical position
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.TimelineSVG.prototype.redraw = function(resize, vertical) {
     this.resize = resize;

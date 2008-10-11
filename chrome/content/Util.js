@@ -1,5 +1,8 @@
 /** ****************************************************************************
- * Util.js
+ * This file is part of ThreadVis.
+ * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
+ * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
+ * Mozilla Thunderbird Email Client" at Graz University of Technology, Austria.
  *
  * Copyright (C) 2008 Alexander C. Hubmann-Haidvogel
  *
@@ -18,6 +21,9 @@ if (! window.ThreadVisNS) {
 
 /** ****************************************************************************
  * General utility class
+ *
+ * @return
+ *          An empty object
  ******************************************************************************/
 ThreadVisNS.Util = {
 }
@@ -26,6 +32,9 @@ ThreadVisNS.Util = {
 
 /** ****************************************************************************
  * Utility class that provides background processing
+ *
+ * @return
+ *          A new processor object
  ******************************************************************************/
 ThreadVisNS.Util.Processor = function() {
     this.listener = null;
@@ -39,6 +48,12 @@ ThreadVisNS.Util.Processor = function() {
 
 /** ****************************************************************************
  * Register listener
+ *
+ * @param listener
+ *          The listener to call on events.
+ *          Must have an "onItem" and an "onFinished" method.
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Util.Processor.prototype.registerListener = function(listener) {
     this.listener = listener;
@@ -48,6 +63,11 @@ ThreadVisNS.Util.Processor.prototype.registerListener = function(listener) {
 
 /** ****************************************************************************
  * Set the list to process
+ *
+ * @param list
+ *          The array of items to process
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Util.Processor.prototype.setList = function(list) {
     this.list = list;
@@ -57,6 +77,9 @@ ThreadVisNS.Util.Processor.prototype.setList = function(list) {
 
 /** ****************************************************************************
  * Start processing
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Util.Processor.prototype.start = function() {
     this.cancelled = false;
@@ -68,6 +91,9 @@ ThreadVisNS.Util.Processor.prototype.start = function() {
 
 /** ****************************************************************************
  * Cancel processing
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Util.Processor.prototype.cancel = function() {
     this.cancelled = true;
@@ -76,7 +102,10 @@ ThreadVisNS.Util.Processor.prototype.cancel = function() {
 
 
 /** ****************************************************************************
- * Process an array of elements
+ * Process an array of elements. Call "onItem", wait for callback and continue.
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Util.Processor.prototype.process = function() {
     if (this.cancelled) {
@@ -109,6 +138,13 @@ ThreadVisNS.Util.Processor.prototype.process = function() {
 
 /** ****************************************************************************
  * Notifier utility class
+ *
+ * @param list
+ *          The array of items
+ * @param listener
+ *          The listener to notify
+ * @return
+ *          A new notifier object
  ******************************************************************************/
 ThreadVisNS.NotifyUtility = function(list, listener) {
     this.listener = listener;
@@ -117,6 +153,12 @@ ThreadVisNS.NotifyUtility = function(list, listener) {
 
 
 
+/** ****************************************************************************
+ * Start processing the list, notify item and wait for callback
+ *
+ * @return
+ *          void
+ ******************************************************************************/
 ThreadVisNS.NotifyUtility.prototype.start = function() {
     if (! this.list || this.list.length == 0) {
         this.finished();
@@ -133,6 +175,14 @@ ThreadVisNS.NotifyUtility.prototype.start = function() {
 
 
 
+/** ****************************************************************************
+ * Process callback after notification finished
+ *
+ * @param data
+ *          The data returned from the notification
+ * @return
+ *          void
+ ******************************************************************************/
 ThreadVisNS.NotifyUtility.prototype.end = function(data) {
     this.listener.onData(data);
     this.start();
@@ -140,6 +190,12 @@ ThreadVisNS.NotifyUtility.prototype.end = function(data) {
 
 
 
+/** ****************************************************************************
+ * Finished processing the list
+ *
+ * @return
+ *          void
+ ******************************************************************************/
 ThreadVisNS.NotifyUtility.prototype.finished = function() {
     this.listener.onFinished();
 }
@@ -148,6 +204,11 @@ ThreadVisNS.NotifyUtility.prototype.finished = function() {
 
 /** ****************************************************************************
  * Format remaining time to process array
+ *
+ * @param remaining
+ *          The remaining time in milliseconds
+ * @return
+ *          A formatted string
  ******************************************************************************/
 ThreadVisNS.Util.formatTimeRemaining = function(remaining) {
     // remaining is in miliseconds

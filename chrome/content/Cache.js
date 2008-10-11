@@ -1,5 +1,8 @@
 /** ****************************************************************************
- * Cache.js
+ * This file is part of ThreadVis.
+ * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
+ * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
+ * Mozilla Thunderbird Email Client" at Graz University of Technology, Austria.
  *
  * Copyright (C) 2007 Alexander C. Hubmann
  * Copyright (C) 2007-2008 Alexander C. Hubmann-Haidvogel
@@ -19,6 +22,11 @@ if (! window.ThreadVisNS) {
 
 /** ****************************************************************************
  * Create cache object
+ *
+ * @param threadvis
+ *          The threadvis object
+ * @return
+ *          A new cache object
  ******************************************************************************/
 ThreadVisNS.Cache = function(threadvis) {
     this.threadvis = threadvis;
@@ -32,6 +40,11 @@ ThreadVisNS.Cache = function(threadvis) {
 
 /** ****************************************************************************
  * Get cache array for message
+ *
+ * @param msg
+ *          The message for which to get the folder
+ * @return
+ *          The cache array of all message ids
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.getCache = function(msg) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
@@ -62,8 +75,18 @@ ThreadVisNS.Cache.prototype.getCache = function(msg) {
 
 /** ****************************************************************************
  * Get cache array for message (internal)
+ *
+ * @param msg
+ *          The message
+ * @param accountKey
+ *          The account key of the account
+ * @param references
+ *          True to also add the references
+ * @return
+ *          An array of all message ids in the thread
  ******************************************************************************/
-ThreadVisNS.Cache.prototype.getCacheInternal = function(msg, accountKey, references) {
+ThreadVisNS.Cache.prototype.getCacheInternal = function(msg, accountKey,
+    references) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "getCacheInternal", {"action" : "start"});
@@ -113,12 +136,8 @@ ThreadVisNS.Cache.prototype.getCacheInternal = function(msg, accountKey, referen
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "getCacheInternal", {"read cache" : cache});
     }
-    if (cache.length > 0) {
-        //this.addToThreaderFromCache(cache, msg.folder.rootFolder);
-    } else {
-        if (references) {
-            this.addToThreaderFromReferences(msg, accountKey);
-        }
+    if (cache.length == 0 && references) {
+        this.addToThreaderFromReferences(msg, accountKey);
     }
 
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
@@ -133,8 +152,16 @@ ThreadVisNS.Cache.prototype.getCacheInternal = function(msg, accountKey, referen
 
 /** ****************************************************************************
  * Add all messages from references to threader
+ *
+ * @param msg
+ *          The message from which to add all messages in references
+ * @param accountKey
+ *          The account key
+ * @return
+ *          void
  ******************************************************************************/
-ThreadVisNS.Cache.prototype.addToThreaderFromReferences = function(msg, accountKey) {
+ThreadVisNS.Cache.prototype.addToThreaderFromReferences = function(msg,
+    accountKey) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "addToThreaderFromReferences", {"action" : "start"});
@@ -167,8 +194,16 @@ ThreadVisNS.Cache.prototype.addToThreaderFromReferences = function(msg, accountK
 
 /** ****************************************************************************
  * Add all messages from cache to threader
+ *
+ * @param cache
+ *          The cache array of all message ids to add to the threader
+ * @param rootFolder
+ *          The root folder in which to search the message ids
+ * @return
+ *          void
  ******************************************************************************/
-ThreadVisNS.Cache.prototype.addToThreaderFromCache = function(cache, rootFolder) {
+ThreadVisNS.Cache.prototype.addToThreaderFromCache = function(cache,
+    rootFolder) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "addToThreaderFromCache", {"action" : "start"});
@@ -203,8 +238,16 @@ ThreadVisNS.Cache.prototype.addToThreaderFromCache = function(cache, rootFolder)
 
 /** ****************************************************************************
  * Search for message id in current account
+ *
+ * @param messageId
+ *          The message id to search
+ * @param rootFolder
+ *          The root folder in which to search
+ * @return
+ *          The message
  ******************************************************************************/
-ThreadVisNS.Cache.prototype.searchMessageByMsgId = function(messageId, rootFolder) {
+ThreadVisNS.Cache.prototype.searchMessageByMsgId = function(messageId,
+    rootFolder) {
     return this.searchInFolder(rootFolder, messageId);
 }
 
@@ -212,6 +255,13 @@ ThreadVisNS.Cache.prototype.searchMessageByMsgId = function(messageId, rootFolde
 
 /** ****************************************************************************
  * Search for message id in folder
+ *
+ * @param folder
+ *          The folder in which to search
+ * @param messageId
+ *          The message id to search
+ * @return
+ *          The message
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.searchInFolder = function(folder, messageId) {
     // first, search in this folder
@@ -303,6 +353,11 @@ ThreadVisNS.Cache.prototype.searchInFolder = function(folder, messageId) {
 
 /** ****************************************************************************
  * Reset all caches for all messages in account
+ *
+ * @param accountKey
+ *          The account key to reset
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.reset = function(accountKey) {
     // reset the cache for the account, i.e. delete the cache file and
@@ -316,15 +371,23 @@ ThreadVisNS.Cache.prototype.reset = function(accountKey) {
 
 /** ****************************************************************************
  * Get the connection for a specific account
+ *
+ * @param accountKey
+ *          The account key
+ * @return
+ *          The database connection
  ******************************************************************************/
-ThreadVisNS.Cache.prototype.getDatabaseConnection = function(account) {
-    return this.databaseConnections[account];
+ThreadVisNS.Cache.prototype.getDatabaseConnection = function(accountKey) {
+    return this.databaseConnections[accountKey];
 }
 
 
 
 /** ****************************************************************************
  * Open/create thread databases for all accounts
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.openDatabases = function() {
     this.databaseConnections = new Object();
@@ -344,6 +407,13 @@ ThreadVisNS.Cache.prototype.openDatabases = function() {
 
 /** ****************************************************************************
  * Open/create thread database
+ *
+ * @param accountKey
+ *          The account key
+ * @param forceRecreate
+ *          True to force a recreate of the database
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.openDatabase = function(accountKey, forceRecreate) {
     var storageService = Components.classes["@mozilla.org/storage/service;1"]
@@ -403,6 +473,11 @@ ThreadVisNS.Cache.prototype.openDatabase = function(accountKey, forceRecreate) {
 
 /** ****************************************************************************
  * Start a database transaction
+ *
+ * @param accountKey
+ *          The account key
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.beginDatabaseTransaction = function(accountKey) {
     try {
@@ -415,6 +490,11 @@ ThreadVisNS.Cache.prototype.beginDatabaseTransaction = function(accountKey) {
 
 /** ****************************************************************************
  * End a database transaction
+ *
+ * @param accountKey
+ *          The account key
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.commitDatabaseTransaction = function(accountKey) {
     try {
@@ -427,6 +507,9 @@ ThreadVisNS.Cache.prototype.commitDatabaseTransaction = function(accountKey) {
 
 /** ****************************************************************************
  * Clear in-memory data
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.clearData = function() {
     this.threadvis.getThreader().reset();
@@ -475,6 +558,7 @@ ThreadVisNS.Cache.prototype.isCached = function(msgId, accountKey) {
 /** ****************************************************************************
  * Check if any of the passed message ids exists in the database
  * if so, return the thread key
+ *
  * @param accountKey
  *          The account key to create the database connection.
  * @param messageIds
@@ -526,6 +610,7 @@ ThreadVisNS.Cache.prototype.getThreadIdsForMessageIds = function(accountKey,
 
 /** ****************************************************************************
  * Create a new thread id
+ *
  * @param accountKey
  *          The account key to create the database connection.
  * @return
@@ -596,6 +681,7 @@ ThreadVisNS.Cache.prototype.createNewThreadId = function(accountKey) {
 
 /** ****************************************************************************
  * Write thread to database
+ *
  * @param accountKey
  *          The account key to create the database connection.
  * @param threadId
@@ -605,6 +691,8 @@ ThreadVisNS.Cache.prototype.createNewThreadId = function(accountKey) {
  *          thread ids as well.
  * @param messageIds
  *          The array of message ids to add to the thread
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.storeThread = function(accountKey, threadId,
     threadIds, messageIds) {
@@ -673,6 +761,7 @@ ThreadVisNS.Cache.prototype.storeThread = function(accountKey, threadId,
 
 /** ****************************************************************************
  * Get the update timestamp for a folder
+ *
  * @param accountKey
  *          The account key to create the database connection.
  * @param folderuri
@@ -715,12 +804,15 @@ ThreadVisNS.Cache.prototype.getFolderUpdateTimestamp = function(accountKey,
 
 /** ****************************************************************************
  * Set the update timestamp for a folder
+ *
  * @param accountKey
  *          The account key to create the database connection.
  * @param folderuri
  *          The folder URI.
  * @param timestamp
  *          The timestamp to set.
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.setFolderUpdateTimestamp = function(accountKey,
     folderuri, timestamp) {
@@ -771,6 +863,9 @@ ThreadVisNS.Cache.prototype.setFolderUpdateTimestamp = function(accountKey,
 
 /** ****************************************************************************
  * Create account caches for all accounts
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.createAccountCaches = function() {
     // loop over all accounts
@@ -795,6 +890,9 @@ ThreadVisNS.Cache.prototype.createAccountCaches = function() {
 
 /** ****************************************************************************
  * Get all account caches
+ *
+ * @return
+ *          All account caches
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.getAccountCaches = function() {
     return this.accountCaches;
@@ -804,6 +902,9 @@ ThreadVisNS.Cache.prototype.getAccountCaches = function() {
 
 /** ****************************************************************************
  * Check all accounts
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.checkAllAccounts = function() {
     // TODO THIS IS BROKEN
@@ -839,6 +940,8 @@ ThreadVisNS.Cache.prototype.checkAllAccounts = function() {
  *          The accountkey to check
  * @param folder
  *          An optional folder to check. If not set, all folders are checked.
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.checkAccount = function(accountKey, folder) {
     var accountCache = this.accountCaches[accountKey];
@@ -865,11 +968,18 @@ ThreadVisNS.Cache.prototype.checkAccount = function(accountKey, folder) {
 
 /** ****************************************************************************
  * Is account enabled
+ *
+ * @param account
+ *          The account
+ * @return
+ *          True if the account is enabled
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.isAccountEnabled = function(account) {
     if (this.threadvis.preferences.getPreference(
         this.threadvis.preferences.PREF_DISABLED_ACCOUNTS) != ""
-            && this.threadvis.preferences.getPreference(this.threadvis.preferences.PREF_DISABLED_ACCOUNTS).indexOf(" " + account.key + " ") > -1) {
+            && this.threadvis.preferences.getPreference(
+                this.threadvis.preferences.PREF_DISABLED_ACCOUNTS)
+                    .indexOf(" " + account.key + " ") > -1) {
         return false;
     }
     return true;
@@ -879,20 +989,23 @@ ThreadVisNS.Cache.prototype.isAccountEnabled = function(account) {
 
 /** ****************************************************************************
  * Cancel all caching activity
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.cancel = function() {
     for (var key in this.accountCaches) {
         this.accountCaches[key].cancel();
     }
-    /*for (var i = 0; i < this.accountCaches.length; i++) {
-        this.accountCaches[i].cancel();
-    }*/
 }
 
 
 
 /** ****************************************************************************
  * Called after caching is done
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.onCacheDone = function() {
     this.notify("onCacheDone");
@@ -902,6 +1015,11 @@ ThreadVisNS.Cache.prototype.onCacheDone = function() {
 
 /** ****************************************************************************
  * Register for callback
+ *
+ * @param event
+ *          The event for which to register
+ * @param callback
+ *          The function to call
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.register = function(event, callback) {
     if (! this.callbacks[event]) {
@@ -914,6 +1032,11 @@ ThreadVisNS.Cache.prototype.register = function(event, callback) {
 
 /** ****************************************************************************
  * Notify callbacks
+ *
+ * @param event
+ *          The event to notify
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.notify = function(event) {
     if (! this.callbacks[event]) {
@@ -935,6 +1058,8 @@ ThreadVisNS.Cache.prototype.notify = function(event) {
  *          The message to cache
  * @param accountKey
  *          The account key
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.cacheMessage = function(message, accountKey) {
     // get the references header

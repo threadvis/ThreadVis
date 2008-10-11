@@ -1,5 +1,8 @@
-/* *******************************************************
- * install.js
+/* *****************************************************************************
+ * This file is part of ThreadVis.
+ * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
+ * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
+ * Mozilla Thunderbird Email Client" at Graz University of Technology, Austria.
  *
  * Copyright (C) 2005-2007 Alexander C. Hubmann
  * Copyright (C) 2007-2008 Alexander C. Hubmann-Haidvogel
@@ -7,10 +10,9 @@
  * javascript install script for mozilla
  *
  * Version: $Id$
- ********************************************************/
+ ******************************************************************************/
 
-var XpiInstaller =
-{
+var XpiInstaller = {
     // --- Editable items begin ---
     extFullName: 'ThreadVis', // The name displayed to the user (don't include the version)
     extShortName: 'threadvis', // The leafname of the JAR file (without the .jar part)
@@ -25,8 +27,7 @@ var XpiInstaller =
     profileInstall: true,
     silentInstall: false,
 
-    install: function()
-    {
+    install: function() {
         var jarName = this.extShortName + '.jar';
         var profileDir = Install.getFolder('Profile', 'chrome');
 
@@ -34,16 +35,12 @@ var XpiInstaller =
         this.parseArguments();
 
         // Check if extension is already installed in profile
-        if (File.exists(Install.getFolder(profileDir, jarName)))
-        {
-            if (!this.silentInstall)
-            {
+        if (File.exists(Install.getFolder(profileDir, jarName))) {
+            if (!this.silentInstall) {
                 Install.alert('Updating existing Profile install of ' + this.extFullName + ' to version ' + this.extVersion + '.');
             }
             this.profileInstall = true;
-        }
-        else if (!this.silentInstall)
-        {
+        } else if (!this.silentInstall) {
             // Ask user for install location, profile or browser dir?
             this.profileInstall = Install.confirm('Install ' + this.extFullName + ' ' + this.extVersion + ' to your Profile directory (OK) or your Browser directory (Cancel)?');
         }
@@ -55,8 +52,11 @@ var XpiInstaller =
 
         // Find directory to install into
         var installPath;
-        if (this.profileInstall) installPath = profileDir;
-        else installPath = Install.getFolder('chrome');
+        if (this.profileInstall) {
+            installPath = profileDir;
+        } else {
+            installPath = Install.getFolder('chrome');
+        }
 
         // Add JAR file
         Install.addFile(null, 'chrome/' + jarName, installPath, null);
@@ -65,8 +65,7 @@ var XpiInstaller =
         var defaultprefdir = Install.getFolder("Program");
         defaultprefdir = Install.getFolder(defaultprefdir, "defaults");
         defaultprefdir = Install.getFolder(defaultprefdir, "pref");
-        for (var pref in this.extDefaultPrefs)
-        {
+        for (var pref in this.extDefaultPrefs) {
             Install.addFile(null, "defaults/preferences/" + this.extDefaultPrefs[pref], defaultprefdir, null);
         }
 
@@ -78,55 +77,43 @@ var XpiInstaller =
         Install.registerChrome(Install.CONTENT | installType, jarPath, 'content/');
 
         // Register locales
-        for (var locale in this.extLocaleNames)
-        {
+        for (var locale in this.extLocaleNames) {
             var regPath = 'locale/' + this.extLocaleNames[locale] + '/';
             Install.registerChrome(Install.LOCALE | installType, jarPath, regPath);
         }
 
         // Register skins
-        for (var skin in this.extSkinNames)
-        {
+        for (var skin in this.extSkinNames) {
             var regPath = 'skin/' + this.extSkinNames[skin] + '/';
             Install.registerChrome(Install.SKIN | installType, jarPath, regPath);
         }
 
         // Perform install
         var err = Install.performInstall();
-        if (err == Install.SUCCESS || err == Install.REBOOT_NEEDED)
-        {
-            if (!this.silentInstall && this.extPostInstallMessage)
-            {
+        if (err == Install.SUCCESS || err == Install.REBOOT_NEEDED) {
+            if (!this.silentInstall && this.extPostInstallMessage) {
                 Install.alert(this.extPostInstallMessage);
             }
-        }
-        else
-        {
+        } else {
             this.handleError(err);
             return;
         }
     },
 
-    parseArguments: function()
-    {
+    parseArguments: function() {
         // Can't use string handling in install, so use if statement instead
         var args = Install.arguments;
-        if (args == 'p=0')
-        {
+        if (args == 'p=0') {
             this.profileInstall = false;
             this.silentInstall = true;
-        }
-        else if (args == 'p=1')
-        {
+        } else if (args == 'p=1') {
             this.profileInstall = true;
             this.silentInstall = true;
         }
     },
 
-    handleError: function(err)
-    {
-        if (!this.silentInstall)
-        {
+    handleError: function(err) {
+        if (!this.silentInstall) {
             Install.alert('Error: Could not install ' + this.extFullName + ' ' + this.extVersion + ' (Error code: ' + err + ')');
         }
         Install.cancelInstall(err);

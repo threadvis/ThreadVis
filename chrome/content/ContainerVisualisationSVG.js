@@ -1,5 +1,8 @@
 /** ****************************************************************************
- * ContainerVisualisationSVG.js
+ * This file is part of ThreadVis.
+ * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
+ * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
+ * Mozilla Thunderbird Email Client" at Graz University of Technology, Austria.
  *
  * Copyright (C) 2007-2008 Alexander C. Hubmann-Haidvogel
  *
@@ -18,6 +21,37 @@ if (! window.ThreadVisNS) {
 
 /** ****************************************************************************
  * Constructor for visualisation class
+ *
+ * @param stack
+ *          The stack on which to draw
+ * @param strings
+ *          The strings object
+ * @param container
+ *          The container to visualise
+ * @param colour
+ *          The colour for the container
+ * @param left
+ *          The left position
+ * @param top
+ *          The top position
+ * @param selected
+ *          True if the message is selected
+ * @param dotSize
+ *          The size of the dot
+ * @param resize
+ *          The resize parameter
+ * @param circle
+ *          True to draw a circle
+ * @param flash
+ *          True to flash
+ * @param spacing
+ *          The spacing
+ * @param opacity
+ *          The opacity
+ * @param messageCircles
+ *          True to draw circle, false to draw square
+ * @return
+ *          A new container visualisation
  ******************************************************************************/
 ThreadVisNS.ContainerVisualisationSVG = function(stack, strings, container,
     colour, left, top, selected, dotSize, resize, circle, flash, spacing,
@@ -140,8 +174,11 @@ ThreadVisNS.ContainerVisualisationSVG = function(stack, strings, container,
 
 
 /** ****************************************************************************
-* create popup menu to delete, copy and cut messages
-* just create stub menu
+ * Create popup menu to delete, copy and cut messages
+ * Just create stub menu
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ContainerVisualisationSVG.prototype.createMenu = function() {
     var menuname = "dot_popup_" + this.left;
@@ -163,7 +200,10 @@ ThreadVisNS.ContainerVisualisationSVG.prototype.createMenu = function() {
 
 
 /** ****************************************************************************
-* fill popup menu to delete, copy and cut messages
+ * Fill popup menu to delete, copy and cut messages
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ContainerVisualisationSVG.prototype.getMenu = function() {
     if (this.popup.rendered == true) {
@@ -251,7 +291,10 @@ ThreadVisNS.ContainerVisualisationSVG.prototype.getMenu = function() {
 
 /** ****************************************************************************
  * Create tooltip for container containing information about container
- * just create stub menu
+ * Just create stub menu
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ContainerVisualisationSVG.prototype.createToolTip = function() {
     if (document.getElementById("ThreadVisTooltip")) {
@@ -277,7 +320,10 @@ ThreadVisNS.ContainerVisualisationSVG.prototype.createToolTip = function() {
 
 
 /** ****************************************************************************
- * fill tooltip for container containing information about container
+ * Fill tooltip for container containing information about container
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ContainerVisualisationSVG.prototype.getToolTip = function() {
     if (this.tooltip.rendered == true) {
@@ -370,9 +416,12 @@ ThreadVisNS.ContainerVisualisationSVG.prototype.getToolTip = function() {
 
 
 /** ****************************************************************************
- * cut message
- * don't do anything until we paste the message
- * just remember which message we have to cut
+ * Cut message
+ * Don't do anything until we paste the message
+ * Just remember which message we have to cut
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ContainerVisualisationSVG.prototype.cut = function() {
     THREADVIS.copyMessage = this.container;
@@ -385,8 +434,11 @@ ThreadVisNS.ContainerVisualisationSVG.prototype.cut = function() {
 
 
 /** ****************************************************************************
- * delete the parent-child relationship for this message
+ * Delete the parent-child relationship for this message
  * (i.e. delete the reference to the parent)
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ContainerVisualisationSVG.prototype.deleteParent = function() {
     var parent = this.container.getParent();
@@ -412,6 +464,11 @@ ThreadVisNS.ContainerVisualisationSVG.prototype.deleteParent = function() {
 
 /** ****************************************************************************
  * Draw circle around container if container is selected
+ *
+ * @param colour
+ *          The colour of the circle
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ContainerVisualisationSVG.prototype.drawCircle = function(colour) {
     if (! this.circle) {
@@ -427,6 +484,9 @@ ThreadVisNS.ContainerVisualisationSVG.prototype.drawCircle = function(colour) {
 
 /** ****************************************************************************
  * Draw container around dot to catch click events and show tooltip
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ContainerVisualisationSVG.prototype.drawClick = function() {
     if (! this.click) {
@@ -462,6 +522,9 @@ ThreadVisNS.ContainerVisualisationSVG.prototype.drawClick = function() {
 
 /** ****************************************************************************
  * Draw dot for container
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ContainerVisualisationSVG.prototype.drawDot = function() {
     this.dot = document.createElementNS(THREADVIS.SVG_NAMESPACE, "circle");
@@ -475,6 +538,9 @@ ThreadVisNS.ContainerVisualisationSVG.prototype.drawDot = function() {
 
 /** ****************************************************************************
  * Flash (show and hide) circle to draw attention to selected container
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ContainerVisualisationSVG.prototype.flash = function() {
     if (this.flashCount == 0) {
@@ -492,8 +558,11 @@ ThreadVisNS.ContainerVisualisationSVG.prototype.flash = function() {
 
 /** ****************************************************************************
  * Hide circle
+ *
+ * @return
+ *          void
  ******************************************************************************/
-ThreadVisNS.ContainerVisualisationSVG.prototype.flashOff = function(old) {
+ThreadVisNS.ContainerVisualisationSVG.prototype.flashOff = function() {
     this.showCircle();
     var ref = this;
     this.flashTimeout = setTimeout(function() {ref.flash();}, 500);
@@ -503,6 +572,9 @@ ThreadVisNS.ContainerVisualisationSVG.prototype.flashOff = function(old) {
 
 /** ****************************************************************************
  * Show circle
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ContainerVisualisationSVG.prototype.flashOn = function() {
     this.hideCircle();
@@ -514,6 +586,9 @@ ThreadVisNS.ContainerVisualisationSVG.prototype.flashOn = function() {
 
 /** ****************************************************************************
  * Hide circle
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ContainerVisualisationSVG.prototype.hideCircle = function() {
     this.circle.setAttribute("display", "none");
@@ -522,8 +597,13 @@ ThreadVisNS.ContainerVisualisationSVG.prototype.hideCircle = function() {
 
 
 /** ****************************************************************************
- * mouse click event handler
- * display message user clicked on
+ * Mouse click event handler
+ * Display message user clicked on
+ *
+ * @param event
+ *          The mouse event
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ContainerVisualisationSVG.prototype.onMouseClick = function(event) {
     // only react to left mouse click
@@ -551,7 +631,10 @@ ThreadVisNS.ContainerVisualisationSVG.prototype.onMouseClick = function(event) {
 
 
 /** ****************************************************************************
- * paste a previously cut message in this thread
+ * Paste a previously cut message in this thread
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ContainerVisualisationSVG.prototype.paste = function() {
     if (THREADVIS.copyMessage) {
@@ -594,9 +677,26 @@ ThreadVisNS.ContainerVisualisationSVG.prototype.paste = function() {
 
 /** ****************************************************************************
  * Re-Draw all elements
+ *
+ * @param resize
+ *          The resize parameter
+ * @param left
+ *          The left position
+ * @param top
+ *          The top position
+ * @param selected
+ *          True if container is selected
+ * @param flash
+ *          True to flash
+ * @param colour
+ *          The colour
+ * @param opacity
+ *          The opacity
+ * @return
+ *          void
  ******************************************************************************/
-ThreadVisNS.ContainerVisualisationSVG.prototype.redraw = function(resize, left, top, selected,
-    flash, colour, opacity) {
+ThreadVisNS.ContainerVisualisationSVG.prototype.redraw = function(resize, left,
+    top, selected, flash, colour, opacity) {
     this.resize = resize;
     this.left = left;
     this.top = top;
@@ -624,6 +724,11 @@ ThreadVisNS.ContainerVisualisationSVG.prototype.redraw = function(resize, left, 
 
 /** ****************************************************************************
  * Re-Draw circle around container if container is selected
+ *
+ * @param colour
+ *          The colour
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ContainerVisualisationSVG.prototype.redrawCircle = function(colour) {
     this.visualiseCircle(colour);
@@ -633,6 +738,9 @@ ThreadVisNS.ContainerVisualisationSVG.prototype.redrawCircle = function(colour) 
 
 /** ****************************************************************************
  * Re-Draw container around dot to catch click events and show tooltip
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ContainerVisualisationSVG.prototype.redrawClick = function() {
     this.visualiseClick();
@@ -642,6 +750,9 @@ ThreadVisNS.ContainerVisualisationSVG.prototype.redrawClick = function() {
 
 /** ****************************************************************************
  * Re-Draw dot for container
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ContainerVisualisationSVG.prototype.redrawDot = function() {
     this.visualiseDot();
@@ -651,6 +762,9 @@ ThreadVisNS.ContainerVisualisationSVG.prototype.redrawDot = function() {
 
 /** ****************************************************************************
  * Show circle
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ContainerVisualisationSVG.prototype.showCircle = function() {
     this.circle.setAttribute("display", "");
@@ -660,6 +774,9 @@ ThreadVisNS.ContainerVisualisationSVG.prototype.showCircle = function() {
 
 /** ****************************************************************************
  * Flash (show and hide) circle to draw attention to selected container
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ContainerVisualisationSVG.prototype.startFlash = function() {
     this.flashCount = 3;
@@ -670,6 +787,9 @@ ThreadVisNS.ContainerVisualisationSVG.prototype.startFlash = function() {
 
 /** ****************************************************************************
  * Stop flashing
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ContainerVisualisationSVG.prototype.stopFlash = function() {
     clearInterval(this.flashInterval);
@@ -682,6 +802,11 @@ ThreadVisNS.ContainerVisualisationSVG.prototype.stopFlash = function() {
 
 /** ****************************************************************************
  * Visualise circle around container if container is selected
+ *
+ * @param colour
+ *          The colour
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ContainerVisualisationSVG.prototype.visualiseCircle = function(colour) {
     var radius = (this.dotSize * 8/6 * this.resize * 0.5);
@@ -704,6 +829,9 @@ ThreadVisNS.ContainerVisualisationSVG.prototype.visualiseCircle = function(colou
 
 /** ****************************************************************************
  * Visualise container around dot to catch click events and show tooltip
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ContainerVisualisationSVG.prototype.visualiseClick = function() {
     var radius = (this.spacing * this.resize * 0.5);
@@ -731,6 +859,9 @@ ThreadVisNS.ContainerVisualisationSVG.prototype.visualiseClick = function() {
 
 /** ****************************************************************************
  * Draw dot for container
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.ContainerVisualisationSVG.prototype.visualiseDot = function() {
     var radius = (this.dotSize * this.resize * 0.5);

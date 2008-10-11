@@ -1,10 +1,14 @@
 /** ****************************************************************************
- * References.js
+ * This file is part of ThreadVis.
+ * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
+ * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
+ * Mozilla Thunderbird Email Client" at Graz University of Technology, Austria.
  *
  * Copyright (C) 2005-2007 Alexander C. Hubmann
  * Copyright (C) 2007-2008 Alexander C. Hubmann-Haidvogel
  *
- * Wrapper for references
+ * Wrapper for references headers in email. Split message ids in header and
+ * return all referenced message ids in an array.
  *
  * $Id$
  ******************************************************************************/
@@ -19,7 +23,9 @@ if (! window.ThreadVisNS) {
 
 /** ****************************************************************************
  * Constructor
- * references == string of references
+ *
+ * @param references 
+ *          The "References" header
  ******************************************************************************/
 ThreadVisNS.References = function(references) {
     // Store message ids of references
@@ -31,7 +37,10 @@ ThreadVisNS.References = function(references) {
 
 
 /** ****************************************************************************
- * build references array
+ * Build references array
+ *
+ * @param references
+ *          The references string
  ******************************************************************************/
 ThreadVisNS.References.prototype.buildReferences = function(references) {
     if (references != null && references != "") {
@@ -63,7 +72,10 @@ ThreadVisNS.References.prototype.buildReferences = function(references) {
 
 
 /** ****************************************************************************
- * get references array
+ * Get references array. Return all references of the message as an array.
+ *
+ * @return
+ *      An array of all referenced message ids
  ******************************************************************************/
 ThreadVisNS.References.prototype.getReferences = function() {
     return this.references;
@@ -72,7 +84,10 @@ ThreadVisNS.References.prototype.getReferences = function() {
 
 
 /** ****************************************************************************
- * get string representation of object
+ * Get string representation of object
+ *
+ * @return
+ *      A string containing all referenced message ids
  ******************************************************************************/
 ThreadVisNS.References.prototype.toString = function() {;
     var string = "";

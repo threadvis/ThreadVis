@@ -1,8 +1,13 @@
 /** ****************************************************************************
- * Timeline.js
+ * This file is part of ThreadVis.
+ * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
+ * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
+ * Mozilla Thunderbird Email Client" at Graz University of Technology, Austria.
  *
  * Copyright (C) 2006-2007 Alexander C. Hubmann
  * Copyright (C) 2007-2008 Alexander C. Hubmann-Haidvogel
+ *
+ * Draw the timeline.
  *
  * $Id$
  ******************************************************************************/
@@ -17,8 +22,26 @@ if (! window.ThreadVisNS) {
 
 /** ****************************************************************************
  * Constructor for timeline class
+ *
+ * @param stack
+ *          The stack to draw the timeline on
+ * @param strings
+ *          The localised strings
+ * @param containers
+ *          An array of all containers
+ * @param resize
+ *          The resize parameter [0..1]
+ * @param dotSize
+ *          The size of a dot
+ * @param top
+ *          The top position of the timeline
+ * @param topDelta
+ *          The delta position of the timeline
+ * @return
+ *          A new timeline object
  ******************************************************************************/
-ThreadVisNS.Timeline = function(stack, strings, containers, resize, dotSize, top, topDelta) {
+ThreadVisNS.Timeline = function(stack, strings, containers, resize, dotSize,
+    top, topDelta) {
     /**
      * XUL stack to draw timeline on
      */
@@ -61,6 +84,8 @@ ThreadVisNS.Timeline = function(stack, strings, containers, resize, dotSize, top
 
 /** ****************************************************************************
  * Draw the timeline
+ *
+ * @return void
  ******************************************************************************/
 ThreadVisNS.Timeline.prototype.draw = function() {
     // start with second container
@@ -89,9 +114,22 @@ ThreadVisNS.Timeline.prototype.draw = function() {
 
 /** ****************************************************************************
  * Draw the label and the tooltip
+ *
+ * @param container
+ *          The container to draw
+ * @param left
+ *          The left position
+ * @param right
+ *          The right position
+ * @param string
+ *          The string to display
+ * @param toolTip
+ *          The tooltip to add
+ * @return
+ *          void
  ******************************************************************************/
-ThreadVisNS.Timeline.prototype.drawTime = function(container, left, right, string,
-    toolTip) {
+ThreadVisNS.Timeline.prototype.drawTime = function(container, left, right,
+    string, toolTip) {
     // check to see if we already created the label and the tooltip
     var elem = null;
     var newElem = false;
@@ -153,6 +191,9 @@ ThreadVisNS.Timeline.prototype.drawTime = function(container, left, right, strin
 
 /** ****************************************************************************
  * Format the time difference for the label and the tooltip
+ *
+ * @param timeDifference
+ *          The time difference to display
  ******************************************************************************/
 ThreadVisNS.Timeline.prototype.formatTime = function(timeDifference) {
     // timedifference is in miliseconds
@@ -239,6 +280,11 @@ ThreadVisNS.Timeline.prototype.formatTime = function(timeDifference) {
 
 /** ****************************************************************************
  * Re-Draw the timeline
+ *
+ * @param resize
+ *          The resize parameter
+ * @param top
+ *          The top position
  ******************************************************************************/
 ThreadVisNS.Timeline.prototype.redraw = function(resize, top) {
     this.resize = resize;
