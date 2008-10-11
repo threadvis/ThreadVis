@@ -19,6 +19,11 @@ if (! window.ThreadVisNS) {
 
 /** ****************************************************************************
  * Constructor
+ *
+ * @param root
+ *          True if container is the root conainer
+ * @return
+ *          A new container
  ******************************************************************************/
 ThreadVisNS.Container = function(root) {
     /**
@@ -63,6 +68,11 @@ ThreadVisNS.Container = function(root) {
  * Add child to this container
  * Removes child from old sibling list
  * Inserts child and all its children
+ *
+ * @param child
+ *          The child to add
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Container.prototype.addChild = function(child) {
     // check if child is already our child
@@ -70,29 +80,26 @@ ThreadVisNS.Container.prototype.addChild = function(child) {
     if (child.getParent() == this)
         return;
 
-    /* check to see if this container is a child of child
-     * this should never happen, because we would create a loop
-     * that's why we don't allow it
-     */
+    // check to see if this container is a child of child
+    // this should never happen, because we would create a loop
+    // that's why we don't allow it
     if (this.findParent(child)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_ERROR,
             "Container.addChild()" , {"error" : "tried to create loop"});
         return;
     }
 
-    /* remove it from old chain
-     * child.hasPrevious means that it's not the first in chain,
-     * so take it out of old chain by juggling the pointers
-     */
+    // remove it from old chain
+    // child.hasPrevious means that it's not the first in chain,
+    // so take it out of old chain by juggling the pointers
     if (child.getPrevious() != null) {
         child.getPrevious().setNext(child.getNext());
         if (child.getNext() != null) {
             child.getNext().setPrevious(child.getPrevious());
         }
     }
-    /* child has no previous, so it's the first in child list
-     * remove it by letting the parent point to the next child in list
-     */
+    // child has no previous, so it's the first in child list
+    // remove it by letting the parent point to the next child in list
     else if (child.getParent() != null) {
         child.getParent().setChild(child.getNext());
         if (child.getNext() != null) {
@@ -111,6 +118,11 @@ ThreadVisNS.Container.prototype.addChild = function(child) {
 /** ****************************************************************************
  * Inserts children into child list
  * Children have to be removed from old position first!
+ *
+ * @param child
+ *          The child to add
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Container.prototype.addChildren = function(child) {
     // we always want to be passed the first child in list
@@ -131,6 +143,11 @@ ThreadVisNS.Container.prototype.addChildren = function(child) {
 
 /** ****************************************************************************
  * Insert a container into sibling list
+ *
+ * @param sibling
+ *          The container to add as a sibling
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Container.prototype.addSibling = function(sibling) {
     if (this.hasNext()) {
@@ -147,51 +164,12 @@ ThreadVisNS.Container.prototype.addSibling = function(sibling) {
 
 
 /** ****************************************************************************
- * Low level check if tree is valid
- ******************************************************************************/
-ThreadVisNS.Container.prototype.check = function() {
-    // check if prev-next relationship holds
-    if (this.hasPrevious()) {
-        if (this.getPrevious().getNext() != this) {
-            alert("CHECK: getPrevious().getNext() did not return this");
-            alert("this:" + this);
-            alert("previous:" + this.getPrevious());
-            alert("previous.getNext():" + this.getPrevious().getNext());
-        }
-    }
-
-    if (this.hasNext()) {
-        if (this.getNext().getPrevious() != this) {
-            alert("CHECK: getNext().getPrevious() did not return this");
-            alert(this);
-            alert("this:" + this);
-            alert("next:" + this.getNext());
-            alert("next.getPrevious():" + this.getNext().getPrevious());
-        }
-    }
-
-    // check if parent relationship holds
-    if (this.hasParent()) {
-        if (this.findParent(this.getParent()) != true) {
-            alert("CHECK: getParent().findChild() did not return true");
-            alert("this: " + this);
-            alert("parent: " + this.getParent());
-        }
-    }
-
-   // check children
-   var child = this.getChild();
-   while (child != null) {
-        child.check();
-        child = child.getNext();
-    }
-}
-
-
-
-/** ****************************************************************************
- * See if this container or any of its parents
- * contains a specific container
+ * See if this container or any of its parents contains a specific container
+ *
+ * @param target
+ *          The container to find
+ * @return
+ *          True if the container is contained in the parent list, false if not
  ******************************************************************************/
 ThreadVisNS.Container.prototype.findParent = function(target) {
     var container = this.getParent();
@@ -211,6 +189,9 @@ ThreadVisNS.Container.prototype.findParent = function(target) {
 
 /** ****************************************************************************
  * Get first child in child list
+ *
+ * @return
+ *          Return the first child
  ******************************************************************************/
 ThreadVisNS.Container.prototype.getChild = function() {
     return this.child;
@@ -220,6 +201,9 @@ ThreadVisNS.Container.prototype.getChild = function() {
 
 /** ****************************************************************************
  * Get child count
+ *
+ * @return
+ *          The number of children
  ******************************************************************************/
 ThreadVisNS.Container.prototype.getChildCount = function() {
     var count = 0;
@@ -234,7 +218,10 @@ ThreadVisNS.Container.prototype.getChildCount = function() {
 
 
 /** ****************************************************************************
- * return at which position child is in child list
+ * Return at which position child is in child list
+ *
+ * @return
+ *          The position of the child in the child list
  ******************************************************************************/
 ThreadVisNS.Container.prototype.getChildPosition = function(child) {
     var count = 0;
@@ -253,6 +240,9 @@ ThreadVisNS.Container.prototype.getChildPosition = function(child) {
 
 /** ****************************************************************************
  * Get all children of this container as array
+ *
+ * @return
+ *          All children of the current container, recursively
  ******************************************************************************/
 ThreadVisNS.Container.prototype.getChildren = function() {
     var containers = new Array();
@@ -269,6 +259,9 @@ ThreadVisNS.Container.prototype.getChildren = function() {
 
 /** ****************************************************************************
  * Get recursive container count
+ *
+ * @return
+ *          The number of all children, counted recursively
  ******************************************************************************/
 ThreadVisNS.Container.prototype.getCountRecursive = function() {
     var count = 1;
@@ -284,6 +277,9 @@ ThreadVisNS.Container.prototype.getCountRecursive = function() {
 
 /** ****************************************************************************
  * Get date of message
+ *
+ * @return
+ *          The date of the message
  ******************************************************************************/
 ThreadVisNS.Container.prototype.getDate = function() {
     if (! this.isDummy()) {
@@ -304,6 +300,9 @@ ThreadVisNS.Container.prototype.getDate = function() {
 
 /** ****************************************************************************
  * Get depth of message in tree
+ *
+ * @return
+ *          The generational depth of the message
  ******************************************************************************/
 ThreadVisNS.Container.prototype.getDepth = function() {
     if (this.hasParent()) {
@@ -321,6 +320,9 @@ ThreadVisNS.Container.prototype.getDepth = function() {
 
 /** ****************************************************************************
  * Get first dummy child
+ *
+ * @return
+ *          The first dummy child, null if none exists
  ******************************************************************************/
 ThreadVisNS.Container.prototype.getDummy = function() {
     var container = null;
@@ -337,6 +339,9 @@ ThreadVisNS.Container.prototype.getDummy = function() {
 
 /** ****************************************************************************
  * Get last sibling in list
+ *
+ * @return
+ *          The last sibling
  ******************************************************************************/
 ThreadVisNS.Container.prototype.getLast = function() {
     var current = this;
@@ -350,6 +355,9 @@ ThreadVisNS.Container.prototype.getLast = function() {
 
 /** ****************************************************************************
  * Get next sibling in list
+ *
+ * @return
+ *          The next container in the sibling list
  ******************************************************************************/
 ThreadVisNS.Container.prototype.getNext = function() {
     return this.next;
@@ -359,6 +367,9 @@ ThreadVisNS.Container.prototype.getNext = function() {
 
 /** ****************************************************************************
  * Get message of this container
+ *
+ * @return
+ *          The message
  ******************************************************************************/
 ThreadVisNS.Container.prototype.getMessage = function() {
     return this.message;
@@ -367,7 +378,10 @@ ThreadVisNS.Container.prototype.getMessage = function() {
 
 
 /** ****************************************************************************
- * Set parent of this container
+ * Get parent of this container
+ *
+ * @return
+ *          The parent of the message
  ******************************************************************************/
 ThreadVisNS.Container.prototype.getParent = function() {
     return this.parent;
@@ -377,6 +391,9 @@ ThreadVisNS.Container.prototype.getParent = function() {
 
 /** ****************************************************************************
  * Get previous sibling in list
+ *
+ * @return
+ *          The previous sibling in the list
  ******************************************************************************/
 ThreadVisNS.Container.prototype.getPrevious = function() {
     return this.previous;
@@ -385,22 +402,10 @@ ThreadVisNS.Container.prototype.getPrevious = function() {
 
 
 /** ****************************************************************************
- * Get simplified subject of this thread
- ******************************************************************************/
-ThreadVisNS.Container.prototype.getSimplifiedSubject = function() {
-    if (! this.isDummy()) {
-        return this.getMessage().getSimplifiedSubject();
-    } else if (this.hasChild()) {
-        return this.getChild().getSimplifiedSubject();
-    } else {
-        return "";
-    }
-}
-
-
-
-/** ****************************************************************************
  * Get subject of message of this thread
+ *
+ * @return
+ *          The subject of the thread (i.e. the subject of the first message)
  ******************************************************************************/
 ThreadVisNS.Container.prototype.getSubject = function() {
     if (! this.isDummy()) {
@@ -416,6 +421,9 @@ ThreadVisNS.Container.prototype.getSubject = function() {
 
 /** ****************************************************************************
  * Get topmost container that is not the root container
+ *
+ * @return
+ *          The topmost container of the thread
  ******************************************************************************/
 ThreadVisNS.Container.prototype.getTopContainer = function() {
     if (this.hasParent()) {
@@ -432,6 +440,9 @@ ThreadVisNS.Container.prototype.getTopContainer = function() {
 
 /** ****************************************************************************
  * See if this container has at least 1 child
+ *
+ * @return
+ *          True if the container has a child container
  ******************************************************************************/
 ThreadVisNS.Container.prototype.hasChild = function() {
     return (this.getChild() != null);
@@ -441,6 +452,9 @@ ThreadVisNS.Container.prototype.hasChild = function() {
 
 /** ****************************************************************************
  * See if this container contains at least 2 children
+ *
+ * @return
+ *          True if the container has at least two children
  ******************************************************************************/
 ThreadVisNS.Container.prototype.hasChildren = function() {
     return (this.hasChild() ? this.getChild().hasSiblings() : false);
@@ -450,6 +464,9 @@ ThreadVisNS.Container.prototype.hasChildren = function() {
 
 /** ****************************************************************************
  * See if this container has a dummy child
+ *
+ * @return
+ *          True if the container has a dummy child
  ******************************************************************************/
 ThreadVisNS.Container.prototype.hasDummy = function() {
     var container = null;
@@ -466,6 +483,9 @@ ThreadVisNS.Container.prototype.hasDummy = function() {
 
 /** ****************************************************************************
  * See if we have a next sibling in list
+ *
+ * @return
+ *          True if the container has a next sibling in the list
  ******************************************************************************/
 ThreadVisNS.Container.prototype.hasNext = function() {
     return (this.getNext() != null);
@@ -475,6 +495,9 @@ ThreadVisNS.Container.prototype.hasNext = function() {
 
 /** ****************************************************************************
  * See if this container has exactly 1 child
+ *
+ * @return
+ *          True if the container has exactly one child
  ******************************************************************************/
 ThreadVisNS.Container.prototype.hasOneChild = function() {
     return (this.hasChild() ? (! this.getChild().hasNext()) : false);
@@ -484,6 +507,9 @@ ThreadVisNS.Container.prototype.hasOneChild = function() {
 
 /** ****************************************************************************
  * See if this container has a parent
+ *
+ * @return
+ *          True if the container has a parent container
  ******************************************************************************/
 ThreadVisNS.Container.prototype.hasParent = function() {
     return (this.getParent() != null);
@@ -493,6 +519,9 @@ ThreadVisNS.Container.prototype.hasParent = function() {
 
 /** ****************************************************************************
  * See if we have a previous sibling in list
+ *
+ * @return
+ *          True if the container has a previous sibling in the list
  ******************************************************************************/
 ThreadVisNS.Container.prototype.hasPrevious = function() {
     return (this.getPrevious() != null);
@@ -502,6 +531,9 @@ ThreadVisNS.Container.prototype.hasPrevious = function() {
 
 /** ****************************************************************************
  * See if we have other containers in sibling list
+ *
+ * @return
+ *          True if the container has any siblings
  ******************************************************************************/
 ThreadVisNS.Container.prototype.hasSiblings = function() {
     return (this.hasNext() || this.hasPrevious());
@@ -511,6 +543,10 @@ ThreadVisNS.Container.prototype.hasSiblings = function() {
 
 /** ****************************************************************************
  * See if this container contains a message
+ *
+ * @return
+ *          True if the container is a dummy container
+ *          (i.e. contains no message)
  ******************************************************************************/
 ThreadVisNS.Container.prototype.isDummy = function() {
     return (this.getMessage() == null);
@@ -519,7 +555,10 @@ ThreadVisNS.Container.prototype.isDummy = function() {
 
 
 /** ****************************************************************************
- * Return if this container is the topmost container
+ * Return if this container is the top most container
+ *
+ * @return
+ *          True if this container is the root container
  ******************************************************************************/
 ThreadVisNS.Container.prototype.isRoot = function() {
     return this.root;
@@ -530,6 +569,9 @@ ThreadVisNS.Container.prototype.isRoot = function() {
 /** ****************************************************************************
  * Return if this container is a top container
  * (topmost container that is not the root container)
+ *
+ * @return
+ *          True if this container is the first container in a thread
  ******************************************************************************/
 ThreadVisNS.Container.prototype.isTopContainer = function() {
     if (this.hasParent()) {
@@ -546,6 +588,13 @@ ThreadVisNS.Container.prototype.isTopContainer = function() {
  * Merge container into this container
  * add children as this children
  * set message as this message
+ *
+ * @param dummy
+ *          The dummy container into which to merge the child
+ * @param child
+ *          The child container to merge
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Container.prototype.mergeChild = function(dummy, child) {
     dummy.addChildren(child.getChild());
@@ -556,20 +605,20 @@ ThreadVisNS.Container.prototype.mergeChild = function(dummy, child) {
 
 /** ****************************************************************************
  * Prune empty containers in this container
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Container.prototype.pruneEmptyContainers = function() {
-    /* 4. Prune empty containers
-     * prune if this container is dummy (empty)
-     * and does not have a child and has a parent
-     */
+    // 4. Prune empty containers
+    // prune if this container is dummy (empty)
+    // and does not have a child and has a parent
     if (this.isDummy() && (! this.hasChild()) && this.hasParent()) {
         this.getParent().removeChild(this);
     }
-    /*
-     * do not prune if is dummy and has one child, because
-     * then we lose information about missing messages
-     *
-     */
+
+     // do not prune if is dummy and has one child, because
+     // then we lose information about missing messages
 
     var container = null;
     for (container = this.getChild(); container != null;
@@ -582,6 +631,9 @@ ThreadVisNS.Container.prototype.pruneEmptyContainers = function() {
 
 /** ****************************************************************************
  * Unlink all children
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Container.prototype.removeChildren = function() {
     this.removeChild();
@@ -591,6 +643,11 @@ ThreadVisNS.Container.prototype.removeChildren = function() {
 
 /** ****************************************************************************
  * Remove a child from the list
+ *
+ * @param child
+ *          The child container to remove
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Container.prototype.removeChild = function(child) {
     // check if child is in fact our child
@@ -598,9 +655,8 @@ ThreadVisNS.Container.prototype.removeChild = function(child) {
         return;
     }
 
-    /* if child is the first in list, we can remove it
-     * by setting the next child in list as first
-     */
+    // if child is the first in list, we can remove it
+    // by setting the next child in list as first
     if (this.getChild() == child) {
         this.setChild(child.getNext());
         
@@ -612,9 +668,8 @@ ThreadVisNS.Container.prototype.removeChild = function(child) {
         child.removePrevious();
         child.removeNext();
     }
-    /* otherwise we have to look it up in child list
-     * and do some pointer juggling
-     */
+    // otherwise we have to look it up in child list
+    // and do some pointer juggling
     else {
         if (child.hasPrevious()) {
             child.getPrevious().setNext(child.getNext());
@@ -634,6 +689,9 @@ ThreadVisNS.Container.prototype.removeChild = function(child) {
 
 /** ****************************************************************************
  * Unlink next sibling in list
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Container.prototype.removeNext = function() {
     this.setNext(null);
@@ -643,6 +701,9 @@ ThreadVisNS.Container.prototype.removeNext = function() {
 
 /** ****************************************************************************
  * Unlink parent
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Container.prototype.removeParent = function() {
     this.setParent(null);
@@ -652,6 +713,9 @@ ThreadVisNS.Container.prototype.removeParent = function() {
 
 /** ****************************************************************************
  * Unlink previous sibling in list
+ *
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Container.prototype.removePrevious = function() {
     this.setPrevious(null);
@@ -661,6 +725,11 @@ ThreadVisNS.Container.prototype.removePrevious = function() {
 
 /** ****************************************************************************
  * Set first child in list
+ *
+ * @param child
+ *          The child to set
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Container.prototype.setChild = function(child) {
     this.child = child;
@@ -670,6 +739,11 @@ ThreadVisNS.Container.prototype.setChild = function(child) {
 
 /** ****************************************************************************
  * Set next sibling in list
+ *
+ * @param next
+ *          The container to set
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Container.prototype.setNext = function(next) {
     this.next = next;
@@ -679,6 +753,11 @@ ThreadVisNS.Container.prototype.setNext = function(next) {
 
 /** ****************************************************************************
  * Set message of this container
+ *
+ * @param message
+ *          The message to set
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Container.prototype.setMessage = function(message) {
     this.message = message;
@@ -688,6 +767,11 @@ ThreadVisNS.Container.prototype.setMessage = function(message) {
 
 /** ****************************************************************************
  * Set parent of this container
+ *
+ * @param parent
+ *          The parent container
+ * @return
+ *          void
  ******************************************************************************/
 ThreadVisNS.Container.prototype.setParent = function(parent) {
     this.parent = parent;
@@ -697,8 +781,16 @@ ThreadVisNS.Container.prototype.setParent = function(parent) {
 
 /** ****************************************************************************
  * Set parent for all containers in list
+ *
+ * @param sibling
+ *          The first sibling in the list
+ * @param parent
+ *          The parent to set
+ * @return
+ *          void
  ******************************************************************************/
-ThreadVisNS.Container.prototype.setParentForContainer = function(sibling, parent) {
+ThreadVisNS.Container.prototype.setParentForContainer = function(sibling,
+    parent) {
     var container = null;
     for (container = sibling; container != null;
         container = container.getNext()) {
@@ -710,6 +802,11 @@ ThreadVisNS.Container.prototype.setParentForContainer = function(sibling, parent
 
 /** ****************************************************************************
  * Set previous sibling in list
+ *
+ * @param prev
+ *          The previous container
+ * @return
+ *          void
   ******************************************************************************/
 ThreadVisNS.Container.prototype.setPrevious = function(prev) {
     this.previous = prev;
@@ -719,6 +816,14 @@ ThreadVisNS.Container.prototype.setPrevious = function(prev) {
 
 /** ****************************************************************************
  * Sort function for sorting javascript array
+ * Sort by date, but never sort child before parent
+ *
+ * @param one
+ *          The first container
+ * @param two
+ *          The second container
+ * @return
+ *          -1 to sort one before two, +1 to sort two before one
  ******************************************************************************/
 function Container_sortFunction(one, two) {
     // just to be sure, we never want to sort a child
@@ -749,6 +854,11 @@ function Container_sortFunction(one, two) {
 
 /** ****************************************************************************
  * Output string representation of this container
+ *
+ * @param prefix
+ *          The prefix
+ * @return
+ *          The string representation
  ******************************************************************************/
 ThreadVisNS.Container.prototype.toString = function(prefix) {
     if (prefix == null) {
@@ -780,6 +890,9 @@ ThreadVisNS.Container.prototype.toString = function(prefix) {
 
 /** ****************************************************************************
  * Output string representation of this container
+ *
+ * @return
+ *          A string representation
  ******************************************************************************/
 ThreadVisNS.Container.prototype.toStringThread = function() {
     if (! this.isDummy()) {
@@ -795,6 +908,9 @@ ThreadVisNS.Container.prototype.toStringThread = function() {
 
 /** ****************************************************************************
  * Get string cache
+ *
+ * @return
+ *          An array of all message ids in the container
  ******************************************************************************/
 ThreadVisNS.Container.prototype.getCache = function() {
     var cache = [];

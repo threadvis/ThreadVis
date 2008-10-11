@@ -16,6 +16,9 @@
 
 /** ****************************************************************************
  * Clear the legend box
+ *
+ * @return
+ *          void
  ******************************************************************************/
 function clearLegend() {
     var legendBox = document.getElementById("LegendContent");
@@ -28,6 +31,9 @@ function clearLegend() {
 
 /** ****************************************************************************
  * Display the legend
+ *
+ * @return
+ *          void
  ******************************************************************************/
 function displayLegend() {
     clearLegend();
