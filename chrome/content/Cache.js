@@ -580,6 +580,7 @@ ThreadVisNS.Cache.prototype.getThreadIdsForMessageIds = function(accountKey,
 
     var count = 0;
     var threadIds = [];
+    var duplicates = {};
     try {
         for (var i = 0; i < messageIds.length; i++) {
             count++;
@@ -587,7 +588,10 @@ ThreadVisNS.Cache.prototype.getThreadIdsForMessageIds = function(accountKey,
             if (statement.executeStep()) {
                 var threadId = statement.getInt32(0);
                 if (threadId) {
-                    threadIds.push(threadId);
+                    if (! duplicates[threadId]) {
+                        threadIds.push(threadId);
+                        duplicates[threadId] = true;
+                    }
                 }
             }
             statement.reset();
@@ -742,19 +746,18 @@ ThreadVisNS.Cache.prototype.storeThread = function(accountKey, threadId,
     // for all message ids in the cache, write to database
     statement = connection.createStatement(
         "INSERT INTO threads (msgid, threadid) VALUES (?, ?)");
-    try {
-        var msgId = null;
-        for (var i = 0; i < messageIds.length; i++) {
+    var msgId = null;
+    for (var i = 0; i < messageIds.length; i++) {
+        try {
             statement.bindStringParameter(0, messageIds[i]);
             statement.bindInt32Parameter(1, threadId);
             statement.execute();
+        } catch (ex) {
+            // ignore any exceptions, as we might insert message ids multiple times
         }
-    } catch (ex) {
-        // ignore any exceptions, as we might insert message ids multiple times
-    } finally {
-        statement.reset();
-        statement = null;
     }
+    statement.reset();
+    statement = null;
 }
 
 
@@ -1068,7 +1071,6 @@ ThreadVisNS.Cache.prototype.cacheMessage = function(message, accountKey) {
     // TODO also evaluate in-reply-to header!
     messageIds = messageIds.concat((new ThreadVisNS.References(
         message.getStringProperty("references"))).getReferences());
-
     // try to get existing thread ids for any of the message-ids in references
     var threadIds = this.getThreadIdsForMessageIds(accountKey, messageIds);
 
