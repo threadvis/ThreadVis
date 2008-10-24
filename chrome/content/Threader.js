@@ -426,7 +426,6 @@ ThreadVisNS.Threader.prototype.thread = function() {
     // close copy/cut database
     this.copycut.close();
     THREADVIS.setStatus("");
-    this.logInfo();
 }
 
 
