@@ -615,8 +615,9 @@ ThreadVisNS.ThreadVis.prototype.init = function() {
         this.delayDrawing();
         return;
     } else {
-        if (! this.threader)
-            this.threader= new ThreadVisNS.Threader();
+        if (! this.threader) {
+            this.threader= new ThreadVisNS.Threader(this.cache);
+        }
     }
 
     /* ************************************************************************
@@ -958,7 +959,6 @@ ThreadVisNS.ThreadVis.prototype.setSelectedMessage = function(force) {
 ThreadVisNS.ThreadVis.prototype.unloadHandler = function() {
     this.logger.log("threadvis", {"action": "unload"});
     this.logger.close();
-    this.threader.closeCopyCut();
     this.cache.cancel();
 }
 
@@ -1042,9 +1042,19 @@ ThreadVisNS.ThreadVis.prototype.visualiseMessage = function(message, force) {
             THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_WARNING,
                 "visualise", {"action" : "message not in threader, getting from cache"});
         }
+        var server = message.folder.server;
+        var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
+            .getService(Components.interfaces.nsIMsgAccountManager))
+            .FindAccountForServer(server);
+        var accountKey = account.key;
+        account = null;
+        delete account;
+        server = null;
+        delete server;
+
         cache = this.cache.getCache(message);
         this.cache.addToThreaderFromCache(cache, message.folder.rootFolder);
-        this.getThreader().thread();
+        this.getThreader().thread(accountKey);
         container = this.getThreader().findContainer(message.messageId);
     }
 

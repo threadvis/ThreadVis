@@ -495,7 +495,19 @@ ThreadVisNS.ContainerVisualisation.prototype.deleteParent = function() {
     var parentmsgid = ! parent.isDummy() ? parent.getMessage().getId() : "";
 
     if (msgid != "" && parentmsgid != "") {
-        THREADVIS.threader.copycut.addCut(msgid + " " + parentmsgid);
+        // get the account key for the message
+        var folder = THREADVIS.getMainWindow().GetLoadedMsgFolder();
+        var server = folder.server;
+        var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
+            .getService(Components.interfaces.nsIMsgAccountManager))
+            .FindAccountForServer(server);
+        var accountKey = account.key;
+        account = null;
+        delete account;
+        server = null;
+        delete server;
+
+        THREADVIS.cache.addCut(accountKey, msgid, parentmsgid);
         THREADVIS.setSelectedMessage(true);
 
         THREADVIS.logger.log("copycut", {"action" : "deletemessage",
@@ -708,7 +720,6 @@ ThreadVisNS.ContainerVisualisation.prototype.onMouseClickDelayed = function(even
 ThreadVisNS.ContainerVisualisation.prototype.paste = function() {
     if (THREADVIS.copyMessage) {
         // check to see if user creates a loop
-        //if (THREADVIS.copyMessage.findChild(this.container)) {
         if (this.container.findParent(THREADVIS.copyMessage)) {
             alert("Action not allowed. This would create a loop.");
             return;
@@ -734,10 +745,21 @@ ThreadVisNS.ContainerVisualisation.prototype.paste = function() {
         }
 
         if (thisMsgid != "" && copyMessageMsgid != "") {
-            THREADVIS.threader.copycut.addCut(copyMessageMsgid + " "
-                + copyMessageParentMsgid);
-            THREADVIS.threader.copycut.addCopy(copyMessageMsgid + " "
-                + thisMsgid);
+            var folder = THREADVIS.getMainWindow().GetLoadedMsgFolder();
+            // get the account key for the message
+            var server = folder.server;
+            var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
+                .getService(Components.interfaces.nsIMsgAccountManager))
+                .FindAccountForServer(server);
+            var accountKey = account.key;
+            account = null;
+            delete account;
+            server = null;
+            delete server;
+
+            THREADVIS.cache.addCut(accountKey,
+                copyMessageMsgid, copyMessageParentMsgid);
+            THREADVIS.cache.addCopy(accountKey, copyMessageMsgid, thisMsgid);
             THREADVIS.setSelectedMessage(true);
 
             THREADVIS.logger.log("copycut", {"action" : "pastemessage",

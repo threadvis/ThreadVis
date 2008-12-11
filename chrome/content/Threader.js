@@ -27,10 +27,12 @@ if (! window.ThreadVisNS) {
 /** ****************************************************************************
  * Constructor
  *
+ * @param cache
+ *          The cache to look up copy/cuts in
  * @return
  *          A new threader object
  ******************************************************************************/
-ThreadVisNS.Threader = function() {
+ThreadVisNS.Threader = function(cache) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_THREADER)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Threader()", {});
@@ -46,8 +48,10 @@ ThreadVisNS.Threader = function() {
      */
     this.messages = new Object();
 
-    // copy/cut object
-    this.copycut = new ThreadVisNS.CopyCut();
+    /**
+     * The cache to look up copy/cuts in
+     */
+    this.cache = cache;
 }
 
 
@@ -101,20 +105,6 @@ ThreadVisNS.Threader.prototype.addMessageDetail = function(subject, author, mess
 
 
 /** ****************************************************************************
- * Close the copy/cut file (but write info first)
- * TODO move this to a database file!
- *
- * @return
- *          void
- ******************************************************************************/
-ThreadVisNS.Threader.prototype.closeCopyCut = function() {
-    this.copycut.write();
-    this.copycut.close();
-}
-
-
-
-/** ****************************************************************************
  * Find a message
  *
  * @return messageId
@@ -136,10 +126,12 @@ ThreadVisNS.Threader.prototype.findContainer = function(messageId) {
 /** ****************************************************************************
  * Put all messages in a container
  *
+ * @param accountKey
+ *          The account key in which to thread
  * @return
  *          void
  ******************************************************************************/
-ThreadVisNS.Threader.prototype.putMessagesInContainer = function() {
+ThreadVisNS.Threader.prototype.putMessagesInContainer = function(accountKey) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_THREADER)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
             "Threader.putMessagesInContainer()", {"action" : 
@@ -151,7 +143,7 @@ ThreadVisNS.Threader.prototype.putMessagesInContainer = function() {
         count++;
         var message = this.messages[id];
         this.totalMessages++;
-        this.putMessageInContainer(message);
+        this.putMessageInContainer(message, accountKey);
     }
 
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_THREADER)) {
@@ -173,10 +165,13 @@ ThreadVisNS.Threader.prototype.putMessagesInContainer = function() {
  *
  * @param message
  *          The message to put into a container
+ * @param accountKey
+ *          The account key in which to thread
  * @return
  *          void
  ******************************************************************************/
-ThreadVisNS.Threader.prototype.putMessageInContainer = function(message) {
+ThreadVisNS.Threader.prototype.putMessageInContainer = function(message,
+    accountKey) {
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_THREADER)) {
         THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO, 
             "Threader.putMessageInContainer()", {"looking at" : message});
@@ -286,7 +281,7 @@ ThreadVisNS.Threader.prototype.putMessageInContainer = function(message) {
             ! referenceContainer.findParent(parentReferenceContainer)) {
             // check if this reference is overridden by a cut
             // (i.e. thread is split by user)
-            if (this.copycut.getCut(referenceId) == parentReferenceId) {
+            if (this.cache.getCut(accountKey, referenceId) == parentReferenceId) {
                 if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_THREADER)) {
                     THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
                         "Threader.putMessageInContainer()", 
@@ -335,7 +330,8 @@ ThreadVisNS.Threader.prototype.putMessageInContainer = function(message) {
     // get copy
     // check if user added a new reference, if so, add us to this parent
     // previous relation should have been taken care of by a cut
-    var copyId = this.copycut.getCopy(message.getId());
+    var copyId = this.cache.getCopy(accountKey, message.getId());
+
     if (copyId) {
         if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_THREADER)) {
             THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
@@ -361,7 +357,7 @@ ThreadVisNS.Threader.prototype.putMessageInContainer = function(message) {
         // if we have a suitable parent
         if (parentReferenceContainer != null) {
             // and this container wasn't cut
-            if (this.copycut.getCut(message.getId()) == parentReferenceId) {
+            if (this.cache.getCut(accountKey, message.getId()) == parentReferenceId) {
                 if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_THREADER)) {
                     THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
                         "Threader.putMessageInContainer()",
@@ -407,24 +403,21 @@ ThreadVisNS.Threader.prototype.hasMessage = function(messageId) {
 /** ****************************************************************************
  * Thread all messages
  *
+ * @param accountKey
+ *          The account key in which to thread
  * @return
  *          void
  ******************************************************************************/
-ThreadVisNS.Threader.prototype.thread = function() {
+ThreadVisNS.Threader.prototype.thread = function(accountKey) {
     THREADVIS.setStatus("Threading ...");
-    // open copy/cut database
-    // TODO move this to database!
-    this.copycut.read();
 
     this.start = (new Date()).getTime();
     THREADVIS.logger.log("threader", {"action" : "start"});
     THREADVIS.setStatus("Threading ...");
 
     // 1. For each message
-    this.putMessagesInContainer();
+    this.putMessagesInContainer(accountKey);
 
-    // close copy/cut database
-    this.copycut.close();
     THREADVIS.setStatus("");
 }
 

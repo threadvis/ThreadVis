@@ -31,7 +31,6 @@
     <script src="chrome://threadvis/content/Container.js" />
     <script src="chrome://threadvis/content/ContainerVisualisation.js" />
     <script src="chrome://threadvis/content/ContainerVisualisationSVG.js" />
-    <script src="chrome://threadvis/content/CopyCut.js" />
     <script src="chrome://threadvis/content/FolderCache.js" />
     <script src="chrome://threadvis/content/Logger.js" />
     <script src="chrome://threadvis/content/Message.js" />

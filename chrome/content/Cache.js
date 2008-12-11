@@ -42,7 +42,7 @@ ThreadVisNS.Cache = function(threadvis) {
  * Get cache array for message
  *
  * @param msg
- *          The message for which to get the folder
+ *          The message for which to get the cache
  * @return
  *          The cache array of all message ids
  ******************************************************************************/
@@ -115,17 +115,28 @@ ThreadVisNS.Cache.prototype.getCacheInternal = function(msg, accountKey,
         statement = connection.createStatement(
             "SELECT msgid FROM threads WHERE threadid = ?");
         statement.bindInt32Parameter(0, threadId);
+        var copyStatement = connection.createStatement(
+            "SELECT childmsgid FROM copy WHERE parentmsgid = ?");
         try {
             while (statement.executeStep()) {
                 var msgid = statement.getString(0);
                 cache.push(msgid);
+                // also add any copied messages to the cache here
+                copyStatement.bindStringParameter(0, msgid);
+                while (copyStatement.executeStep()) {
+                    var childMsgId = copyStatement.getString(0);
+                    cache.push(childMsgId);
+                }
+                copyStatement.reset();
             }
         } catch (ex) {
             THREADVIS.logger.log("Error while performing SQL statement", {
                 "exception": ex});
         } finally {
-            statement.reset;
+            statement.reset();
             statement = null;
+            copyStatement.reset();
+            copyStatement = null;
         }
     }
 
@@ -451,19 +462,35 @@ ThreadVisNS.Cache.prototype.openDatabase = function(accountKey, forceRecreate) {
         if (connection.tableExists("updatetimestamps")) {
             connection.executeSimpleSQL("DROP TABLE updatetimestamps");
         }
+        if (connection.tableExists("copy")) {
+            connection.executeSimpleSQL("DROP TABLE copy");
+        }
+        if (connection.tableExists("cut")) {
+            connection.executeSimpleSQL("DROP TABLE cut");
+        }
     }
 
     // check for table
     if (! connection.tableExists("threads")) {
         connection.createTable("threads", "msgid string, threadid int");
-        connection.executeSimpleSQL("CREATE UNIQUE INDEX msgid_idx ON threads(msgid ASC)");
-        connection.executeSimpleSQL("CREATE INDEX threadid_idx ON threads(threadid ASC)");
+        connection.executeSimpleSQL("CREATE UNIQUE INDEX threads_msgid_idx ON threads(msgid ASC)");
+        connection.executeSimpleSQL("CREATE INDEX threads_threadid_idx ON threads(threadid ASC)");
     }
     if (! connection.tableExists("threadcounter")) {
         connection.createTable("threadcounter", "threadid int");
     }
     if (! connection.tableExists("updatetimestamps")) {
         connection.createTable("updatetimestamps", "folderuri string, updatetimestamp string");
+    }
+    if (! connection.tableExists("copy")) {
+        connection.createTable("copy", "parentmsgid string, childmsgid string");
+        connection.executeSimpleSQL("CREATE UNIQUE INDEX copy_tupel_idx ON copy(parentmsgid ASC, childmsgid ASC)");
+        connection.executeSimpleSQL("CREATE INDEX copy_childmsgid_idx ON copy(childmsgid ASC)");
+    }
+    if (! connection.tableExists("cut")) {
+        connection.createTable("cut", "parentmsgid string, childmsgid string");
+        connection.executeSimpleSQL("CREATE UNIQUE INDEX cut_tupel_idx ON cut(parentmsgid ASC, childmsgid ASC)");
+        connection.executeSimpleSQL("CREATE INDEX cut_childmsgid_idx ON cut(childmsgid ASC)");
     }
 
     this.databaseConnections[accountKey] = connection;
@@ -1086,4 +1113,269 @@ ThreadVisNS.Cache.prototype.cacheMessage = function(message, accountKey) {
 
     // write cache data
     this.storeThread(accountKey, threadId, threadIds, messageIds);
+}
+
+
+
+/** ****************************************************************************
+ * Check for user-defined thread. Look up a new parent of this child message id.
+ *
+ * @param accountKey
+ *          The current account key.
+ * @param childMsgId
+ *          The message id of the child to look up
+ * @return
+ *          The message id of the new parent, if one exists. Null otherwise
+ ******************************************************************************/
+ThreadVisNS.Cache.prototype.getCopy = function(accountKey, childMsgId) {
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "getCopy", {"action" : "start",
+                "childMsgId" : childMsgId});
+    }
+
+    var connection = this.getDatabaseConnection(accountKey);
+
+    var statement = connection.createStatement(
+        "SELECT parentmsgid FROM copy WHERE childmsgid = ?");
+
+    var parentMsgId = null;
+    try {
+        statement.bindStringParameter(0, childMsgId);
+        if (statement.executeStep()) {
+            parentMsgId = statement.getString(0);
+        }
+    } catch (ex) {
+        THREADVIS.logger.log("Error while performing SQL statement", {
+            "exception": ex});
+    } finally {
+        statement.reset();
+        statement = null;
+        delete statement;
+    }
+
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "getCopy", {"action" : "end",
+                "childMsgId" : childMsgId,
+                "parentMsgId" : parentMsgId});
+    }
+
+    return parentMsgId;
+}
+
+
+
+/** ****************************************************************************
+ * Check for user-defined thread. Look up a new parent of this child message id.
+ *
+ * @param accountKey
+ *          The current account key.
+ * @param childMsgId
+ *          The message id of the child to look up
+ * @return
+ *          The message id of the new parent, if one exists. Null otherwise
+ ******************************************************************************/
+ThreadVisNS.Cache.prototype.getCut = function(accountKey, childMsgId) {
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "getCut", {"action" : "start"});
+    }
+
+    var connection = this.getDatabaseConnection(accountKey);
+
+    var statement = connection.createStatement(
+        "SELECT parentmsgid FROM cut WHERE childmsgid = ?");
+
+    var parentMsgId = null;
+    try {
+        statement.bindStringParameter(0, childMsgId);
+        if (statement.executeStep()) {
+            parentMsgId = statement.getString(0);
+        }
+    } catch (ex) {
+        THREADVIS.logger.log("Error while performing SQL statement", {
+            "exception": ex});
+    } finally {
+        statement.reset();
+        statement = null;
+        delete statement;
+    }
+
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "getCut", {"action" : "end",
+                "childMsgId" : childMsgId,
+                "parentMsgId" : parentMsgId});
+    }
+
+    return parentMsgId;
+}
+
+
+
+/** ****************************************************************************
+ * Add a new user-defined thread entry. ChildMsgId is a new child of
+ * parentMsgId.
+ *
+ * @param accountKey
+ *          The current account key.
+ * @param childMsgId
+ *          The message id of the child.
+ * @param parentMsgId
+ *          The message id of the new parent
+ * @return
+ *          void
+ ******************************************************************************/
+ThreadVisNS.Cache.prototype.addCopy = function(accountKey, childMsgId,
+    parentMsgId) {
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "addCopy", {"action" : "start",
+                "childMsgId" : childMsgId,
+                "parentMsgId" : parentMsgId});
+    }
+
+    var connection = this.getDatabaseConnection(accountKey);
+
+    // first check if this connection exists as a cut, if so, simply delete it
+    var statement = connection.createStatement(
+        "DELETE FROM cut WHERE childmsgid = ? AND parentmsgid = ?");
+    try {
+        statement.bindStringParameter(0, childMsgId);
+        statement.bindStringParameter(1, parentMsgId);
+        statement.execute();
+    } catch (ex) {
+        THREADVIS.logger.log("Error while performing SQL statement", {
+            "exception": ex});
+    } finally {
+        statement.reset();
+        statement = null;
+        delete statement;
+    }
+
+    var statement = connection.createStatement(
+        "INSERT INTO copy (childmsgid, parentmsgid) VALUES (?, ?)");
+    try {
+        statement.bindStringParameter(0, childMsgId);
+        statement.bindStringParameter(1, parentMsgId);
+        statement.execute();
+    } catch (ex) {
+        THREADVIS.logger.log("Error while performing SQL statement", {
+            "exception": ex});
+    } finally {
+        statement.reset();
+        statement = null;
+        delete statement;
+    }
+
+    // also add message id to cache of this thread
+    var threadId = null;
+    var statement = connection.createStatement(
+        "SELECT threadid FROM threads WHERE msgid = ?");
+    try {
+        statement.bindStringParameter(0, parentMsgId);
+        if (statement.executeStep()) {
+            threadId = statement.getInt32(0);
+        }
+    } catch (ex) {
+        THREADVIS.logger.log("Error while performing SQL statement", {
+            "exception": ex});
+    } finally {
+        statement.reset();
+        statement = null;
+        delete statement;
+    }
+
+    if (threadId) {
+        var statement = connection.createStatement(
+            "INSERT INTO threads (msgid, threadid) VALUES (?, ?)");
+        try {
+            statement.bindStringParameter(0, childMsgId);
+            statement.bindInt32Parameter(1, threadId);
+            statement.execute();
+        } catch (ex) {
+            // ignore any exceptions, as we might insert message ids multiple times
+        } finally {
+            statement.reset();
+            statement = null;
+            delete statement;
+        }
+    }
+}
+
+
+
+/** ****************************************************************************
+ * Add a new user-defined thread entry. ChildMsgId is no longer a child of
+ * parentMsgId.
+ *
+ * @param accountKey
+ *          The current account key.
+ * @param childMsgId
+ *          The message id of the child.
+ * @param parentMsgId
+ *          The message id of the old parent
+ * @return
+ *          void
+ ******************************************************************************/
+ThreadVisNS.Cache.prototype.addCut = function(accountKey, childMsgId,
+    parentMsgId) {
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "addCut", {"action" : "start",
+                "childMsgId" : childMsgId,
+                "parentMsgId" : parentMsgId});
+    }
+
+    var connection = this.getDatabaseConnection(accountKey);
+
+    // first check if this connection exists as a copy, if so, simply delete it
+    var statement = connection.createStatement(
+        "DELETE FROM copy WHERE childmsgid = ? AND parentmsgid = ?");
+    try {
+        statement.bindStringParameter(0, childMsgId);
+        statement.bindStringParameter(1, parentMsgId);
+        statement.execute();
+    } catch (ex) {
+        THREADVIS.logger.log("Error while performing SQL statement", {
+            "exception": ex});
+    } finally {
+        statement.reset();
+        statement = null;
+        delete statement;
+    }
+
+    var statement = connection.createStatement(
+        "INSERT INTO cut (childmsgid, parentmsgid) VALUES (?, ?)");
+    try {
+        statement.bindStringParameter(0, childMsgId);
+        statement.bindStringParameter(1, parentMsgId);
+        statement.execute();
+    } catch (ex) {
+        THREADVIS.logger.log("Error while performing SQL statement", {
+            "exception": ex});
+    } finally {
+        statement.reset();
+        statement = null;
+        delete statement;
+    }
+
+    // also delete message id from cache of this thread
+    // don't do this, keep original information!
+    /*
+    var statement = connection.createStatement(
+        "DELETE FROM threads WHERE msgid = ?");
+    try {
+        statement.bindStringParameter(0, childMsgId);
+        statement.execute();
+    } catch (ex) {
+        THREADVIS.logger.log("Error while performing SQL statement", {
+            "exception": ex});
+    } finally {
+        statement.reset();
+        statement = null;
+        delete statement;
+    }
+    */
 }

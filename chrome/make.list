@@ -8,7 +8,6 @@ content/Container.js
 content/ContainerVisualisation.js
 content/ContainerVisualisationSVG.js
 content/contents.rdf
-content/CopyCut.js
 content/Email.xul
 content/FolderCache.js
 content/Legend.js
