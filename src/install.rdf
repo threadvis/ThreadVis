@@ -71,9 +71,9 @@
     <em:name>ThreadVis</em:name>
     <em:description>Displays a small graphic visualising the context (thread) of the currently selected email.</em:description>
     <em:creator>Alexander C. Hubmann-Haidvogel</em:creator>
-    <em:homepageURL>http://www.student.tugraz.at/ahubmann/threadvis/</em:homepageURL>
+    <em:homepageURL>http://threadvis.mozdev.org/</em:homepageURL>
     <em:optionsURL>chrome://threadvis/content/SettingsDialog.xul</em:optionsURL>
-    <em:updateURL>http://www.student.tugraz.at/ahubmann/threadvis/update.rdf</em:updateURL>
+    <em:updateURL>http://downloads.mozdev.org/threadvis/update.rdf</em:updateURL>
     <em:iconURL>chrome://threadvis/content/images/icon.png</em:iconURL>
 
     <!-- Packages, Skins and Locales that this extension registers -->
