@@ -11,7 +11,7 @@
  * http://www.iicm.tugraz.at/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -47,6 +47,11 @@
 
     <script type="application/x-javascript"
         src="chrome://threadvis/content/Settings.js" />
+
+    <stringbundleset>
+        <stringbundle id="threadVisStrings" 
+            src="chrome://threadvis/locale/ThreadVis.properties" />
+    </stringbundleset>
 
     <wizardpage description="">
         <label value="&about.name;" id="extensionName" />
@@ -97,13 +102,6 @@
                 preference="extensions.threadvis.disabledfolders"
                 hidden="true" />
         </groupbox>
-    </wizardpage>
-
-    <wizardpage description="&wizard.thesis.title;">
-        <description>&wizard.thesis.1;</description>
-        <description>&wizard.thesis.2;</description>
-        <description>&wizard.thesis.3;</description>
-        <checkbox id="logging" label="&wizard.thesis.logging;" checked="false" />
     </wizardpage>
 
     <wizardpage description="&wizard.end.title;">

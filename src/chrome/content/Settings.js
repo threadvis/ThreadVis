@@ -9,7 +9,7 @@
  * http://www.iicm.tugraz.at/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -644,11 +644,8 @@ function loadAboutPreference() {
         preferences.PREF_DISABLED_ACCOUNTS);
     var disabledFolders = preferences.getPreference(
         preferences.PREF_DISABLED_FOLDERS);
-    var doLogging = preferences.getPreference(
-        preferences.PREF_LOGGING);
     document.getElementById("hiddenDisabledAccounts").value = disabledAccounts;
     document.getElementById("hiddenDisabledFolders").value = disabledFolders;
-    document.getElementById("logging").checked = doLogging;
 }
 
 
@@ -664,7 +661,6 @@ function saveAboutSettings() {
         .getElementById("hiddenDisabledAccounts").value;
     var disabledFolders = document
         .getElementById("hiddenDisabledFolders").value;
-    var doLogging = document.getElementById("logging").checked;
     var notShowAgain = document.getElementById("donotshowagain").checked;
 
     var preferences = window.opener.THREADVIS.preferences;
@@ -675,9 +671,6 @@ function saveAboutSettings() {
     preferences.setPreference(
         preferences.PREF_DISABLED_FOLDERS, disabledFolders,
         preferences.PREF_STRING);
-    preferences.setPreference(
-        preferences.PREF_LOGGING, doLogging,
-        preferences.PREF_BOOL);
     if (notShowAgain) {
         preferences.setPreference(
             preferences.PREF_ABOUT, about,
