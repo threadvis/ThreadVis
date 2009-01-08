@@ -8,8 +8,8 @@
  * An electronic version of the thesis is available online at
  * http://www.iicm.tugraz.at/ahubmann.pdf
  *
- * Copyright (C) 2005-2007 Alexander C. Hubmann
- * Copyright (C) 2007-2008 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
+ * Copyright (C) 2007, 2008, 2009 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free

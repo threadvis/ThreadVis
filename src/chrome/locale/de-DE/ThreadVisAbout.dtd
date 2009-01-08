@@ -10,7 +10,7 @@
  * http://www.iicm.tugraz.at/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -34,8 +34,8 @@
 <!ENTITY about.title                                        "&#xDC;ber ThreadVis">
 <!ENTITY about.version                                      "Version">
 <!ENTITY about.description                                  "Zeigt eine kleine Grafik, die den Kontext (Thread) der aktuell angezeigten Nachricht visualisiert.">
-<!ENTITY about.copyright                                    "&#xA9; 2004-2007 Alexander C. Hubmann &#xA9; 2007 Alexander C. Hubmann-Haidvogel">
-<!ENTITY about.homepage                                     "http://www.student.tugraz.at/ahubmann/threadvis/">
+<!ENTITY about.copyright                                    "&#xA9; 2005, 2006, 2007 Alexander C. Hubmann. &#xA9; 2007, 2008, 2009 Alexander C. Hubmann-Haidvogel">
+<!ENTITY about.homepage                                     "http://threadvis.mozdev.org/">
 <!ENTITY about.email                                        "ahubmann@gmail.com">
 <!ENTITY about.name                                         "ThreadVis">
 <!ENTITY extension.version                                  "<<version>>.<<build>>">
@@ -48,11 +48,6 @@
 <!ENTITY wizard.workings.2                                  "Zus&#xE4;tzlich k&#xF6;nnen die Ordner, f&#xFC;r die die Erweiterung aktiviert werden soll, im n&#xE4;chsten Schritt ausgew&#xE4;hlt werden.">
 <!ENTITY wizard.accounts.title                              "Aktivierte Accounts/Ordner">
 <!ENTITY wizard.accounts.1                                  "Bitte w&#xE4;hlen Sie unten die Accounts/Order aus, f&#xFC;r die die Erweiterung aktiviert werden soll:">
-<!ENTITY wizard.thesis.title                                "Meine Diplomarbeit">
-<!ENTITY wizard.thesis.1                                    "Dieses Add-on ist Teil meiner Diplomarbeit. Ebenso ist eine anonyme Studie &#xFC;ber die Verwendung der Erweiterung Teil der Arbeit.">
-<!ENTITY wizard.thesis.2                                    "Daf&#xFC;r ben&#xF6;tige ich Mithilfe: Bitte aktivieren Sie unten das Sammeln von Informationen &#xFC;ber die Verwendung. Damit speichert das Add-on anonyme Daten in einer Log-Datei. Bitte schicken Sie mir diese Log-Datei in regelm&#xE4;&#xDF;igen Abst&#xE4;nden zu (die Erweiterung wird Sie daran erinnern).">
-<!ENTITY wizard.thesis.3                                    "Wenn die Checkbox nicht aktiviert ist, werden keinerlei Informationen gesammelt.">
-<!ENTITY wizard.thesis.logging                              "Logging aktivieren">
 <!ENTITY wizard.end.title                                   "">
 <!ENTITY wizard.end.1                                       "Alle hier getroffenen Einstellungen und noch weitere k&#xF6;nnen jederzeit in den Settings des Add-ons ge&#xE4;ndert werden. &#xD6;ffnen Sie daf&#xFC;r entweder den Einstellungs-Dialog oder klicken Sie rechts auf die Visualisierung und w&#xE4;hlen Sie 'Einstellungen'.">
 <!ENTITY wizard.end.showagain                               "Diese Nachricht nicht wieder anzeigen">
