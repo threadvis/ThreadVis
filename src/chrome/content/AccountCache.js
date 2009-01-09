@@ -220,7 +220,7 @@ ThreadVisNS.AccountCache.prototype.getEnabledFolders = function(folder) {
                         folder.updateFolder(null);
                     } catch (ex) {
                         THREADVIS.logger.log("Updating folder threw exception.", {
-                            "folder" : nextFolder.URI,
+                            "folder" : folder.URI,
                             "exception" : ex});
                     }
                 }
