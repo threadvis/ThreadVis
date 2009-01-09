@@ -60,7 +60,6 @@ pref("extensions.threadvis.visualisation.opacity", 30);
 pref("extensions.threadvis.visualisation.svg", false);
 pref("extensions.threadvis.visualisation.messagecircles", true);
 pref("extensions.threadvis.visualisation.zoom", "full");
-pref("extensions.threadvis.cache.updatetimestamp", "");
 pref("extensions.threadvis.svg.height", 1000);
 pref("extensions.threadvis.svg.width", 1000);
 pref("extensions.threadvis.cache.updatefolders", false);
