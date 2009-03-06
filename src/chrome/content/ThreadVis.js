@@ -186,11 +186,16 @@ ThreadVisNS.ThreadVis.prototype.addMessage = function(header) {
         header.mime2DecodedAuthor, header.messageId, header.messageKey, date,
         header.folder.URI, header.getStringProperty("references"), false);
 
-    // see if msg is a sent mail
-    var issent = IsSpecialFolder(header.folder, MSG_FOLDER_FLAG_SENTMAIL, true)
-        || this.sentMailIdentities[message.getFromEmail()] == true;
-
+    // check if msg is a sent mail
+    var issent = false;
+    // it is sent if it is stored in a folder that is marked as sent (if enabled)
+    issent |= IsSpecialFolder(header.folder, MSG_FOLDER_FLAG_SENTMAIL, true) &&
+        this.preferences.getPreference(this.preferences.PREF_SENTMAIL_FOLDERFLAG);
+    // or it is sent if the sender address is a local identity (if enabled)
+    issent |= this.sentMailIdentities[message.getFromEmail()] == true &&
+        this.preferences.getPreference(this.preferences.PREF_SENTMAIL_IDENTITY);
     message.setSent(issent);
+
     this.getThreader().addMessage(message);
 
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_EMAIL)) {
