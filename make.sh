@@ -41,8 +41,8 @@ SVN=/opt/subversion/bin/svn
 # Get newest revision
 # ##############################################################################
 
-svninfo=`$SVN info -r HEAD src`
-revision=`echo $svninfo | sed -e 's/.* Revision: \([0-9]*\) .*/\1/'`
+svninfo=`$SVN info -r HEAD --xml src`
+revision=`echo $svninfo | sed -e 's/.*\<commit revision="\([0-9]*\)"\>.*/\1/'`
 
 # check if any changed files exist
 svnstatus=`$SVN status src`
