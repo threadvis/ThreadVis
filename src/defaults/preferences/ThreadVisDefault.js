@@ -66,3 +66,4 @@ pref("extensions.threadvis.cache.updatefolders", false);
 pref("extensions.threadvis.cache.skipinvalidfolders", false);
 pref("extensions.threadvis.sentmail.folderflag", true);
 pref("extensions.threadvis.sentmail.identity", true);
+pref("extensions.threadvis.visualisation.hideonsingle", false);

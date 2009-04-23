@@ -230,7 +230,6 @@ ThreadVisNS.Visualisation.prototype.checkSize = function() {
         this.box.boxObject.width != this.boxWidth) {
         this.resetStack();
         this.visualise();
-        
     }
 
     this.boxHeight = this.box.boxObject.height;
@@ -652,15 +651,17 @@ ThreadVisNS.Visualisation.prototype.HEXtoDEC = function(hex) {
 /** ****************************************************************************
  * Display disabled message
  *
+ * @param forceHide
+ *          Force hiding of visualisation, even if preference is not set
  * @return
  *          void
  ******************************************************************************/
-ThreadVisNS.Visualisation.prototype.displayDisabled = function() {
+ThreadVisNS.Visualisation.prototype.displayDisabled = function(forceHide) {
     this.clearStack();
     this.currentContainer = null;
 
     // if preference set, hide box completely
-    if (THREADVIS.preferences.getPreference(
+    if (forceHide || THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_HIDE_ON_DISABLE)) {
         this.outerBox.hidden = true;
         return;
@@ -1658,6 +1659,10 @@ ThreadVisNS.Visualisation.prototype.visualise = function(container, force) {
 
     if (container == null) {
         container = this.currentContainer;
+    }
+
+    if (container == null) {
+        return;
     }
 
     if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {

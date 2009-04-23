@@ -1022,8 +1022,21 @@ ThreadVisNS.ThreadVis.prototype.visualise = function(container) {
         return;
     }
 
+    // if user wants to hide visualisation if it only consists of a single
+    // message, do so, but not in popup visualisation
+    if (msgCount == 1 &&
+        this.preferences.getPreference(this.preferences.PREF_VIS_HIDE_ON_SINGLE) &&
+        ! this.isPopupVisualisation()) {
+        this.visualisation.disabled = true;
+        this.visualisation.displayDisabled(true);
+        this.visualisedMsgId = null;
+        this.selectedContainer = null;
+        return;
+    }
+
     this.clear = false;
     this.createBox();
+    this.visualisation.disabled = false;
     this.visualisation.visualise(container);
     this.selectedContainer = container;
 }

@@ -75,12 +75,13 @@ ThreadVisNS.PreferenceObserver = function() {
     this.PREF_VIS_COLOURS_BORDER = "visualisation.colours.border";
     this.PREF_VIS_COLOURS_RECEIVED = "visualisation.colours.received";
     this.PREF_VIS_COLOURS_SENT = "visualisation.colours.sent";
+    this.PREF_VIS_HIDE_ON_DISABLE = "visualisation.hideondisable";
+    this.PREF_VIS_HIDE_ON_SINGLE = "visualisation.hideonsingle"
     this.PREF_VIS_HIGHLIGHT = "visualisation.highlight";
     this.PREF_VIS_MINIMAL_WIDTH = "visualisation.minimalwidth";
     this.PREF_VIS_OPACITY = "visualisation.opacity";
     this.PREF_VIS_SVG = "visualisation.svg";
     this.PREF_VIS_ZOOM = "visualisation.zoom";
-    this.PREF_VIS_HIDE_ON_DISABLE = "visualisation.hideondisable";
 
     this.prefBranch = null;
     this.preferences = new Object();
@@ -256,6 +257,10 @@ ThreadVisNS.PreferenceObserver.prototype.preferenceReload = function() {
         this.prefBranch.PREF_STRING, "#7FFF00,#00FFFF,#7F00FF,#997200,#009926,#002699,#990072,#990000,#4C9900,#009999,#4C0099,#FFBF00,#00FF3F,#003FFF,#FF00BF");
     this.loadPreference(this.PREF_VIS_COLOURS_SENT,
         this.prefBranch.PREF_STRING, "#ff0000");
+    this.loadPreference(this.PREF_VIS_HIDE_ON_DISABLE,
+        this.prefBranch.PREF_BOOL, true);
+    this.loadPreference(this.PREF_VIS_HIDE_ON_SINGLE,
+        this.prefBranch.PREF_BOOL, false);
     this.loadPreference(this.PREF_VIS_HIGHLIGHT,
         this.prefBranch.PREF_BOOL, true);
     this.loadPreference(this.PREF_VIS_MINIMAL_WIDTH,
@@ -266,8 +271,6 @@ ThreadVisNS.PreferenceObserver.prototype.preferenceReload = function() {
         this.prefBranch.PREF_BOOL, false);
     this.loadPreference(this.PREF_VIS_ZOOM,
         this.prefBranch.PREF_STRING, "full");
-    this.loadPreference(this.PREF_VIS_HIDE_ON_DISABLE,
-        this.prefBranch.PREF_BOOL, true);
 }
 
 
