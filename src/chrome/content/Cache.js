@@ -296,21 +296,9 @@ ThreadVisNS.Cache.prototype.searchInFolder = function(folder, messageId) {
     // check for enabled/disabled folders
     if (THREADVIS.checkEnabledAccountOrFolder(folder)) {
         // exclude virtual folders in search
-        if (! (folder.flags & MSG_FOLDER_FLAG_VIRTUAL) &&
+        if (! (folder.flags & THREADVIS.MSG_FOLDER_FLAG_VIRTUAL) &&
             !folder.noSelect) {
-            // again, do not call updateFolder, this is bad
-            //subfolder.updateFolder(null);
-            try {
-                msgDB = folder.getMsgDatabase(null);
-            } catch (ex) {
-                // can we do this here?
-                try {
-                    folder.updateFolder(null);
-                    msgDB = folder.getMsgDatabase(null);
-                } catch (ex) {
-                }
-            }
-
+            msgDB = this.getMsgFolderDatabase(folder);
             if (msgDB) {
                 msgHdr = msgDB.getMsgHdrForMessageID(messageId);
                 msgDB = null;
@@ -1395,4 +1383,55 @@ ThreadVisNS.Cache.prototype.addCut = function(accountKey, childMsgId,
         delete statement;
     }
     */
+}
+
+
+
+/** ****************************************************************************
+ * Get the message database for a folder. This has changed in Thunderbird 3
+ * (changeset 1714:649e4c6a0e38), it is no longer a function, but an attribute.
+ *
+ * @param folder
+ *          The folder for which to fetch the message database.
+ * @return
+ *          The message database for the folder.
+ ******************************************************************************/
+ThreadVisNS.Cache.prototype.getMsgFolderDatabase = function(folder) {
+    // first, check the attribute
+    var db = folder.msgDatabase;
+    if (db) {
+        return db;
+    }
+
+    // no database, try getMsgDatabase
+    try {
+        db = folder.getMsgDatabase(null);
+        if (db) {
+            return db;
+        }
+    } catch (ex) {
+    }
+
+    // still no database, try updateFolder
+    try {
+        folder.updateFolder(null);
+    } catch (ex) {
+    }
+
+    // again, try attribute
+    db = folder.msgDatabase;
+    if (db) {
+        return db;
+    }
+
+    // still no luck, try a last getMsgDatabase
+    try {
+        db = folder.getMsgDatabase(null);
+        if (db) {
+            return db;
+        }
+    } catch (ex) {
+    }
+
+    return null;
 }

@@ -183,7 +183,7 @@ ThreadVisNS.AccountCache.prototype.getEnabledFolders = function(folder) {
     // check for enabled/disabled folders
     if (THREADVIS.checkEnabledAccountOrFolder(folder)) {
         // exclude virtual folders in search
-        if (! (folder.flags & MSG_FOLDER_FLAG_VIRTUAL) &&
+        if (! (folder.flags & THREADVIS.MSG_FOLDER_FLAG_VIRTUAL) &&
             ! folder.noSelect) {
 
             // check if folder is valid
@@ -194,7 +194,7 @@ ThreadVisNS.AccountCache.prototype.getEnabledFolders = function(folder) {
             if (checkFolder) {
                 folderValid = false;
                 try {
-                    var tmpDB = folder.getMsgDatabase(null);
+                    var tmpDB = this.cache.getMsgFolderDatabase(folder);
                     if (tmpDB) {
                         folderValid = true;
                         tmpDB = null;

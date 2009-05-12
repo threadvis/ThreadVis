@@ -105,6 +105,20 @@ ThreadVisNS.ThreadVis = function(threadvisParent) {
     this.SVG_NAMESPACE =
         "http://www.w3.org/2000/svg";
 
+    // Set up folder flags
+    // Keep backward compatibility. TB2 has the globals MSG_FOLDER_FLAG_*,
+    // TB3 uses the Components.interfaces.nsMsgFolderFlags.* objects.
+    try {
+        this.MSG_FOLDER_FLAG_VIRTUAL = Components.interfaces.nsMsgFolderFlags.Virtual;
+    } catch (ex) {
+        this.MSG_FOLDER_FLAG_VIRTUAL = MSG_FOLDER_FLAG_VIRTUAL;
+    }
+    try {
+        this.MSG_FOLDER_FLAG_SENTMAIL = Components.interfaces.nsMsgFolderFlags.SentMail;
+    } catch (ex) {
+        this.MSG_FOLDER_FLAG_SENTMAIL = MSG_FOLDER_FLAG_SENTMAIL;
+    }
+
     // increment this to trigger about dialog
     this.ABOUT = 1;
 
@@ -189,7 +203,7 @@ ThreadVisNS.ThreadVis.prototype.addMessage = function(header) {
     // check if msg is a sent mail
     var issent = false;
     // it is sent if it is stored in a folder that is marked as sent (if enabled)
-    issent |= IsSpecialFolder(header.folder, MSG_FOLDER_FLAG_SENTMAIL, true) &&
+    issent |= IsSpecialFolder(header.folder, THREADVIS.MSG_FOLDER_FLAG_SENTMAIL, true) &&
         this.preferences.getPreference(this.preferences.PREF_SENTMAIL_FOLDERFLAG);
     // or it is sent if the sender address is a local identity (if enabled)
     issent |= this.sentMailIdentities[message.getFromEmail()] == true &&

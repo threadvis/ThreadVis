@@ -1066,7 +1066,6 @@ ThreadVisNS.Visualisation.prototype.getNewColour = function(sent) {
     if (sent) {
         var hex = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_COLOURS_SENT);
-        
     } else {
         var receivedColours = THREADVIS.preferences.getPreference(
             THREADVIS.preferences.PREF_VIS_COLOURS_RECEIVED).split(",");

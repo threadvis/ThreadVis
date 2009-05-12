@@ -61,98 +61,100 @@
     <script src="chrome://threadvis/content/Visualisation.js" />
 
     <hbox id="expandedHeaderView">
-        <stringbundleset>
-            <stringbundle id="ThreadVisStrings" 
-                src="chrome://threadvis/locale/ThreadVis.properties" />
-        </stringbundleset>
-        <popupset>
-            <popup id="ThreadVisPopUp">
-                <menuitem label="&popup.settings;" 
-                    oncommand="THREADVIS.openThreadVisOptionsDialog();" />
-                <menuitem label="&popup.popupwindow;"
-                    oncommand="THREADVIS.displayVisualisationWindow();" />
-                <menuitem label="&popup.legend;"
-                    oncommand="THREADVIS.displayLegendWindow();" />
-                <menuitem label="&popup.exportsvg;"
-                    oncommand="THREADVIS.visualisation.exportToSVG();" />
-            </popup>
-        </popupset>
-        <popupset id="ThreadVisPopUpSet">
-        </popupset>
-        <splitter class="mousehidden" oncommand="THREADVIS.setMinimalWidth();">
-        </splitter>
-        <hbox id="ThreadVis" flex="2">
-            <vbox flex="1">
-                <vbox id="ThreadVisBox"
-                    style="overflow: hidden;" flex="1"
-                    context="ThreadVisPopUp" />
-                <hbox id="ThreadVisHorizontalScrollbar"
-                    style="height: 5px; width: 0px;">
-                    <hbox id="ThreadVisScrollbarLeft"
-                        style="width: 6px; height: 5px; padding-right: 1px; visibility: hidden;">
-                        <image src="chrome://threadvis/content/images/arrowleft.png"
-                            style="width: 5px; height: 5px;" />
-                    </hbox>
-                    <stack id="ThreadVisScrollbarHorizontalBox"
-                        style="background: #cccccc; border: 1px solid #333333; height: 5px; visibility: hidden"
-                        flex="1">
-                        <box id="ThreadVisScrollbarHorizontal"
-                            style="height: 3px; background: #333333; cursor: e-resize;" />
-                    </stack>
-                    <hbox id="ThreadVisScrollbarRight"
-                        style="width: 6px; height: 5px; padding-left: 1px; visibility: hidden;">
-                        <image src="chrome://threadvis/content/images/arrowright.png"
-                            style="width: 5px; height: 5px;" />
-                    </hbox>
-                </hbox>
-            </vbox>
-            <vbox id="ThreadVisVerticalScrollbar">
-                <vbox style="width: 5px;" flex="1">
-                    <hbox id="ThreadVisScrollbarUp"
-                        style="width: 5px; height: 6px; padding-bottom: 1px; visibility: hidden;">
-                        <image src="chrome://threadvis/content/images/arrowtop.png"
-                            style="width: 5px; height: 5px;" />
-                    </hbox>
-                    <stack id="ThreadVisScrollbarVerticalBox"
-                        style="background: #cccccc; border: 1px solid #333333; visibility: hidden;"
-                        flex="1">
-                        <box id="ThreadVisScrollbarVertical"
-                            style="width: 3px; background: #333333; cursor: s-resize;" />
-                    </stack>
-                    <hbox id="ThreadVisScrollbarDown"
-                        style="width: 5px; height: 6px; padding-top: 1px; visibility: hidden;">
-                        <image src="chrome://threadvis/content/images/arrowbottom.png"
-                            style="width: 5px; height: 5px;" />
+        <hbox>
+            <stringbundleset>
+                <stringbundle id="ThreadVisStrings" 
+                    src="chrome://threadvis/locale/ThreadVis.properties" />
+            </stringbundleset>
+            <popupset>
+                <popup id="ThreadVisPopUp">
+                    <menuitem label="&popup.settings;" 
+                        oncommand="THREADVIS.openThreadVisOptionsDialog();" />
+                    <menuitem label="&popup.popupwindow;"
+                        oncommand="THREADVIS.displayVisualisationWindow();" />
+                    <menuitem label="&popup.legend;"
+                        oncommand="THREADVIS.displayLegendWindow();" />
+                    <menuitem label="&popup.exportsvg;"
+                        oncommand="THREADVIS.visualisation.exportToSVG();" />
+                </popup>
+            </popupset>
+            <popupset id="ThreadVisPopUpSet">
+            </popupset>
+            <splitter class="mousehidden" oncommand="THREADVIS.setMinimalWidth();">
+            </splitter>
+            <hbox id="ThreadVis" flex="2">
+                <vbox flex="1">
+                    <vbox id="ThreadVisBox"
+                        style="overflow: hidden;" flex="1"
+                        context="ThreadVisPopUp" />
+                    <hbox id="ThreadVisHorizontalScrollbar"
+                        style="height: 5px; width: 0px;">
+                        <hbox id="ThreadVisScrollbarLeft"
+                            style="width: 6px; height: 5px; padding-right: 1px; visibility: hidden;">
+                            <image src="chrome://threadvis/content/images/arrowleft.png"
+                                style="width: 5px; height: 5px;" />
+                        </hbox>
+                        <stack id="ThreadVisScrollbarHorizontalBox"
+                            style="background: #cccccc; border: 1px solid #333333; height: 5px; visibility: hidden"
+                            flex="1">
+                            <box id="ThreadVisScrollbarHorizontal"
+                                style="height: 3px; background: #333333; cursor: e-resize;" />
+                        </stack>
+                        <hbox id="ThreadVisScrollbarRight"
+                            style="width: 6px; height: 5px; padding-left: 1px; visibility: hidden;">
+                            <image src="chrome://threadvis/content/images/arrowright.png"
+                                style="width: 5px; height: 5px;" />
+                        </hbox>
                     </hbox>
                 </vbox>
-                <hbox style="height: 5px;" />
-            </vbox>
-            <vbox id="ThreadVisButtons">
-                <hbox id="ThreadVisZoomIn"
-                    onclick="THREADVIS.zoomIn();">
-                    <image src="chrome://threadvis/content/images/plus.png"
-                        style="width: 16px; height: 16px; padding: 1px;"
-                        tooltiptext="&zoomin.tooltip;" />
-                </hbox>
-                <hbox id="ThreadVisZoomOut"
-                    onclick="THREADVIS.zoomOut();">
-                    <image src="chrome://threadvis/content/images/minus.png"
-                        style="width: 16px; height: 16px; padding: 1px;"
-                        tooltiptext="&zoomout.tooltip;" />
-                </hbox>
-                <hbox id="ThreadVisWindow"
-                    onclick="THREADVIS.displayVisualisationWindow();">
-                    <image src="chrome://threadvis/content/images/window.png"
-                        style="width: 16px; height: 16px; padding: 1px;"
-                        tooltiptext="&popup.popupwindow;" />
-                </hbox>
-                <hbox id="ThreadVisLegend"
-                    onclick="THREADVIS.displayLegendWindow();">
-                    <image src="chrome://threadvis/content/images/legend.png"
-                        style="width: 16px; height: 16px; padding: 1px;"
-                        tooltiptext="&popup.legend;" />
-                </hbox>
-            </vbox>
+                <vbox id="ThreadVisVerticalScrollbar">
+                    <vbox style="width: 5px;" flex="1">
+                        <hbox id="ThreadVisScrollbarUp"
+                            style="width: 5px; height: 6px; padding-bottom: 1px; visibility: hidden;">
+                            <image src="chrome://threadvis/content/images/arrowtop.png"
+                                style="width: 5px; height: 5px;" />
+                        </hbox>
+                        <stack id="ThreadVisScrollbarVerticalBox"
+                            style="background: #cccccc; border: 1px solid #333333; visibility: hidden;"
+                            flex="1">
+                            <box id="ThreadVisScrollbarVertical"
+                                style="width: 3px; background: #333333; cursor: s-resize;" />
+                        </stack>
+                        <hbox id="ThreadVisScrollbarDown"
+                            style="width: 5px; height: 6px; padding-top: 1px; visibility: hidden;">
+                            <image src="chrome://threadvis/content/images/arrowbottom.png"
+                                style="width: 5px; height: 5px;" />
+                        </hbox>
+                    </vbox>
+                    <hbox style="height: 5px;" />
+                </vbox>
+                <vbox id="ThreadVisButtons">
+                    <hbox id="ThreadVisZoomIn"
+                        onclick="THREADVIS.zoomIn();">
+                        <image src="chrome://threadvis/content/images/plus.png"
+                            style="width: 16px; height: 16px; padding: 1px;"
+                            tooltiptext="&zoomin.tooltip;" />
+                    </hbox>
+                    <hbox id="ThreadVisZoomOut"
+                        onclick="THREADVIS.zoomOut();">
+                        <image src="chrome://threadvis/content/images/minus.png"
+                            style="width: 16px; height: 16px; padding: 1px;"
+                            tooltiptext="&zoomout.tooltip;" />
+                    </hbox>
+                    <hbox id="ThreadVisWindow"
+                        onclick="THREADVIS.displayVisualisationWindow();">
+                        <image src="chrome://threadvis/content/images/window.png"
+                            style="width: 16px; height: 16px; padding: 1px;"
+                            tooltiptext="&popup.popupwindow;" />
+                    </hbox>
+                    <hbox id="ThreadVisLegend"
+                        onclick="THREADVIS.displayLegendWindow();">
+                        <image src="chrome://threadvis/content/images/legend.png"
+                            style="width: 16px; height: 16px; padding: 1px;"
+                            tooltiptext="&popup.legend;" />
+                    </hbox>
+                </vbox>
+            </hbox>
         </hbox>
     </hbox>
 

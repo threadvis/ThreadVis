@@ -153,10 +153,22 @@ ThreadVisNS.Message.prototype.getFrom = function() {
  ******************************************************************************/
 ThreadVisNS.Message.prototype.getFromEmail = function() {
     // parse email address
-    var email = this.getFrom();
-    email = Components.classes["@mozilla.org/messenger/headerparser;1"]
-        .getService(Components.interfaces.nsIMsgHeaderParser)
-        .extractHeaderAddressMailboxes(null, email);
+    var parser = Components.classes["@mozilla.org/messenger/headerparser;1"]
+        .getService(Components.interfaces.nsIMsgHeaderParser);
+    // Thunderbird 3 does something which should never be done on APIs:
+    // changing the interface, but keeping the name and version.
+    // In TB 2, extractHeaderAddressMailboxes has two parameters:
+    // a charset and the line to parse.
+    // In TB 3, extractHeaderAddressMailboxes has only a single parameter:
+    // the line to parse.
+    // How on earth should one write code that is both compatible with
+    // TB2 and TB3?
+    // The code below is an ugly hack, a better solution is needed!
+    // TODO fix this hack.
+    var email = parser.extractHeaderAddressMailboxes(null, this.getFrom());
+    if (email == "") {
+        email = parser.extractHeaderAddressMailboxes(this.getFrom());
+    }
     return email;
 }
 
