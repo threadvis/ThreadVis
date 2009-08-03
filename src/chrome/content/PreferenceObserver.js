@@ -47,6 +47,7 @@ ThreadVisNS.PreferenceObserver = function() {
     this.PREF_BRANCH = "extensions.threadvis.";
 
     this.PREF_ABOUT = "about";
+    this.PREF_CACHE_CHECK_INTERVAL = "cache.checkinterval";
     this.PREF_CACHE_UPDATE_FOLDERS = "cache.updatefolders";
     this.PREF_CACHE_SKIP_INVALID_FOLDERS = "cache.skipinvalidfolders";
     this.PREF_DISABLED_ACCOUNTS = "disabledaccounts";
@@ -200,6 +201,8 @@ ThreadVisNS.PreferenceObserver.prototype.observe = function(subject, topic,
  ******************************************************************************/
 ThreadVisNS.PreferenceObserver.prototype.preferenceReload = function() {
     this.loadPreference(this.PREF_ABOUT,
+        this.prefBranch.PREF_INT, 0);
+    this.loadPreference(this.PREF_CACHE_CHECK_INTERVAL,
         this.prefBranch.PREF_INT, 0);
     this.loadPreference(this.PREF_CACHE_UPDATE_FOLDERS,
         this.prefBranch.PREF_BOOL, false);

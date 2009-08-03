@@ -51,6 +51,7 @@ ThreadVisNS.Cache = function(threadvis) {
     this.accountCaches = {};
     this.callbacks = [];
     this.createAccountCaches();
+    this.startPeriodicAccountChecking();
 }
 
 
@@ -942,28 +943,89 @@ ThreadVisNS.Cache.prototype.getAccountCaches = function() {
  *          void
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.checkAllAccounts = function() {
-    // TODO THIS IS BROKEN
-    return;
-    var accountCache = null;
-    for (var i = 0; i < this.accountCaches.length; i++) {
-        var status = this.accountCaches[i].status();
-        if (status.doneChecking || status.working) {
-            continue;
-        }
-        accountCache = this.accountCaches[i];
-        break;
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "checkAllAccounts", {"action" : "start"});
+    }
+    for (var accountKey in this.accountCaches) {
+        this.checkAccount(accountKey);
+    }
+}
+
+
+
+/** ****************************************************************************
+ * Start periodic checking of all accounts for new messages to cache
+ *
+ * @return
+ *          void
+ ******************************************************************************/
+ThreadVisNS.Cache.prototype.startPeriodicAccountChecking = function() {
+    var interval = this.threadvis.preferences.getPreference(
+        this.threadvis.preferences.PREF_CACHE_CHECK_INTERVAL);
+
+    if (interval > 0) {
+        var ref = this;
+        setInterval(function() {
+            ref.checkAllAccounts();
+        }, interval);
     }
 
-    if (accountCache) {
-        var ref = this;
-        accountCache.register("onCheckDone", function() {
-            ref.checkAllAccounts();
-        });
-        accountCache.check();
-    } else {
-        // check done
-        alert("check for all accounts done");
+    // below is broken in TB3b2
+    /*var notificationListener = {
+        itemAdded: function(item) {
+            if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+                THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+                    "new item found", {"item" : item});
+            }
+        }
     }
+    var notificationService = Components.classes["@mozilla.org/messenger/msgnotificationservice;1"]
+        .getService(Components.interfaces.nsIMsgFolderNotificationService);
+    notificationService.addListener(notificationListener,
+        notificationService.allMsgNotifications);
+
+    delete notificationService;
+    notificationService = null;
+    */
+
+    var ref = this;
+    // add folder listener, so that we can add newly received messages
+    var folderListener = {
+        OnItemAdded: function(parentItem, item, view) {
+            if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+                THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+                    "onItemAdded", {item: item});
+            }
+
+            if (item instanceof Components.interfaces.nsIMsgDBHdr) {
+                var server = item.folder.server;
+                var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
+                    .getService(Components.interfaces.nsIMsgAccountManager))
+                    .FindAccountForServer(server);
+                var accountKey = account.key;
+                account = null;
+                delete account;
+                server = null;
+                delete server;
+
+                ref.checkAccount(accountKey, item.folder);
+            }
+        },
+        OnItemRemoved: function(parentItem, item, view) {
+        },
+        OnItemPropertyChanged: function(item, property, oldValue, newValue) {},
+        OnItemIntPropertyChanged: function(item, property, oldValue, newValue) {},
+        OnItemBoolPropertyChanged: function(item, property, oldValue, newValue) {},
+        OnItemUnicharPropertyChanged: function(item, property, oldValue, newValue) {},
+        OnItemPropertyFlagChanged: function(item, property, oldFlag, newFlag) {},
+        OnItemEvent: function(folder, event) {}
+    }
+
+    var gMailSession = Components.classes["@mozilla.org/messenger/services/session;1"]
+        .getService(Components.interfaces.nsIMsgMailSession);
+    gMailSession.AddFolderListener(folderListener,
+        Components.interfaces.nsIFolderListener.all);
 }
 
 
@@ -980,13 +1042,15 @@ ThreadVisNS.Cache.prototype.checkAllAccounts = function() {
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.checkAccount = function(accountKey, folder) {
     var accountCache = this.accountCaches[accountKey];
-    /*for (var i = 0; i < this.accountCaches.length; i++) {
-        if (this.accountCaches[i].account = account) {
-            accountCache = this.accountCaches[i];
-            break;
-        }
-    }*/
-
+    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
+        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
+            "checkAccount", {
+                accountKey: accountKey,
+                folder: folder,
+                accountCache: accountCache
+            }
+        );
+    }
     if (accountCache) {
         var ref = this;
         accountCache.register("onCheckDone", function() {

@@ -671,48 +671,22 @@ ThreadVisNS.ThreadVis.prototype.init = function() {
     // remember msgkey of visualised message
     this.visualisedMsgId = "";
 
+    // remember selected message
+    this.selectedMsgUri = "";
+
     // remember container of selected message
     this.selectedContainer = null;
 
-    // add messages when we display first header
-    // register this as event handler later
+    // register for message selection
     var ref = this;
-    this.doLoad = {
-        onStartHeaders: function() {ref.setSelectedMessage();},
-        onEndHeaders: function() {}
-    };
-    gMessageListeners.push(this.doLoad);
-
-    // add folder listener, so that we can add newly received
-    // messages
-    this.folderListener = {
-        OnItemAdded: function(parentItem, item, view) {
-            // this is called
-            // POP:  - when new msgs arrive
-            //       - when moving messages from one folder to another
-            // IMAP: - only when new msgs arrive
-            //       - NOT when moving messages!!
-            ref.onItemAdded(parentItem, item, view);
-        },
-        OnItemRemoved: function(parentItem, item, view) {
-            // removed item from folder
-            //ref.onItemRemoved(parentItem, item, view);
-        },
-        OnItemPropertyChanged: function(item, property, oldValue, newValue) {},
-        OnItemIntPropertyChanged: function(item, property, oldValue, newValue) {},
-        OnItemBoolPropertyChanged: function(item, property, oldValue, newValue) {},
-        OnItemUnicharPropertyChanged: function(item, property, oldValue, newValue) {},
-        OnItemPropertyFlagChanged: function(item, property, oldFlag, newFlag) {},
-        OnItemEvent: function(folder, event) {}
-    }
-
-    if (! this.gMailSession) {
-        this.gMailSession = Components.classes["@mozilla.org/messenger/services/session;1"]
-            .getService(Components.interfaces.nsIMsgMailSession);
-    }
-
-    var notifyFlags = Components.interfaces.nsIFolderListener.all;
-    this.gMailSession.AddFolderListener(this.folderListener, notifyFlags);
+    var observerService = Components.classes["@mozilla.org/observer-service;1"]
+        .getService(Components.interfaces.nsIObserverService);
+    observerService.addObserver({
+        observe: function(subject, topic, data) {
+            ref.selectedMsgUri = data;
+            ref.setSelectedMessage();
+        }
+    }, "MsgMsgDisplayed", false);
 
     addEventListener("unload", function() {ref.unloadHandler()}, false);
 }
@@ -784,44 +758,6 @@ ThreadVisNS.ThreadVis.prototype.logJavaScriptErrors = function(message, file,
     line) {
     THREADVIS.logger.log("threadvis-jserror", {"message": message,
         "file" : file, "line" : line});
-}
-
-
-
-/** ****************************************************************************
- * Called when a new message is saved to a folder
- *
- * @param parentItem
- *          The parent item of the message which has been added
- * @param item
- *          The item which has been added
- * @param view
- *          The view
- * @return
- *          void
- ******************************************************************************/
-ThreadVisNS.ThreadVis.prototype.onItemAdded = function(parentItem, item, view) {
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "onItemAdded", {item: item});
-    }
-
-    var ref = this;
-    clearTimeout(this.timeoutItemAdded);
-    if (item instanceof Components.interfaces.nsIMsgDBHdr) {
-        // check if added to folder or account that is disabled
-        if (this.checkEnabledAccountOrFolder(item.folder)) {
-            /*this.timeoutItemAdded = setTimeout(function() {
-                ref.cache.updateNewMessages(item, false);
-            }, 1000);*/
-            // TODO recheck account!
-        } else {
-            if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_CACHE)) {
-                THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-                    "onItemAdded", {"stopped": "account or folder disabled"});
-            }
-        }
-    }
 }
 
 
@@ -960,8 +896,8 @@ ThreadVisNS.ThreadVis.prototype.setSelectedMessage = function(force) {
     }
 
     // get currently loaded message
-    var msgUri = GetLoadedMessage();
-    var msg = messenger.messageServiceFromURI(msgUri).messageURIToMsgHdr(msgUri);
+    var msg = messenger.messageServiceFromURI(this.selectedMsgUri)
+        .messageURIToMsgHdr(this.selectedMsgUri);
 
     var loadedMsgFolder = msg.folder;
     this.rootFolder = loadedMsgFolder.rootFolder;
