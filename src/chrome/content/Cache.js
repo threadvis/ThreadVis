@@ -343,6 +343,8 @@ ThreadVisNS.Cache.prototype.searchInFolder = function(folder, messageId) {
             currentFolderURI = currentItem
                 .QueryInterface(Components.interfaces.nsIRDFResource).Value;
             subfolder = GetMsgFolderFromUri(currentFolderURI);
+            // this is the new way (at least in tb3b3), decide if we drop backwards compatibility!
+            //subfolder = MailUtils.getFolderForURI(currentFolderURI, true);
 
             var foundHeader = this.searchInFolder(subfolder, messageId);
             subfolder = null;
@@ -776,17 +778,30 @@ ThreadVisNS.Cache.prototype.storeThread = function(accountKey, threadId,
     statement.reset();
     statement = null;
 
+    // remove duplicate message ids
+    var hash = {};
+    for (var i = 0; i < messageIds.length; i++) {
+        if (hash[messageIds[i]]) {
+            messageIds[i] = null;
+        } else {
+            hash[messageIds[i]] = true;
+        }
+    }
+
     // for all message ids in the cache, write to database
     statement = connection.createStatement(
         "INSERT INTO threads (msgid, threadid) VALUES (?, ?)");
     var msgId = null;
     for (var i = 0; i < messageIds.length; i++) {
-        try {
-            statement.bindStringParameter(0, messageIds[i]);
-            statement.bindInt32Parameter(1, threadId);
-            statement.execute();
-        } catch (ex) {
-            // ignore any exceptions, as we might insert message ids multiple times
+        if (messageIds[i] != null) {
+            try {
+                statement.bindStringParameter(0, messageIds[i]);
+                statement.bindInt32Parameter(1, threadId);
+                statement.execute();
+            } catch (ex) {
+                THREADVIS.logger.log("Error while performing SQL statement", {
+                    "exception": ex});
+            }
         }
     }
     statement.reset();
