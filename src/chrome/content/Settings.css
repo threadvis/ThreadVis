@@ -32,7 +32,7 @@
 
 
 tabpanel.overflow {
-    overflow: auto;
+    /*overflow: auto;*/
 }
 
 tab {
@@ -45,6 +45,7 @@ tab {
 }
 
 #aboutVersion {
+    padding-top: 5px;
     font-weight: bold;
     color: rgb(144,144,144);
 }
@@ -54,9 +55,6 @@ tab {
 }
 
 #aboutCopyright {
-    border-top-style: solid;
-    border-top-color: rgb(192,192,192);
-    border-top-width: 1px;
     padding-top: 5px;
 }
 
@@ -82,5 +80,6 @@ radio[pane=paneThreadVis] {
 }
 
 .detailedDescription {
+    font-size: 90%;
     color: rgb(70,70,70);
 }
