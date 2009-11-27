@@ -39,7 +39,7 @@
 
     <prefwindow id="MailPreferences">
         <prefpane id="paneThreadVis" label="&settings.title;"
-            src="chrome://threadvis/content/Settings15.xul" />
+            src="chrome://threadvis/content/Settings.xul" />
     </prefwindow>
 
 </overlay>
