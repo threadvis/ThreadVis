@@ -715,14 +715,7 @@ ThreadVisNS.ContainerVisualisation.prototype.onMouseClickDelayed = function(even
         if (THREADVIS.isPopupVisualisation()) {
             elem = window.opener;
         }
-        if (elem.THREADVIS.isMessageWindow()) {
-            elem.SelectFolder(container.getMessage().getFolder());
-            elem.LoadMessageByMsgKey(container.getMessage().getKey());
-            elem.THREADVIS.visualise(container);
-        } else {
-            elem.THREADVIS.callback(container.getMessage().getKey(),
-                container.getMessage().getFolder());
-        }
+        elem.THREADVIS.callback(container.getMessage(), elem.THREADVIS.isMessageWindow());
     }
 }
 

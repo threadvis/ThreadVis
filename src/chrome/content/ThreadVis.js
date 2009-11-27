@@ -31,6 +31,8 @@
 
 
 
+//Components.utils.import("resource://app/modules/gloda/public.js");
+
 if (! window.ThreadVisNS) {
     window.ThreadVisNS = {};
 }
@@ -224,47 +226,31 @@ ThreadVisNS.ThreadVis.prototype.addMessage = function(header) {
  * Callback function from extension. Called after mouse click in extension
  * Select message in mail view.
  *
- * @param msgKey
- *          The message key of the selected message
- * @param folder
- *          The folder of the message
+ * @param message
+ *          The message to display
+ * @param isMessageWindow
+ *          True if standalone window
  * @return
  *          void
  ******************************************************************************/
-ThreadVisNS.ThreadVis.prototype.callback = function(msgKey, folder) {
+ThreadVisNS.ThreadVis.prototype.callback = function(message, isMessageWindow) {
     if (! this.preferences.getPreference(this.preferences.PREF_ENABLED)) {
         return;
     }
 
-    this.logger.log("msgselect", {"from" : "extension", "key" : msgKey});
+    this.selectedMsgKey = message.getKey();
+    // re-search message in case its folder has changed
+    // TODO eventually switch to MailUtils
+    var folder = GetMsgFolderFromUri(message.getFolder(), true);
+    var msg = this.cache.searchMessageByMsgId(message.getId(), folder.rootFolder);
 
-    this.selectedMsgKey = msgKey;
-
-    // get folder for message
-    this.getMainWindow().SelectFolder(folder);
-
-    // clear current selection
-    var tree = this.getMainWindow().GetThreadTree();
-
-    var treeBoxObj = tree.treeBoxObject;
-    // this is necessary because Thunderbird >= 1.5 uses
-    // tree.view.selection
-    // and
-    // tree.treeBoxObject.selection
-    // doesn't work anymore
-    var treeSelection = null;
-    if (tree.view) {
-        treeSelection = tree.view.selection;
-    } else {
-        treeSelection = treeBoxObj.selection;
+    if (! isMessageWindow) {
+        gFolderTreeView.selectFolder(msg.folder);
     }
+    gFolderDisplay.clearSelection();
+    gFolderDisplay.show(msg.folder);
 
-    treeSelection.clearSelection();
-
-    // select message
-    this.getMainWindow().gDBView.selectMsgByKey(msgKey);
-
-    treeBoxObj.ensureRowIsVisible(treeSelection.currentIndex);
+    gFolderDisplay.selectMessage(msg);
 }
 
 
@@ -898,6 +884,29 @@ ThreadVisNS.ThreadVis.prototype.setSelectedMessage = function(force) {
     // get currently loaded message
     var msg = messenger.messageServiceFromURI(this.selectedMsgUri)
         .messageURIToMsgHdr(this.selectedMsgUri);
+
+    /*
+     * THIS WILL WORK SOMEDAY WHEN GLODA ACTUALLY INDEXES ALL MESSAGES
+    var glodaMessage = Gloda.getMessageCollectionForHeader(msg, {
+        onItemsAdded: function(items, collection) {
+    }, onQueryCompleted: function(collection) {
+    	var found = collection.items.length > 0;
+    	if (found) {
+    		var message = collection.items[0];
+    		message.conversation.getMessagesCollection({
+    			onQueryCompleted: function(collection) {
+    				alert("conversation: " + collection.items.length);
+    				for (var i = 0; i < collection.items.length; i++) {
+    					alert(collection.items[i].from);
+    				}
+    		}
+    		}, null);
+    	} else {
+    		alert("no gloda message for: " + msg);
+    	}
+    }
+    }, null);
+    */
 
     var loadedMsgFolder = msg.folder;
     this.rootFolder = loadedMsgFolder.rootFolder;

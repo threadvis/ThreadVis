@@ -92,36 +92,6 @@ ThreadVisNS.Threader.prototype.addMessage = function(message) {
 
 
 /** ****************************************************************************
- * Add a new message
- *
- * @param subject
- *          The subject of the message
- * @param author
- *          The author of the message
- * @param messageId
- *          The messageid of the message
- * @param messageKey
- *          The key of the message
- * @param date
- *          The date of the message
- * @param uri
- *          The URI of the message
- * @param references
- *          The references string
- * @param issent
- *          True if the message is sent
- * @return
- *          void
- ******************************************************************************/
-ThreadVisNS.Threader.prototype.addMessageDetail = function(subject, author, messageId,
-    messageKey, date, uri, references, issent) {
-    this.addMessage(new ThreadVisNS.Message(subject, author, messageId, messageKey, date, 
-        uri, references, issent));
-}
-
-
-
-/** ****************************************************************************
  * Find a message
  *
  * @return messageId
