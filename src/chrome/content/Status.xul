@@ -47,21 +47,6 @@
                 value="&statusbar.disabledFolder;" hidden="true" />
             <description id="ThreadVisStatusTooltipFolderEnabled"
                 value="&statusbar.enabledFolder;" hidden="true" />
-            <vbox id="ThreadVisStatusTooltipCache" hidden="true">
-                <separator class="groove" />
-                <description value="Cache-Update triggered by message"
-                    style="font-weight: bold" />
-                <description id="ThreadVisStatusTooltipCacheMessage" value="" />
-                <hbox>
-                    <description id="ThreadVisStatusTooltipCacheAccount"
-                        value="in account" style="font-weight: bold" />
-                    <description id="ThreadVisStatusTooltipCacheAccountName"
-                        value="" />
-                </hbox>
-                <description id="ThreadVisStatusTooltipCacheRethread"
-                    value="Re-Threading..." hidden="true"
-                    style="font-weight: bold" />
-            </vbox>
         </tooltip>
         <statusbarpanel tooltip="ThreadVisStatusTooltip" mode="icon" class="statusbarpanel-menu-iconic"
             style="list-style-image: url('chrome://threadvis/content/images/statusbar.png')">

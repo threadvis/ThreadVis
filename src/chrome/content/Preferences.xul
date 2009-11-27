@@ -37,32 +37,6 @@
 <overlay id="ThreadVisPreferences"
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-    <!--
-    Please note that there are three different overlays defined in this
-    file. Since Seamonkey/Thunderbird tries to match the outermost 
-    element by its ID to apply the overlay, only one of those overlays gets
-    used in each application/version and the others get ignored.
-    -->
-
-    <!-- This is for Seamonkey. -->
-    <treechildren id="panelChildren">
-        <treeitem id="ThreadVis" container="false">
-            <treerow>
-                <treecell label="&settings.title;"
-                    url="chrome://threadvis/content/Settings.xul" />
-            </treerow>
-        </treeitem>
-    </treechildren>
-
-    <!-- This is for Thunderbird < 1.5 -->
-    <vbox id="prefsCategories">
-        <button id="threadvis" orient="vertical" class="buttonBoxButton"
-            type="radio" label="&settings.title;" group="categories"
-            url="chrome://threadvis/content/Settings.xul"
-            style="list-style-image: url(chrome://threadvis/content/images/icon.png);" />
-    </vbox>
-
-    <!-- This is for Thunderbird 1.5 -->
     <prefwindow id="MailPreferences">
         <prefpane id="paneThreadVis" label="&settings.title;"
             src="chrome://threadvis/content/Settings15.xul" />

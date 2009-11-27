@@ -246,11 +246,6 @@ ThreadVisNS.Visualisation.prototype.checkSize = function() {
  *          void
  ******************************************************************************/
 ThreadVisNS.Visualisation.prototype.clearStack = function() {
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "Visualisation.clearStack()", {});
-    }
-
     this.outerBox.hidden = false;
     while (this.stack.firstChild != null) {
         this.stack.removeChild(this.stack.firstChild);
@@ -262,13 +257,10 @@ ThreadVisNS.Visualisation.prototype.clearStack = function() {
     }
 
     // reset move
-    if (THREADVIS.SVG) {
-        this.stack.setAttribute("transform", "translate(0,0)");
-    } else {
-        this.stack.style.marginLeft = "0px";
-        this.stack.style.marginTop = "0px";
-        this.stack.style.padding = "5px";
-    }
+    this.stack.style.marginLeft = "0px";
+    this.stack.style.marginTop = "0px";
+    this.stack.style.padding = "5px";
+
     if (! THREADVIS.isPopupVisualisation()) {
         this.setVariableSize();
         this.setFixedSize();
@@ -540,41 +532,10 @@ ThreadVisNS.Visualisation.prototype.createLegendBox = function(hsv, name,
  *          void
  ******************************************************************************/
 ThreadVisNS.Visualisation.prototype.createStack = function() {
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "Visualisation.createStack()", {});
-    }
-
     var ref = this;
     if (! this.stack) {
-        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
-            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-                "Visualisation.createStack()", {"action" : "create stack"});
-        }
         this.stack = null;
-        // try to create SVG if enabled
-        var svgEnabled = THREADVIS.preferences.getPreference(
-            THREADVIS.preferences.PREF_VIS_SVG);
-        if (svgEnabled) {
-            try {
-                var svg = document.createElementNS(THREADVIS.SVG_NAMESPACE, "svg");
-                if (svg instanceof SVGSVGElement) {
-                    this.stack = document.createElementNS(THREADVIS.SVG_NAMESPACE, "g");
-                    svg.appendChild(this.stack);
-                    this.stack.setAttribute("id", "ThreadVisStack");
-                    this.box.appendChild(svg);
-                    THREADVIS.SVG = true;
-                    THREADVIS.logger.log("Using SVG.", {});
-                } else {
-                    this.stack = null;
-                }
-            } catch (ex) {
-                this.stack = null;
-            }
-        }
         if (this.stack == null) {
-            THREADVIS.logger.log("Using XUL.", {});
-            THREADVIS.SVG = false;
             this.stack = document.createElementNS(THREADVIS.XUL_NAMESPACE, "stack");
             this.stack.setAttribute("id", "ThreadVisStack");
             this.stack.style.position = "relative";
@@ -589,29 +550,15 @@ ThreadVisNS.Visualisation.prototype.createStack = function() {
         this.box.addEventListener("DOMMouseScroll",
             function(event) {ref.onScroll(event);}, false);
     } else {
-        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
-            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-                "Visualisation.createStack()", {"action" : "clear stack"});
-        }
         this.clearStack();
     }
 
-    if (THREADVIS.SVG) {
-        var loading = document.createElementNS(THREADVIS.SVG_NAMESPACE, "text");
-        var text = document.createTextNode(
-            this.strings.getString("visualisation.loading"));
-        loading.appendChild(text);
-        loading.setAttribute("x", "20");
-        loading.setAttribute("y", "20");
-        loading.setAttribute("color", "#999999");
-    } else {
-        var loading = document.createElementNS(THREADVIS.XUL_NAMESPACE, "description");
-        loading.setAttribute("value", this.strings.getString("visualisation.loading"));
-        loading.style.position = "relative";
-        loading.style.top = "20px"
-        loading.style.left = "20px"
-        loading.style.color = "#999999";
-    }
+    var loading = document.createElementNS(THREADVIS.XUL_NAMESPACE, "description");
+    loading.setAttribute("value", this.strings.getString("visualisation.loading"));
+    loading.style.position = "relative";
+    loading.style.top = "20px"
+    loading.style.left = "20px"
+    loading.style.color = "#999999";
     this.stack.appendChild(loading);
 }
 
@@ -667,50 +614,27 @@ ThreadVisNS.Visualisation.prototype.displayDisabled = function(forceHide) {
         return;
     }
 
-    if (THREADVIS.SVG) {
-        var warning = document.createElementNS(THREADVIS.SVG_NAMESPACE, "text");
-        var text = document.createTextNode(
-            this.strings.getString("visualisation.disabledWarning"));
-        warning.appendChild(text);
-        warning.setAttribute("x", "20");
-        warning.setAttribute("y", "10");
-        warning.setAttribute("color", "#999999");
-        this.stack.appendChild(warning);
+    var warning = document.createElementNS(THREADVIS.XUL_NAMESPACE, "label");
+    warning.setAttribute("value",
+        this.strings.getString("visualisation.disabledWarning"));
+    warning.style.position = "relative";
+    warning.style.top = "10px"
+    warning.style.left = "20px"
+    warning.style.color = "#999999";
+    this.stack.appendChild(warning);
 
-        var link = document.createElementNS(THREADVIS.SVG_NAMESPACE, "text");
-        var text = document.createTextNode(
-            this.strings.getString("visualisation.disabledWarning"));
-        link.appendChild(text);
-        link.setAttribute("x", "20");
-        link.setAttribute("y", "30");
-        link.setAttribute("color", "#0000ff");
-        link.addEventListener("click", function() {
-            THREADVIS.openThreadVisOptionsDialog();
-        }, true);
-        this.stack.appendChild(link);
-    } else {
-        var warning = document.createElementNS(THREADVIS.XUL_NAMESPACE, "label");
-        warning.setAttribute("value",
-            this.strings.getString("visualisation.disabledWarning"));
-        warning.style.position = "relative";
-        warning.style.top = "10px"
-        warning.style.left = "20px"
-        warning.style.color = "#999999";
-        this.stack.appendChild(warning);
-
-        var link = document.createElementNS(THREADVIS.XUL_NAMESPACE, "label");
-        link.setAttribute("value", this.strings.getString("visualisation.disabledWarningLink"));
-        link.style.position = "relative";
-        link.style.top = "30px"
-        link.style.left = "20px"
-        link.style.color = "#0000ff";
-        link.style.textDecoration = "underline";
-        link.addEventListener("click", function() {
-            THREADVIS.openThreadVisOptionsDialog();
-        }, true);
-        link.style.cursor = "pointer";
-        this.stack.appendChild(link);
-    }
+    var link = document.createElementNS(THREADVIS.XUL_NAMESPACE, "label");
+    link.setAttribute("value", this.strings.getString("visualisation.disabledWarningLink"));
+    link.style.position = "relative";
+    link.style.top = "30px"
+    link.style.left = "20px"
+    link.style.color = "#0000ff";
+    link.style.textDecoration = "underline";
+    link.addEventListener("click", function() {
+        THREADVIS.openThreadVisOptionsDialog();
+    }, true);
+    link.style.cursor = "pointer";
+    this.stack.appendChild(link);
 
     // set cursor
     this.box.style.cursor = "";
@@ -733,52 +657,30 @@ ThreadVisNS.Visualisation.prototype.displayDisabled = function(forceHide) {
 ThreadVisNS.Visualisation.prototype.displayWarningCount = function(container) {
     this.clearStack();
 
-    if (THREADVIS.SVG) {
-        var warning = document.createElementNS(THREADVIS.SVG_NAMESPACE, "text");
-        warning.appendChild(document.createTextNode(
-            this.strings.getString("visualisation.warningCount") + " [" +
-            container.getTopContainer().getCountRecursive() + "]."));
-        warning.setAttribute("x", "20");
-        warning.setAttribute("y", "10");
-        warning.setAttribute("color", "#999999");
-        this.stack.appendChild(warning);
+    var warning = document.createElementNS(THREADVIS.XUL_NAMESPACE, "label");
+    warning.setAttribute("value",
+        this.strings.getString("visualisation.warningCount") + " [" +
+        container.getTopContainer().getCountRecursive() + "].");
+    warning.style.position = "relative";
+    warning.style.top = "10px"
+    warning.style.left = "20px"
+    warning.style.color = "#999999";
+    this.stack.appendChild(warning);
 
-        var link = document.createElementNS(THREADVIS.SVG_NAMESPACE, "text");
-        link.appendChild(document.createTextNode(
-            this.strings.getString("visualisation.warningCountLink")));
-        link.setAttribute("x", "20");
-        link.setAttribute("y", "30");
-        link.setAttribute("color", "#0000ff");
-        var ref = this;
-        link.addEventListener("click", function() {
-            ref.visualise(container, true);
-        }, true);
-        this.stack.appendChild(link);
-    } else {
-        var warning = document.createElementNS(THREADVIS.XUL_NAMESPACE, "label");
-        warning.setAttribute("value",
-            this.strings.getString("visualisation.warningCount") + " [" +
-            container.getTopContainer().getCountRecursive() + "].");
-        warning.style.position = "relative";
-        warning.style.top = "10px"
-        warning.style.left = "20px"
-        warning.style.color = "#999999";
-        this.stack.appendChild(warning);
+    var link = document.createElementNS(THREADVIS.XUL_NAMESPACE, "label");
+    link.setAttribute("value", this.strings.getString("visualisation.warningCountLink"));
+    link.style.position = "relative";
+    link.style.top = "30px"
+    link.style.left = "20px"
+    link.style.color = "#0000ff";
+    link.style.textDecoration = "underline";
+    var ref = this;
+    link.addEventListener("click", function() {
+        ref.visualise(container, true);
+    }, true);
+    link.style.cursor = "pointer";
+    this.stack.appendChild(link);
 
-        var link = document.createElementNS(THREADVIS.XUL_NAMESPACE, "label");
-        link.setAttribute("value", this.strings.getString("visualisation.warningCountLink"));
-        link.style.position = "relative";
-        link.style.top = "30px"
-        link.style.left = "20px"
-        link.style.color = "#0000ff";
-        link.style.textDecoration = "underline";
-        var ref = this;
-        link.addEventListener("click", function() {
-            ref.visualise(container, true);
-        }, true);
-        link.style.cursor = "pointer";
-        this.stack.appendChild(link);
-    }
     // set cursor
     this.box.style.cursor = "";
 }
@@ -818,15 +720,9 @@ ThreadVisNS.Visualisation.prototype.drawArc = function(colour, vPosition,
     var prefArcWidth = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_ARC_WIDTH);
 
-    if (THREADVIS.SVG) {
-        var arc = new ThreadVisNS.ArcVisualisationSVG(this.stack, prefDotSize, this.resize,
-            prefArcMinHeight, prefArcDifference, prefArcRadius, prefArcWidth,
-            colour, vPosition, height, left, right, top, opacity);
-    } else {
-        var arc = new ThreadVisNS.ArcVisualisation(this.stack, prefDotSize, this.resize,
-            prefArcMinHeight, prefArcDifference, prefArcRadius, prefArcWidth,
-            colour, vPosition, height, left, right, top, opacity);
-    }
+    var arc = new ThreadVisNS.ArcVisualisation(this.stack, prefDotSize, this.resize,
+        prefArcMinHeight, prefArcDifference, prefArcRadius, prefArcWidth,
+        colour, vPosition, height, left, right, top, opacity);
 
     return arc;
 }
@@ -936,15 +832,9 @@ ThreadVisNS.Visualisation.prototype.drawDot = function(container, colour, left,
     var prefMessageCircles = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_MESSAGE_CIRCLES);
 
-    if (THREADVIS.SVG) {
-        var msg = new ThreadVisNS.ContainerVisualisationSVG(this.stack, this.strings, container,
-            colour, left, top, selected, prefDotSize, this.resize, circle, flash,
-            prefSpacing, opacity, prefMessageCircles);
-    } else {
-        var msg = new ThreadVisNS.ContainerVisualisation(this.stack, this.strings, container,
-            colour, left, top, selected, prefDotSize, this.resize, circle, flash,
-            prefSpacing, opacity, prefMessageCircles);
-    }
+    var msg = new ThreadVisNS.ContainerVisualisation(this.stack, this.strings, container,
+        colour, left, top, selected, prefDotSize, this.resize, circle, flash,
+        prefSpacing, opacity, prefMessageCircles);
 
     return msg;
 }
@@ -1100,13 +990,6 @@ ThreadVisNS.Visualisation.prototype.getNewColour = function(sent) {
  *******************************************************************************/
 ThreadVisNS.Visualisation.prototype.getResize = function(xCount, yCount, sizeX,
     sizeY) {
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO, 
-            "Visualisation.getResize()", {"action" : "start",
-            "xcount" : xCount, "ycount" : yCount, "sizex" : sizeX,
-            "sizey" : sizeY});
-    }
-
     var prefArcDifference = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_ARC_DIFFERENCE);
     var prefArcMinHeight = THREADVIS.preferences.getPreference(
@@ -1136,15 +1019,6 @@ ThreadVisNS.Visualisation.prototype.getResize = function(xCount, yCount, sizeX,
         resize = 1;
     }
 
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "Visualisation.getResize()", {"action" : "end",
-            "resize" : resize, "resizex" : resizeX,
-            "resizey" : resizeY, "spaceperarcavailablex" : spacePerArcAvailableX,
-            "spaceperarcavailabley" : spacePerArcAvailableY,
-            "spaceperarcneededx" : spacePerArcNeededX,
-            "spaceperarcneededy" : spacePerArcNeededY});
-    }
     return resize;
 }
 
@@ -1165,11 +1039,7 @@ ThreadVisNS.Visualisation.prototype.moveVisualisation = function(container) {
         THREADVIS.preferences.PREF_ZOOM_HEIGHT));*/
 
     // get current left margin
-    if (THREADVIS.SVG) {
-        var oldMargin = this.stack.transform.baseVal.getConsolidationMatrix().e;
-    } else {
-        var oldMargin = parseFloat(this.stack.style.marginLeft);
-    }
+    var oldMargin = parseFloat(this.stack.style.marginLeft);
     var newMargin = oldMargin;
 
     var originalWidth = this.box.boxObject.width;
@@ -1192,12 +1062,7 @@ ThreadVisNS.Visualisation.prototype.moveVisualisation = function(container) {
         newMargin = (- container.xPosition + (prefSpacing / 2))* this.resize;
     }
 
-    if (THREADVIS.SVG) {
-        this.moveVisualisationTo({x: newMargin});
-    } else {
-        //this.stack.style.marginLeft = newMargin + "px";
-        this.moveVisualisationTo({x: newMargin});
-    }
+    this.moveVisualisationTo({x: newMargin});
 }
 
 
@@ -1213,24 +1078,11 @@ ThreadVisNS.Visualisation.prototype.moveVisualisation = function(container) {
  *          void
  ******************************************************************************/
 ThreadVisNS.Visualisation.prototype.moveVisualisationTo = function(position) {
-    if (THREADVIS.SVG) {
-        var matrix = this.stack.transform.baseVal.getConsolidationMatrix();
-        var x = matrix.e;
-        var y = matrix.f;
-        if (position.x) {
-            x = position.x;
-        }
-        if (position.y) {
-            y = position.y;
-        }
-        this.stack.setAttribute("transform", "translate(" + x + "," + y + ")");
-    } else {
-        if (typeof(position.x) != "undefined") {
-            this.stack.style.marginLeft = position.x + "px";
-        }
-        if (typeof(position.y) != "undefined") {
-            this.stack.style.marginTop = position.y + "px";
-        }
+    if (typeof(position.x) != "undefined") {
+        this.stack.style.marginLeft = position.x + "px";
+    }
+    if (typeof(position.y) != "undefined") {
+        this.stack.style.marginTop = position.y + "px";
     }
 }
 
@@ -1246,11 +1098,6 @@ ThreadVisNS.Visualisation.prototype.moveVisualisationTo = function(position) {
  *          void
  ******************************************************************************/
 ThreadVisNS.Visualisation.prototype.onMouseClick = function(event) {
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPOMENT_VISUALISATION)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "Visualisation.onMouseClick()", {});
-    }
-
     var container = event.target.container;
     if (container && ! container.isDummy()) {
         THREADVIS.callback(container.getMessage().getKey(), 
@@ -1283,13 +1130,8 @@ ThreadVisNS.Visualisation.prototype.onMouseDown = function(event) {
     // remember box size now
     this.boxWidth = this.box.boxObject.width;
     this.boxHeight = this.box.boxObject.height;
-    if (THREADVIS.SVG) {
-        this.stackWidth = this.stack.getBBox().width;
-        this.stackHeight = this.stack.getBBox().height;
-    } else {
-        this.stackWidth = this.stack.boxObject.width;
-        this.stackHeight = this.stack.boxObject.height;
-    }
+    this.stackWidth = this.stack.boxObject.width;
+    this.stackHeight = this.stack.boxObject.height;
 
     this.startX = event.clientX;
     this.startY = event.clientY;
@@ -1316,14 +1158,9 @@ ThreadVisNS.Visualisation.prototype.onMouseMove = function(event) {
         var y = event.clientY;
         var dx = x - this.startX;
         var dy = y - this.startY;
-        if (THREADVIS.SVG) {
-            var matrix = this.stack.transform.baseVal.getConsolidationMatrix();
-            var currentX = matrix.e;
-            var currentY = matrix.f;
-        } else {
-            var currentX = parseFloat(this.stack.style.marginLeft);
-            var currentY = parseFloat(this.stack.style.marginTop);
-        }
+        var currentX = parseFloat(this.stack.style.marginLeft);
+        var currentY = parseFloat(this.stack.style.marginTop);
+
         if (currentX == "") {
             currentX = 0;
         }
@@ -1419,11 +1256,6 @@ ThreadVisNS.Visualisation.prototype.onScroll = function(event) {
  *          void
  ******************************************************************************/
 ThreadVisNS.Visualisation.prototype.resetStack = function() {
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "Visualisation.resetStack()", {});
-    }
-
     this.stack.style.marginLeft = "0px";
     this.stack.style.marginTop = "0px";
 }
@@ -1527,15 +1359,6 @@ ThreadVisNS.Visualisation.prototype.setVariableSize = function() {
  ******************************************************************************/
 ThreadVisNS.Visualisation.prototype.timeScaling = function(containers, 
     minimalTimeDifference, width) {
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "Visualisation.timeScaling()", {"action" : "start",
-            "containers" : containers.toString(),
-            "minimaltimedifference" : minimalTimeDifference,
-            "width" : width,
-            "no. containers" : containers.length});
-    }
-
     var prefSpacing = THREADVIS.preferences.getPreference(
         THREADVIS.preferences.PREF_VIS_SPACING);
     var prefTimescaling = THREADVIS.preferences.getPreference(
@@ -1575,13 +1398,6 @@ ThreadVisNS.Visualisation.prototype.timeScaling = function(containers,
     // width / spacing would lead to 3
     var maxCountX = width / prefSpacing;
 
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "Visualisation.timeScaling()",  {"action" : "first pass done",
-            "totalTimeScale" : totalTimeScale,
-            "maxCountX" : maxCountX});
-    }
-
     // if the time scaling factor is bigger than what we can display, we have 
     // a problem
     // this means, we have to scale the timing factor down
@@ -1603,13 +1419,6 @@ ThreadVisNS.Visualisation.prototype.timeScaling = function(containers,
         if (totalTimeScale == containers.length - 1) {
             break;
         }
-    }
-
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "Visualisation.timeScaling()",
-            {"action" : "second pass done", 
-            "totalTimeScale" : totalTimeScale});
     }
 
     return containers;
@@ -1662,12 +1471,6 @@ ThreadVisNS.Visualisation.prototype.visualise = function(container, force) {
 
     if (container == null) {
         return;
-    }
-
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "Visualisation.visualise()", {"action" : "start",
-            "container" : container.toString()});
     }
 
     var prefArcDifference = THREADVIS.preferences.getPreference(
@@ -1883,15 +1686,9 @@ ThreadVisNS.Visualisation.prototype.visualise = function(container, force) {
     popupBox.setAttribute("context", "ThreadVisPopUp");
 
     if (prefTimeline) {
-        if (THREADVIS.SVG) {
-            this.timeline = new ThreadVisNS.TimelineSVG(this.stack, this.strings, this.containers,
-                this.resize, prefDotSize, topHeight,
-                prefArcMinHeight + prefDotSize - prefArcWidth - 2);
-        } else {
-            this.timeline = new ThreadVisNS.Timeline(this.stack, this.strings, this.containers,
-                this.resize, prefDotSize, topHeight,
-                prefArcMinHeight + prefDotSize - prefArcWidth - 2);
-        }
+        this.timeline = new ThreadVisNS.Timeline(this.stack, this.strings, this.containers,
+            this.resize, prefDotSize, topHeight,
+            prefArcMinHeight + prefDotSize - prefArcWidth - 2);
         this.timeline.draw();
     } else {
         this.timeline = null;
@@ -2007,11 +1804,6 @@ ThreadVisNS.Visualisation.prototype.visualiseExisting = function(container) {
 
         // if thread has changed and we don't have all container visualisations
         if (this.containerVisualisations[thisContainer] == null) {
-            if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
-                THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_WARNING,
-                    "Visualisation.visualiseExisting()",
-                    {"action" : "cached visualisation does not contain this message, redraw"});
-            }
             // do a full redraw
             this.currentContainer = null;
             this.visualise(container);
@@ -2129,9 +1921,6 @@ ThreadVisNS.Visualisation.prototype.zoomIn = function(amount) {
     clearTimeout(this.zoomTimeout);
     var ref = this;
     this.zoomTimeout = setTimeout(function() {ref.visualise();}, 200);
-
-    THREADVIS.logger.log("zoom", {"action" : "in", "zoomlevel" : this.zoom,
-        "delta" : amount});
 }
 
 
@@ -2161,9 +1950,6 @@ ThreadVisNS.Visualisation.prototype.zoomOut = function(amount) {
     clearTimeout(this.zoomTimeout);
     var ref = this;
     this.zoomTimeout = setTimeout(function() {ref.visualise();}, 200);
-
-    THREADVIS.logger.log("zoom", {"action" : "out", 
-        "zoomlevel" : this.zoom, "delta" : amount});
 }
 
 
@@ -2197,12 +1983,6 @@ ThreadVisNS.Visualisation.prototype.exportToSVG = function(container, force) {
 
     if (container == null) {
         container = this.currentContainer;
-    }
-
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "Visualisation.exportToSVG()", {"action" : "start",
-            "container" : container.toString()});
     }
 
     var prefArcDifference = THREADVIS.preferences.getPreference(

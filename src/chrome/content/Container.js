@@ -104,8 +104,6 @@ ThreadVisNS.Container.prototype.addChild = function(child) {
     // this should never happen, because we would create a loop
     // that's why we don't allow it
     if (this.findParent(child)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_ERROR,
-            "Container.addChild()" , {"error" : "tried to create loop"});
         return;
     }
 
@@ -922,30 +920,4 @@ ThreadVisNS.Container.prototype.toStringThread = function() {
     }
 
     return this.toString("\n");
-}
-
-
-
-/** ****************************************************************************
- * Get string cache
- *
- * @return
- *          An array of all message ids in the container
- ******************************************************************************/
-ThreadVisNS.Container.prototype.getCache = function() {
-    var cache = [];
-
-    if (! this.isDummy()) {
-        cache.push(this.getMessage().getId());
-    }
-
-    if (this.hasChild()) {
-        // get cache for all children
-        var container = null;
-        for (container = this.getChild(); container != null;
-            container = container.getNext()) {
-            cache = cache.concat(container.getCache());
-        }
-    }
-    return cache;
 }

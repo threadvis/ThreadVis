@@ -172,14 +172,8 @@ ThreadVisNS.Scrollbar = function(visualisation, stack, box) {
  *          object.y is the y-position of the vertical scrollbar
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.calculatePosition = function() {
-    if (THREADVIS.SVG) {
-        var matrix = this.stack.transform.baseVal.getConsolidationMatrix();
-        var movedX = Math.abs(matrix.e);
-        var movedY = Math.abs(matrix.f);
-    } else {
-        var movedX = Math.abs(parseFloat(this.stack.style.marginLeft));
-        var movedY = Math.abs(parseFloat(this.stack.style.marginTop));
-    }
+    var movedX = Math.abs(parseFloat(this.stack.style.marginLeft));
+    var movedY = Math.abs(parseFloat(this.stack.style.marginTop));
 
     var x = (movedX / this.getStackWidth()) * this.getScrollBarHorizontalWidth();
     var y = (movedY / this.getStackHeight()) * this.getScrollBarVerticalHeight();
@@ -311,11 +305,8 @@ ThreadVisNS.Scrollbar.prototype.getScrollBarVerticalHeight = function() {
  *          The height of the visualisation stack in pixel
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.getStackHeight = function() {
-    if (THREADVIS.SVG) {
-        return this.stack.getBBox().height;
-    } else {
-        return this.stack.boxObject.height;
-    }
+    return this.stack.boxObject.height;
+
 }
 
 
@@ -327,11 +318,8 @@ ThreadVisNS.Scrollbar.prototype.getStackHeight = function() {
  *          The width of the visualisation stack in pixel
  ******************************************************************************/
 ThreadVisNS.Scrollbar.prototype.getStackWidth = function() {
-    if (THREADVIS.SVG) {
-        return this.stack.getBBox().width;
-    } else {
-        return this.stack.boxObject.width;
-    }
+    return this.stack.boxObject.width;
+
 }
 
 

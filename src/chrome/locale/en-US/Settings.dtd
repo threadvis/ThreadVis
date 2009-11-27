@@ -33,21 +33,6 @@
 <!ENTITY settings.title                                     "ThreadVis">
 <!ENTITY label.default                                      "(default)">
 <!ENTITY extension.enabled                                  "Enable Extension">
-<!ENTITY logfiles.tab                                       "Logfiles">
-<!ENTITY logfiles.caption                                   "Enable Logging">
-<!ENTITY logfiles.console                                   "Only log to error console">
-<!ENTITY logfiles.enable.checkbox                           "Enable Logging">
-<!ENTITY logfiles.enable.description.whatlogged             "If you enable logging, only statistical information about your inbox, the mail threads you are reading and the way you are interacting with the extension are logged.">
-<!ENTITY logfiles.enable.description.sending                "This information is never automatically sent to anyone. You can share this information by clicking on &#x22;&logfiles.send.button;&#x22; below.">
-<!ENTITY logfiles.debug.checkbox                            "Include Debug Information">
-<!ENTITY logfiles.debug.description.general                 "If you experience any problems using the extension, enable debug logging to include more information in the logfiles.">
-<!ENTITY logfiles.debug.description.personalinfo            "Attention: This information may include personal information such as message-ids, the structure of the threads you are viewing, etc.">
-<!ENTITY logfiles.debug.description.size                    "Also keep in mind that enabling this option will greatly increase the size of the logfiles and reduce the performance of the extension!">
-<!ENTITY logfiles.debug.level                               "Log-Level:">
-<!ENTITY logfiles.send.button                               "Send Logfiles">
-<!ENTITY logfiles.send.tooltip                              "Creates a new empty email and attaches the logfiles.">
-<!ENTITY logfiles.reset.button                              "Reset Logfiles">
-<!ENTITY logfiles.reset.tooltip                             "Resets the logfiles to size 0. Do this after sending the logfiles to save diskspace.">
 <!ENTITY visualisation.tab                                  "Visualisation">
 <!ENTITY visualisation.caching.caption                      "Cache">
 <!ENTITY visualisation.caching.reset                        "Reset Cache for Selected Account">
@@ -71,7 +56,6 @@
 <!ENTITY visualisation.size.arcwidth                        "Arc Width">
 <!ENTITY visualisation.size.spacing                         "Spacing between Messages">
 <!ENTITY visualisation.size.messagecircles                  "Draw messages as circles">
-<!ENTITY visualisation.svg                                  "Use SVG if available">
 <!ENTITY visualisation.colour.caption                       "Colours">
 <!ENTITY visualisation.colour.single.caption                "Single Colour">
 <!ENTITY visualisation.colour.single.description            "Only use a single colour in the visualisation. The selected message is displayed in blue, other messages are displayed in grey.">

@@ -33,24 +33,7 @@
 <!ENTITY settings.title                                     "ThreadVis">
 <!ENTITY label.default                                      "(Standard)">
 <!ENTITY extension.enabled                                  "Erweiterung aktivieren">
-<!ENTITY logfiles.tab                                       "Log-Dateien">
-<!ENTITY logfiles.caption                                   "Logging aktivieren">
-<!ENTITY logfiles.console                                   "Nur in der Fehler-Konsole loggen">
-<!ENTITY logfiles.enable.checkbox                           "Logging aktivieren">
-<!ENTITY logfiles.enable.description.whatlogged             "Wenn Sie das Logging aktivieren, werden nur statistische Daten &#xFC;ber Ihre Mailbox, &#xFC;ber die Konversationen die Sie lesen und die Art mit der Sie die Erweiterung verwenden, gespeichert.">
-<!ENTITY logfiles.enable.description.sending                "Diese Information wird nie automatisch versendet. Sie k&#xF6;nnen diese Informationen versenden, indem Sie auf den Button &#x22;&logfiles.send.button;&#x22; klicken.">
-<!ENTITY logfiles.debug.checkbox                            "Debug-Informationen inkludieren">
-<!ENTITY logfiles.debug.description.general                 "Wenn Sie auf Probleme mit der Erweiterung sto&#xDF;en, k&#xF6;nnen Sie Debug-Informationen in den Log-Dateien inkludieren, um die Behebung der Probleme zu vereinfachen.">
-<!ENTITY logfiles.debug.description.personalinfo            "Achtung: Diese Informationen k&#xF6;nnen pers&#xF6;nliche Daten wie Message-IDs, die Struktur der Konversationen die Sie f&#xFC;hren und &#xE4;hnliche Informationen beinhalten.">
-<!ENTITY logfiles.debug.description.size                    "Bitte beachten Sie auch, dass durch das Aktivieren dieser Option die Gr&#xF6;&#xDF;e der Log-Dateien extrem anw&#xE4;chst und die Geschwindigkeit der Erweiterung verringert wird.">
-<!ENTITY logfiles.debug.level                               "Log-Level:">
-<!ENTITY logfiles.send.button                               "Log-Dateien senden">
-<!ENTITY logfiles.send.tooltip                              "Erstellt eine neue leere E-Mail und f&#xFC;gt die Log-Dateien als Anhang an.">
-<!ENTITY logfiles.reset.button                              "Log-Dateien zur&#xFC;cksetzen">
-<!ENTITY logfiles.reset.tooltip                             "Setzt die Log-Dateien auf Gr&#xF6;&#xDF;e 0 zur&#xFC;ck. Sie k&#xF6;nnen dies tun, nachdem Sie die Log-Dateien abgeschickt haben, um Speicherplatz zu sparen.">
 <!ENTITY visualisation.tab                                  "Visualisierung">
-<!ENTITY visualisation.caching.caption                      "Cache">
-<!ENTITY visualisation.caching.reset                        "Cache f&#xFC;r ausgew&#xE4;hltes Konto zur&#xFC;cksetzen">
 <!ENTITY visualisation.caching.selectAccount                "Konto w&#xE4;hlen...">
 <!ENTITY visualisation.zoom.caption                         "Standard-Gr&#xF6;&#xDF;e">
 <!ENTITY visualisation.zoom.fit                             "angepasst (Auto-Zoom)">
@@ -71,7 +54,6 @@
 <!ENTITY visualisation.size.arcwidth                        "Linienbreite">
 <!ENTITY visualisation.size.spacing                         "Abstand zwischen zwei Nachrichten">
 <!ENTITY visualisation.size.messagecircles                  "Nachrichten als Kreise zeichnen">
-<!ENTITY visualisation.svg                                  "SVG verwenden, so verf&#xFC;gbar">
 <!ENTITY visualisation.colour.caption                       "Farben">
 <!ENTITY visualisation.colour.single.caption                "Einzelne Farbe">
 <!ENTITY visualisation.colour.single.description            "Verwendet nur eine einzige Farbe in der Visualisierung. Die ausgew&#xE4;hlte Nachricht wird blau dargestellt, andere Nachrichten in grau.">

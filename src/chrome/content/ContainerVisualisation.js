@@ -162,13 +162,6 @@ ThreadVisNS.ContainerVisualisation = function(stack, strings, container, colour,
         this.style ="dummy";
     }
 
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "ContainerVisualisation()", {"action" : "start", "container" :
-            this.container.toString(), "colour" : this.colour, "style" :
-            this.style, "left" : this.left, "top" : this.top});
-    }
-
     this.drawDot();
 
     this.drawCircle("black");
@@ -191,8 +184,7 @@ ThreadVisNS.ContainerVisualisation = function(stack, strings, container, colour,
 
 
 /** ****************************************************************************
- * Create popup menu to delete, copy and cut messages
- * Just create stub menu
+ * Create popup menu
  *
  * @return
  *          void
@@ -216,93 +208,15 @@ ThreadVisNS.ContainerVisualisation.prototype.createMenu = function() {
 
 
 /** ****************************************************************************
- * Fill popup menu to delete, copy and cut messages
+ * Fill popup menu
  *
  * @return
  *          void
  ******************************************************************************/
 ThreadVisNS.ContainerVisualisation.prototype.getMenu = function() {
     if (this.popup.rendered == true) {
-        if (THREADVIS.copyMessage) {
-            this.menuitemPaste.setAttribute("disabled", false);
-        } else {
-            this.menuitemPaste.setAttribute("disabled", true);
-        }
         return;
     }
-
-    var menuitemDelete = document.createElementNS(THREADVIS.XUL_NAMESPACE,
-        "menuitem");
-    var menuitemCut = document.createElementNS(THREADVIS.XUL_NAMESPACE,
-        "menuitem");
-    var menuitemPaste = document.createElementNS(THREADVIS.XUL_NAMESPACE,
-        "menuitem");
-
-    this.menuitemPaste = menuitemPaste;
-
-    // delete menu item
-    menuitemDelete.setAttribute("label",
-        this.strings.getString("copycut.delete"));
-    var tooltipDelete = document.createElementNS(THREADVIS.XUL_NAMESPACE,
-        "tooltip");
-    tooltipDelete.setAttribute("orient", "vertical");
-    tooltipDelete.setAttribute("id", "dot_popup_tooltip_delete_" + this.left);
-
-    var tooltipLabelDelete = document.createElementNS(THREADVIS.XUL_NAMESPACE,
-        "description");
-    var tooltipTextDelete = document.createTextNode(
-        this.strings.getString("copycut.delete.tooltip"));
-    tooltipLabelDelete.style.height = "50px";
-    tooltipLabelDelete.appendChild(tooltipTextDelete);
-    tooltipDelete.appendChild(tooltipLabelDelete);
-
-    menuitemDelete.setAttribute("tooltip", "dot_popup_tooltip_delete_"
-        + this.left);
-
-    // cut menu item
-    menuitemCut.setAttribute("label", this.strings.getString("copycut.cut"));
-    var tooltipCut = document.createElementNS(THREADVIS.XUL_NAMESPACE,
-        "tooltip");
-    tooltipCut.setAttribute("orient", "vertical");
-    tooltipCut.setAttribute("id", "dot_popup_tooltip_cut_" + this.left);
-
-    var tooltipLabelCut = document.createElementNS(THREADVIS.XUL_NAMESPACE,
-        "description");
-    var tooltipTextCut = document.createTextNode(
-        this.strings.getString("copycut.cut.tooltip"));
-    tooltipLabelCut.style.height = "50px";
-    tooltipLabelCut.appendChild(tooltipTextCut);
-    tooltipCut.appendChild(tooltipLabelCut);
-
-    menuitemCut.setAttribute("tooltip", "dot_popup_tooltip_cut_" + this.left);
-
-    // paste menu item
-    menuitemPaste.setAttribute("label",
-        this.strings.getString("copycut.paste"));
-    if (THREADVIS.copyMessage) {
-        menuitemPaste.setAttribute("disabled", false);
-    } else {
-        menuitemPaste.setAttribute("disabled", true);
-    }
-    var tooltipPaste = document.createElementNS(THREADVIS.XUL_NAMESPACE,
-        "tooltip");
-    tooltipPaste.setAttribute("orient", "vertical");
-    tooltipPaste.setAttribute("id", "dot_popup_tooltip_paste_" + this.left);
-
-    var tooltipLabelPaste = document.createElementNS(THREADVIS.XUL_NAMESPACE,
-        "description");
-    var tooltipTextPaste = document.createTextNode(
-        this.strings.getString("copycut.paste.tooltip"));
-    tooltipLabelPaste.style.height = "50px";
-    tooltipLabelPaste.appendChild(tooltipTextPaste);
-    tooltipPaste.appendChild(tooltipLabelPaste);
-
-    menuitemPaste.setAttribute("tooltip", "dot_popup_tooltip_paste_"
-        + this.left);
-
-    this.popup.appendChild(menuitemDelete);
-    this.popup.appendChild(menuitemCut);
-    this.popup.appendChild(menuitemPaste);
 
     // include normal menu items
     var separator = document.createElementNS(THREADVIS.XUL_NAMESPACE,
@@ -319,14 +233,6 @@ ThreadVisNS.ContainerVisualisation.prototype.getMenu = function() {
             items[i].getAttribute("oncommand"));
         this.popup.appendChild(item);
     }
-
-    var ref = this;
-    menuitemDelete.addEventListener("command",
-        function() {ref.deleteParent();}, true);
-    menuitemCut.addEventListener("command",
-        function() {ref.cut();}, true);
-    menuitemPaste.addEventListener("command",
-        function() {ref.paste();}, true);
 
     this.popup.rendered = true;
 }
@@ -394,11 +300,6 @@ ThreadVisNS.ContainerVisualisation.prototype.getToolTip = function() {
     }
 
     if (! this.container.isDummy()) {
-        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
-            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-                "Visualisation.drawDot()", {"action" : "create tooltip start"});
-        }
-
         // if container container message, view details
         var authorLabel = document.createElementNS(THREADVIS.XUL_NAMESPACE,
             "label");
@@ -440,18 +341,7 @@ ThreadVisNS.ContainerVisualisation.prototype.getToolTip = function() {
         this.tooltip.appendChild(author);
         this.tooltip.appendChild(date);
         this.tooltip.appendChild(subject);
-
-        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
-            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-                "Visualisation.drawDot()", {"action" : "create tooltip end"});
-        }
     } else {
-        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
-            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-                "Visualisation.drawDot()", {"action" :
-                "create missing tooltip start"});
-        }
-        
         // otherwise we display info about missing message
         var desc1 = document.createElementNS(THREADVIS.XUL_NAMESPACE,
             "description");
@@ -463,73 +353,8 @@ ThreadVisNS.ContainerVisualisation.prototype.getToolTip = function() {
             this.strings.getString("tooltip.missingmessagedetail"));
         this.tooltip.appendChild(desc1);
         this.tooltip.appendChild(desc2);
-
-        if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
-            THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-                "Visualisation.drawDot()",
-                {"action" : "create missing tooltip end"});
-        }
     }
     this.tooltip.rendered = true;
-}
-
-
-
-/** ****************************************************************************
- * Cut message
- * Don't do anything until we paste the message
- * Just remember which message we have to cut
- *
- * @return
- *          void
- ******************************************************************************/
-ThreadVisNS.ContainerVisualisation.prototype.cut = function() {
-    THREADVIS.copyMessage = this.container;
-    var msgKey = THREADVIS.copyMessage.isDummy() ? "DUMMY" : 
-                    THREADVIS.copyMessage.getMessage().getKey();
-    THREADVIS.logger.log("copycut", {"action" : "cutmessage",
-        "msgkey" : msgKey});
-}
-
-
-
-/** ****************************************************************************
- * Delete the parent-child relationship for this message
- * (i.e. delete the reference to the parent)
- *
- * @return
- *          void
- ******************************************************************************/
-ThreadVisNS.ContainerVisualisation.prototype.deleteParent = function() {
-    var parent = this.container.getParent();
-    parent.removeChild(this.container);
-    parent.getTopContainer().pruneEmptyContainers();
-
-    var msgid = ! this.container.isDummy() ?
-        this.container.getMessage().getId() : "";
-    var msgkey = ! this.container.isDummy() ?
-        this.container.getMessage().getKey() : "";
-    var parentmsgid = ! parent.isDummy() ? parent.getMessage().getId() : "";
-
-    if (msgid != "" && parentmsgid != "") {
-        // get the account key for the message
-        var folder = THREADVIS.getMainWindow().GetLoadedMsgFolder();
-        var server = folder.server;
-        var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
-            .getService(Components.interfaces.nsIMsgAccountManager))
-            .FindAccountForServer(server);
-        var accountKey = account.key;
-        account = null;
-        delete account;
-        server = null;
-        delete server;
-
-        THREADVIS.cache.addCut(accountKey, msgid, parentmsgid);
-        THREADVIS.setSelectedMessage(true);
-
-        THREADVIS.logger.log("copycut", {"action" : "deletemessage",
-            "msgkey" : msgkey});
-    }
 }
 
 
@@ -702,11 +527,6 @@ ThreadVisNS.ContainerVisualisation.prototype.onMouseClick = function(event) {
  *          void
  ******************************************************************************/
 ThreadVisNS.ContainerVisualisation.prototype.onMouseClickDelayed = function(event) {
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "Visualisation.onMouseClick()", {});
-    }
-
     var container = event.target.container;
     if (container && ! container.isDummy()) {
         // check to see if this visualisation is in the popup window
@@ -717,67 +537,6 @@ ThreadVisNS.ContainerVisualisation.prototype.onMouseClickDelayed = function(even
         }
         elem.THREADVIS.callback(container.getMessage(), elem.THREADVIS.isMessageWindow());
     }
-}
-
-
-
-/** ****************************************************************************
- * Paste a previously cut message in this thread
- *
- * @return
- *          void
- ******************************************************************************/
-ThreadVisNS.ContainerVisualisation.prototype.paste = function() {
-    if (THREADVIS.copyMessage) {
-        // check to see if user creates a loop
-        if (this.container.findParent(THREADVIS.copyMessage)) {
-            alert("Action not allowed. This would create a loop.");
-            return;
-        }
-        var copyParent = THREADVIS.copyMessage.getParent();
-        this.container.addChild(THREADVIS.copyMessage);
-
-        var thisMsgid = ! this.container.isDummy() ?
-            this.container.getMessage().getId() : "";
-        var thisMsgkey = ! this.container.isDummy() ?
-            this.container.getMessage().getKey() : "";
-        var copyMessageMsgid = ! THREADVIS.copyMessage.isDummy() ?
-            THREADVIS.copyMessage.getMessage().getId() : "";
-        var copyMessageMsgkey = ! THREADVIS.copyMessage.isDummy() ?
-            THREADVIS.copyMessage.getMessage().getKey() : "";
-        var copyMessageParentMsgid = "";
-        var copyMessageParentMsgkey = "";
-        if (copyParent) {
-            copyMessageParentMsgid = ! copyParent.isDummy() ?
-                copyParent.getMessage().getId() : "";
-            copyMessageParentMsgkey = ! copyParent.isDummy() ?
-                copyParent.getMessage().getKey() : "";
-        }
-
-        if (thisMsgid != "" && copyMessageMsgid != "") {
-            var folder = THREADVIS.getMainWindow().GetLoadedMsgFolder();
-            // get the account key for the message
-            var server = folder.server;
-            var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
-                .getService(Components.interfaces.nsIMsgAccountManager))
-                .FindAccountForServer(server);
-            var accountKey = account.key;
-            account = null;
-            delete account;
-            server = null;
-            delete server;
-
-            THREADVIS.cache.addCut(accountKey,
-                copyMessageMsgid, copyMessageParentMsgid);
-            THREADVIS.cache.addCopy(accountKey, copyMessageMsgid, thisMsgid);
-            THREADVIS.setSelectedMessage(true);
-
-            THREADVIS.logger.log("copycut", {"action" : "pastemessage",
-                "copied-msgkey" : copyMessageMsgkey,
-                "pasted-msgkey" : thisMsgkey});
-        }
-    }
-    THREADVIS.copyMessage = null;
 }
 
 
@@ -924,14 +683,6 @@ ThreadVisNS.ContainerVisualisation.prototype.visualiseCircle = function(colour) 
     var styleBorder = "";
     styleBorder = (this.dotSize / 6 * this.resize) + "px solid " + colour;
 
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "Visualisation.drawDot()", {"action" : "draw selection circle",
-            "top" : styleTop, "left" : styleLeft, "height" : styleHeight,
-            "width" : styleWidth, "background" : styleBackground,
-            "border" : styleBorder});
-    }
-
     this.circle.style.position = "relative";
     this.circle.style.top = styleTop;
     this.circle.style.left = styleLeft;
@@ -961,13 +712,6 @@ ThreadVisNS.ContainerVisualisation.prototype.visualiseClick = function() {
     var styleWidth = (this.spacing * this.resize) + "px";
     var styleBackground = "";
     var styleBorder = "";
-
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "Visualisation.drawClick()", {"top" : styleTop, "left" : styleLeft,
-            "height" : styleHeight, "width" : styleWidth, "background" :
-            styleBackground, "border" : styleBorder});
-    }
 
     this.click.style.position = "relative";
     this.click.style.top = styleTop;
@@ -1005,13 +749,6 @@ ThreadVisNS.ContainerVisualisation.prototype.visualiseDot = function() {
     } else {
         styleBorder = (this.dotSize / 4 * this.resize) + "px solid "
             + this.colour;
-    }
-
-    if (THREADVIS.logger.isDebug(THREADVIS.logger.COMPONENT_VISUALISATION)) {
-        THREADVIS.logger.logDebug(THREADVIS.logger.LEVEL_INFO,
-            "Visualisation.drawDot()", {"top" : styleTop, "left" : styleLeft,
-            "height" : styleHeight, "width" : styleWidth, "background" :
-            styleBackground, "border" : styleBorder});
     }
 
     this.dot.style.position = "relative";

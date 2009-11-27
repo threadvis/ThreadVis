@@ -42,11 +42,9 @@ var XUL_NAMESPACE = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.x
  *          void
  ******************************************************************************/
 function init() {
-    toggleLogging();
     toggleHighlight();
     buildAccountList();
     buildAccountPreference();
-    buildCacheList();
 }
 
 
@@ -175,38 +173,10 @@ function buildAccountPreference() {
         
     }
     pref.value = prefString;
-    // We need to call doCommand(), because otherwise Thunderbird 1.5 doesn't
+    // We need to call doCommand(), because otherwise Thunderbird doesn't
     // update the underlying preference upon closing the window (i.e. ignores
     // the new value of the textbox).
     pref.doCommand();
-}
-
-
-
-/** ****************************************************************************
- * Build the cache list
- * Get all accounts
- *
- * @return
- *          void
- ******************************************************************************/
-function buildCacheList() {
-    var accountBox = document.getElementById("cacheSelectAccountMenuPopup");
-
-    var accountManager = Components.classes["@mozilla.org/messenger/account-manager;1"]
-        .getService(Components.interfaces.nsIMsgAccountManager);
-
-    var accounts = accountManager.accounts;
-    for (var i = 0; i < accounts.Count(); i++)  {
-        var account = accounts.QueryElementAt(i, Components.interfaces.nsIMsgAccount);
-
-        var menuitem = document.createElementNS(XUL_NAMESPACE, "menuitem");
-        menuitem.setAttribute("label", account.incomingServer.prettyName);
-        menuitem.setAttribute("value", account.key);
-        accountBox.appendChild(menuitem);
-    }
-
-    accountManager = null;
 }
 
 
@@ -275,7 +245,7 @@ function buildFolderPreference() {
         }
     }
     pref.value = prefString;
-    // We need to call doCommand(), because otherwise Thunderbird 1.5 doesn't
+    // We need to call doCommand(), because otherwise Thunderbird doesn't
     // update the underlying preference upon closing the window (i.e. ignores
     // the new value of the textbox).
     pref.doCommand();
@@ -345,29 +315,13 @@ function composeEmail(to, subject, body, attachments) {
  *          An array of all subfolders
  ******************************************************************************/
 function getAllFolders(folder) {
-    // Seamonkey < 2 and Thunderbird <= 2 use GetSubFolders
-    // (which returns a nsIEnumerator)
-    // so we have to use .currentItem() and .next()
-    // Thunderbird 3 and Seamonkey 2 use subFolders (which returns a nsISimpleEnumerator
-    // so we have to use .getNext() and .hasMoreElements()
-    var folderEnumerator = null;
-    if (folder.GetSubFolders) {
-        folderEnumerator = folder.GetSubFolders();
-    }
-    if (folder.subFolders) {
-        folderEnumerator = folder.subFolders;
-    }
+    var folderEnumerator = folder.subFolders;
     var currentFolder = null;
     var folders = new Array();
 
     while (true) {
         try {
-            if (folderEnumerator.currentItem) {
-                currentFolder = folderEnumerator.currentItem();
-            }
-            if (folderEnumerator.getNext) {
-                currentFolder = folderEnumerator.getNext();
-            }
+            currentFolder = folderEnumerator.getNext();
         } catch (Exception) {
             break;
         }
@@ -381,11 +335,7 @@ function getAllFolders(folder) {
         }
 
         try {
-            if (folderEnumerator.next) {
-                folderEnumerator.next();
-            }
-            if (folderEnumerator.hasMoreElements && 
-                ! folderEnumerator.hasMoreElements()) {
+            if (! folderEnumerator.hasMoreElements()) {
                 break;
             }
         } catch (e) {
@@ -394,104 +344,6 @@ function getAllFolders(folder) {
     }
 
     return folders;
-}
-
-
-
-/** ****************************************************************************
- * Return file objects for all logfiles
- *
- * @return
- *          The array of all logfiles
- ******************************************************************************/
-function getLogfiles() {
-    var logfiles = new Array();
-    var logger = getLogger();
-
-    var file = null;
-    if (logger) {
-        file = logger.getFile();
-    }
-
-    if (file) {
-        if (file.exists()) {
-            logfiles.push(file);
-        }
-    }
-
-    return logfiles;
-}
-
-
-
-/** ****************************************************************************
- * Get the logger object
- *
- * @param object
- *          A window object from which to search
- * @return
- *          The logger object
- ******************************************************************************/
-function getLogger(object) {
-    // if no object given, assume this window
-    if (! object) {
-        object = window;
-    }
-
-    // check for logger object
-    if (object.THREADVIS && object.THREADVIS.logger) {
-        return object.THREADVIS.logger;
-    }
-
-    // go to top parent window
-    if (object.parent && object != object.parent) {
-        return getLogger(object.parent);
-    }
-
-    // go to window opener, until logger found
-    if (object.opener && object != object.opener) {
-        return getLogger(object.opener);
-    }
-
-    // we have no logger, no parent and no opener
-    // this shouldn't happen
-    return null;
-}
-
-
-
-/** ****************************************************************************
- * Get the threadvis object
- *
- * @param object
- *          A window object to start searching from
- * @return
- *          The threadvis object
- ******************************************************************************/
-function getThreadvis(object) {
-    // if no object given, assume this window
-    if (! object) {
-        object = window;
-    }
-
-    // check for logger object
-    if (object.THREADVIS) {
-        return object.THREADVIS;
-    }
-
-    // go to top parent window
-    if (object.parent && object != object.parent) {
-        return getThreadvis(object.parent);
-    }
-
-    // go to window opener, until logger found
-    if (object.opener && object != object.opener) {
-        return getThreadvis(object.opener);
-    }
-
-    // we have no logger, no parent and no opener
-    // this shouldn't happen
-    return null;
 }
 
 
@@ -517,58 +369,6 @@ function openURL(url) {
 
 
 /** ****************************************************************************
- * Reset the logfiles
- *
- * @return
- *          void
- ******************************************************************************/
-function resetLogfiles() {
-    var logger = getLogger();
-
-    if (logger) {
-        logger.reset(true);
-    }
-    else {
-        alert(document.getElementById("threadVisStrings")
-            .getString("logger.couldnotdeletefile"));
-    }
-}
-
-
-
-/** ****************************************************************************
- * Send the logfiles to the author
- *
- * @return
- *          void
- ******************************************************************************/
-function sendLogfiles() {
-    var logfiles = getLogfiles();
-    composeEmail("ahubmann@gmail.com", "[ThreadVis] Auto-Email-Logs",
-        null, logfiles);
-}
-
-
-
-/** ****************************************************************************
- * Enable or disable the cache reset button
- *
- * @return
- *          void
- ******************************************************************************/
-function toggleCacheSelect() {
-    var menulist = document.getElementById("cacheSelectAccount");
-    var button = document.getElementById("resetCache");
-    if (menulist.value != "---") {
-        button.disabled = false;
-    } else {
-        button.disabled = true;
-    }
-}
-
-
-
-/** ****************************************************************************
  * Enable or disable the highlight checkbox
  *
  * @return
@@ -587,24 +387,6 @@ function toggleHighlight() {
 
 
 /** ****************************************************************************
- * Enable or disable the debug checkbox
- *
- * @return
- *          void
- ******************************************************************************/
-function toggleLogging() {
-    var logCheckbox = document.getElementById("doLogging");
-    var debugCheckbox = document.getElementById("doLoggingDebug");
-    if (logCheckbox.checked) {
-        debugCheckbox.disabled = false;
-    } else {
-        debugCheckbox.disabled = true;
-    }
-}
-
-
-
-/** ****************************************************************************
  * Write an email to the author
  *
  * @return
@@ -612,22 +394,6 @@ function toggleLogging() {
  ******************************************************************************/
 function writeEmail() {
     composeEmail("ahubmann@gmail.com", "[ThreadVis] <insert subject here>", null)
-}
-
-
-
-/** ****************************************************************************
- * Reset cache for selected account
- *
- * @return
- *          void
- ******************************************************************************/
-function resetCache() {
-    var menulist = document.getElementById("cacheSelectAccount");
-    var accountKey = menulist.value;
-    getThreadvis().cache.reset(accountKey);
-    alert(document.getElementById("threadVisStrings")
-        .getString("cache.reset.done"));
 }
 
 

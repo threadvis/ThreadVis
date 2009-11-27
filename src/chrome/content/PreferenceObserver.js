@@ -47,17 +47,9 @@ ThreadVisNS.PreferenceObserver = function() {
     this.PREF_BRANCH = "extensions.threadvis.";
 
     this.PREF_ABOUT = "about";
-    this.PREF_CACHE_CHECK_INTERVAL = "cache.checkinterval";
-    this.PREF_CACHE_UPDATE_FOLDERS = "cache.updatefolders";
-    this.PREF_CACHE_SKIP_INVALID_FOLDERS = "cache.skipinvalidfolders";
     this.PREF_DISABLED_ACCOUNTS = "disabledaccounts";
     this.PREF_DISABLED_FOLDERS = "disabledfolders";
     this.PREF_ENABLED = "enabled";
-    this.PREF_LOGGING = "logging.enabled";
-    this.PREF_LOGGING_DEBUG = "logging.debug";
-    this.PREF_LOGGING_DEBUG_COMPONENT = "logging.debug.component";
-    this.PREF_LOGGING_CONSOLE = "logging.console";
-    this.PREF_LOGGING_EMAIL = "logging.email";
     this.PREF_SENTMAIL_FOLDERFLAG = "sentmail.folderflag";
     this.PREF_SENTMAIL_IDENTITY = "sentmail.identity";
     this.PREF_SVG_HEIGHT = "svg.height";
@@ -81,7 +73,6 @@ ThreadVisNS.PreferenceObserver = function() {
     this.PREF_VIS_HIGHLIGHT = "visualisation.highlight";
     this.PREF_VIS_MINIMAL_WIDTH = "visualisation.minimalwidth";
     this.PREF_VIS_OPACITY = "visualisation.opacity";
-    this.PREF_VIS_SVG = "visualisation.svg";
     this.PREF_VIS_ZOOM = "visualisation.zoom";
 
     this.prefBranch = null;
@@ -202,28 +193,12 @@ ThreadVisNS.PreferenceObserver.prototype.observe = function(subject, topic,
 ThreadVisNS.PreferenceObserver.prototype.preferenceReload = function() {
     this.loadPreference(this.PREF_ABOUT,
         this.prefBranch.PREF_INT, 0);
-    this.loadPreference(this.PREF_CACHE_CHECK_INTERVAL,
-        this.prefBranch.PREF_INT, 0);
-    this.loadPreference(this.PREF_CACHE_UPDATE_FOLDERS,
-        this.prefBranch.PREF_BOOL, false);
-    this.loadPreference(this.PREF_CACHE_SKIP_INVALID_FOLDERS,
-        this.prefBranch.PREF_BOOL, false);
     this.loadPreference(this.PREF_DISABLED_ACCOUNTS,
         this.prefBranch.PREF_STRING, "");
     this.loadPreference(this.PREF_DISABLED_FOLDERS,
         this.prefBranch.PREF_STRING, "");
     this.loadPreference(this.PREF_ENABLED,
         this.prefBranch.PREF_BOOL, true);
-    this.loadPreference(this.PREF_LOGGING,
-        this.prefBranch.PREF_BOOL, false);
-    this.loadPreference(this.PREF_LOGGING_DEBUG,
-        this.prefBranch.PREF_BOOL, false);
-    this.loadPreference(this.PREF_LOGGING_DEBUG_COMPONENT,
-        this.prefBranch.PREF_STRING, "");
-    this.loadPreference(this.PREF_LOGGING_CONSOLE,
-        this.prefBranch.PREF_BOOL, false);
-    this.loadPreference(this.PREF_LOGGING_EMAIL,
-        this.prefBranch.PREF_STRING, "0");
     this.loadPreference(this.PREF_SENTMAIL_FOLDERFLAG,
         this.prefBranch.PREF_BOOL, true);
     this.loadPreference(this.PREF_SENTMAIL_IDENTITY,
@@ -270,8 +245,6 @@ ThreadVisNS.PreferenceObserver.prototype.preferenceReload = function() {
         this.prefBranch.PREF_INT, 0);
     this.loadPreference(this.PREF_VIS_OPACITY,
         this.prefBranch.PREF_INT, 30);
-    this.loadPreference(this.PREF_VIS_SVG,
-        this.prefBranch.PREF_BOOL, false);
     this.loadPreference(this.PREF_VIS_ZOOM,
         this.prefBranch.PREF_STRING, "full");
 }

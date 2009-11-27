@@ -44,10 +44,10 @@ if (! window.ThreadVisNS) {
  *          The subject of the message
  * @param from
  *          The "From" address
+ * @param fromIdentity
+ *          The "From" identity
  * @param messageId
  *          The message id of the email
- * @param messageKey
- *          The message key
  * @param date
  *          The date of the message
  * @param folder
@@ -59,7 +59,7 @@ if (! window.ThreadVisNS) {
  * @return
  *          A new message
  ******************************************************************************/
-ThreadVisNS.Message = function(subject, from, messageId, messageKey, date,
+ThreadVisNS.Message = function(subject, from, fromIdentity, messageId, date,
     folder, references, sent) {
     /**
      * Message date
@@ -70,6 +70,11 @@ ThreadVisNS.Message = function(subject, from, messageId, messageKey, date,
      * Sender of message
      */
     this.from = from;
+
+    /**
+     * The from identity (sender of the message)
+     */
+    this.fromIdentity = fromIdentity;
 
     /**
      * Folder message is in
@@ -85,11 +90,6 @@ ThreadVisNS.Message = function(subject, from, messageId, messageKey, date,
      * Message id
      */
     this.messageId = messageId;
-
-    /**
-     * Message key, to identify the message in mozilla
-     */
-    this.messageKey = messageKey;
 
     /**
      * References of this message
@@ -152,24 +152,7 @@ ThreadVisNS.Message.prototype.getFrom = function() {
  *          The parsed email address
  ******************************************************************************/
 ThreadVisNS.Message.prototype.getFromEmail = function() {
-    // parse email address
-    var parser = Components.classes["@mozilla.org/messenger/headerparser;1"]
-        .getService(Components.interfaces.nsIMsgHeaderParser);
-    // Thunderbird 3 does something which should never be done on APIs:
-    // changing the interface, but keeping the name and version.
-    // In TB 2, extractHeaderAddressMailboxes has two parameters:
-    // a charset and the line to parse.
-    // In TB 3, extractHeaderAddressMailboxes has only a single parameter:
-    // the line to parse.
-    // How on earth should one write code that is both compatible with
-    // TB2 and TB3?
-    // The code below is an ugly hack, a better solution is needed!
-    // TODO fix this hack.
-    var email = parser.extractHeaderAddressMailboxes(null, this.getFrom());
-    if (email == "") {
-        email = parser.extractHeaderAddressMailboxes(this.getFrom());
-    }
-    return email;
+    return this.fromIdentity.value;
 }
 
 
@@ -182,18 +165,6 @@ ThreadVisNS.Message.prototype.getFromEmail = function() {
  ******************************************************************************/
 ThreadVisNS.Message.prototype.getId = function() {
     return this.messageId;
-}
-
-
-
-/** ****************************************************************************
- * Get message key
- *
- * @return
- *          The message key
- ******************************************************************************/
-ThreadVisNS.Message.prototype.getKey = function() {
-    return this.messageKey;
 }
 
 
@@ -244,20 +215,6 @@ ThreadVisNS.Message.prototype.isSent = function() {
 
 
 /** ****************************************************************************
- * Set if message is sent (i.e. in sent-mail folder)
- *
- * @param sent
- *          True if message is a sent message
- * @return
- *          void
- ******************************************************************************/
-ThreadVisNS.Message.prototype.setSent = function(sent) {
-    this.sent = sent;
-}
-
-
-
-/** ****************************************************************************
  * Return message as string
  *
  * @return
@@ -265,7 +222,7 @@ ThreadVisNS.Message.prototype.setSent = function(sent) {
  ******************************************************************************/
 ThreadVisNS.Message.prototype.toString = function() {
     return "Message: Subject: '" + this.subject + "'. From: '" + this.from +
-        "'. MsgId: '" + this.messageId + "'. MsgKey: '" + this.messageKey +
-        "'. Date: '" + this.date + "'. Folder: '" + this.folder +
+        "'. MsgId: '" + this.messageId + "'. Date: '" + this.date +
+        "'. Folder: '" + this.folder +
         "'. Refs: '" + this.references + "'. Sent: '" + this.sent + "'";
 }

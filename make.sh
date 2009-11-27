@@ -155,3 +155,7 @@ rm -Rf build/src
 
 
 echo "Build $revision successful."
+
+# copy to desktop for easy installation
+cp build/ThreadVis.xpi /Users/sascha/Desktop/ThreadVis.xpi
+
