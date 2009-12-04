@@ -63,10 +63,17 @@ ThreadVisNS.Cache = function(threadvis) {
  * @return
  *          void
  ******************************************************************************/
-ThreadVisNS.Cache.prototype.getCache = function(msg, callback) {
+ThreadVisNS.Cache.prototype.getCache = function(msg, callback, numTry) {
+    if (numTry == null) {
+        numTry = 1;
+    }
     var ref = this;
     Gloda.getMessageCollectionForHeader(msg, {
         onItemsAdded: function(items, collection) {
+        },
+        onItemsModified: function(items, collection) {
+        },
+        onItemsRemoved: function(items, collection) {
         },
         onQueryCompleted: function(collection) {
             var found = collection.items.length > 0;
@@ -75,9 +82,12 @@ ThreadVisNS.Cache.prototype.getCache = function(msg, callback) {
                 message.conversation.getMessagesCollection({
                     onItemsAdded: function(items, collection) {
                     },
+                    onItemsModified: function(items, collection) {
+                    },
+                    onItemsRemoved: function(items, collection) {
+                    },
                     onQueryCompleted: function(collection) {
                         for (var i = 0; i < collection.items.length; i++) {
-                            //cache.push(collection.items[i].headerMessageID)
                             var message = ref.createMessage(collection.items[i]);
                             ref.addToThreader(message);
                         }
@@ -85,7 +95,14 @@ ThreadVisNS.Cache.prototype.getCache = function(msg, callback) {
                     }
                 }, null);
             } else {
-                alert("no gloda message for: " + msg);
+                if (numTry > 10) {
+                    // tried 10 times to fetch message from gloda,
+                    // display error.
+                } else {
+                    setTimeout(function() {
+                        ref.getCache(msg, callback, numTry++);
+                    }, 5000);
+                }
             }
         }
     }, null);
