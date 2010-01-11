@@ -10,7 +10,7 @@
  * http://www.iicm.tugraz.at/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008, 2009 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009, 2010 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -34,7 +34,7 @@
 <!ENTITY about.title                                        "About ThreadVis">
 <!ENTITY about.version                                      "Version">
 <!ENTITY about.description                                  "Displays a small graphic visualising the context (thread) of the currently selected email.">
-<!ENTITY about.copyright                                    "&#xA9; 2005, 2006, 2007 Alexander C. Hubmann. &#xA9; 2007, 2008, 2009 Alexander C. Hubmann-Haidvogel">
+<!ENTITY about.copyright                                    "&#xA9; 2005, 2006, 2007 Alexander C. Hubmann. &#xA9; 2007, 2008, 2009, 2010 Alexander C. Hubmann-Haidvogel">
 <!ENTITY about.homepage                                     "http://threadvis.mozdev.org/">
 <!ENTITY about.email                                        "ahubmann@gmail.com">
 <!ENTITY about.name                                         "ThreadVis">
