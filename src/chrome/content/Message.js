@@ -40,71 +40,24 @@ if (! window.ThreadVisNS) {
 /** ****************************************************************************
  * Constructor
  *
- * @param subject
- *          The subject of the message
- * @param from
- *          The "From" address
- * @param fromIdentity
- *          The "From" identity
- * @param messageId
- *          The message id of the email
- * @param date
- *          The date of the message
- * @param folder
- *          The folder of the message
- * @param references
- *          The "References" header
+ * @param glodaMessage
+ *          The gloda message object
  * @param sent
  *          True if the message was sent
  * @return
  *          A new message
  ******************************************************************************/
-ThreadVisNS.Message = function(subject, from, fromIdentity, messageId, date,
-    folder, references, sent) {
+ThreadVisNS.Message = function(glodaMessage, sent) {
     /**
-     * Message date
+     * Gloda message
      */
-    this.date = date;
-
-    /**
-     * Sender of message
-     */
-    this.from = from;
-
-    /**
-     * The from identity (sender of the message)
-     */
-    this.fromIdentity = fromIdentity;
-
-    /**
-     * Folder message is in
-     */
-    this.folder = folder;
-
-    /**
-     * if folder stores sent mails
-     */
-    this.sent = sent;
-
-    /**
-     * Message id
-     */
-    this.messageId = messageId;
+    this.glodaMessage = glodaMessage;
 
     /**
      * References of this message
      */
-    this.references = new ThreadVisNS.References(references);
-
-    /**
-     * Depth of reply of this message
-     */
-    this.replyCount = 0;
-
-    /**
-     * Subject of message
-     */
-    this.subject = subject;
+    this.references = new ThreadVisNS.References(
+        glodaMessage.folderMessage.getStringProperty("references"));
 }
 
 
@@ -116,7 +69,7 @@ ThreadVisNS.Message = function(subject, from, fromIdentity, messageId, date,
  *          The date of the message
  ******************************************************************************/
 ThreadVisNS.Message.prototype.getDate = function() {
-    return this.date;
+    return this.glodaMessage.date;
 }
 
 
@@ -128,7 +81,7 @@ ThreadVisNS.Message.prototype.getDate = function() {
  *          The folder of the message
  ******************************************************************************/
 ThreadVisNS.Message.prototype.getFolder = function() {
-    return this.folder;
+    return this.glodaMessage.folderURI;
 }
 
 
@@ -140,7 +93,7 @@ ThreadVisNS.Message.prototype.getFolder = function() {
  *          The sender of the message
  ******************************************************************************/
 ThreadVisNS.Message.prototype.getFrom = function() {
-    return this.from;
+    return this.glodaMessage.folderMessage.mime2DecodedAuthor;
 }
 
 
@@ -152,7 +105,7 @@ ThreadVisNS.Message.prototype.getFrom = function() {
  *          The parsed email address
  ******************************************************************************/
 ThreadVisNS.Message.prototype.getFromEmail = function() {
-    return this.fromIdentity.value;
+    return this.glodaMessage.from.value;
 }
 
 
@@ -164,7 +117,7 @@ ThreadVisNS.Message.prototype.getFromEmail = function() {
  *          The message id
  ******************************************************************************/
 ThreadVisNS.Message.prototype.getId = function() {
-    return this.messageId;
+    return this.glodaMessage.headerMessageID;
 }
 
 
@@ -182,25 +135,13 @@ ThreadVisNS.Message.prototype.getReferences = function() {
 
 
 /** ****************************************************************************
- * Get reply count of this message
- *
- * @return
- *          The number of replies to this message
- ******************************************************************************/
-ThreadVisNS.Message.prototype.getReplyCount = function() {
-    return this.replyCount;
-}
-
-
-
-/** ****************************************************************************
  * Get original subject
  *
  * @return
  *          The subject
  ******************************************************************************/
 ThreadVisNS.Message.prototype.getSubject = function() {
-    return this.subject;
+    return this.glodaMessage.subject;
 }
 
 
@@ -210,6 +151,15 @@ ThreadVisNS.Message.prototype.getSubject = function() {
  ******************************************************************************/
 ThreadVisNS.Message.prototype.isSent = function() {
     return this.sent;
+}
+
+
+
+/** ****************************************************************************
+ * Get body of message
+ ******************************************************************************/
+ThreadVisNS.Message.prototype.getBody = function() {
+    return this.glodaMessage.indexedBodyText;
 }
 
 

@@ -338,9 +338,18 @@ ThreadVisNS.ContainerVisualisation.prototype.getToolTip = function() {
         subjectText.setAttribute("value",
             this.container.getMessage().getSubject());
 
+        var body = document.createElementNS(THREADVIS.XUL_NAMESPACE,
+            "description");
+        var bodyText = document.createTextNode(
+            this.container.getMessage().getBody());
+        body.appendChild(bodyText);
+
         this.tooltip.appendChild(author);
         this.tooltip.appendChild(date);
         this.tooltip.appendChild(subject);
+        this.tooltip.appendChild(document.createElementNS(
+            THREADVIS.XUL_NAMESPACE, "separator"));
+        this.tooltip.appendChild(body);
     } else {
         // otherwise we display info about missing message
         var desc1 = document.createElementNS(THREADVIS.XUL_NAMESPACE,

@@ -1338,7 +1338,6 @@ ThreadVisNS.Visualisation.prototype.setVariableSize = function() {
     this.outerBox.removeAttribute("height");
     this.outerBox.setAttribute("flex", "2");
     this.popups.removeAttribute("width");
-    this.expandedHeaders.removeAttribute("width");
 }
 
 

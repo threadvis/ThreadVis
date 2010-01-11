@@ -119,31 +119,20 @@ ThreadVisNS.Cache.prototype.getCache = function(msg, callback, numTry) {
  *          void
  ******************************************************************************/
 ThreadVisNS.Cache.prototype.createMessage = function(glodaMessage) {
-    var subject = glodaMessage.subject;
-    var messageId = glodaMessage.headerMessageID;
-    var date = glodaMessage.date;
-    var folderURI = glodaMessage.folderURI;
-
-    var dbMessage = glodaMessage.folderMessage;
-    var references = dbMessage.getStringProperty("references");
-    var from = dbMessage.mime2DecodedAuthor;
-    var fromIdentity = glodaMessage.from;
-
     // check if msg is a sent mail
     var issent = false;
 
     // it is sent if it is stored in a folder that is marked as sent (if enabled)
-    issent |= dbMessage.folder.isSpecialFolder(
+    issent |= glodaMessage.folderMessage.folder.isSpecialFolder(
                 Components.interfaces.nsMsgFolderFlags.SentMail, true) &&
         this.threadvis.preferences.getPreference(
                 this.threadvis.preferences.PREF_SENTMAIL_FOLDERFLAG);
     // or it is sent if the sender address is a local identity (if enabled)
-    issent |= this.threadvis.sentMailIdentities[fromIdentity.value] == true &&
+    issent |= this.threadvis.sentMailIdentities[glodaMessage.from.value] == true &&
         this.threadvis.preferences.getPreference(
                 this.threadvis.preferences.PREF_SENTMAIL_IDENTITY);
 
-    var message = new ThreadVisNS.Message(subject, from, fromIdentity,
-        messageId, date, folderURI, references, issent);
+    var message = new ThreadVisNS.Message(glodaMessage, issent);
 
     return message;
 }
