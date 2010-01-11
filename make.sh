@@ -11,7 +11,7 @@
 # * http://www.iicm.tugraz.at/ahubmann.pdf
 # *
 # * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
-# * Copyright (C) 2007, 2008, 2009 Alexander C. Hubmann-Haidvogel
+# * Copyright (C) 2007, 2008, 2009, 2010 Alexander C. Hubmann-Haidvogel
 # *
 # * ThreadVis is free software: you can redistribute it and/or modify it under
 # * the terms of the GNU Affero General Public License as published by the Free
@@ -99,12 +99,6 @@ sed -i -e "s/<<build>>/${revision}/g" build/src/chrome/locale/en-US/ThreadVis.dt
 
 sed -i -e "s/<<version>>/${version}/g" build/src/chrome/locale/en-US/ThreadVisAbout.dtd
 sed -i -e "s/<<build>>/${revision}/g" build/src/chrome/locale/en-US/ThreadVisAbout.dtd
-
-sed -i -e "s/<<version>>/${version}/g" build/src/chrome/content/Logger.js
-sed -i -e "s/<<build>>/${revision}/g" build/src/chrome/content/Logger.js
-
-sed -i -e "s/<<version>>/${version}/g" build/src/install.js
-sed -i -e "s/<<build>>/${revision}/g" build/src/install.js
 
 sed -i -e "s/<<version>>/${version}/g" build/src/install.rdf
 sed -i -e "s/<<build>>/${revision}/g" build/src/install.rdf

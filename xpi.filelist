@@ -1,5 +1,4 @@
 chrome.manifest
-install.js
 install.rdf
 chrome/threadvis.jar
 defaults/preferences/ThreadVisDefault.js
