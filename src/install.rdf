@@ -55,6 +55,8 @@
     <em:creator>Alexander C. Hubmann-Haidvogel</em:creator>
     <em:homepageURL>http://threadvis.mozdev.org/</em:homepageURL>
     <em:optionsURL>chrome://threadvis/content/SettingsDialog.xul</em:optionsURL>
+    <em:updateURL>http://downloads.mozdev.org/threadvis/update.rdf</em:updateURL>
+    <em:updateKey>MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCzoXxRZpe30ceEm8Zpb/n8W46qfzNAol3zlOohk1GZD5st97vGt6V0f0fZVG69wNHAISbHzHQqGta832La8o5UQzQVDVe55wax7f/l0uSs+LOLjNs3bKNpr2z4s0BAFZO7mrtBdHFIRs22E/OU5cfdMsFhJaXEhGXZ+BFiAPst5wIDAQAB</em:updateKey>
     <em:iconURL>chrome://threadvis/content/images/icon.png</em:iconURL>
 
     <!-- Packages, Skins and Locales that this extension registers -->

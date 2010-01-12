@@ -126,18 +126,32 @@ cd build/src
 zip -r ThreadVis.xpi . -i@../../xpi.filelist
 cd ../..
 cp build/src/ThreadVis.xpi build/ThreadVis.xpi
-cp build/src/update.rdf build/update.rdf
+
 
 
 # ##############################################################################
 # Create XPI file for addons.mozilla.org
+# (remove the updateURL and updateKey lines)
 # ##############################################################################
 
 sed -i -e '/<em:updateURL>.*<\/em:updateUrl>/d' build/src/install.rdf
+sed -i -e '/<em:updateKey>.*<\/em:updateKey>/d' build/src/install.rdf
 cd build/src
 zip -r ThreadVis-addons.mozilla.org.xpi . -i@../../xpi.filelist
 cd ../..
 cp build/src/ThreadVis-addons.mozilla.org.xpi build/ThreadVis-addons.mozilla.org.xpi
+
+
+
+# ##############################################################################
+# Include the update hash for the created XPI file
+# Sign the file
+# Copy to output directory
+# ##############################################################################
+
+sha512sum=`shasum -a 512 build/ThreadVis.xpi | awk '{print $1}'`
+sed -i -e "s/<<updatehash>>/sha512:${sha512sum}/g" build/src/update.rdf
+cp build/src/update.rdf build/update.rdf
 
 
 
