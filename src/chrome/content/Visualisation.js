@@ -1298,8 +1298,7 @@ ThreadVisNS.Visualisation.prototype.setFixedSize = function(x, y) {
     // total width and height of available space
     var outerWidth = 0;
     if (x) {
-        outerWidth = x + this.verticalScrollbarBox.boxObject.width
-            + this.buttonsBox.boxObject.width;
+        outerWidth = x + this.verticalScrollbarBox.boxObject.width;
     } else {
         outerWidth = this.outerBox.boxObject.width;
         // check for minimal width
