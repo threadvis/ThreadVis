@@ -113,7 +113,7 @@ sed -i -e "s/<<build>>/${revision}/g" build/src/update.rdf
 # ##############################################################################
 
 cd build/src/chrome
-zip -r threadvis.jar . -i@../../../jar.filelist
+zip -q -r threadvis.jar . -i@../../../jar.filelist
 cd ../../..
 
 
@@ -123,7 +123,7 @@ cd ../../..
 # ##############################################################################
 
 cd build/src
-zip -r ThreadVis.xpi . -i@../../xpi.filelist
+zip -q -r ThreadVis.xpi . -i@../../xpi.filelist
 cd ../..
 cp build/src/ThreadVis.xpi build/ThreadVis.xpi
 
@@ -137,7 +137,7 @@ cp build/src/ThreadVis.xpi build/ThreadVis.xpi
 sed -i -e '/<em:updateURL>.*<\/em:updateUrl>/d' build/src/install.rdf
 sed -i -e '/<em:updateKey>.*<\/em:updateKey>/d' build/src/install.rdf
 cd build/src
-zip -r ThreadVis-addons.mozilla.org.xpi . -i@../../xpi.filelist
+zip -q -r ThreadVis-addons.mozilla.org.xpi . -i@../../xpi.filelist
 cd ../..
 cp build/src/ThreadVis-addons.mozilla.org.xpi build/ThreadVis-addons.mozilla.org.xpi
 
