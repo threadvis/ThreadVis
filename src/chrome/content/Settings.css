@@ -31,14 +31,6 @@
 
 
 
-tabpanel.overflow {
-    /*overflow: auto;*/
-}
-
-tab {
-    padding: 0.5em;
-}
-
 #extensionName {
     font-size: large;
     font-weight: bold;
