@@ -31,7 +31,6 @@
  * XUL file to display settings dialog
  ******************************************************************************/
 -->
-<?xml-stylesheet href="chrome://threadvis/content/Settings.css" type="text/css"?>
 
 <!DOCTYPE overlay SYSTEM "chrome://threadvis/locale/Settings.dtd">
 <overlay id="ThreadVisPaneOverlay"
@@ -99,7 +98,7 @@
         </preferences>
 
         <tabbox flex="1" id="threadVisTabBox">
-            <tabs id="settingsTabs">
+            <tabs>
                 <tab label="&about.tab;" />
                 <tab label="&visualisation.timescaling.caption;" />
                 <tab label="&visualisation.size.caption;" />
@@ -107,9 +106,9 @@
                 <tab label="&visualisation.enabledaccounts.caption;" />
             </tabs>
 
-            <tabpanels id="settingsTabPanels" flex="1">
+            <tabpanels flex="1">
 
-                <tabpanel id="about" orient="vertical" flex="1">
+                <tabpanel id="about" orient="vertical">
                     <label value="&extension.name;" id="extensionName" />
                     <hbox>
                         <vbox>
@@ -138,7 +137,7 @@
                     </groupbox>
                 </tabpanel>
 
-                <tabpanel id="visualisation.timescaling" orient="vertical" flex="1">
+                <tabpanel id="visualisation.timescaling" orient="vertical">
                     <radiogroup id="doTimeScaling"
                         preference="extensions.threadvis.timescaling.enabled">
                         <vbox>
@@ -177,7 +176,7 @@
                         preference="extensions.threadvis.timeline.enabled" />
                 </tabpanel>
 
-                <tabpanel id="visualisationSizeTab" orient="vertical" flex="1">
+                <tabpanel id="visualisationSizeTab" orient="vertical">
                     <grid>
                         <columns>
                             <column />
@@ -262,7 +261,7 @@
                     </grid>
                 </tabpanel>
 
-                <tabpanel id="visualisationColourTab" orient="vertical" flex="1">
+                <tabpanel id="visualisationColourTab" orient="vertical">
                     <radiogroup id="visualisationColour"
                         preference="extensions.threadvis.visualisation.colour"
                         oncommand="toggleHighlight();">
@@ -304,14 +303,14 @@
                     </hbox>
                 </tabpanel>
 
-                <tabpanel id="visualisationAccountsFoldersTab" orient="vertical" flex="1">
+                <tabpanel id="visualisationAccountsFoldersTab" orient="vertical">
                     <textbox id="hiddenDisabledAccounts"
                         preference="extensions.threadvis.disabledaccounts"
                         hidden="true" />
                     <label class="indent">
                         &visualisation.enabledaccounts.description;
                     </label>
-                    <groupbox height="220px">
+                    <groupbox>
                             <vbox id="enableAccounts"
                                 style="overflow: auto;"
                                 class="indent" />
