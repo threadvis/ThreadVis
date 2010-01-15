@@ -59,13 +59,12 @@
     <em:updateKey>MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCzoXxRZpe30ceEm8Zpb/n8W46qfzNAol3zlOohk1GZD5st97vGt6V0f0fZVG69wNHAISbHzHQqGta832La8o5UQzQVDVe55wax7f/l0uSs+LOLjNs3bKNpr2z4s0BAFZO7mrtBdHFIRs22E/OU5cfdMsFhJaXEhGXZ+BFiAPst5wIDAQAB</em:updateKey>
     <em:iconURL>chrome://threadvis/content/images/icon.png</em:iconURL>
 
-    <!-- Packages, Skins and Locales that this extension registers -->
-    <em:file>
-      <Description about="urn:mozilla:extension:file:threadvis.jar">
-        <em:package>content/</em:package>
-        <em:locale>locale/en-US/</em:locale>
-        <em:locale>locale/de-DE/</em:locale>
-      </Description>
-    </em:file>
+    <em:localized>
+        <Description>
+        <em:locale>de-DE</em:locale>
+        <em:description>Zeigt eine kleine Grafik, die den Kontext (Thread) der aktuell angezeigten Nachricht visualisiert.</em:description>
+        </Description>
+    </em:localized>
+
   </Description>
 </RDF>
