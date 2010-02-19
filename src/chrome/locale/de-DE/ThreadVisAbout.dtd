@@ -31,20 +31,20 @@
  ******************************************************************************/
 -->
 <!ENTITY window.title                                       "ThreadVis">
-<!ENTITY about.title                                        "&#xDC;ber ThreadVis">
 <!ENTITY about.version                                      "Version">
 <!ENTITY about.description                                  "Zeigt eine kleine Grafik, die den Kontext (Thread) der aktuell angezeigten Nachricht visualisiert.">
-<!ENTITY about.copyright                                    "&#xA9; 2005, 2006, 2007 Alexander C. Hubmann. &#xA9; 2007, 2008, 2009, 2010 Alexander C. Hubmann-Haidvogel">
+<!ENTITY about.copyright1                                   "&#xA9; 2005, 2006, 2007 Alexander C. Hubmann">
+<!ENTITY about.copyright2                                   "&#xA9; 2007, 2008, 2009, 2010 Alexander C. Hubmann-Haidvogel">
 <!ENTITY about.homepage                                     "http://threadvis.mozdev.org/">
 <!ENTITY about.email                                        "ahubmann@gmail.com">
 <!ENTITY about.name                                         "ThreadVis">
 <!ENTITY extension.version                                  "<<version>>.<<build>>">
 <!ENTITY wizard.about.title                                 "&#xDC;ber die Visualisierung">
 <!ENTITY wizard.about.1                                     "Das Add-on f&#xFC;gt eine Visualisierung des aktuellen Threads in den Header-Bereich der Email-Ansicht ein. Diese Visualisierung stellt alle Nachrichten der aktuellen Konversation kompakt und &#xFC;bersichtlich dar.">
-<!ENTITY wizard.about.2                                     "&#xDC;ber die entsprechenden Buttons kann die Visualisierung verg&#xF6;&#xDF;ert oder verkleinert und in einem eigenen Popup-Window dargestellt werden. Eine Legende gibt zus&#xE4;tzliche Informationen.">
-<!ENTITY wizard.about.3                                     "Die Visualisierung kann auch zur Navigation zwischen den einzelnen Nachrichten des Threads verwendet werden.">
+<!ENTITY wizard.about.2                                     "Die Nachrichten werden horizontal als Punkte dargestellt, beginnend mit der &#xE4;ltesten Nachricht. Empfangene Nachrichten werden als volle Kreise dargestellt, gesendete als hohle Kreise. Die aktuell ausgew&#xE4;hlte Nachricht wird durch einen schwarzen Kreis hervorgehoben.">
+<!ENTITY wizard.about.3                                     "Durch Time Scaling ist der Abstand zwischen zwei Nachrichten proportional zum zeitlichen Abstand, eine Timeline gibt den genauen zeitlichen Abstand an. Die Visualisierung kann auch zur Navigation zwischen den einzelnen Nachrichten des Threads verwendet werden.">
 <!ENTITY wizard.workings.title                              "Funktionsweise">
-<!ENTITY wizard.workings.1                                  "Beim ersten Start analysiert die Erweiterung alle vorhandenen Nachrichten und speichert die ben&#xF6;tigten Informationen in einem Cache ab. Dadurch ist keine erneute Berechnung f&#xFC;r bereits analysierte Nachrichten notwendig, nur neu empfangene Nachrichten werden im Hintergrund analysiert.">
+<!ENTITY wizard.workings.1                                  "ThreadVis verwendet die globale Suche und Nachrichtenindizierung von Thunderbird, welche aktiviert sein muss.">
 <!ENTITY wizard.workings.2                                  "Zus&#xE4;tzlich k&#xF6;nnen die Ordner, f&#xFC;r die die Erweiterung aktiviert werden soll, im n&#xE4;chsten Schritt ausgew&#xE4;hlt werden.">
 <!ENTITY wizard.accounts.title                              "Aktivierte Accounts/Ordner">
 <!ENTITY wizard.accounts.1                                  "Bitte w&#xE4;hlen Sie unten die Accounts/Order aus, f&#xFC;r die die Erweiterung aktiviert werden soll:">

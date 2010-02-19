@@ -35,12 +35,16 @@
 
 
 
-<!DOCTYPE overlay SYSTEM "chrome://threadvis/locale/ThreadVisAbout.dtd">
+<!DOCTYPE overlay [
+<!ENTITY % threadVisDTD SYSTEM "chrome://threadvis/locale/ThreadVisAbout.dtd">
+<!ENTITY % advancedDTD SYSTEM "chrome://messenger/locale/preferences/advanced.dtd">
+%threadVisDTD;
+%advancedDTD;
+]>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <wizard id="ThreadVisAbout" title="&window.title;"
-    persist="width height screenX screenY"
-    width="500"
-    height="400"
+    width="600"
+    height="420"
     onload="loadAboutPreference(); buildAccountList();"
     onwizardfinish="saveAboutSettings();"
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
@@ -53,8 +57,7 @@
             src="chrome://threadvis/locale/ThreadVis.properties" />
     </stringbundleset>
 
-    <wizardpage description="">
-        <label value="&about.name;" id="extensionName" />
+    <wizardpage label=" ">
         <hbox>
             <image src="chrome://threadvis/content/images/about.png" />
         </hbox>
@@ -63,8 +66,11 @@
         <description id="aboutDescription">
             &about.description;
         </description>
-        <label id="aboutCopyright">
-            &about.copyright;
+        <label class="aboutCopyright">
+            &about.copyright1;
+        </label>
+        <label class="aboutCopyright">
+            &about.copyright2;
         </label>
         <label value="&about.email;" onclick="writeEmail();"
             id="aboutEmail" />
@@ -75,21 +81,24 @@
         <separator class="thin" />
     </wizardpage>
 
-    <wizardpage description="&wizard.about.title;">
+    <wizardpage label="&wizard.about.title;">
         <description>&wizard.about.1;</description>
         <description>&wizard.about.2;</description>
         <hbox>
-            <image src="chrome://threadvis/locale/ui.png" width="400" height="102" />
+            <image class="screenshot" src="chrome://threadvis/locale/ui.png" />
         </hbox>
         <description>&wizard.about.3;</description>
     </wizardpage>
 
-    <wizardpage description="&wizard.workings.title;">
+    <wizardpage label="&wizard.workings.title;">
         <description>&wizard.workings.1;</description>
+        <checkbox id="enableGloda"
+            label="&enableGlodaSearch.label;"
+            preference="mailnews.database.global.indexer.enabled" />
         <description>&wizard.workings.2;</description>
     </wizardpage>
 
-    <wizardpage description="&wizard.accounts.title;">
+    <wizardpage label="&wizard.accounts.title;">
         <description>&wizard.accounts.1;</description>
         <textbox id="hiddenDisabledAccounts"
             preference="extensions.threadvis.disabledaccounts"
@@ -104,7 +113,7 @@
         </groupbox>
     </wizardpage>
 
-    <wizardpage description="&wizard.end.title;">
+    <wizardpage label="&wizard.end.title;">
         <description>&wizard.end.1;</description>
         <checkbox id="donotshowagain"
             label="&wizard.end.showagain;" checked="true" />

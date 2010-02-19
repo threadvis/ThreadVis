@@ -410,8 +410,11 @@ function loadAboutPreference() {
         preferences.PREF_DISABLED_ACCOUNTS);
     var disabledFolders = preferences.getPreference(
         preferences.PREF_DISABLED_FOLDERS);
+    var glodaEnabled = preferences.getPreference(
+        preferences.PREF_GLODA_ENABLED);
     document.getElementById("hiddenDisabledAccounts").value = disabledAccounts;
     document.getElementById("hiddenDisabledFolders").value = disabledFolders;
+    document.getElementById("enableGloda").checked = glodaEnabled;
 }
 
 
@@ -428,20 +431,20 @@ function saveAboutSettings() {
     var disabledFolders = document
         .getElementById("hiddenDisabledFolders").value;
     var notShowAgain = document.getElementById("donotshowagain").checked;
+    var glodaEnabled = document.getElementById("enableGloda").checked;
 
     var preferences = window.opener.THREADVIS.preferences;
     var about = window.opener.THREADVIS.ABOUT;
     preferences.setPreference(
-        preferences.PREF_DISABLED_ACCOUNTS, disabledAccounts,
-        preferences.PREF_STRING);
+        preferences.PREF_DISABLED_ACCOUNTS, disabledAccounts);
     preferences.setPreference(
-        preferences.PREF_DISABLED_FOLDERS, disabledFolders,
-        preferences.PREF_STRING);
+        preferences.PREF_DISABLED_FOLDERS, disabledFolders);
     if (notShowAgain) {
         preferences.setPreference(
-            preferences.PREF_ABOUT, about,
-            preferences.PREF_INT);
+            preferences.PREF_ABOUT, about);
     }
+    preferences.setPreference(
+        preferences.PREF_GLODA_ENABLED, glodaEnabled);
 }
 
 
@@ -466,6 +469,7 @@ function selectAll(element) {
             folderCheckbox.checked = true;
         }
     }
+    buildFolderPreference();
 }
 
 
@@ -490,4 +494,5 @@ function selectNone(element) {
             folderCheckbox.checked = false;
         }
     }
+    buildFolderPreference();
 }

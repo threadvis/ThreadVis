@@ -46,40 +46,39 @@ if (! window.ThreadVisNS) {
 ThreadVisNS.PreferenceObserver = function() {
     this.PREF_BRANCH = "extensions.threadvis.";
 
-    this.PREF_ABOUT = "about";
-    this.PREF_DISABLED_ACCOUNTS = "disabledaccounts";
-    this.PREF_DISABLED_FOLDERS = "disabledfolders";
-    this.PREF_ENABLED = "enabled";
-    this.PREF_SENTMAIL_FOLDERFLAG = "sentmail.folderflag";
-    this.PREF_SENTMAIL_IDENTITY = "sentmail.identity";
-    this.PREF_SVG_HEIGHT = "svg.height";
-    this.PREF_SVG_WIDTH = "svg.width";
-    this.PREF_TIMELINE = "timeline.enabled";
-    this.PREF_TIMESCALING = "timescaling.enabled";
-    this.PREF_VIS_DOTSIZE = "visualisation.dotsize";
-    this.PREF_VIS_ARC_MINHEIGHT = "visualisation.arcminheight";
-    this.PREF_VIS_ARC_RADIUS = "visualisation.arcradius";
-    this.PREF_VIS_ARC_DIFFERENCE = "visualisation.arcdifference";
-    this.PREF_VIS_ARC_WIDTH = "visualisation.arcwidth";
-    this.PREF_VIS_SPACING = "visualisation.spacing";
-    this.PREF_VIS_MESSAGE_CIRCLES = "visualisation.messagecircles";
-    this.PREF_VIS_COLOUR = "visualisation.colour";
-    this.PREF_VIS_COLOURS_BACKGROUND = "visualisation.colours.background";
-    this.PREF_VIS_COLOURS_BORDER = "visualisation.colours.border";
-    this.PREF_VIS_COLOURS_RECEIVED = "visualisation.colours.received";
-    this.PREF_VIS_COLOURS_SENT = "visualisation.colours.sent";
-    this.PREF_VIS_HIDE_ON_DISABLE = "visualisation.hideondisable";
-    this.PREF_VIS_HIDE_ON_SINGLE = "visualisation.hideonsingle"
-    this.PREF_VIS_HIGHLIGHT = "visualisation.highlight";
-    this.PREF_VIS_MINIMAL_WIDTH = "visualisation.minimalwidth";
-    this.PREF_VIS_OPACITY = "visualisation.opacity";
-    this.PREF_VIS_ZOOM = "visualisation.zoom";
+    this.PREF_ABOUT = this.PREF_BRANCH + "about";
+    this.PREF_DISABLED_ACCOUNTS = this.PREF_BRANCH + "disabledaccounts";
+    this.PREF_DISABLED_FOLDERS = this.PREF_BRANCH + "disabledfolders";
+    this.PREF_ENABLED = this.PREF_BRANCH + "enabled";
+    this.PREF_SENTMAIL_FOLDERFLAG = this.PREF_BRANCH + "sentmail.folderflag";
+    this.PREF_SENTMAIL_IDENTITY = this.PREF_BRANCH + "sentmail.identity";
+    this.PREF_SVG_HEIGHT = this.PREF_BRANCH + "svg.height";
+    this.PREF_SVG_WIDTH = this.PREF_BRANCH + "svg.width";
+    this.PREF_TIMELINE = this.PREF_BRANCH + "timeline.enabled";
+    this.PREF_TIMESCALING = this.PREF_BRANCH + "timescaling.enabled";
+    this.PREF_VIS_DOTSIZE = this.PREF_BRANCH + "visualisation.dotsize";
+    this.PREF_VIS_ARC_MINHEIGHT = this.PREF_BRANCH + "visualisation.arcminheight";
+    this.PREF_VIS_ARC_RADIUS = this.PREF_BRANCH + "visualisation.arcradius";
+    this.PREF_VIS_ARC_DIFFERENCE = this.PREF_BRANCH + "visualisation.arcdifference";
+    this.PREF_VIS_ARC_WIDTH = this.PREF_BRANCH + "visualisation.arcwidth";
+    this.PREF_VIS_SPACING = this.PREF_BRANCH + "visualisation.spacing";
+    this.PREF_VIS_MESSAGE_CIRCLES = this.PREF_BRANCH + "visualisation.messagecircles";
+    this.PREF_VIS_COLOUR = this.PREF_BRANCH + "visualisation.colour";
+    this.PREF_VIS_COLOURS_BACKGROUND = this.PREF_BRANCH + "visualisation.colours.background";
+    this.PREF_VIS_COLOURS_BORDER = this.PREF_BRANCH + "visualisation.colours.border";
+    this.PREF_VIS_COLOURS_RECEIVED = this.PREF_BRANCH + "visualisation.colours.received";
+    this.PREF_VIS_COLOURS_SENT = this.PREF_BRANCH + "visualisation.colours.sent";
+    this.PREF_VIS_HIDE_ON_DISABLE = this.PREF_BRANCH + "visualisation.hideondisable";
+    this.PREF_VIS_HIDE_ON_SINGLE = this.PREF_BRANCH + "visualisation.hideonsingle"
+    this.PREF_VIS_HIGHLIGHT = this.PREF_BRANCH + "visualisation.highlight";
+    this.PREF_VIS_MINIMAL_WIDTH = this.PREF_BRANCH + "visualisation.minimalwidth";
+    this.PREF_VIS_OPACITY = this.PREF_BRANCH + "visualisation.opacity";
+    this.PREF_VIS_ZOOM = this.PREF_BRANCH + "visualisation.zoom";
 
     this.PREF_GLODA_ENABLED = "mailnews.database.global.indexer.enabled";
 
     this.prefBranch = null;
     this.preferences = new Object();
-    this.callback = new Object();
 
     var prefService = Components.classes["@mozilla.org/preferences-service;1"]
         .getService(Components.interfaces.nsIPrefService);
@@ -105,13 +104,11 @@ ThreadVisNS.PreferenceObserver = function() {
  *          void
  ******************************************************************************/
 ThreadVisNS.PreferenceObserver.prototype.doCallback = function(pref) {
-    var value = this.preferences[pref];
-    var array = this.callback[pref];
-    if (array) {
-        for (var key in array) {
-            var func = array[key];
-            func(value);
-        }
+    var value = this.preferences[pref].value;
+    var callbacks = this.preferences[pref].callbacks;
+    for (var key in callbacks) {
+        var func = callbacks[key];
+        func(value);
     }
 }
 
@@ -125,7 +122,7 @@ ThreadVisNS.PreferenceObserver.prototype.doCallback = function(pref) {
  *          The value of the preference
  ******************************************************************************/
 ThreadVisNS.PreferenceObserver.prototype.getPreference = function(pref) {
-    return this.preferences[pref];
+    return this.preferences[pref].value;
 }
 
 
@@ -135,8 +132,8 @@ ThreadVisNS.PreferenceObserver.prototype.getPreference = function(pref) {
  *
  * @param pref
  *          The preference to load
- * @param typ
- *          The type of the preference (boo, string, int)
+ * @param type
+ *          The type of the preference (bool, string, int)
  * @param def
  *          The default value
  * @param prefBranch
@@ -144,27 +141,34 @@ ThreadVisNS.PreferenceObserver.prototype.getPreference = function(pref) {
  * @return
  *          void
  ******************************************************************************/
-ThreadVisNS.PreferenceObserver.prototype.loadPreference = function(pref, typ,
+ThreadVisNS.PreferenceObserver.prototype.loadPreference = function(pref, type,
     def, prefBranch) {
-    this.preferences[pref]= def;
+    this.preferences[pref] = {};
+    this.preferences[pref].value = def;
+    this.preferences[pref].callbacks = [];
+    this.preferences[pref].type = type;
 
     if (! prefBranch) {
         prefBranch = this.prefBranch;
     }
+    this.preferences[pref].branch = prefBranch;
 
-    if (prefBranch.getPrefType(pref) != typ) {
+    // remove leading branch from pref name
+    var loadPref = pref.substring(prefBranch.root.length);
+
+    if (prefBranch.getPrefType(loadPref) != type) {
         return;
     }
 
-    switch (typ) {
-        case prefBranch.PREF_BOOL:
-            this.preferences[pref] = prefBranch.getBoolPref(pref);
+    switch (type) {
+        case this.PREF_BOOL:
+            this.preferences[pref].value = prefBranch.getBoolPref(loadPref);
             break;
-        case prefBranch.PREF_STRING:
-            this.preferences[pref] = prefBranch.getCharPref(pref);
+        case this.PREF_STRING:
+            this.preferences[pref].value = prefBranch.getCharPref(loadPref);
             break;
-        case prefBranch.PREF_INT:
-            this.preferences[pref] = prefBranch.getIntPref(pref);
+        case this.PREF_INT:
+            this.preferences[pref].value = prefBranch.getIntPref(loadPref);
             break;
     }
 }
@@ -201,64 +205,64 @@ ThreadVisNS.PreferenceObserver.prototype.observe = function(subject, topic,
  ******************************************************************************/
 ThreadVisNS.PreferenceObserver.prototype.preferenceReload = function() {
     this.loadPreference(this.PREF_ABOUT,
-        this.prefBranch.PREF_INT, 0);
+        this.PREF_INT, 0);
     this.loadPreference(this.PREF_DISABLED_ACCOUNTS,
-        this.prefBranch.PREF_STRING, "");
+        this.PREF_STRING, "");
     this.loadPreference(this.PREF_DISABLED_FOLDERS,
-        this.prefBranch.PREF_STRING, "");
+        this.PREF_STRING, "");
     this.loadPreference(this.PREF_ENABLED,
-        this.prefBranch.PREF_BOOL, true);
+        this.PREF_BOOL, true);
     this.loadPreference(this.PREF_SENTMAIL_FOLDERFLAG,
-        this.prefBranch.PREF_BOOL, true);
+        this.PREF_BOOL, true);
     this.loadPreference(this.PREF_SENTMAIL_IDENTITY,
-        this.prefBranch.PREF_BOOL, true);
+        this.PREF_BOOL, true);
     this.loadPreference(this.PREF_SVG_HEIGHT,
-        this.prefBranch.PREF_INT, 1000);
+        this.PREF_INT, 1000);
     this.loadPreference(this.PREF_SVG_WIDTH,
-        this.prefBranch.PREF_INT, 1000);
+        this.PREF_INT, 1000);
     this.loadPreference(this.PREF_TIMELINE,
-        this.prefBranch.PREF_BOOL, true);
+        this.PREF_BOOL, true);
     this.loadPreference(this.PREF_TIMESCALING,
-        this.prefBranch.PREF_BOOL, true);
+        this.PREF_BOOL, true);
     this.loadPreference(this.PREF_VIS_DOTSIZE,
-        this.prefBranch.PREF_INT, 12);
+        this.PREF_INT, 12);
     this.loadPreference(this.PREF_VIS_ARC_MINHEIGHT,
-        this.prefBranch.PREF_INT, 12);
+        this.PREF_INT, 12);
     this.loadPreference(this.PREF_VIS_ARC_RADIUS,
-        this.prefBranch.PREF_INT, 32);
+        this.PREF_INT, 32);
     this.loadPreference(this.PREF_VIS_ARC_DIFFERENCE,
-        this.prefBranch.PREF_INT, 6);
+        this.PREF_INT, 6);
     this.loadPreference(this.PREF_VIS_ARC_WIDTH,
-        this.prefBranch.PREF_INT, 2);
+        this.PREF_INT, 2);
     this.loadPreference(this.PREF_VIS_SPACING,
-        this.prefBranch.PREF_INT, 24);
+        this.PREF_INT, 24);
     this.loadPreference(this.PREF_VIS_MESSAGE_CIRCLES,
-        this.prefBranch.PREF_BOOL, true);
+        this.PREF_BOOL, true);
     this.loadPreference(this.PREF_VIS_COLOUR,
-        this.prefBranch.PREF_STRING, "author");
+        this.PREF_STRING, "author");
     this.loadPreference(this.PREF_VIS_COLOURS_BACKGROUND,
-        this.prefBranch.PREF_STRING, "");
+        this.PREF_STRING, "");
     this.loadPreference(this.PREF_VIS_COLOURS_BORDER,
-        this.prefBranch.PREF_STRING, "");
+        this.PREF_STRING, "");
     this.loadPreference(this.PREF_VIS_COLOURS_RECEIVED,
-        this.prefBranch.PREF_STRING, "#7FFF00,#00FFFF,#7F00FF,#997200,#009926,#002699,#990072,#990000,#4C9900,#009999,#4C0099,#FFBF00,#00FF3F,#003FFF,#FF00BF");
+        this.PREF_STRING, "#7FFF00,#00FFFF,#7F00FF,#997200,#009926,#002699,#990072,#990000,#4C9900,#009999,#4C0099,#FFBF00,#00FF3F,#003FFF,#FF00BF");
     this.loadPreference(this.PREF_VIS_COLOURS_SENT,
-        this.prefBranch.PREF_STRING, "#ff0000");
+        this.PREF_STRING, "#ff0000");
     this.loadPreference(this.PREF_VIS_HIDE_ON_DISABLE,
-        this.prefBranch.PREF_BOOL, true);
+        this.PREF_BOOL, true);
     this.loadPreference(this.PREF_VIS_HIDE_ON_SINGLE,
-        this.prefBranch.PREF_BOOL, false);
+        this.PREF_BOOL, false);
     this.loadPreference(this.PREF_VIS_HIGHLIGHT,
-        this.prefBranch.PREF_BOOL, true);
+        this.PREF_BOOL, true);
     this.loadPreference(this.PREF_VIS_MINIMAL_WIDTH,
-        this.prefBranch.PREF_INT, 0);
+        this.PREF_INT, 0);
     this.loadPreference(this.PREF_VIS_OPACITY,
-        this.prefBranch.PREF_INT, 30);
+        this.PREF_INT, 30);
     this.loadPreference(this.PREF_VIS_ZOOM,
-        this.prefBranch.PREF_STRING, "full");
+        this.PREF_STRING, "full");
 
     this.loadPreference(this.PREF_GLODA_ENABLED,
-            this.glodaPrefBranch.PREF_BOOL, true, this.glodaPrefBranch);
+            this.PREF_BOOL, true, this.glodaPrefBranch);
 
 }
 
@@ -296,11 +300,7 @@ ThreadVisNS.PreferenceObserver.prototype.register =  function() {
  ******************************************************************************/
 ThreadVisNS.PreferenceObserver.prototype.registerCallback = function(preference,
     func) {
-    if (this.callback[preference]) {
-        this.callback[preference].push(func);
-    } else {
-        this.callback[preference] = new Array(func);
-    }
+    this.preferences[preference].callbacks.push(func);
 }
 
 
@@ -312,15 +312,12 @@ ThreadVisNS.PreferenceObserver.prototype.registerCallback = function(preference,
  *          The name of the preference
  * @param val
  *          The value of the preference
- * @param typ
- *          The type of the preference
  * @return
  *          void
  ******************************************************************************/
-ThreadVisNS.PreferenceObserver.prototype.setPreference = function(pref, val,
-    typ) {
-    this.preferences[pref] = val;
-    this.storePreference(pref, typ, val);
+ThreadVisNS.PreferenceObserver.prototype.setPreference = function(pref, val) {
+    this.preferences[pref].value = val;
+    this.storePreference(pref, val);
 }
 
 
@@ -330,26 +327,26 @@ ThreadVisNS.PreferenceObserver.prototype.setPreference = function(pref, val,
  *
  * @param pref
  *          The name of the preference
- * @param typ
- *          The type of the preference
  * @param val
  *          The value of the preference
  * @return
  *          void
  ******************************************************************************/
-ThreadVisNS.PreferenceObserver.prototype.storePreference = function(pref, typ,
-    val) {
-    this.preferences[pref]= val;
+ThreadVisNS.PreferenceObserver.prototype.storePreference = function(pref, val) {
+    var branch = this.preferences[pref].branch;
+    var type = this.preferences[pref].type;
+    // remove leading branch from pref name
+    pref = pref.substring(branch.root.length);
 
-    switch (typ) {
-        case this.prefBranch.PREF_BOOL:
-            this.prefBranch.setBoolPref(pref, val);
+    switch (type) {
+        case this.PREF_BOOL:
+            branch.setBoolPref(pref, val);
             break;
-        case this.prefBranch.PREF_STRING:
-            this.prefBranch.setCharPref(pref, val);
+        case this.PREF_STRING:
+            branch.setCharPref(pref, val);
             break;
-        case this.prefBranch.PREF_INT:
-            this.prefBranch.setIntPref(pref, val);
+        case this.PREF_INT:
+            branch.setIntPref(pref, val);
             break;
     }
 }
