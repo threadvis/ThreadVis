@@ -219,9 +219,6 @@ ThreadVisNS.ContainerVisualisation.prototype.getMenu = function() {
     }
 
     // include normal menu items
-    var separator = document.createElementNS(THREADVIS.XUL_NAMESPACE,
-        "menuseparator");
-    this.popup.appendChild(separator);
     var defaultPopup = document.getElementById("ThreadVisPopUp");
     var items = defaultPopup.getElementsByTagName("menuitem");
     for (var i = 0; i < items.length; i++) {
