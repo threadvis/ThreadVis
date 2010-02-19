@@ -115,10 +115,6 @@ ThreadVisNS.ThreadVis = function(threadvisParent) {
     // if parent object exists, reuse some of the internal objects
     this.threadvisParent = threadvisParent;
 
-    // cache enabled account/folder
-    this.cacheKeyCheckEnabledAccountOrFolder = null;
-    this.cacheValueCheckEnabledAccountOrFolder = null;
-
     // remember all local accounts, for sent-mail comparison
     var accountManager = Components.classes["@mozilla.org/messenger/account-manager;1"]
         .getService(Components.interfaces.nsIMsgAccountManager);
@@ -158,7 +154,7 @@ ThreadVisNS.ThreadVis = function(threadvisParent) {
  *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.callback = function(message, isMessageWindow) {
-    if (! this.preferences.getPreference(this.preferences.PREF_ENABLED)) {
+    if (! this.checkEnabled()) {
         return;
     }
 
@@ -173,6 +169,22 @@ ThreadVisNS.ThreadVis.prototype.callback = function(message, isMessageWindow) {
     gFolderDisplay.show(msg.folder);
 
     gFolderDisplay.selectMessage(msg);
+}
+
+
+
+/** ****************************************************************************
+ * Check if extension and all needed other parts (e.g. gloda) are enabled
+ *
+ * @return
+ *          True if the extension is enabled, false if not.
+ ******************************************************************************/
+ThreadVisNS.ThreadVis.prototype.checkEnabled = function() {
+    var threadvisEnabled =
+        this.preferences.getPreference(this.preferences.PREF_ENABLED);
+    var glodaEnabled =
+        this.preferences.getPreference(this.preferences.PREF_GLODA_ENABLED);
+    return threadvisEnabled && glodaEnabled;
 }
 
 
@@ -193,11 +205,6 @@ ThreadVisNS.ThreadVis.prototype.checkEnabledAccountOrFolder = function(folder) {
         return false;
     }
 
-    // get from cache
-    if (this.cacheKeyCheckEnabledAccountOrFolder == folder) {
-        return this.cacheValueCheckEnabledAccountOrFolder;
-    }
-
     var server = folder.server;
     var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
         .getService(Components.interfaces.nsIMsgAccountManager))
@@ -206,19 +213,13 @@ ThreadVisNS.ThreadVis.prototype.checkEnabledAccountOrFolder = function(folder) {
     if (this.preferences.getPreference(this.preferences.PREF_DISABLED_ACCOUNTS) != ""
         && this.preferences.getPreference(this.preferences.PREF_DISABLED_ACCOUNTS)
         .indexOf(" " + account.key + " ") > -1) {
-        this.cacheKeyCheckEnabledAccountOrFolder = folder;
-        this.cacheValueCheckEnabledAccountOrFolder = false;
         return false;
     } else {
         if (this.preferences.getPreference(this.preferences.PREF_DISABLED_FOLDERS) != ""
             && this.preferences.getPreference(this.preferences.PREF_DISABLED_FOLDERS)
             .indexOf(" " + folder.URI + " ") > -1) {
-            this.cacheKeyCheckEnabledAccountOrFolder = folder;
-            this.cacheValueCheckEnabledAccountOrFolder = false;
             return false;
         } else {
-            this.cacheKeyCheckEnabledAccountOrFolder = folder;
-            this.cacheValueCheckEnabledAccountOrFolder = true;
             return true;
         }
     }
@@ -233,7 +234,7 @@ ThreadVisNS.ThreadVis.prototype.checkEnabledAccountOrFolder = function(folder) {
  *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.clearVisualisation = function() {
-    if (! this.preferences.getPreference(this.preferences.PREF_ENABLED) ) {
+    if (! this.checkEnabled()) {
         return;
     }
 
@@ -511,7 +512,7 @@ ThreadVisNS.ThreadVis.prototype.init = function() {
         this.cache = new ThreadVisNS.Cache(this);
     }
 
-    if (! this.preferences.getPreference(this.preferences.PREF_ENABLED)) {
+    if (! this.checkEnabled()) {
         this.deleteBox();
         return;
     }
@@ -651,8 +652,6 @@ ThreadVisNS.ThreadVis.prototype.openThreadVisOptionsDialog = function() {
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.preferenceChanged = function() {
     this.visualisation.changed = true;
-    this.cacheKeyCheckEnabledAccountOrFolder = null;
-    this.cacheValueCheckEnabledAccountOrFolder = null;
 
     if (this.popupWindow && this.popupWindow.THREADVIS)
         this.popupWindow.THREADVIS.visualisation.changed = true;
@@ -686,7 +685,7 @@ ThreadVisNS.ThreadVis.prototype.setMinimalWidth = function() {
  *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.setSelectedMessage = function(force) {
-    if (! this.preferences.getPreference(this.preferences.PREF_ENABLED)) {
+    if (! this.checkEnabled()) {
         this.visualisation.disabled = true;
         this.visualisation.displayDisabled();
         this.visualisedMsgId = null;
@@ -731,10 +730,7 @@ ThreadVisNS.ThreadVis.prototype.setSelectedMessage = function(force) {
  *          void
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.visualise = function(container) {
-    if (! this.preferences.getPreference(this.preferences.PREF_ENABLED)) {
-        return;
-    }
-    if (! this.checkEnabledAccountOrFolder()) {
+    if (! this.checkEnabled() || ! this.checkEnabledAccountOrFolder()) {
         return;
     }
 
@@ -781,10 +777,7 @@ ThreadVisNS.ThreadVis.prototype.visualiseMessage = function(message, force) {
         return;
     }
 
-    if (! this.preferences.getPreference(this.preferences.PREF_ENABLED)) {
-        return;
-    }
-    if (! this.checkEnabledAccountOrFolder()) {
+    if (! this.checkEnabled() || ! this.checkEnabledAccountOrFolder()) {
         return;
     }
 

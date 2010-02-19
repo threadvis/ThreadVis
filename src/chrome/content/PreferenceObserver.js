@@ -75,6 +75,8 @@ ThreadVisNS.PreferenceObserver = function() {
     this.PREF_VIS_OPACITY = "visualisation.opacity";
     this.PREF_VIS_ZOOM = "visualisation.zoom";
 
+    this.PREF_GLODA_ENABLED = "mailnews.database.global.indexer.enabled";
+
     this.prefBranch = null;
     this.preferences = new Object();
     this.callback = new Object();
@@ -82,6 +84,7 @@ ThreadVisNS.PreferenceObserver = function() {
     var prefService = Components.classes["@mozilla.org/preferences-service;1"]
         .getService(Components.interfaces.nsIPrefService);
     this.prefBranch = prefService.getBranch(this.PREF_BRANCH);
+    this.glodaPrefBranch = prefService.getBranch(this.PREF_GLODA_ENABLED);
 
     this.PREF_BOOL = this.prefBranch.PREF_BOOL;
     this.PREF_INT = this.prefBranch.PREF_INT;
@@ -136,26 +139,32 @@ ThreadVisNS.PreferenceObserver.prototype.getPreference = function(pref) {
  *          The type of the preference (boo, string, int)
  * @param def
  *          The default value
+ * @param prefBranch
+ *          The branch to use to read the value
  * @return
  *          void
  ******************************************************************************/
 ThreadVisNS.PreferenceObserver.prototype.loadPreference = function(pref, typ,
-    def) {
+    def, prefBranch) {
     this.preferences[pref]= def;
 
-    if (this.prefBranch.getPrefType(pref) != typ) {
+    if (! prefBranch) {
+        prefBranch = this.prefBranch;
+    }
+
+    if (prefBranch.getPrefType(pref) != typ) {
         return;
     }
 
     switch (typ) {
-        case this.prefBranch.PREF_BOOL:
-            this.preferences[pref] = this.prefBranch.getBoolPref(pref);
+        case prefBranch.PREF_BOOL:
+            this.preferences[pref] = prefBranch.getBoolPref(pref);
             break;
-        case this.prefBranch.PREF_STRING:
-            this.preferences[pref] = this.prefBranch.getCharPref(pref);
+        case prefBranch.PREF_STRING:
+            this.preferences[pref] = prefBranch.getCharPref(pref);
             break;
-        case this.prefBranch.PREF_INT:
-            this.preferences[pref] = this.prefBranch.getIntPref(pref);
+        case prefBranch.PREF_INT:
+            this.preferences[pref] = prefBranch.getIntPref(pref);
             break;
     }
 }
@@ -247,6 +256,10 @@ ThreadVisNS.PreferenceObserver.prototype.preferenceReload = function() {
         this.prefBranch.PREF_INT, 30);
     this.loadPreference(this.PREF_VIS_ZOOM,
         this.prefBranch.PREF_STRING, "full");
+
+    this.loadPreference(this.PREF_GLODA_ENABLED,
+            this.glodaPrefBranch.PREF_BOOL, true, this.glodaPrefBranch);
+
 }
 
 
@@ -258,9 +271,15 @@ ThreadVisNS.PreferenceObserver.prototype.preferenceReload = function() {
  *          void
  ******************************************************************************/
 ThreadVisNS.PreferenceObserver.prototype.register =  function() {
+    // add observer for our own branch
     var pbi = this.prefBranch
-        .QueryInterface(Components.interfaces.nsIPrefBranchInternal);
+        .QueryInterface(Components.interfaces.nsIPrefBranch2);
     pbi.addObserver("", this, false);
+
+    // add observer for gloda
+    var glodaObserver = this.glodaPrefBranch
+        .QueryInterface(Components.interfaces.nsIPrefBranch2);
+    glodaObserver.addObserver("", this, false);
 }
 
 
@@ -349,6 +368,6 @@ ThreadVisNS.PreferenceObserver.prototype.unregister = function() {
     }
 
     var pbi = this.prefBranch
-        .QueryInterface(Components.interfaces.nsIPrefBranchInternal);
+        .QueryInterface(Components.interfaces.nsIPrefBranch2);
     pbi.removeObserver("", this);
 }
