@@ -54,6 +54,11 @@ ThreadVisNS.Message = function(glodaMessage, sent) {
     this.glodaMessage = glodaMessage;
 
     /**
+     * Flag for sent mail
+     */
+    this.sent = sent;
+
+    /**
      * References of this message
      */
     this.references = new ThreadVisNS.References(
