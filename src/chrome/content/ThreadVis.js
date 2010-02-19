@@ -464,8 +464,7 @@ ThreadVisNS.ThreadVis.prototype.init = function() {
         this.server = this.threadvisParent.server;
         this.preferences = this.threadvisParent.preferences;
         this.cache = this.threadvisParent.cache;
-    }
-    else {
+    } else {
         var ref = this;
         this.preferences = new ThreadVisNS.PreferenceObserver();
         this.preferences.registerCallback(this.preferences.PREF_DISABLED_ACCOUNTS,
@@ -510,6 +509,9 @@ ThreadVisNS.ThreadVis.prototype.init = function() {
             function(value) {ref.preferenceChanged();});
 
         this.cache = new ThreadVisNS.Cache(this);
+
+        // display about dialog and email reminder only once on each startup
+        setTimeout(function() { THREADVIS.displayAbout(); }, 5000);
     }
 
     if (! this.checkEnabled()) {
@@ -542,9 +544,6 @@ ThreadVisNS.ThreadVis.prototype.init = function() {
     /* ************************************************************************
      * code below only gets executed if no parent threadvis object was found
      * ***********************************************************************/
-
-    // display about dialog and email reminder only once on each startup
-    setTimeout(function() { THREADVIS.displayAbout(); }, 5000);
 
     // remember msgid of visualised message
     this.visualisedMsgId = "";
