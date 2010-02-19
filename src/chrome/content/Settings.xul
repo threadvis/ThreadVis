@@ -109,32 +109,32 @@
             <tabpanels flex="1">
 
                 <tabpanel id="about" orient="vertical">
-                    <label value="&extension.name;" id="extensionName" />
-                    <hbox>
-                        <vbox>
-                            <image src="chrome://threadvis/content/images/about.png" />
-                            <label value="&about.version; &extension.version;"
-                                id="aboutVersion" />
-                        </vbox>
-                        <vbox flex="1">
-                            <description id="aboutDescription">
-                                &extension.description;
-                            </description>
-                            <label id="aboutCopyright">
-                                &extension.copyright;
-                            </label>
-                            <label value="&extension.email;" onclick="writeEmail();"
-                                id="aboutEmail" />
-                            <label value="&extension.homepage;"
-                                onclick="openURL('&extension.homepage;');"
-                                id="aboutHomepage" />
-                        </vbox>
-                    </hbox>
-                    <groupbox>
-                        <checkbox id="enableThreadVis"
+                    <vbox>
+                        <hbox pack="center">
+                           <vbox>
+                                <image src="chrome://threadvis/content/images/about.png" />
+                                <label value="&about.version; &extension.version;"
+                                    id="aboutVersion" />
+                            </vbox>
+                        </hbox>
+                        <description class="indent" id="aboutDescription">
+                            &extension.description;
+                        </description>
+                        <label class="indent aboutCopyright">
+                            &extension.copyright1;
+                        </label>
+                        <label class="indent aboutCopyright">
+                            &extension.copyright2;
+                        </label>
+                        <label class="indent" value="&extension.email;" onclick="writeEmail();"
+                            id="aboutEmail" />
+                        <label class="indent" value="&extension.homepage;"
+                            onclick="openURL('&extension.homepage;');"
+                            id="aboutHomepage" />
+                        <checkbox id="enableThreadVis" class="indent"
                             label="&extension.enabled;"
                             preference="extensions.threadvis.enabled" />
-                    </groupbox>
+                    </vbox>
                 </tabpanel>
 
                 <tabpanel id="visualisation.timescaling" orient="vertical">

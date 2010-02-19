@@ -31,35 +31,31 @@
 
 
 
-#extensionName {
-    font-size: large;
-    font-weight: bold;
-}
-
 #aboutVersion {
-    padding-top: 5px;
+    margin-bottom: 10px;
     font-weight: bold;
     color: rgb(144,144,144);
+    text-align: right;
 }
 
 #aboutDescription {
     color: rgb(64,64,64);
-}
-
-#aboutCopyright {
-    padding-top: 5px;
+    margin-bottom: 10px;
 }
 
 #aboutHomepage {
     text-decoration: underline;
-    color: rgb(0,0,255);
+    color: rgb(49, 106, 197);
     cursor: pointer;
 }
 
 #aboutEmail {
     text-decoration: underline;
-    color: rgb(0,0,255);
+    color: rgb(49, 106, 197);
     cursor: pointer;
+}
+#enableThreadVis {
+    margin-top: 20px;
 }
 
 radio[pane=paneThreadVis] {
