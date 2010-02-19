@@ -164,7 +164,7 @@ ThreadVisNS.Timeline.prototype.drawTime = function(container, left, right,
     var styleBorderRight = "";
     var styleBorderTop = "";
     var styleFontSize = "9px";
-    var styleLeft = ((left - this.dotSize / 2)* this.resize) + "px";
+    var styleLeft = (left * this.resize) + "px";
     var styleTop = (this.top - this.topDelta) * this.resize + "px";
     var styleWidth = ((right - left) * this.resize) + "px";
 
