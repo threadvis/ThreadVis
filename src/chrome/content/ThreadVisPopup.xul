@@ -37,7 +37,6 @@
 <!DOCTYPE overlay SYSTEM "chrome://threadvis/locale/ThreadVis.dtd">
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <window id="ThreadVisPopup" title="&popupwindow.title;"
-    onclose="THREADVIS.onVisualisationWindowClose();"
     persist="width height screenX screenY"
     orient="vertical"
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">

@@ -51,9 +51,8 @@ addEventListener("load", function() {
  *          void
  ******************************************************************************/
 ThreadVisNS.createThreadVis = function() {
-    var threadvisParent = ThreadVisNS.checkForThreadVis(window);
     if (THREADVIS == null) {
-        THREADVIS = new ThreadVisNS.ThreadVis(threadvisParent);
+        THREADVIS = new ThreadVisNS.ThreadVis();
         THREADVIS.init();
     }
 }
@@ -61,44 +60,12 @@ ThreadVisNS.createThreadVis = function() {
 
 
 /** ****************************************************************************
- * Check all openers for threadvis
- *
- * @param win
- *          The window object to check
- * @return
- *          A found threadvis object
- ******************************************************************************/
-ThreadVisNS.checkForThreadVis = function(win) {
-    if (! win) {
-        return null;
-    }
-
-    if (win.THREADVIS) {
-        return win.THREADVIS;
-    }
-
-    if (win.parent && win != win.parent) {
-        return ThreadVisNS.checkForThreadVis(win.parent);
-    }
-
-    if (win.opener) {
-        return ThreadVisNS.checkForThreadVis(win.opener);
-    }
-
-    return null;
-}
-
-
-
-/** ****************************************************************************
  * Constructor
  *
- * @param threadvisparent
- *          Link to parent object (if it exists)
  * @return
  *          A new ThreadVis object
  ******************************************************************************/
-ThreadVisNS.ThreadVis = function(threadvisParent) {
+ThreadVisNS.ThreadVis = function() {
     this.XUL_NAMESPACE =
         "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
@@ -111,9 +78,6 @@ ThreadVisNS.ThreadVis = function(threadvisParent) {
 
     // store server to react to server switch
     this.server = null;
-
-    // if parent object exists, reuse some of the internal objects
-    this.threadvisParent = threadvisParent;
 
     // remember all local accounts, for sent-mail comparison
     var accountManager = Components.classes["@mozilla.org/messenger/account-manager;1"]
@@ -246,7 +210,7 @@ ThreadVisNS.ThreadVis.prototype.clearVisualisation = function() {
     this.clear = true;
 
     // also clear popup
-    if (this.popupWindow && ! this.popupWindow.closed) {
+    if (this.hasPopupVisualisation()) {
         this.popupWindow.THREADVIS.clearVisualisation();
     }
 
@@ -369,12 +333,15 @@ ThreadVisNS.ThreadVis.prototype.displayVisualisationWindow = function() {
         return;
     }
 
-    var flags = "chrome=yes,resizable=yes,alwaysRaised=yes,dependent=yes";
     this.popupWindow = window.openDialog("chrome://threadvis/content/ThreadVisPopup.xul",
-        "ThreadVisPopup", flags);
+        null, "chrome=yes,resizable=yes,alwaysRaised=yes,dependent=yes");
+    var ref = this;
+    this.popupWindow.addEventListener("close", function() {
+        ref.visualise(ref.popupWindow.THREADVIS.selectedContainer, true);
+    }, false);
+
     this.deleteBox();
     clearInterval(this.visualisation.checkResizeInterval);
-    this.visualisedMsgId = null;
 }
 
 
@@ -426,9 +393,6 @@ ThreadVisNS.ThreadVis.prototype.getPopupVisualisation = function() {
     if (this.popupWindow != null && ! this.popupWindow.closed) {
         return this.popupWindow;
     }
-    if (this.threadvisParent) {
-        return this.threadvisParent.getPopupVisualisation();
-    }
     return null;
 }
 
@@ -444,9 +408,6 @@ ThreadVisNS.ThreadVis.prototype.hasPopupVisualisation = function() {
     if (this.popupWindow != null && ! this.popupWindow.closed) {
         return true;
     }
-    if (this.threadvisParent) {
-        return this.threadvisParent.hasPopupVisualisation();
-    }
     return false;
 }
 
@@ -459,14 +420,23 @@ ThreadVisNS.ThreadVis.prototype.hasPopupVisualisation = function() {
  *          void
 ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.init = function() {
-    if (this.threadvisParent) {
-        this.threader = this.threadvisParent.getThreader();
-        this.server = this.threadvisParent.server;
-        this.preferences = this.threadvisParent.preferences;
-        this.cache = this.threadvisParent.cache;
-    } else {
+    // init general things
+
+    this.preferences = new ThreadVisNS.PreferenceObserver();
+
+    // visualisation object
+    this.visualisation = new ThreadVisNS.Visualisation();
+
+    // create box object
+    this.createBox();
+
+    this.clearVisualisation();
+
+    this.threader = new ThreadVisNS.Threader();
+
+    // init only for new window, not for popup
+    if (! this.isPopupVisualisation()) {
         var ref = this;
-        this.preferences = new ThreadVisNS.PreferenceObserver();
         this.preferences.registerCallback(this.preferences.PREF_DISABLED_ACCOUNTS,
             function(value) {ref.preferenceChanged();});
         this.preferences.registerCallback(this.preferences.PREF_DISABLED_FOLDERS,
@@ -512,77 +482,43 @@ ThreadVisNS.ThreadVis.prototype.init = function() {
 
         // display about dialog and email reminder only once on each startup
         setTimeout(function() { THREADVIS.displayAbout(); }, 5000);
-    }
 
-    if (! this.checkEnabled()) {
-        this.deleteBox();
-        return;
-    }
-
-    // visualisation object
-    if (! this.visualisation) {
-        this.visualisation = new ThreadVisNS.Visualisation();
-    }
-
-    // create box object
-    this.createBox();
-
-    this.clearVisualisation();
-
-    // check to see if parent threadvis object exists
-    if (this.threadvisParent) {
-        // visualise selected message
-        // delay drawing until size of box is known
-        this.delayDrawing();
-        return;
-    } else {
-        if (! this.threader) {
-            this.threader= new ThreadVisNS.Threader();
+        if (! this.checkEnabled()) {
+            this.deleteBox();
+            return;
         }
+
+	    // remember msgid of visualised message
+	    this.visualisedMsgId = "";
+
+	    // remember selected message
+	    this.selectedMsgUri = "";
+
+	    // remember container of selected message
+	    this.selectedContainer = null;
+
+	    // register for message selection
+	    var ref = this;
+	    var observerService = Components.classes["@mozilla.org/observer-service;1"]
+	        .getService(Components.interfaces.nsIObserverService);
+	    observerService.addObserver({
+	        observe: function(subject, topic, data) {
+	            // only observe events in the same window, otherwise opening a second
+	            // Thunderbird window would result in both visualisations changing
+	            // since both observers would react to the event
+	            // the subject of the call is the msgHeaderSink of the msgWindow, in
+	            // which the notify happened, so we can check that
+	            if (subject == msgWindow.msgHeaderSink) {
+	                ref.selectedMsgUri = data;
+	                ref.setSelectedMessage();
+	            }
+	        }
+	    }, "MsgMsgDisplayed", false);
     }
 
-    /* ************************************************************************
-     * code below only gets executed if no parent threadvis object was found
-     * ***********************************************************************/
-
-    // remember msgid of visualised message
-    this.visualisedMsgId = "";
-
-    // remember selected message
-    this.selectedMsgUri = "";
-
-    // remember container of selected message
-    this.selectedContainer = null;
-
-    // register for message selection
-    var ref = this;
-    var observerService = Components.classes["@mozilla.org/observer-service;1"]
-        .getService(Components.interfaces.nsIObserverService);
-    observerService.addObserver({
-        observe: function(subject, topic, data) {
-            ref.selectedMsgUri = data;
-            ref.setSelectedMessage();
-        }
-    }, "MsgMsgDisplayed", false);
-}
-
-
-
-/** ****************************************************************************
- * Delay drawing of visualisation until size of box is known
- *
- * @return
- *          void
-******************************************************************************/
-ThreadVisNS.ThreadVis.prototype.delayDrawing = function() {
-    var boxSize = this.visualisation.getBoxSize();
-    if (boxSize.width > 0) {
-        this.visualise(this.threadvisParent.selectedContainer);
-    } else {
-        var ref = this;
-        setTimeout(function() {
-            ref.delayDrawing();
-        }, 100);
+    // for a popup, draw initial visualisation
+    if (this.isPopupVisualisation()) {
+        this.visualise(window.opener.THREADVIS.selectedContainer);
     }
 }
 
@@ -595,12 +531,7 @@ ThreadVisNS.ThreadVis.prototype.delayDrawing = function() {
  *          True if the current window is a message window, false if not
 ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.isMessageWindow = function() {
-    if (this.threadvisParent &&
-        document.getElementById("expandedHeaderView") != null) {
-        return true;
-    } else {
-        return false;
-    }
+    return document.getElementById("expandedHeaderView") != null;
 }
 
 
@@ -613,20 +544,6 @@ ThreadVisNS.ThreadVis.prototype.isMessageWindow = function() {
  ******************************************************************************/
 ThreadVisNS.ThreadVis.prototype.isPopupVisualisation = function() {
     return document.documentElement.id == "ThreadVisPopup";
-}
-
-
-
-/** ****************************************************************************
- * Called when popup window gets closed
- *
- * @return
- *          void
- ******************************************************************************/
-ThreadVisNS.ThreadVis.prototype.onVisualisationWindowClose = function() {
-    this.visualisedMsgId = null;
-    this.threadvisParent.visualisedMsgId = null;
-    this.threadvisParent.setSelectedMessage();
 }
 
 
@@ -725,20 +642,24 @@ ThreadVisNS.ThreadVis.prototype.setSelectedMessage = function(force) {
  *
  * @param container
  *          The container to visualise
+ * @param forceNoPopup
+ *          True to force visualisation in this window,
+ *          even if popup still exists
  * @return
  *          void
  ******************************************************************************/
-ThreadVisNS.ThreadVis.prototype.visualise = function(container) {
+ThreadVisNS.ThreadVis.prototype.visualise = function(container, forceNoPopup) {
     if (! this.checkEnabled() || ! this.checkEnabledAccountOrFolder()) {
         return;
     }
 
-    var msgCount = container.getTopContainer().getCountRecursive();
-
-    if (this.hasPopupVisualisation() && ! this.isPopupVisualisation()) {
+    if (this.hasPopupVisualisation() && ! this.isPopupVisualisation() &&
+            ! forceNoPopup) {
         this.getPopupVisualisation().THREADVIS.visualise(container);
         return;
     }
+
+    var msgCount = container.getTopContainer().getCountRecursive();
 
     // if user wants to hide visualisation if it only consists of a single
     // message, do so, but not in popup visualisation
@@ -804,12 +725,7 @@ ThreadVisNS.ThreadVis.prototype.visualiseMessage = function(message, force) {
     //this.threader.reset();
 
     if (container != null && ! container.isDummy()) {
-        // visualise any popup windows that might exist
-        if (this.popupWindow && this.popupWindow.THREADVIS) {
-            this.popupWindow.THREADVIS.visualise(container);
-        } else {
-            this.visualise(container);
-        }
+        this.visualise(container);
     } else {
         // - message id not found, or
         // - container with id was dummy
