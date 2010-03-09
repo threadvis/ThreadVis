@@ -488,32 +488,32 @@ ThreadVisNS.ThreadVis.prototype.init = function() {
             return;
         }
 
-	    // remember msgid of visualised message
-	    this.visualisedMsgId = "";
+        // remember msgid of visualised message
+        this.visualisedMsgId = "";
 
-	    // remember selected message
-	    this.selectedMsgUri = "";
+        // remember selected message
+        this.selectedMsgUri = "";
 
-	    // remember container of selected message
-	    this.selectedContainer = null;
+        // remember container of selected message
+        this.selectedContainer = null;
 
-	    // register for message selection
-	    var ref = this;
-	    var observerService = Components.classes["@mozilla.org/observer-service;1"]
-	        .getService(Components.interfaces.nsIObserverService);
-	    observerService.addObserver({
-	        observe: function(subject, topic, data) {
-	            // only observe events in the same window, otherwise opening a second
-	            // Thunderbird window would result in both visualisations changing
-	            // since both observers would react to the event
-	            // the subject of the call is the msgHeaderSink of the msgWindow, in
-	            // which the notify happened, so we can check that
-	            if (subject == msgWindow.msgHeaderSink) {
-	                ref.selectedMsgUri = data;
-	                ref.setSelectedMessage();
-	            }
-	        }
-	    }, "MsgMsgDisplayed", false);
+        // register for message selection
+        var ref = this;
+        var observerService = Components.classes["@mozilla.org/observer-service;1"]
+                                                 .getService(Components.interfaces.nsIObserverService);
+        observerService.addObserver({
+            observe: function(subject, topic, data) {
+                // only observe events in the same window, otherwise opening a second
+                // Thunderbird window would result in both visualisations changing
+                // since both observers would react to the event
+                // the subject of the call is the msgHeaderSink of the msgWindow, in
+                // which the notify happened, so we can check that
+                if (subject == msgWindow.msgHeaderSink) {
+                    ref.selectedMsgUri = data;
+                    ref.setSelectedMessage();
+                }
+            }
+        }, "MsgMsgDisplayed", false);
     }
 
     // for a popup, draw initial visualisation
