@@ -38,7 +38,7 @@
 <!ENTITY about.homepage                                     "http://threadvis.mozdev.org/">
 <!ENTITY about.email                                        "ahubmann@gmail.com">
 <!ENTITY about.name                                         "ThreadVis">
-<!ENTITY extension.version                                  "<<version>>.<<build>>">
+<!ENTITY extension.version                                  "[[version]].[[build]]">
 <!ENTITY wizard.about.title                                 "About the Visualisation">
 <!ENTITY wizard.about.1                                     "The extension adds a visualisation of the currently displayed thread to the header view. This visualisation displays all messages of the current conversation in a clear and compact way.">
 <!ENTITY wizard.about.2                                     "The messages are displayed as dots on a horizontal axis, the oldest message to the left. Received messages are visualised using full circles, sent messages as hollow circles. The currently selected message is highlighted using a black circle.">

@@ -68,4 +68,4 @@
 <!ENTITY extension.homepage                                 "http://threadvis.mozdev.org/">
 <!ENTITY extension.email                                    "ahubmann@gmail.com">
 <!ENTITY extension.name                                     "ThreadVis">
-<!ENTITY extension.version                                  "<<version>>.<<build>>">
+<!ENTITY extension.version                                  "[[version]].[[build]]">

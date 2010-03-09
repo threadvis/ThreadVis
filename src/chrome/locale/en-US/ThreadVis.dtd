@@ -44,4 +44,4 @@
 <!ENTITY statusbar.enableFolder     "Enable for the current folder">
 <!ENTITY statusbar.disableFolder    "Disable for the current folder">
 <!ENTITY extension.name             "ThreadVis">
-<!ENTITY extension.version          "<<version>>.<<build>>">
+<!ENTITY extension.version          [[version]].[[build]]">

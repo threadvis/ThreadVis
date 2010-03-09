@@ -44,4 +44,4 @@
 <!ENTITY statusbar.enableFolder     "F&#xFC;r den aktuellen Ordner aktivieren">
 <!ENTITY statusbar.disableFolder    "F&#xFC;r den aktuellen Ordner deaktivieren">
 <!ENTITY extension.name             "ThreadVis">
-<!ENTITY extension.version          "<<version>>.<<build>>">
+<!ENTITY extension.version          "[[version]].[[build]]">

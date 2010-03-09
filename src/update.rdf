@@ -41,7 +41,7 @@
             <RDF:Seq>
                 <RDF:li>
                     <RDF:Description>
-                        <em:version><<version>>.<<build>></em:version>
+                        <em:version>[[version]].[[build]]</em:version>
                         <!-- Target Application - Thunderbird -->
                         <em:targetApplication>
                             <Description>
@@ -49,7 +49,7 @@
                                 <em:minVersion>3.0</em:minVersion>
                                 <em:maxVersion>3.0.*</em:maxVersion>
                                 <em:updateLink>http://downloads.mozdev.org/threadvis/ThreadVis.xpi</em:updateLink>
-                                <em:updateHash><<updatehash>></em:updateHash>
+                                <em:updateHash>[[updatehash]]</em:updateHash>
                             </Description>
                         </em:targetApplication>
                     </RDF:Description>

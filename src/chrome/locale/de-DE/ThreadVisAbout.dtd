@@ -38,7 +38,7 @@
 <!ENTITY about.homepage                                     "http://threadvis.mozdev.org/">
 <!ENTITY about.email                                        "ahubmann@gmail.com">
 <!ENTITY about.name                                         "ThreadVis">
-<!ENTITY extension.version                                  "<<version>>.<<build>>">
+<!ENTITY extension.version                                  "[[version]].[[build]]">
 <!ENTITY wizard.about.title                                 "&#xDC;ber die Visualisierung">
 <!ENTITY wizard.about.1                                     "Das Add-on f&#xFC;gt eine Visualisierung des aktuellen Threads in den Header-Bereich der Email-Ansicht ein. Diese Visualisierung stellt alle Nachrichten der aktuellen Konversation kompakt und &#xFC;bersichtlich dar.">
 <!ENTITY wizard.about.2                                     "Die Nachrichten werden horizontal als Punkte dargestellt, beginnend mit der &#xE4;ltesten Nachricht. Empfangene Nachrichten werden als volle Kreise dargestellt, gesendete als hohle Kreise. Die aktuell ausgew&#xE4;hlte Nachricht wird durch einen schwarzen Kreis hervorgehoben.">

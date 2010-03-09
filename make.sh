@@ -33,7 +33,7 @@
 
 
 
-SVN=/opt/subversion/bin/svn
+SVN=/usr/bin/svn
 
 
 
@@ -82,29 +82,29 @@ cp -r src/* build/src
 # Update code with version and revision
 # ##############################################################################
 
-sed -i -e "s/<<version>>/${version}/g" build/src/chrome/locale/de-DE/Settings.dtd
-sed -i -e "s/<<build>>/${revision}/g" build/src/chrome/locale/de-DE/Settings.dtd
+sed -i -e "s/[[version]]/${version}/g" build/src/chrome/locale/de-DE/Settings.dtd
+sed -i -e "s/[[build]]/${revision}/g" build/src/chrome/locale/de-DE/Settings.dtd
 
-sed -i -e "s/<<version>>/${version}/g" build/src/chrome/locale/de-DE/ThreadVis.dtd
-sed -i -e "s/<<build>>/${revision}/g" build/src/chrome/locale/de-DE/ThreadVis.dtd
+sed -i -e "s/[[version]]/${version}/g" build/src/chrome/locale/de-DE/ThreadVis.dtd
+sed -i -e "s/[[build]]/${revision}/g" build/src/chrome/locale/de-DE/ThreadVis.dtd
 
-sed -i -e "s/<<version>>/${version}/g" build/src/chrome/locale/de-DE/ThreadVisAbout.dtd
-sed -i -e "s/<<build>>/${revision}/g" build/src/chrome/locale/de-DE/ThreadVisAbout.dtd
+sed -i -e "s/[[version]]/${version}/g" build/src/chrome/locale/de-DE/ThreadVisAbout.dtd
+sed -i -e "s/[[build]]/${revision}/g" build/src/chrome/locale/de-DE/ThreadVisAbout.dtd
 
-sed -i -e "s/<<version>>/${version}/g" build/src/chrome/locale/en-US/Settings.dtd
-sed -i -e "s/<<build>>/${revision}/g" build/src/chrome/locale/en-US/Settings.dtd
+sed -i -e "s/[[version]]/${version}/g" build/src/chrome/locale/en-US/Settings.dtd
+sed -i -e "s/[[build]]/${revision}/g" build/src/chrome/locale/en-US/Settings.dtd
 
-sed -i -e "s/<<version>>/${version}/g" build/src/chrome/locale/en-US/ThreadVis.dtd
-sed -i -e "s/<<build>>/${revision}/g" build/src/chrome/locale/en-US/ThreadVis.dtd
+sed -i -e "s/[[version]]/${version}/g" build/src/chrome/locale/en-US/ThreadVis.dtd
+sed -i -e "s/[[build]]/${revision}/g" build/src/chrome/locale/en-US/ThreadVis.dtd
 
-sed -i -e "s/<<version>>/${version}/g" build/src/chrome/locale/en-US/ThreadVisAbout.dtd
-sed -i -e "s/<<build>>/${revision}/g" build/src/chrome/locale/en-US/ThreadVisAbout.dtd
+sed -i -e "s/[[version]]/${version}/g" build/src/chrome/locale/en-US/ThreadVisAbout.dtd
+sed -i -e "s/[[build]]/${revision}/g" build/src/chrome/locale/en-US/ThreadVisAbout.dtd
 
-sed -i -e "s/<<version>>/${version}/g" build/src/install.rdf
-sed -i -e "s/<<build>>/${revision}/g" build/src/install.rdf
+sed -i -e "s/[[version]]/${version}/g" build/src/install.rdf
+sed -i -e "s/[[build]]/${revision}/g" build/src/install.rdf
 
-sed -i -e "s/<<version>>/${version}/g" build/src/update.rdf
-sed -i -e "s/<<build>>/${revision}/g" build/src/update.rdf
+sed -i -e "s/[[version]]/${version}/g" build/src/update.rdf
+sed -i -e "s/[[build]]/${revision}/g" build/src/update.rdf
 
 
 
@@ -150,7 +150,7 @@ cp build/src/ThreadVis-addons.mozilla.org.xpi build/ThreadVis-addons.mozilla.org
 # ##############################################################################
 
 sha512sum=`shasum -a 512 build/ThreadVis.xpi | awk '{print $1}'`
-sed -i -e "s/<<updatehash>>/sha512:${sha512sum}/g" build/src/update.rdf
+sed -i -e "s/[[updatehash]]/sha512:${sha512sum}/g" build/src/update.rdf
 cp build/src/update.rdf build/update.rdf
 
 
@@ -166,4 +166,3 @@ echo "Build $revision successful."
 
 # copy to desktop for easy installation
 cp build/ThreadVis.xpi /Users/sascha/Desktop/ThreadVis.xpi
-
