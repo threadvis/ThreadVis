@@ -104,7 +104,7 @@ ThreadVisNS.PreferenceObserver = function() {
  *          void
  ******************************************************************************/
 ThreadVisNS.PreferenceObserver.prototype.doCallback = function(pref) {
-    var value = this.preferences[pref].value;
+    var value = this.getPreference(pref);
     var callbacks = this.preferences[pref].callbacks;
     for (var key in callbacks) {
         var func = callbacks[key];
@@ -143,56 +143,37 @@ ThreadVisNS.PreferenceObserver.prototype.getPreference = function(pref) {
  ******************************************************************************/
 ThreadVisNS.PreferenceObserver.prototype.loadPreference = function(pref, type,
     def, prefBranch) {
-    this.preferences[pref] = {};
-    this.preferences[pref].value = def;
-    this.preferences[pref].callbacks = [];
-    this.preferences[pref].type = type;
-
-    if (! prefBranch) {
-        prefBranch = this.prefBranch;
+    if (this.preferences[pref] == null) {
+        this.preferences[pref] = {};
+        this.preferences[pref].value = def;
+        this.preferences[pref].callbacks = [];
+        this.preferences[pref].type = type;
+        if (! prefBranch) {
+            prefBranch = this.prefBranch;
+        }
+        this.preferences[pref].branch = prefBranch;
     }
-    this.preferences[pref].branch = prefBranch;
 
     // remove leading branch from pref name
-    var loadPref = pref.substring(prefBranch.root.length);
-
-    if (prefBranch.getPrefType(loadPref) != type) {
+    var loadPref = pref.substring(this.preferences[pref].branch.root.length);
+    if (this.preferences[pref].branch.getPrefType(loadPref) != type) {
         return;
     }
 
     switch (type) {
         case this.PREF_BOOL:
-            this.preferences[pref].value = prefBranch.getBoolPref(loadPref);
+            this.preferences[pref].value = this.preferences[pref].branch
+                .getBoolPref(loadPref);
             break;
         case this.PREF_STRING:
-            this.preferences[pref].value = prefBranch.getCharPref(loadPref);
+            this.preferences[pref].value = this.preferences[pref].branch
+                .getCharPref(loadPref);
             break;
         case this.PREF_INT:
-            this.preferences[pref].value = prefBranch.getIntPref(loadPref);
+            this.preferences[pref].value = this.preferences[pref].branch
+                .getIntPref(loadPref);
             break;
     }
-}
-
-
-
-/** ****************************************************************************
- * Observe preferences changes
- *
- * @param subject
- * @param topic
- * @param data
- * @return
- *          void
- ******************************************************************************/
-ThreadVisNS.PreferenceObserver.prototype.observe = function(subject, topic,
-    data) {
-    if(topic != "nsPref:changed") {
-        return;
-    }
-
-    // reload preferences
-    this.preferenceReload();
-    this.doCallback(data);
 }
 
 
@@ -278,12 +259,31 @@ ThreadVisNS.PreferenceObserver.prototype.register =  function() {
     // add observer for our own branch
     var pbi = this.prefBranch
         .QueryInterface(Components.interfaces.nsIPrefBranch2);
-    pbi.addObserver("", this, false);
+    var ref = this;
+    pbi.addObserver("", {
+        observe: function(subject, topic, data) {
+            if (topic != "nsPref:changed") {
+                return;
+            }
+            // reload preferences
+            ref.preferenceReload();
+            ref.doCallback(ref.PREF_BRANCH + data);
+        }
+    }, false);
 
     // add observer for gloda
     var glodaObserver = this.glodaPrefBranch
         .QueryInterface(Components.interfaces.nsIPrefBranch2);
-    glodaObserver.addObserver("", this, false);
+    glodaObserver.addObserver("", {
+        observe: function(subject, topic, data) {
+            if (topic != "nsPref:changed") {
+                return;
+            }
+            // reload preferences
+            ref.preferenceReload();
+            ref.doCallback(data);
+        }
+    }, false);
 }
 
 
