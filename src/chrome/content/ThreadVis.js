@@ -112,12 +112,10 @@ ThreadVisNS.ThreadVis = function() {
  *
  * @param message
  *          The message to display
- * @param isMessageWindow
- *          True if standalone window
  * @return
  *          void
  ******************************************************************************/
-ThreadVisNS.ThreadVis.prototype.callback = function(message, isMessageWindow) {
+ThreadVisNS.ThreadVis.prototype.callback = function(message) {
     if (! this.checkEnabled()) {
         return;
     }
@@ -126,7 +124,7 @@ ThreadVisNS.ThreadVis.prototype.callback = function(message, isMessageWindow) {
     var folder = MailUtils.getFolderForURI(message.getFolder(), true);
     var msg = this.cache.searchMessageByMsgId(message.getId(), folder.rootFolder);
 
-    if (! isMessageWindow) {
+    if (gFolderTreeView) {
         gFolderTreeView.selectFolder(msg.folder);
     }
     gFolderDisplay.clearSelection();
@@ -520,18 +518,6 @@ ThreadVisNS.ThreadVis.prototype.init = function() {
     if (this.isPopupVisualisation()) {
         this.visualise(window.opener.THREADVIS.selectedContainer);
     }
-}
-
-
-
-/** ****************************************************************************
- * Check if the current window is a message window
- *
- * @return
- *          True if the current window is a message window, false if not
-******************************************************************************/
-ThreadVisNS.ThreadVis.prototype.isMessageWindow = function() {
-    return document.getElementById("expandedHeaderView") != null;
 }
 
 

@@ -541,7 +541,7 @@ ThreadVisNS.ContainerVisualisation.prototype.onMouseClickDelayed = function(even
         if (THREADVIS.isPopupVisualisation()) {
             elem = window.opener;
         }
-        elem.THREADVIS.callback(container.getMessage(), elem.THREADVIS.isMessageWindow());
+        elem.THREADVIS.callback(container.getMessage());
     }
 }
 
