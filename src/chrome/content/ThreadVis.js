@@ -127,7 +127,6 @@ ThreadVisNS.ThreadVis.prototype.callback = function(message) {
     if (gFolderTreeView) {
         gFolderTreeView.selectFolder(msg.folder);
     }
-    gFolderDisplay.clearSelection();
     gFolderDisplay.show(msg.folder);
 
     gFolderDisplay.selectMessage(msg);
