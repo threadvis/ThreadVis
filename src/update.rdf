@@ -48,7 +48,7 @@
                                 <em:id>{3550f703-e582-4d05-9a08-453d09bdfdc6}</em:id>
                                 <em:minVersion>3.0</em:minVersion>
                                 <em:maxVersion>3.0.*</em:maxVersion>
-                                <em:updateLink>http://downloads.mozdev.org/threadvis/ThreadVis.xpi</em:updateLink>
+                                <em:updateLink>http://downloads.mozdev.org/threadvis/ThreadVis-[[version]].[[build]].xpi</em:updateLink>
                                 <em:updateHash>[[updatehash]]</em:updateHash>
                             </Description>
                         </em:targetApplication>
