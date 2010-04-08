@@ -101,11 +101,30 @@ var ThreadVis = (function(ThreadVis) {
      * @return True if the extension is enabled, false if not.
      **************************************************************************/
     ThreadVis.checkEnabled = function() {
+        return ThreadVis.checkEnabledThreadVis()
+                && ThreadVis.checkEnabledGloda();
+    }
+
+    /***************************************************************************
+     * Check if extension is disabled
+     * 
+     * @return True if the extension is enabled, false if not.
+     **************************************************************************/
+    ThreadVis.checkEnabledThreadVis = function() {
         var threadvisEnabled = ThreadVis.Preferences
                 .getPreference(ThreadVis.Preferences.PREF_ENABLED);
+        return threadvisEnabled;
+    }
+
+    /***************************************************************************
+     * Check GloDa is enabled
+     * 
+     * @return True if the gloda is enabled, false if not.
+     **************************************************************************/
+    ThreadVis.checkEnabledGloda = function() {
         var glodaEnabled = ThreadVis.Preferences
                 .getPreference(ThreadVis.Preferences.PREF_GLODA_ENABLED);
-        return threadvisEnabled && glodaEnabled;
+        return glodaEnabled;
     }
 
     /***************************************************************************
@@ -113,9 +132,9 @@ var ThreadVis = (function(ThreadVis) {
      * 
      * @param folder
      *            The folder to check
-     * @return True if the folder/account is enabled, false if not.
+     * @return True if the account is enabled, false if not.
      **************************************************************************/
-    ThreadVis.checkEnabledAccountOrFolder = function(folder) {
+    ThreadVis.checkEnabledAccount = function(folder) {
         if (!folder) {
             folder = ThreadVis.getMainWindow().gFolderDisplay.displayedFolder;
         }
@@ -134,17 +153,45 @@ var ThreadVis = (function(ThreadVis) {
                         ThreadVis.Preferences.PREF_DISABLED_ACCOUNTS).indexOf(
                         " " + account.key + " ") > -1) {
             return false;
-        } else {
-            if (ThreadVis.Preferences
-                    .getPreference(ThreadVis.Preferences.PREF_DISABLED_FOLDERS) != ""
-                    && ThreadVis.Preferences.getPreference(
-                            ThreadVis.Preferences.PREF_DISABLED_FOLDERS)
-                            .indexOf(" " + folder.URI + " ") > -1) {
-                return false;
-            } else {
-                return true;
-            }
         }
+        return true;
+    }
+
+    /***************************************************************************
+     * Check if current folder is enabled in extension
+     * 
+     * @param folder
+     *            The folder to check
+     * @return True if the folder is enabled, false if not.
+     **************************************************************************/
+    ThreadVis.checkEnabledFolder = function(folder) {
+        if (!folder) {
+            folder = ThreadVis.getMainWindow().gFolderDisplay.displayedFolder;
+        }
+        if (!folder) {
+            return false;
+        }
+
+        if (ThreadVis.Preferences
+                .getPreference(ThreadVis.Preferences.PREF_DISABLED_FOLDERS) != ""
+                && ThreadVis.Preferences.getPreference(
+                        ThreadVis.Preferences.PREF_DISABLED_FOLDERS).indexOf(
+                        " " + folder.URI + " ") > -1) {
+            return false;
+        }
+        return true;
+    }
+
+    /***************************************************************************
+     * Check if current account is enabled in extension
+     * 
+     * @param folder
+     *            The folder to check
+     * @return True if the folder/account is enabled, false if not.
+     **************************************************************************/
+    ThreadVis.checkEnabledAccountOrFolder = function(folder) {
+        return ThreadVis.checkEnabledAccount(folder)
+                && ThreadVis.checkEnabledFolder(folder);
     }
 
     /***************************************************************************
@@ -445,6 +492,10 @@ var ThreadVis = (function(ThreadVis) {
                     ThreadVis.Preferences.PREF_VIS_ZOOM, function(value) {
                         ThreadVis.preferenceChanged();
                     });
+            ThreadVis.Preferences.registerCallback(
+                    ThreadVis.Preferences.PREF_GLODA_ENABLED, function(value) {
+                        ThreadVis.preferenceChanged();
+                    });
 
             // display about dialog and email reminder only once on each startup
             setTimeout(function() {
@@ -453,7 +504,6 @@ var ThreadVis = (function(ThreadVis) {
 
             if (!ThreadVis.checkEnabled()) {
                 ThreadVis.deleteBox();
-                return;
             }
 
             // remember msgid of visualised message
@@ -490,6 +540,14 @@ var ThreadVis = (function(ThreadVis) {
         if (ThreadVis.isPopupVisualisation()) {
             ThreadVis.visualise(window.opener.ThreadVis.selectedContainer);
         }
+
+        // set initial status
+        ThreadVis.setStatus(null, {
+            enabled : ThreadVis.checkEnabledThreadVis(),
+            accountEnabled : ThreadVis.checkEnabledAccount(),
+            folderEnabled : ThreadVis.checkEnabledFolder(),
+            glodaEnabled : ThreadVis.checkEnabledGloda()
+        });
     }
 
     /***************************************************************************
@@ -550,7 +608,10 @@ var ThreadVis = (function(ThreadVis) {
             ThreadVis.visualisation.displayDisabled();
             ThreadVis.visualisedMsgId = null;
             ThreadVis.setStatus(null, {
-                enabled : false
+                enabled : ThreadVis.checkEnabledThreadVis(),
+                accountEnabled : ThreadVis.checkEnabledAccount(),
+                folderEnabled : ThreadVis.checkEnabledFolder(),
+                glodaEnabled : ThreadVis.checkEnabledGloda()
             });
             return;
         }
@@ -559,13 +620,18 @@ var ThreadVis = (function(ThreadVis) {
             ThreadVis.visualisation.displayDisabled();
             ThreadVis.visualisedMsgId = null;
             ThreadVis.setStatus(null, {
-                folderEnabled : false
+                enabled : ThreadVis.checkEnabledThreadVis(),
+                glodaEnabled : ThreadVis.checkEnabledGloda(),
+                accountEnabled : ThreadVis.checkEnabledAccount(),
+                folderEnabled : ThreadVis.checkEnabledFolder()
             });
             return;
         }
         ThreadVis.setStatus(null, {
-            enabled : true,
-            folderEnabled : true
+            enabled : ThreadVis.checkEnabledThreadVis(),
+            glodaEnabled : ThreadVis.checkEnabledGloda(),
+            accountEnabled : ThreadVis.checkEnabledAccount(),
+            folderEnabled : ThreadVis.checkEnabledFolder()
         });
 
         ThreadVis.visualisation.disabled = false;
@@ -723,38 +789,114 @@ var ThreadVis = (function(ThreadVis) {
                 elem.value = elem.getAttribute("defaultvalue");
             }
         }
+        var disabled = false;
+        var disabledGloda = false;
+        var disabledAccount = false;
+        var disabledFolder = false;
         if (typeof (tooltip) != "undefined") {
             if (typeof (tooltip.enabled) != "undefined") {
-                if (tooltip.enabled) {
-                    document.getElementById("ThreadVisStatusTooltipDisabled").hidden = true;
-                } else {
-                    document.getElementById("ThreadVisStatusTooltipDisabled").hidden = false;
-                    document.getElementById("ThreadVisStatusMenuEnableFolder")
-                            .setAttribute("disabled", true);
-                    document.getElementById("ThreadVisStatusMenuDisableFolder")
-                            .setAttribute("disabled", true);
-                }
+                disabled = !tooltip.enabled;
+            }
+            if (typeof (tooltip.glodaEnabled) != "undefined") {
+                disabledGloda = !tooltip.glodaEnabled;
             }
             if (typeof (tooltip.folderEnabled) != "undefined") {
-                if (tooltip.folderEnabled) {
-                    document
-                            .getElementById("ThreadVisStatusTooltipFolderDisabled").hidden = true;
-                    document
-                            .getElementById("ThreadVisStatusTooltipFolderEnabled").hidden = false;
-                    document.getElementById("ThreadVisStatusMenuEnableFolder")
-                            .setAttribute("disabled", true);
-                    document.getElementById("ThreadVisStatusMenuDisableFolder")
-                            .setAttribute("disabled", false);
-                } else {
-                    document
-                            .getElementById("ThreadVisStatusTooltipFolderDisabled").hidden = false;
-                    document
-                            .getElementById("ThreadVisStatusTooltipFolderEnabled").hidden = true;
-                    document.getElementById("ThreadVisStatusMenuEnableFolder")
-                            .setAttribute("disabled", false);
-                    document.getElementById("ThreadVisStatusMenuDisableFolder")
-                            .setAttribute("disabled", true);
-                }
+                disabledFolder = !tooltip.folderEnabled;
+            }
+            if (typeof (tooltip.accountEnabled) != "undefined") {
+                disabledAccount = !tooltip.accountEnabled;
+            }
+            if (disabled) {
+                document.getElementById("ThreadVisStatusTooltipDisabled").hidden = false;
+                document.getElementById("ThreadVisStatusMenuEnable")
+                        .setAttribute("checked", false);
+                document.getElementById("ThreadVisStatusMenuDisable")
+                        .setAttribute("checked", true);
+            } else {
+                document.getElementById("ThreadVisStatusTooltipDisabled").hidden = true;
+                document.getElementById("ThreadVisStatusMenuEnable")
+                        .setAttribute("checked", true);
+                document.getElementById("ThreadVisStatusMenuDisable")
+                        .setAttribute("checked", false);
+            }
+            if (!disabled && disabledGloda) {
+                document.getElementById("ThreadVisStatusTooltipGlodaDisabled").hidden = false;
+            } else {
+                document.getElementById("ThreadVisStatusTooltipGlodaDisabled").hidden = true;
+            }
+            if (!disabled && !disabledGloda && disabledAccount) {
+                document
+                        .getElementById("ThreadVisStatusTooltipAccountDisabled").hidden = false;
+                document.getElementById("ThreadVisStatusMenuEnableAccount")
+                        .setAttribute("checked", false);
+                document.getElementById("ThreadVisStatusMenuDisableAccount")
+                        .setAttribute("checked", true);
+            } else {
+                document
+                        .getElementById("ThreadVisStatusTooltipAccountDisabled").hidden = true;
+                document.getElementById("ThreadVisStatusMenuEnableAccount")
+                        .setAttribute("checked", true);
+                document.getElementById("ThreadVisStatusMenuDisableAccount")
+                        .setAttribute("checked", false);
+            }
+            if (!disabled && !disabledGloda && !disabledAccount
+                    && disabledFolder) {
+                document.getElementById("ThreadVisStatusTooltipFolderDisabled").hidden = false;
+                document.getElementById("ThreadVisStatusMenuEnableFolder")
+                        .setAttribute("checked", false);
+                document.getElementById("ThreadVisStatusMenuDisableFolder")
+                        .setAttribute("checked", true);
+            } else {
+                document.getElementById("ThreadVisStatusTooltipFolderDisabled").hidden = true;
+                document.getElementById("ThreadVisStatusMenuEnableFolder")
+                        .setAttribute("checked", true);
+                document.getElementById("ThreadVisStatusMenuDisableFolder")
+                        .setAttribute("checked", false);
+            }
+
+            // global disable
+            if (!disabledGloda) {
+                document.getElementById("ThreadVisStatusMenuEnable").disabled = false;
+                document.getElementById("ThreadVisStatusMenuDisable").disabled = false;
+            } else {
+                document.getElementById("ThreadVisStatusMenuEnable").disabled = true;
+                document.getElementById("ThreadVisStatusMenuDisable").disabled = true;
+            }
+
+            // account disable
+            if (!disabled && !disabledGloda) {
+                document.getElementById("ThreadVisStatusMenuEnableAccount").disabled = false;
+                document.getElementById("ThreadVisStatusMenuDisableAccount").disabled = false;
+            } else {
+                document.getElementById("ThreadVisStatusMenuEnableAccount").disabled = true;
+                document.getElementById("ThreadVisStatusMenuDisableAccount").disabled = true;
+            }
+
+            // folder disable
+            if (!disabled && !disabledGloda && !disabledAccount) {
+                document.getElementById("ThreadVisStatusMenuEnableFolder").disabled = false;
+                document.getElementById("ThreadVisStatusMenuDisableFolder").disabled = false;
+            } else {
+                document.getElementById("ThreadVisStatusMenuEnableFolder").disabled = true;
+                document.getElementById("ThreadVisStatusMenuDisableFolder").disabled = true;
+            }
+
+            if (disabled || disabledGloda || disabledAccount || disabledFolder) {
+                document.getElementById("ThreadVisStatusBarPanel")
+                        .setAttribute(
+                                "class",
+                                document.getElementById(
+                                        "ThreadVisStatusBarPanel")
+                                        .getAttribute("class")
+                                        + " disabled");
+            } else {
+                document.getElementById("ThreadVisStatusBarPanel")
+                        .setAttribute(
+                                "class",
+                                document.getElementById(
+                                        "ThreadVisStatusBarPanel")
+                                        .getAttribute("class").replace(
+                                                /disabled/g, ""));
             }
         }
     }
@@ -766,7 +908,7 @@ var ThreadVis = (function(ThreadVis) {
      **************************************************************************/
     ThreadVis.disableCurrentFolder = function() {
         // get currently displayed folder
-        var folder = ThreadVis.getMainWindow().GetLoadedMsgFolder();
+        var folder = ThreadVis.getMainWindow().gFolderDisplay.displayedFolder;
         if (folder) {
             var folderSetting = ThreadVis.Preferences
                     .getPreference(ThreadVis.Preferences.PREF_DISABLED_FOLDERS);
@@ -786,7 +928,7 @@ var ThreadVis = (function(ThreadVis) {
      **************************************************************************/
     ThreadVis.enableCurrentFolder = function() {
         // get currently displayed folder
-        var folder = ThreadVis.getMainWindow().GetLoadedMsgFolder();
+        var folder = ThreadVis.getMainWindow().gFolderDisplay.displayedFolder;
         if (folder) {
             var folderSetting = ThreadVis.Preferences
                     .getPreference(ThreadVis.Preferences.PREF_DISABLED_FOLDERS);
@@ -799,6 +941,78 @@ var ThreadVis = (function(ThreadVis) {
                     ThreadVis.Preferences.PREF_DISABLED_FOLDERS, folderSetting,
                     ThreadVis.Preferences.PREF_STRING);
         }
+    }
+
+    /***************************************************************************
+     * Enable for current account
+     * 
+     * @return void
+     **************************************************************************/
+    ThreadVis.enableCurrentAccount = function() {
+        // get currently displayed folder
+        var folder = ThreadVis.getMainWindow().gFolderDisplay.displayedFolder;
+        if (folder) {
+            var server = folder.server;
+            var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
+                    .getService(Components.interfaces.nsIMsgAccountManager))
+                    .FindAccountForServer(server);
+
+            var accountSetting = ThreadVis.Preferences
+                    .getPreference(ThreadVis.Preferences.PREF_DISABLED_ACCOUNTS);
+
+            var index = accountSetting.indexOf(" " + account.key + " ");
+            accountSetting = accountSetting.substring(0, index)
+                    + accountSetting.substring(index + account.key.length);
+
+            ThreadVis.Preferences.setPreference(
+                    ThreadVis.Preferences.PREF_DISABLED_ACCOUNTS,
+                    accountSetting, ThreadVis.Preferences.PREF_STRING);
+        }
+    }
+
+    /***************************************************************************
+     * Disable for current account
+     * 
+     * @return void
+     **************************************************************************/
+    ThreadVis.disableCurrentAccount = function() {
+        // get currently displayed folder
+        var folder = ThreadVis.getMainWindow().gFolderDisplay.displayedFolder;
+        if (folder) {
+            var server = folder.server;
+            var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
+                    .getService(Components.interfaces.nsIMsgAccountManager))
+                    .FindAccountForServer(server);
+
+            var accountSetting = ThreadVis.Preferences
+                    .getPreference(ThreadVis.Preferences.PREF_DISABLED_ACCOUNTS);
+
+            accountSetting = accountSetting + " " + account.key;
+
+            ThreadVis.Preferences.setPreference(
+                    ThreadVis.Preferences.PREF_DISABLED_ACCOUNTS,
+                    accountSetting, ThreadVis.Preferences.PREF_STRING);
+        }
+    }
+
+    /***************************************************************************
+     * Enable
+     * 
+     * @return void
+     **************************************************************************/
+    ThreadVis.enable = function() {
+        ThreadVis.Preferences.setPreference(ThreadVis.Preferences.PREF_ENABLED,
+                true, ThreadVis.Preferences.PREF_BOOL);
+    }
+
+    /***************************************************************************
+     * Disable
+     * 
+     * @return void
+     **************************************************************************/
+    ThreadVis.disable = function() {
+        ThreadVis.Preferences.setPreference(ThreadVis.Preferences.PREF_ENABLED,
+                false, ThreadVis.Preferences.PREF_BOOL);
     }
 
     return ThreadVis;

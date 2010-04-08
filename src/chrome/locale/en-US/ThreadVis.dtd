@@ -38,10 +38,13 @@
 <!ENTITY zoomin.tooltip             "Zoom In">
 <!ENTITY zoomout.tooltip            "Zoom Out">
 <!ENTITY legend.title               "ThreadVis Legend">
+<!ENTITY statusbar.disabled         "Disabled in preferences.">
+<!ENTITY statusbar.disabledGloda    "Disabled because the 'Global Search and Indexer' feature is disabled.">
 <!ENTITY statusbar.disabledAccount  "Disabled for the current account.">
 <!ENTITY statusbar.disabledFolder   "Disabled for the current folder.">
-<!ENTITY statusbar.enabledFolder    "Enabled for the current folder.">
-<!ENTITY statusbar.enableFolder     "Enable for the current folder">
-<!ENTITY statusbar.disableFolder    "Disable for the current folder">
+<!ENTITY statusbar.enable           "Enabled">
+<!ENTITY statusbar.disable          "Disabled">
+<!ENTITY statusbar.enableAccount    "For current account">
+<!ENTITY statusbar.enableFolder     "For current folder">
 <!ENTITY extension.name             "ThreadVis">
 <!ENTITY extension.version          "[[version]].[[build]]">

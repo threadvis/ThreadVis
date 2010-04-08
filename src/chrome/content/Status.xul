@@ -35,6 +35,7 @@
 
 
 <!DOCTYPE overlay SYSTEM "chrome://threadvis/locale/ThreadVis.dtd">
+<?xml-stylesheet href="chrome://threadvis/content/ThreadVis.css" type="text/css"?>
 <overlay id="ThreadVisStatus"
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
@@ -42,20 +43,61 @@
         <tooltip id="ThreadVisStatusTooltip" orient="vertical">
             <description value="&extension.name; &extension.version;" />
             <description id="ThreadVisStatusTooltipDisabled"
-                value="&statusbar.disabledAccount;" hidden="true" />
+                         value="&statusbar.disabled;"
+                         hidden="true" />
+            <description id="ThreadVisStatusTooltipGlodaDisabled"
+                         value="&statusbar.disabledGloda;"
+                         hidden="true" />
+            <description id="ThreadVisStatusTooltipAccountDisabled"
+                         value="&statusbar.disabledAccount;"
+                         hidden="true" />
             <description id="ThreadVisStatusTooltipFolderDisabled"
-                value="&statusbar.disabledFolder;" hidden="true" />
-            <description id="ThreadVisStatusTooltipFolderEnabled"
-                value="&statusbar.enabledFolder;" hidden="true" />
+                         value="&statusbar.disabledFolder;"
+                         hidden="true" />
         </tooltip>
-        <statusbarpanel tooltip="ThreadVisStatusTooltip" mode="icon" class="statusbarpanel-menu-iconic"
-            style="list-style-image: url('chrome://threadvis/content/images/statusbar.png')">
+        <statusbarpanel id="ThreadVisStatusBarPanel" tooltip="ThreadVisStatusTooltip"
+            mode="icon" class="statusbarpanel-menu-iconic">
             <menupopup id="ThreadVisStatusPopUp">
-                <menuitem id="ThreadVisStatusMenuEnableFolder" disabled="true" label="&statusbar.enableFolder;" 
-                    oncommand="ThreadVis.enableCurrentFolder();" />
-                <menuitem id="ThreadVisStatusMenuDisableFolder" disabled="true" label="&statusbar.disableFolder;"
-                    oncommand="ThreadVis.disableCurrentFolder();" />
+                <menuitem label="&extension.name; &extension.version;"
+                    disabled="true" />
+                
+                <menuitem id="ThreadVisStatusMenuEnable"
+                          label="&statusbar.enable;"
+                          type="checkbox"
+                          oncommand="ThreadVis.enable();" />
+                <menuitem id="ThreadVisStatusMenuDisable"
+                          label="&statusbar.disable;"
+                          type="checkbox"
+                          oncommand="ThreadVis.disable();" />
+                
                 <menuseparator />
+                
+                <menuitem disabled="true"
+                          label="&statusbar.enableAccount;" />
+                <menuitem id="ThreadVisStatusMenuEnableAccount"
+                          type="checkbox"
+                          label="&statusbar.enable;"
+                          oncommand="ThreadVis.enableCurrentAccount();" />
+                <menuitem id="ThreadVisStatusMenuDisableAccount"
+                          type="checkbox"
+                          label="&statusbar.disable;"
+                          oncommand="ThreadVis.disableCurrentAccount();" />
+                
+                <menuseparator />
+                
+                <menuitem disabled="true"
+                          label="&statusbar.enableFolder;" />
+                <menuitem id="ThreadVisStatusMenuEnableFolder"
+                          type="checkbox"
+                          label="&statusbar.enable;" 
+                          oncommand="ThreadVis.enableCurrentFolder();" />
+                <menuitem id="ThreadVisStatusMenuDisableFolder"
+                          type="checkbox"
+                          label="&statusbar.disable;"
+                          oncommand="ThreadVis.disableCurrentFolder();" />
+                
+                <menuseparator />
+                
                 <menuitem label="&popup.settings;" 
                     oncommand="ThreadVis.openThreadVisOptionsDialog();" />
             </menupopup>

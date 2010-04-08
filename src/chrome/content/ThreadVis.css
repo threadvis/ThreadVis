@@ -38,3 +38,15 @@ splitter.mousehidden {
 splitter.mousehidden:hover {
     visibility: visible;
 }
+
+#ThreadVisStatusBarPanel {
+    list-style-image: url('chrome://threadvis/content/images/statusbar.png');
+}
+
+#ThreadVisStatusBarPanel.disabled {
+    list-style-image: url('chrome://threadvis/content/images/statusbar-disabled.png');
+}
+
+#ThreadVisStatusBarPanel.disabled #ThreadVisStatusText {
+    color: #cccccc;
+}
