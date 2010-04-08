@@ -1015,5 +1015,24 @@ var ThreadVis = (function(ThreadVis) {
                 false, ThreadVis.Preferences.PREF_BOOL);
     }
 
+    /***************************************************************************
+     * Log to error console
+     * 
+     * @param source
+     *            The source file.
+     * @param message
+     *            The log message
+     * @return void
+     **************************************************************************/
+    ThreadVis.log = function(source, message) {
+        var consoleService = Components.classes["@mozilla.org/consoleservice;1"]
+                .getService(Components.interfaces.nsIConsoleService);
+        var scriptError = Components.classes["@mozilla.org/scripterror;1"]
+                .createInstance(Components.interfaces.nsIScriptError);
+        scriptError.init(message, source, null, null, null,
+                Components.interfaces.nsIScriptError.errorFlag, null);
+        consoleService.logMessage(scriptError);
+    }
+
     return ThreadVis;
 }(ThreadVis || {}));

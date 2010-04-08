@@ -103,6 +103,14 @@ var ThreadVis = (function(ThreadVis) {
         // check if msg is a sent mail
         var issent = false;
 
+        if (glodaMessage.folderMessage == null) {
+            ThreadVis.log("Cache",
+                    "Could not find 'real' message for gloda message with msg-id '"
+                            + glodaMessage.headerMessageID + "' in folder '"
+                            + glodaMessage.folder + "'")
+            return null;
+        }
+
         // it is sent if it is stored in a folder that is marked as sent (if
         // enabled)
         issent |= glodaMessage.folderMessage.folder.isSpecialFolder(
@@ -159,11 +167,39 @@ var ThreadVis = (function(ThreadVis) {
             // exclude virtual folders in search
             if (!(folder.flags & Components.interfaces.nsMsgFolderFlags.Virtual)
                     && !folder.noSelect) {
-                msgDB = folder.msgDatabase;
+                try {
+                    var msgDB = folder.msgDatabase;
+                } catch (ex) {
+                    ThreadVis.log("Cache",
+                            "Getting message database from folder threw exception.\n"
+                                    + ex + "\nFolder: " + folder.URI
+                                    + "\nFolder-Flags: " + folder.flags);
+                    // try refreshing the folder
+                    ThreadVis.log("Cache", "Trying to refresh folder " + folder.URI);
+                    try {
+                        folder.updateFolder(null);
+                    } catch (ex) {
+                        ThreadVis.log("Cache",
+                                "Refreshing folder threw exception.\n" + ex);
+                    }
+                    try {
+                        msgDB = folder.msgDatabase;
+                    } catch (ex) {
+                        ThreadVis
+                                .log(
+                                        "Cache",
+                                        "Getting message database from folder threw exception, for the second time. Giving up.\n"
+                                                + ex
+                                                + "\nFolder: "
+                                                + folder.URI
+                                                + "\nFolder-Flags: "
+                                                + folder.flags);
+                    }
+                }
+
                 if (msgDB) {
                     msgHdr = msgDB.getMsgHdrForMessageID(messageId);
                     msgDB = null;
-                    delete msgDB;
                 }
 
                 if (msgHdr) {
