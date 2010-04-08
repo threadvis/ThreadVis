@@ -319,7 +319,7 @@ var ThreadVis = (function(ThreadVis) {
                 }
                 // reload preferences
                 ThreadVis.Preferences.preferenceReload();
-                ThreadVis.Preferences.doCallback(data);
+                ThreadVis.Preferences.doCallback(ThreadVis.Preferences.PREF_GLODA_ENABLED);
             }
         }, false);
     }
