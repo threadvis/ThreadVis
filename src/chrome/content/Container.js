@@ -215,7 +215,7 @@ var ThreadVis = (function(ThreadVis) {
      **************************************************************************/
     ThreadVis.Container.prototype.getChildPosition = function(child) {
         var count = 0;
-        var container = 0;
+        var container = null;
         for (container = this.getChild(); container != null; container = container
                 .getNext()) {
             if (container == child) {
