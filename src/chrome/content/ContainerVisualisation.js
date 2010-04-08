@@ -54,8 +54,6 @@ var ThreadVis = (function(ThreadVis) {
      *            The resize parameter
      * @param circle
      *            True to draw a circle
-     * @param flash
-     *            True to flash
      * @param spacing
      *            The spacing
      * @param opacity
@@ -65,7 +63,7 @@ var ThreadVis = (function(ThreadVis) {
      * @return A new container visualisation
      **************************************************************************/
     ThreadVis.ContainerVisualisation = function(stack, strings, container,
-            colour, left, top, selected, dotSize, resize, circle, flash,
+            colour, left, top, selected, dotSize, resize, circle,
             spacing, opacity, messageCircles) {
         /**
          * XUL stack on which container gets drawn
@@ -119,16 +117,6 @@ var ThreadVis = (function(ThreadVis) {
         this.isCircle = circle;
 
         /**
-         * number of times the circle flashes
-         */
-        this.flashCount = 3;
-
-        /**
-         * should the circle be flashing (boolean)
-         */
-        this.flash = flash;
-
-        /**
          * the spacing between two messages in px
          */
         this.spacing = spacing;
@@ -169,10 +157,6 @@ var ThreadVis = (function(ThreadVis) {
 
         this.createToolTip();
         this.createMenu();
-
-        if (this.selected && this.isCircle && this.flash) {
-            this.startFlash();
-        }
     }
 
     /***************************************************************************
@@ -406,51 +390,6 @@ var ThreadVis = (function(ThreadVis) {
     }
 
     /***************************************************************************
-     * Flash (show and hide) circle to draw attention to selected container
-     * 
-     * @return void
-     **************************************************************************/
-    ThreadVis.ContainerVisualisation.prototype.flash = function() {
-        if (this.flashCount == 0) {
-            clearTimeout(this.flashTimeout);
-            return;
-        }
-
-        this.flashCount--;
-
-        var ref = this;
-        this.flashOnTimeout = setTimeout(function() {
-            ref.flashOn();
-        }, 10);
-    }
-
-    /***************************************************************************
-     * Hide circle
-     * 
-     * @return void
-     **************************************************************************/
-    ThreadVis.ContainerVisualisation.prototype.flashOff = function() {
-        this.showCircle();
-        var ref = this;
-        this.flashTimeout = setTimeout(function() {
-            ref.flash();
-        }, 500);
-    }
-
-    /***************************************************************************
-     * Show circle
-     * 
-     * @return void
-     **************************************************************************/
-    ThreadVis.ContainerVisualisation.prototype.flashOn = function() {
-        this.hideCircle();
-        var ref = this;
-        this.flashOffTimeout = setTimeout(function() {
-            ref.flashOff();
-        }, 500);
-    }
-
-    /***************************************************************************
      * Hide circle
      * 
      * @return void
@@ -520,8 +459,6 @@ var ThreadVis = (function(ThreadVis) {
      *            The top position
      * @param selected
      *            True if container is selected
-     * @param flash
-     *            True to flash
      * @param colour
      *            The colour
      * @param opacity
@@ -529,12 +466,11 @@ var ThreadVis = (function(ThreadVis) {
      * @return void
      **************************************************************************/
     ThreadVis.ContainerVisualisation.prototype.redraw = function(resize, left,
-            top, selected, flash, colour, opacity) {
+            top, selected, colour, opacity) {
         this.resize = resize;
         this.left = left;
         this.top = top;
         this.selected = selected;
-        this.flash = flash;
         this.colour = colour;
         this.opacity = opacity;
 
@@ -547,10 +483,6 @@ var ThreadVis = (function(ThreadVis) {
         }
 
         this.redrawClick();
-
-        if (this.selected && this.drawCircle && this.flash) {
-            this.startFlash();
-        }
     }
 
     /***************************************************************************
@@ -589,28 +521,6 @@ var ThreadVis = (function(ThreadVis) {
      **************************************************************************/
     ThreadVis.ContainerVisualisation.prototype.showCircle = function() {
         this.circle.hidden = false;
-    }
-
-    /***************************************************************************
-     * Flash (show and hide) circle to draw attention to selected container
-     * 
-     * @return void
-     **************************************************************************/
-    ThreadVis.ContainerVisualisation.prototype.startFlash = function() {
-        this.flashCount = 3;
-        this.flash();
-    }
-
-    /***************************************************************************
-     * Stop flashing
-     * 
-     * @return void
-     **************************************************************************/
-    ThreadVis.ContainerVisualisation.prototype.stopFlash = function() {
-        clearInterval(this.flashInterval);
-        clearTimeout(this.flashOnTimeout);
-        clearTimeout(this.flashOffTimeout);
-        this.hideCircle();
     }
 
     /***************************************************************************

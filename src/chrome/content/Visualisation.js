@@ -228,25 +228,31 @@ var ThreadVis = (function(ThreadVis) {
     }
 
     /***************************************************************************
-     * Clear stack Delete all children
+     * Clear stack. Delete all children
      * 
      * @return void
      **************************************************************************/
     ThreadVis.Visualisation.prototype.clearStack = function() {
-        this.outerBox.hidden = false;
-        while (this.stack.firstChild != null) {
-            this.stack.removeChild(this.stack.firstChild);
+        if (this.outerBox != null) {
+            this.outerBox.hidden = false;
+        }
+        if (this.stack != null) {
+            while (this.stack.firstChild != null) {
+                this.stack.removeChild(this.stack.firstChild);
+            }
+            // reset move
+            this.stack.style.marginLeft = "0px";
+            this.stack.style.marginTop = "0px";
+            this.stack.style.padding = "5px";
+
         }
 
-        // also delete all popupset menus
-        while (this.popups.firstChild != null) {
-            this.popups.removeChild(this.popups.firstChild);
+        if (this.popups != null) {
+            // also delete all popupset menus
+            while (this.popups.firstChild != null) {
+                this.popups.removeChild(this.popups.firstChild);
+            }
         }
-
-        // reset move
-        this.stack.style.marginLeft = "0px";
-        this.stack.style.marginTop = "0px";
-        this.stack.style.padding = "5px";
 
         if (!ThreadVis.isPopupVisualisation()) {
             this.setVariableSize();
@@ -322,135 +328,6 @@ var ThreadVis = (function(ThreadVis) {
                 emailField.style.borderBottom = "";
             }
         }
-    }
-
-    /***************************************************************************
-     * Convert a HSV colour to a RGB colour
-     * 
-     * @param hue
-     *            The "hue" value of the colour
-     * @param saturation
-     *            The "saturation" value of the colour
-     * @param value
-     *            The "value" value of the colour
-     * @return The same colour in RGB colour model object.r Red component
-     *         [0..255] object.g Green component [0..255] object.b Blue
-     *         component [0..255]
-     **************************************************************************/
-    ThreadVis.Visualisation.prototype.convertHSVtoRGB = function(hue,
-            saturation, value) {
-        var h = hue / 360;
-        var s = saturation / 100;
-        var v = value / 100;
-
-        if (s == 0) {
-            return {
-                "r" : v * 255,
-                "g" : v * 255,
-                "b" : v * 255
-            };
-        } else {
-            var varH = h * 6;
-            var varI = Math.floor(varH);
-            var var1 = v * (1 - s);
-            var var2 = v * (1 - s * (varH - varI));
-            var var3 = v * (1 - s * (1 - (varH - varI)));
-
-            switch (varI) {
-                case 0:
-                    var varR = v;
-                    var varG = var3;
-                    var varB = var1;
-                    break;
-                case 1:
-                    var varR = var2;
-                    var varG = v;
-                    var varB = var1;
-                    break;
-                case 2:
-                    var varR = var1;
-                    var varG = v;
-                    var varB = var3;
-                    break;
-                case 3:
-                    var varR = var1;
-                    var varG = var2;
-                    var varB = v;
-                    break;
-                case 4:
-                    var varR = var3;
-                    var varG = var1;
-                    var varB = v;
-                    break;
-                default:
-                    var varR = v;
-                    var varG = var1;
-                    var varB = var2;
-            }
-            return {
-                "r" : varR * 255,
-                "g" : varG * 255,
-                "b" : varB * 255
-            };
-        }
-    }
-
-    /***************************************************************************
-     * Convert a RGB colour to a HSV colour
-     * 
-     * @param r
-     *            The red value
-     * @param g
-     *            The green value
-     * @param b
-     *            The blue value
-     * @return The same colour in HSV colour model object.hue The hue of the
-     *         colour object.saturation The saturation of the colour
-     *         object.value The value of the colour
-     **************************************************************************/
-    ThreadVis.Visualisation.prototype.convertRGBtoHSV = function(r, g, b) {
-        r = r / 255;
-        g = g / 255;
-        b = b / 255;
-        var h = 0;
-        var s = 0;
-        var v = 0;
-
-        var minVal = Math.min(r, g, b);
-        var maxVal = Math.max(r, g, b);
-        var delta = maxVal - minVal;
-
-        var v = maxVal;
-
-        if (delta == 0) {
-            h = 0;
-            s = 0;
-        } else {
-            s = delta / maxVal;
-            var del_R = (((maxVal - r) / 6) + (delta / 2)) / delta;
-            var del_G = (((maxVal - g) / 6) + (delta / 2)) / delta;
-            var del_B = (((maxVal - b) / 6) + (delta / 2)) / delta;
-
-            if (r == maxVal) {
-                h = del_B - del_G;
-            } else if (g == maxVal) {
-                h = (1 / 3) + del_R - del_B;
-            } else if (b == maxVal) {
-                h = (2 / 3) + del_G - del_R;
-            }
-
-            if (h < 0) {
-                h += 1;
-            }
-            if (h > 1) {
-                h -= 1;
-            }
-        }
-        return {
-            "hue" : h * 360,
-            "saturation" : s * 100,
-            "value" : v * 100
-        };
     }
 
     /***************************************************************************
@@ -546,32 +423,6 @@ var ThreadVis = (function(ThreadVis) {
     }
 
     /***************************************************************************
-     * Get hexadecimal representation of a decimal number
-     * 
-     * @param dec
-     *            The decimal value of the number
-     * @return The hexadecimal string representing the colour
-     **************************************************************************/
-    ThreadVis.Visualisation.prototype.DECtoHEX = function(dec) {
-        var alpha = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A",
-                "B", "C", "D", "E", "F" ];
-        var n_ = Math.floor(dec / 16)
-        var _n = dec - n_ * 16;
-        return alpha[n_] + alpha[_n];
-    }
-
-    /***************************************************************************
-     * Get decimal representation of a hexadecimal number
-     * 
-     * @param hex
-     *            The hexadecimal value of the number
-     * @return The decimal value of the number
-     **************************************************************************/
-    ThreadVis.Visualisation.prototype.HEXtoDEC = function(hex) {
-        return parseInt(hex, 16);
-    }
-
-    /***************************************************************************
      * Display disabled message
      * 
      * @param forceHide
@@ -584,7 +435,7 @@ var ThreadVis = (function(ThreadVis) {
 
         // if preference set, hide box completely
         if (forceHide
-                || ThreadVIs.Preferences
+                || ThreadVis.Preferences
                         .getPreference(ThreadVis.Preferences.PREF_VIS_HIDE_ON_DISABLE)) {
             this.outerBox.hidden = true;
             return;
@@ -783,14 +634,12 @@ var ThreadVis = (function(ThreadVis) {
      *            True if the container is selected
      * @param circle
      *            True to draw a circle around the dot
-     * @param flash
-     *            True to flash
      * @param opacity
      *            The opacity of the dot
      * @return The dot object
      **************************************************************************/
     ThreadVis.Visualisation.prototype.drawDot = function(container, colour,
-            left, top, selected, circle, flash, opacity) {
+            left, top, selected, circle, opacity) {
         var prefDotSize = ThreadVis.Preferences
                 .getPreference(ThreadVis.Preferences.PREF_VIS_DOTSIZE);
         var prefSpacing = ThreadVis.Preferences
@@ -800,7 +649,7 @@ var ThreadVis = (function(ThreadVis) {
 
         var msg = new ThreadVis.ContainerVisualisation(this.stack,
                 this.strings, container, colour, left, top, selected,
-                prefDotSize, this.resize, circle, flash, prefSpacing, opacity,
+                prefDotSize, this.resize, circle, prefSpacing, opacity,
                 prefMessageCircles);
 
         return msg;
@@ -821,8 +670,6 @@ var ThreadVis = (function(ThreadVis) {
      *            True if the container is selected
      * @param circle
      *            True to draw a circle around the dot
-     * @param flash
-     *            True to flash
      * @param opacity
      *            The opacity of the dot
      * @param counter
@@ -830,7 +677,7 @@ var ThreadVis = (function(ThreadVis) {
      * @return The dot SVG string
      **************************************************************************/
     ThreadVis.Visualisation.prototype.drawDotSVG = function(container, colour,
-            left, top, selected, circle, flash, opacity, resize, counter) {
+            left, top, selected, circle, opacity, resize, counter) {
         var prefDotSize = ThreadVis.Preferences
                 .getPreference(ThreadVis.Preferences.PREF_VIS_DOTSIZE);
         var prefSpacing = ThreadVis.Preferences
@@ -891,11 +738,11 @@ var ThreadVis = (function(ThreadVis) {
      **************************************************************************/
     ThreadVis.Visualisation.prototype.getColour = function(hue, saturation,
             value) {
-        var rgb = this.convertHSVtoRGB(hue, saturation, value);
+        var rgb = ThreadVis.Util.convertHSVtoRGB(hue, saturation, value);
 
-        return "#" + this.DECtoHEX(Math.floor(rgb.r))
-                + this.DECtoHEX(Math.floor(rgb.g))
-                + this.DECtoHEX(Math.floor(rgb.b));
+        return "#" + ThreadVis.Util.DECtoHEX(Math.floor(rgb.r))
+                + ThreadVis.Util.DECtoHEX(Math.floor(rgb.g))
+                + ThreadVis.Util.DECtoHEX(Math.floor(rgb.b));
     }
 
     /***************************************************************************
@@ -918,8 +765,9 @@ var ThreadVis = (function(ThreadVis) {
             var hex = receivedColours[this.lastColour];
         }
         var hex = hex.substr(1);
-        return this.convertRGBtoHSV(this.HEXtoDEC(hex.substr(0, 2)), this
-                .HEXtoDEC(hex.substr(2, 2)), this.HEXtoDEC(hex.substr(4, 2)));
+        return ThreadVis.Util.convertRGBtoHSV(ThreadVis.Util.HEXtoDEC(hex
+                .substr(0, 2)), ThreadVis.Util.HEXtoDEC(hex.substr(2, 2)),
+                ThreadVis.Util.HEXtoDEC(hex.substr(4, 2)));
     }
 
     /***************************************************************************
@@ -980,11 +828,6 @@ var ThreadVis = (function(ThreadVis) {
     ThreadVis.Visualisation.prototype.moveVisualisation = function(container) {
         var prefSpacing = ThreadVis.Preferences
                 .getPreference(ThreadVis.Preferences.PREF_VIS_SPACING);
-        /*
-         * var prefDefaultZoomHeight =
-         * parseFloat(THREADVIS.preferences.getPreference(
-         * THREADVIS.preferences.PREF_ZOOM_HEIGHT));
-         */
 
         // get current left margin
         var oldMargin = parseFloat(this.stack.style.marginLeft);
@@ -1063,7 +906,7 @@ var ThreadVis = (function(ThreadVis) {
         }
 
         // only pan if visualisation is larger than viewport
-        if (this.scrollbar && !this.scrollbar.isShown()) {
+        if (this.scrollbar != null && !this.scrollbar.isShown()) {
             return;
         }
 
@@ -1200,7 +1043,7 @@ var ThreadVis = (function(ThreadVis) {
             this.box.style.cursor = "-moz-grabbing";
         }
         // set cursor if visualisation is draggable
-        else if (this.scrollbar && this.scrollbar.isShown()) {
+        else if (this.scrollbar != null && this.scrollbar.isShown()) {
             this.box.style.cursor = "-moz-grab";
         } else {
             this.box.style.cursor = "";
@@ -1532,13 +1375,9 @@ var ThreadVis = (function(ThreadVis) {
             // if we are using more than one colour
             var circle = prefColour == "single" ? false : true;
 
-            // at the moment, don't flash
-            // note: dot only flashes if circle == true
-            var flash = false;
-
             this.containerVisualisations[thisContainer] = this.drawDot(
                     thisContainer, colour, x, topHeight, selected, circle,
-                    flash, opacity);
+                    opacity);
 
             thisContainer.xPosition = x;
 
@@ -1718,10 +1557,6 @@ var ThreadVis = (function(ThreadVis) {
             // if we are using more than one colour
             var circle = prefColour == "single" ? false : true;
 
-            // at the moment, don't flash
-            // note: dot only flashes if circle == true
-            var flash = false;
-
             // if thread has changed and we don't have all container
             // visualisations
             if (this.containerVisualisations[thisContainer] == null) {
@@ -1770,7 +1605,7 @@ var ThreadVis = (function(ThreadVis) {
 
             // draw dot
             this.containerVisualisations[thisContainer].redraw(this.resize, x,
-                    topHeight, selected, flash, colour, opacity);
+                    topHeight, selected, colour, opacity);
 
             thisContainer.xPosition = x;
 
@@ -1808,7 +1643,7 @@ var ThreadVis = (function(ThreadVis) {
         this.colourAuthors(this.authors);
         this.createLegend(this.authors);
 
-        if (prefTimeline && this.timeline) {
+        if (prefTimeline && this.timeline != null) {
             this.timeline.redraw(this.resize, topHeight, prefArcMinHeight
                     + prefDotSize - prefArcWidth - 2);
         }
