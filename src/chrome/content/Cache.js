@@ -190,7 +190,6 @@ var ThreadVis = (function(ThreadVis) {
 
                 var foundHeader = this.searchInFolder(subfolder, messageId);
                 subfolder = null;
-                delete subfolder;
                 if (foundHeader) {
                     return foundHeader;
                 }
