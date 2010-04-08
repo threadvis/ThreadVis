@@ -29,34 +29,28 @@
  * JavaScript file to visualise legend
  ******************************************************************************/
 
-
-
-/** ****************************************************************************
+/*******************************************************************************
  * Clear the legend box
- *
- * @return
- *          void
+ * 
+ * @return void
  ******************************************************************************/
 function clearLegend() {
     var legendBox = document.getElementById("LegendContent");
-    while(legendBox.firstChild != null) {
+    while (legendBox.firstChild != null) {
         legendBox.removeChild(legendBox.firstChild);
     }
 }
 
-
-
-/** ****************************************************************************
+/*******************************************************************************
  * Display the legend
- *
- * @return
- *          void
+ * 
+ * @return void
  ******************************************************************************/
 function displayLegend() {
     clearLegend();
 
     var legendBox = document.getElementById("LegendContent");
-    var legend = opener.THREADVIS.getLegend();
+    var legend = opener.ThreadVis.getLegend();
     legendBox.appendChild(legend);
     window.sizeToContent();
 }

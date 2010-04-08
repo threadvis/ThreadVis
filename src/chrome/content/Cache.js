@@ -29,218 +29,190 @@
  * Implements cache for threaded messages
  ******************************************************************************/
 
+var ThreadVis = (function(ThreadVis) {
 
+    Components.utils.import("resource://app/modules/gloda/public.js");
 
-if (! window.ThreadVisNS) {
-    window.ThreadVisNS = {};
-}
+    /***************************************************************************
+     * Create cache object
+     * 
+     * @return A new cache object
+     **************************************************************************/
+    ThreadVis.Cache = {}
 
-
-
-Components.utils.import("resource://app/modules/gloda/public.js");
-
-
-
-/** ****************************************************************************
- * Create cache object
- *
- * @param threadvis
- *          The threadvis object
- * @return
- *          A new cache object
- ******************************************************************************/
-ThreadVisNS.Cache = function(threadvis) {
-    this.threadvis = threadvis;
-}
-
-
-
-/** ****************************************************************************
- * Get cache array for message
- *
- * @param msg
- *          The message for which to get the cache
- * @return
- *          void
- ******************************************************************************/
-ThreadVisNS.Cache.prototype.getCache = function(msg, callback, numTry) {
-    if (numTry == null) {
-        numTry = 1;
-    }
-    var ref = this;
-    Gloda.getMessageCollectionForHeader(msg, {
-        onItemsAdded: function(items, collection) {
-        },
-        onItemsModified: function(items, collection) {
-        },
-        onItemsRemoved: function(items, collection) {
-        },
-        onQueryCompleted: function(collection) {
-            var found = collection.items.length > 0;
-            if (found) {
-                var message = collection.items[0];
-                message.conversation.getMessagesCollection({
-                    onItemsAdded: function(items, collection) {
-                    },
-                    onItemsModified: function(items, collection) {
-                    },
-                    onItemsRemoved: function(items, collection) {
-                    },
-                    onQueryCompleted: function(collection) {
-                        for (var i = 0; i < collection.items.length; i++) {
-                            var message = ref.createMessage(collection.items[i]);
-                            ref.addToThreader(message);
+    /***************************************************************************
+     * Get cache array for message
+     * 
+     * @param msg
+     *            The message for which to get the cache
+     * @return void
+     **************************************************************************/
+    ThreadVis.Cache.getCache = function(msg, callback, numTry) {
+        if (numTry == null) {
+            numTry = 1;
+        }
+        Gloda.getMessageCollectionForHeader(msg, {
+            onItemsAdded : function(items, collection) {
+            },
+            onItemsModified : function(items, collection) {
+            },
+            onItemsRemoved : function(items, collection) {
+            },
+            onQueryCompleted : function(collection) {
+                var found = collection.items.length > 0;
+                if (found) {
+                    var message = collection.items[0];
+                    message.conversation.getMessagesCollection( {
+                        onItemsAdded : function(items, collection) {
+                        },
+                        onItemsModified : function(items, collection) {
+                        },
+                        onItemsRemoved : function(items, collection) {
+                        },
+                        onQueryCompleted : function(collection) {
+                            for ( var i = 0; i < collection.items.length; i++) {
+                                var message = ThreadVis.Cache
+                                        .createMessage(collection.items[i]);
+                                ThreadVis.Cache.addToThreader(message);
+                            }
+                            callback();
                         }
-                        callback();
-                    }
-                }, null);
-            } else {
-                if (numTry > 10) {
-                    // tried 10 times to fetch message from gloda,
-                    // display error.
+                    }, null);
                 } else {
-                    setTimeout(function() {
-                        ref.getCache(msg, callback, numTry++);
-                    }, 5000);
+                    if (numTry > 10) {
+                        // tried 10 times to fetch message from gloda,
+                        // display error.
+                    } else {
+                        setTimeout(function() {
+                            ThreadVis.Cache.getCache(msg, callback, numTry++);
+                        }, 5000);
+                    }
+                }
+            }
+        }, null);
+    }
+
+    /***************************************************************************
+     * Create a message
+     * 
+     * @param glodaMessage
+     *            The gloda message to add
+     * @return void
+     **************************************************************************/
+    ThreadVis.Cache.createMessage = function(glodaMessage) {
+        // check if msg is a sent mail
+        var issent = false;
+
+        // it is sent if it is stored in a folder that is marked as sent (if
+        // enabled)
+        issent |= glodaMessage.folderMessage.folder.isSpecialFolder(
+                Components.interfaces.nsMsgFolderFlags.SentMail, true)
+                && ThreadVis.Preferences
+                        .getPreference(ThreadVis.Preferences.PREF_SENTMAIL_FOLDERFLAG);
+        // or it is sent if the sender address is a local identity (if enabled)
+        issent |= ThreadVis.sentMailIdentities[glodaMessage.from.value] == true
+                && ThreadVis.Preferences
+                        .getPreference(ThreadVis.Preferences.PREF_SENTMAIL_IDENTITY);
+
+        var message = new ThreadVis.Message(glodaMessage, issent);
+
+        return message;
+    }
+
+    /***************************************************************************
+     * Add a message to the threader
+     * 
+     * @param message
+     *            The message to ad
+     * @return void
+     **************************************************************************/
+    ThreadVis.Cache.addToThreader = function(message) {
+        ThreadVis.Threader.addMessage(message);
+    }
+
+    /***************************************************************************
+     * Search for message id in current account
+     * 
+     * @param messageId
+     *            The message id to search
+     * @param rootFolder
+     *            The root folder in which to search
+     * @return The message
+     **************************************************************************/
+    ThreadVis.Cache.searchMessageByMsgId = function(messageId, rootFolder) {
+        return this.searchInFolder(rootFolder, messageId);
+    }
+
+    /***************************************************************************
+     * Search for message id in folder
+     * 
+     * @param folder
+     *            The folder in which to search
+     * @param messageId
+     *            The message id to search
+     * @return The message
+     **************************************************************************/
+    ThreadVis.Cache.searchInFolder = function(folder, messageId) {
+        // first, search in this folder
+        // check for enabled/disabled folders
+        if (ThreadVis.checkEnabledAccountOrFolder(folder)) {
+            // exclude virtual folders in search
+            if (!(folder.flags & Components.interfaces.nsMsgFolderFlags.Virtual)
+                    && !folder.noSelect) {
+                msgDB = folder.msgDatabase;
+                if (msgDB) {
+                    msgHdr = msgDB.getMsgHdrForMessageID(messageId);
+                    msgDB = null;
+                    delete msgDB;
+                }
+
+                if (msgHdr) {
+                    return msgHdr;
                 }
             }
         }
-    }, null);
-}
 
+        // if not found, loop over subfolders and search them
+        if (folder.hasSubFolders) {
+            var subfolders = folder.subFolders;
+            var subfolder = null;
+            var msgHdr = null;
+            var msgDB = null;
+            var currentFolderURI = "";
 
+            var done = false;
+            while (!done) {
+                var currentItem = null;
+                currentItem = subfolders.getNext();
+                currentFolderURI = currentItem
+                        .QueryInterface(Components.interfaces.nsIRDFResource).Value;
+                subfolder = MailUtils.getFolderForURI(currentFolderURI, true);
 
-/** ****************************************************************************
- * Create a message
- *
- * @param glodaMessage
- *          The gloda message to add
- * @return
- *          void
- ******************************************************************************/
-ThreadVisNS.Cache.prototype.createMessage = function(glodaMessage) {
-    // check if msg is a sent mail
-    var issent = false;
+                var foundHeader = this.searchInFolder(subfolder, messageId);
+                subfolder = null;
+                delete subfolder;
+                if (foundHeader) {
+                    return foundHeader;
+                }
 
-    // it is sent if it is stored in a folder that is marked as sent (if enabled)
-    issent |= glodaMessage.folderMessage.folder.isSpecialFolder(
-                Components.interfaces.nsMsgFolderFlags.SentMail, true) &&
-        this.threadvis.preferences.getPreference(
-                this.threadvis.preferences.PREF_SENTMAIL_FOLDERFLAG);
-    // or it is sent if the sender address is a local identity (if enabled)
-    issent |= this.threadvis.sentMailIdentities[glodaMessage.from.value] == true &&
-        this.threadvis.preferences.getPreference(
-                this.threadvis.preferences.PREF_SENTMAIL_IDENTITY);
-
-    var message = new ThreadVisNS.Message(glodaMessage, issent);
-
-    return message;
-}
-
-
-
-/** ****************************************************************************
- * Add a message to the threader
- *
- * @param message
- *          The message to ad
- * @return
- *          void
- ******************************************************************************/
-ThreadVisNS.Cache.prototype.addToThreader = function(message) {
-    this.threadvis.getThreader().addMessage(message);
-}
-
-
-
-/** ****************************************************************************
- * Search for message id in current account
- *
- * @param messageId
- *          The message id to search
- * @param rootFolder
- *          The root folder in which to search
- * @return
- *          The message
- ******************************************************************************/
-ThreadVisNS.Cache.prototype.searchMessageByMsgId = function(messageId,
-    rootFolder) {
-    return this.searchInFolder(rootFolder, messageId);
-}
-
-
-
-/** ****************************************************************************
- * Search for message id in folder
- *
- * @param folder
- *          The folder in which to search
- * @param messageId
- *          The message id to search
- * @return
- *          The message
- ******************************************************************************/
-ThreadVisNS.Cache.prototype.searchInFolder = function(folder, messageId) {
-    // first, search in this folder
-    // check for enabled/disabled folders
-    if (THREADVIS.checkEnabledAccountOrFolder(folder)) {
-        // exclude virtual folders in search
-        if (! (folder.flags & Components.interfaces.nsMsgFolderFlags.Virtual) &&
-            !folder.noSelect) {
-            msgDB = folder.msgDatabase;
-            if (msgDB) {
-                msgHdr = msgDB.getMsgHdrForMessageID(messageId);
-                msgDB = null;
-                delete msgDB;
-            }
-
-            if (msgHdr) {
-                return msgHdr;
+                try {
+                    done = !subfolders.hasMoreElements();
+                } catch (e) {
+                    done = true;
+                }
             }
         }
+        return null;
     }
 
-    // if not found, loop over subfolders and search them
-    if (folder.hasSubFolders) {
-        var subfolders = folder.subFolders;
-        var subfolder = null;
-        var msgHdr = null;
-        var msgDB = null;
-        var currentFolderURI = "";
-
-        var done = false;
-        while(!done) {
-            var currentItem = null;
-            currentItem = subfolders.getNext();
-            currentFolderURI = currentItem
-                .QueryInterface(Components.interfaces.nsIRDFResource).Value;
-            subfolder = MailUtils.getFolderForURI(currentFolderURI, true);
-
-            var foundHeader = this.searchInFolder(subfolder, messageId);
-            subfolder = null;
-            delete subfolder;
-            if (foundHeader) {
-                return foundHeader;
-            }
-
-            try {
-                done = ! subfolders.hasMoreElements();
-            } catch(e) {
-                done = true;
-            }
-        }
+    /***************************************************************************
+     * Clear in-memory data
+     * 
+     * @return void
+     **************************************************************************/
+    ThreadVis.Cache.clearData = function() {
+        ThreadVis.Threader.reset();
     }
-    return null;
-}
 
-
-
-/** ****************************************************************************
- * Clear in-memory data
- *
- * @return
- *          void
- ******************************************************************************/
-ThreadVisNS.Cache.prototype.clearData = function() {
-    this.threadvis.getThreader().reset();
-}
+    return ThreadVis;
+}(ThreadVis || {}));

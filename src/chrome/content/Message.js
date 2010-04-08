@@ -29,155 +29,124 @@
  * Wrap email message
  ******************************************************************************/
 
+var ThreadVis = (function(ThreadVis) {
 
+    /***************************************************************************
+     * Constructor
+     * 
+     * @param glodaMessage
+     *            The gloda message object
+     * @param sent
+     *            True if the message was sent
+     * @return A new message
+     **************************************************************************/
+    ThreadVis.Message = function(glodaMessage, sent) {
+        /**
+         * Gloda message
+         */
+        this.glodaMessage = glodaMessage;
 
-if (! window.ThreadVisNS) {
-    window.ThreadVisNS = {};
-}
+        /**
+         * Flag for sent mail
+         */
+        this.sent = sent;
 
+        /**
+         * References of this message
+         */
+        this.references = new ThreadVis.References(glodaMessage.folderMessage
+                .getStringProperty("references"));
+    }
 
+    /***************************************************************************
+     * Get date of message
+     * 
+     * @return The date of the message
+     **************************************************************************/
+    ThreadVis.Message.prototype.getDate = function() {
+        return this.glodaMessage.date;
+    }
 
-/** ****************************************************************************
- * Constructor
- *
- * @param glodaMessage
- *          The gloda message object
- * @param sent
- *          True if the message was sent
- * @return
- *          A new message
- ******************************************************************************/
-ThreadVisNS.Message = function(glodaMessage, sent) {
-    /**
-     * Gloda message
-     */
-    this.glodaMessage = glodaMessage;
+    /***************************************************************************
+     * Get folder message is in
+     * 
+     * @return The folder of the message
+     **************************************************************************/
+    ThreadVis.Message.prototype.getFolder = function() {
+        return this.glodaMessage.folderURI;
+    }
 
-    /**
-     * Flag for sent mail
-     */
-    this.sent = sent;
+    /***************************************************************************
+     * Get sender of message
+     * 
+     * @return The sender of the message
+     **************************************************************************/
+    ThreadVis.Message.prototype.getFrom = function() {
+        return this.glodaMessage.folderMessage.mime2DecodedAuthor;
+    }
 
-    /**
-     * References of this message
-     */
-    this.references = new ThreadVisNS.References(
-        glodaMessage.folderMessage.getStringProperty("references"));
-}
+    /***************************************************************************
+     * Parse email address from "From" header
+     * 
+     * @return The parsed email address
+     **************************************************************************/
+    ThreadVis.Message.prototype.getFromEmail = function() {
+        return this.glodaMessage.from.value;
+    }
 
+    /***************************************************************************
+     * Get message id
+     * 
+     * @return The message id
+     **************************************************************************/
+    ThreadVis.Message.prototype.getId = function() {
+        return this.glodaMessage.headerMessageID;
+    }
 
+    /***************************************************************************
+     * Get references
+     * 
+     * @return The referenced header
+     **************************************************************************/
+    ThreadVis.Message.prototype.getReferences = function() {
+        return this.references;
+    }
 
-/** ****************************************************************************
- * Get date of message
- *
- * @return
- *          The date of the message
- ******************************************************************************/
-ThreadVisNS.Message.prototype.getDate = function() {
-    return this.glodaMessage.date;
-}
+    /***************************************************************************
+     * Get original subject
+     * 
+     * @return The subject
+     **************************************************************************/
+    ThreadVis.Message.prototype.getSubject = function() {
+        return this.glodaMessage.subject;
+    }
 
+    /***************************************************************************
+     * See if message is sent (i.e. in sent-mail folder)
+     **************************************************************************/
+    ThreadVis.Message.prototype.isSent = function() {
+        return this.sent;
+    }
 
+    /***************************************************************************
+     * Get body of message
+     **************************************************************************/
+    ThreadVis.Message.prototype.getBody = function() {
+        return this.glodaMessage.indexedBodyText;
+    }
 
-/** ****************************************************************************
- * Get folder message is in
- *
- * @return
- *          The folder of the message
- ******************************************************************************/
-ThreadVisNS.Message.prototype.getFolder = function() {
-    return this.glodaMessage.folderURI;
-}
+    /***************************************************************************
+     * Return message as string
+     * 
+     * @return The string representation of the message
+     **************************************************************************/
+    ThreadVis.Message.prototype.toString = function() {
+        return "Message: Subject: '" + this.getSubject() + "'. From: '"
+                + this.getFrom() + "'. MsgId: '" + this.getId() + "'. Date: '"
+                + this.getDate() + "'. Folder: '" + this.getFolder()
+                + "'. Refs: '" + this.getReferences() + "'. Sent: '"
+                + this.isSent() + "'";
+    }
 
-
-
-/** ****************************************************************************
- * Get sender of message
- *
- * @return
- *          The sender of the message
- ******************************************************************************/
-ThreadVisNS.Message.prototype.getFrom = function() {
-    return this.glodaMessage.folderMessage.mime2DecodedAuthor;
-}
-
-
-
-/** ****************************************************************************
- * Parse email address from "From" header
- *
- * @return
- *          The parsed email address
- ******************************************************************************/
-ThreadVisNS.Message.prototype.getFromEmail = function() {
-    return this.glodaMessage.from.value;
-}
-
-
-
-/** ****************************************************************************
- * Get message id
- *
- * @return
- *          The message id
- ******************************************************************************/
-ThreadVisNS.Message.prototype.getId = function() {
-    return this.glodaMessage.headerMessageID;
-}
-
-
-
-/** ****************************************************************************
- * Get references
- *
- * @return
- *          The referenced header
- ******************************************************************************/
-ThreadVisNS.Message.prototype.getReferences = function() {
-    return this.references;
-}
-
-
-
-/** ****************************************************************************
- * Get original subject
- *
- * @return
- *          The subject
- ******************************************************************************/
-ThreadVisNS.Message.prototype.getSubject = function() {
-    return this.glodaMessage.subject;
-}
-
-
-
-/** ****************************************************************************
- * See if message is sent (i.e. in sent-mail folder)
- ******************************************************************************/
-ThreadVisNS.Message.prototype.isSent = function() {
-    return this.sent;
-}
-
-
-
-/** ****************************************************************************
- * Get body of message
- ******************************************************************************/
-ThreadVisNS.Message.prototype.getBody = function() {
-    return this.glodaMessage.indexedBodyText;
-}
-
-
-
-/** ****************************************************************************
- * Return message as string
- *
- * @return
- *          The string representation of the message
- ******************************************************************************/
-ThreadVisNS.Message.prototype.toString = function() {
-    return "Message: Subject: '" + this.subject + "'. From: '" + this.from +
-        "'. MsgId: '" + this.messageId + "'. Date: '" + this.date +
-        "'. Folder: '" + this.folder +
-        "'. Refs: '" + this.references + "'. Sent: '" + this.sent + "'";
-}
+    return ThreadVis;
+}(ThreadVis || {}));

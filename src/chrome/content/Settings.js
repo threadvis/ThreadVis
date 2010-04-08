@@ -29,17 +29,12 @@
  * JavaScript file for settings dialog
  ******************************************************************************/
 
-
-
 var XUL_NAMESPACE = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
-
-
-/** ****************************************************************************
+/*******************************************************************************
  * Init the dialog, read all settings, build the account list, ...
- *
- * @return
- *          void
+ * 
+ * @return void
  ******************************************************************************/
 function init() {
     toggleHighlight();
@@ -47,40 +42,33 @@ function init() {
     buildAccountPreference();
 }
 
-
-
-/** ****************************************************************************
+/*******************************************************************************
  * Add attachments from file objects
- *
+ * 
  * @param composeFields
- *          Object to add the attachments to
+ *            Object to add the attachments to
  * @param attachments
- *          List of files to attach to the message
- * @return
- *          void
+ *            List of files to attach to the message
+ * @return void
  ******************************************************************************/
 function addAttachments(composeFields, attachments) {
     for (key in attachments) {
         var file = attachments[key];
         var attachment = Components.classes["@mozilla.org/messengercompose/attachment;1"]
-            .createInstance(Components.interfaces.nsIMsgAttachment);
+                .createInstance(Components.interfaces.nsIMsgAttachment);
         var ios = Components.classes["@mozilla.org/network/io-service;1"]
-            .getService(Components.interfaces.nsIIOService);
-        var fileHandler = ios.getProtocolHandler("file")
-            .QueryInterface(Components.interfaces.nsIFileProtocolHandler);
+                .getService(Components.interfaces.nsIIOService);
+        var fileHandler = ios.getProtocolHandler("file").QueryInterface(
+                Components.interfaces.nsIFileProtocolHandler);
         attachment.url = fileHandler.getURLSpecFromFile(file);
         composeFields.addAttachment(attachment);
     }
 }
 
-
-
-/** ****************************************************************************
- * Build the account list
- * Get all accounts, display checkbox for each
- *
- * @return
- *          void
+/*******************************************************************************
+ * Build the account list Get all accounts, display checkbox for each
+ * 
+ * @return void
  ******************************************************************************/
 function buildAccountList() {
     var accountBox = document.getElementById("enableAccounts");
@@ -88,11 +76,12 @@ function buildAccountList() {
     var strings = document.getElementById("threadVisStrings");
 
     var accountManager = Components.classes["@mozilla.org/messenger/account-manager;1"]
-        .getService(Components.interfaces.nsIMsgAccountManager);
+            .getService(Components.interfaces.nsIMsgAccountManager);
 
     var accounts = accountManager.accounts;
-    for (var i = 0; i < accounts.Count(); i++)  {
-        var account = accounts.QueryElementAt(i, Components.interfaces.nsIMsgAccount);
+    for ( var i = 0; i < accounts.Count(); i++) {
+        var account = accounts.QueryElementAt(i,
+                Components.interfaces.nsIMsgAccount);
 
         // get folders
         var rootFolder = account.incomingServer.rootFolder;
@@ -110,11 +99,13 @@ function buildAccountList() {
         }
 
         var buttonAll = document.createElementNS(XUL_NAMESPACE, "button");
-        buttonAll.setAttribute("label", strings.getString("enabledaccounts.button.all"));
+        buttonAll.setAttribute("label", strings
+                .getString("enabledaccounts.button.all"));
         buttonAll.setAttribute("accountkey", account.key);
         buttonAll.setAttribute("oncommand", "selectAll(this);");
         var buttonNone = document.createElementNS(XUL_NAMESPACE, "button");
-        buttonNone.setAttribute("label", strings.getString("enabledaccounts.button.none"));
+        buttonNone.setAttribute("label", strings
+                .getString("enabledaccounts.button.none"));
         buttonNone.setAttribute("accountkey", account.key);
         buttonNone.setAttribute("oncommand", "selectNone(this);");
         var spacer = document.createElementNS(XUL_NAMESPACE, "spacer");
@@ -135,13 +126,10 @@ function buildAccountList() {
     }
 }
 
-
-
-/** ****************************************************************************
+/*******************************************************************************
  * Create a string preference of all selected accounts
- *
- * @return
- *          void
+ * 
+ * @return void
  ******************************************************************************/
 function buildAccountPreference() {
     var accountBox = document.getElementById("enableAccounts");
@@ -149,20 +137,21 @@ function buildAccountPreference() {
 
     var prefString = " ";
 
-    var checkboxes = accountBox.getElementsByAttribute("checkboxtype", "account");
+    var checkboxes = accountBox.getElementsByAttribute("checkboxtype",
+            "account");
 
-    for (var i = 0; i < checkboxes.length; i++) {
+    for ( var i = 0; i < checkboxes.length; i++) {
         var checkbox = checkboxes.item(i);
-        if (! checkbox.checked) {
-            prefString += checkbox.getAttribute("accountkey") +  " ";
+        if (!checkbox.checked) {
+            prefString += checkbox.getAttribute("accountkey") + " ";
         }
 
-        var folderCheckboxes = accountBox
-            .getElementsByAttribute("checkboxtype", "folder");
-        for (var j = 0; j < folderCheckboxes.length; j++) {
+        var folderCheckboxes = accountBox.getElementsByAttribute(
+                "checkboxtype", "folder");
+        for ( var j = 0; j < folderCheckboxes.length; j++) {
             var folderCheckbox = folderCheckboxes.item(j);
-            if (folderCheckbox.getAttribute("accountkey") == 
-                checkbox.getAttribute("accountkey")) {
+            if (folderCheckbox.getAttribute("accountkey") == checkbox
+                    .getAttribute("accountkey")) {
                 if (checkbox.checked) {
                     folderCheckbox.disabled = false;
                 } else {
@@ -170,7 +159,7 @@ function buildAccountPreference() {
                 }
             }
         }
-        
+
     }
     pref.value = prefString;
     // We need to call doCommand(), because otherwise Thunderbird doesn't
@@ -179,26 +168,23 @@ function buildAccountPreference() {
     pref.doCommand();
 }
 
-
-
-/** ****************************************************************************
+/*******************************************************************************
  * Create checkbox elements for all folders
- *
+ * 
  * @param box
- *          The box to which to add the checkbox elements to
+ *            The box to which to add the checkbox elements to
  * @param folders
- *          All folders for which to create checkboxes
+ *            All folders for which to create checkboxes
  * @param account
- *          The account for which the checkboxes are created
+ *            The account for which the checkboxes are created
  * @param indent
- *          The amount of indentation
- * @return
- *          void
+ *            The amount of indentation
+ * @return void
  ******************************************************************************/
 function buildFolderCheckboxes(box, folders, account, indent) {
     var pref = document.getElementById("hiddenDisabledFolders").value;
 
-    for (var i = 0; i < folders.length; i++) {
+    for ( var i = 0; i < folders.length; i++) {
         var folder = folders[i];
 
         if (folder instanceof Array) {
@@ -222,13 +208,10 @@ function buildFolderCheckboxes(box, folders, account, indent) {
     }
 }
 
-
-
-/** ****************************************************************************
+/*******************************************************************************
  * Create a string preference of all selected folders
- *
- * @return
- *          void
+ * 
+ * @return void
  ******************************************************************************/
 function buildFolderPreference() {
     var accountBox = document.getElementById("enableAccounts");
@@ -236,11 +219,12 @@ function buildFolderPreference() {
 
     var prefString = " ";
 
-    var checkboxes = accountBox.getElementsByAttribute("checkboxtype", "folder");
+    var checkboxes = accountBox
+            .getElementsByAttribute("checkboxtype", "folder");
 
-    for (var i = 0; i < checkboxes.length; i++) {
+    for ( var i = 0; i < checkboxes.length; i++) {
         var checkbox = checkboxes.item(i);
-        if (! checkbox.checked) {
+        if (!checkbox.checked) {
             prefString += checkbox.getAttribute("folderuri") + " ";
         }
     }
@@ -251,40 +235,35 @@ function buildFolderPreference() {
     pref.doCommand();
 }
 
-
-
-/** ****************************************************************************
+/*******************************************************************************
  * Compose an email
- *
+ * 
  * @param to
- *          The address to which the email should be sent
+ *            The address to which the email should be sent
  * @param subjet
- *          The subject of the email
+ *            The subject of the email
  * @param body
- *          The body of the email
+ *            The body of the email
  * @param attachments
- *          A list of files to attach to the email
- * @return
- *          void
+ *            A list of files to attach to the email
+ * @return void
  ******************************************************************************/
 function composeEmail(to, subject, body, attachments) {
     var msgComposeType = Components.interfaces.nsIMsgCompType;
     var msgComposFormat = Components.interfaces.nsIMsgCompFormat;
-    var msgComposeService = Components
-        .classes["@mozilla.org/messengercompose;1"].getService();
+    var msgComposeService = Components.classes["@mozilla.org/messengercompose;1"]
+            .getService();
     msgComposeService = msgComposeService
-        .QueryInterface(Components.interfaces.nsIMsgComposeService);
-    
-    var params = Components
-        .classes["@mozilla.org/messengercompose/composeparams;1"]
-        .createInstance(Components.interfaces.nsIMsgComposeParams);
-    
+            .QueryInterface(Components.interfaces.nsIMsgComposeService);
+
+    var params = Components.classes["@mozilla.org/messengercompose/composeparams;1"]
+            .createInstance(Components.interfaces.nsIMsgComposeParams);
+
     if (params) {
         params.type = msgComposeType.New;
         params.format = msgComposFormat.Default;
-        var composeFields = Components
-            .classes["@mozilla.org/messengercompose/composefields;1"]
-            .createInstance(Components.interfaces.nsIMsgCompFields);
+        var composeFields = Components.classes["@mozilla.org/messengercompose/composefields;1"]
+                .createInstance(Components.interfaces.nsIMsgCompFields);
         if (composeFields) {
             if (to) {
                 composeFields.to = to;
@@ -304,15 +283,12 @@ function composeEmail(to, subject, body, attachments) {
     }
 }
 
-
-
-/** ****************************************************************************
+/*******************************************************************************
  * Get all subfolders starting from "folder" as array
- *
+ * 
  * @param folder
- *          The folder to check
- * @return
- *          An array of all subfolders
+ *            The folder to check
+ * @return An array of all subfolders
  ******************************************************************************/
 function getAllFolders(folder) {
     var folderEnumerator = folder.subFolders;
@@ -335,7 +311,7 @@ function getAllFolders(folder) {
         }
 
         try {
-            if (! folderEnumerator.hasMoreElements()) {
+            if (!folderEnumerator.hasMoreElements()) {
                 break;
             }
         } catch (e) {
@@ -346,33 +322,26 @@ function getAllFolders(folder) {
     return folders;
 }
 
-
-
-/** ****************************************************************************
+/*******************************************************************************
  * Open a homepage
- *
+ * 
  * @param url
- *          The URL to open
- * @return
- *          void
+ *            The URL to open
+ * @return void
  ******************************************************************************/
 function openURL(url) {
     var uri = Components.classes["@mozilla.org/network/standard-url;1"]
-        .createInstance(Components.interfaces.nsIURI);
+            .createInstance(Components.interfaces.nsIURI);
     uri.spec = url;
-    var protocolSvc = Components
-        .classes["@mozilla.org/uriloader/external-protocol-service;1"]
-        .getService(Components.interfaces.nsIExternalProtocolService);
+    var protocolSvc = Components.classes["@mozilla.org/uriloader/external-protocol-service;1"]
+            .getService(Components.interfaces.nsIExternalProtocolService);
     protocolSvc.loadUrl(uri);
 }
 
-
-
-/** ****************************************************************************
+/*******************************************************************************
  * Enable or disable the highlight checkbox
- *
- * @return
- *          void
+ * 
+ * @return void
  ******************************************************************************/
 function toggleHighlight() {
     var colourRadio = document.getElementById("visualisationColourAuthor");
@@ -384,86 +353,71 @@ function toggleHighlight() {
     }
 }
 
-
-
-/** ****************************************************************************
+/*******************************************************************************
  * Write an email to the author
- *
- * @return
- *          void
+ * 
+ * @return void
  ******************************************************************************/
 function writeEmail() {
-    composeEmail("ahubmann@gmail.com", "[ThreadVis] <insert subject here>", null)
+    composeEmail("ahubmann@gmail.com", "[ThreadVis] <insert subject here>",
+            null)
 }
 
-
-
-/** ****************************************************************************
+/*******************************************************************************
  * Load preferences in about dialog
- *
- * @return
- *          void
+ * 
+ * @return void
  ******************************************************************************/
 function loadAboutPreference() {
-    var preferences = window.opener.THREADVIS.preferences;
-    var disabledAccounts = preferences.getPreference(
-        preferences.PREF_DISABLED_ACCOUNTS);
-    var disabledFolders = preferences.getPreference(
-        preferences.PREF_DISABLED_FOLDERS);
-    var glodaEnabled = preferences.getPreference(
-        preferences.PREF_GLODA_ENABLED);
+    var preferences = window.opener.ThreadVis.Preferences;
+    var disabledAccounts = preferences
+            .getPreference(preferences.PREF_DISABLED_ACCOUNTS);
+    var disabledFolders = preferences
+            .getPreference(preferences.PREF_DISABLED_FOLDERS);
+    var glodaEnabled = preferences
+            .getPreference(preferences.PREF_GLODA_ENABLED);
     document.getElementById("hiddenDisabledAccounts").value = disabledAccounts;
     document.getElementById("hiddenDisabledFolders").value = disabledFolders;
     document.getElementById("enableGloda").checked = glodaEnabled;
 }
 
-
-
-/** ****************************************************************************
+/*******************************************************************************
  * Save preferences in about dialog
- *
- * @return
- *          void
+ * 
+ * @return void
  ******************************************************************************/
 function saveAboutSettings() {
-    var disabledAccounts = document
-        .getElementById("hiddenDisabledAccounts").value;
-    var disabledFolders = document
-        .getElementById("hiddenDisabledFolders").value;
+    var disabledAccounts = document.getElementById("hiddenDisabledAccounts").value;
+    var disabledFolders = document.getElementById("hiddenDisabledFolders").value;
     var notShowAgain = document.getElementById("donotshowagain").checked;
     var glodaEnabled = document.getElementById("enableGloda").checked;
 
-    var preferences = window.opener.THREADVIS.preferences;
-    var about = window.opener.THREADVIS.ABOUT;
-    preferences.setPreference(
-        preferences.PREF_DISABLED_ACCOUNTS, disabledAccounts);
-    preferences.setPreference(
-        preferences.PREF_DISABLED_FOLDERS, disabledFolders);
+    var preferences = window.opener.ThreadVis.preferences;
+    var about = window.opener.ThreadVis.ABOUT;
+    preferences.setPreference(preferences.PREF_DISABLED_ACCOUNTS,
+            disabledAccounts);
+    preferences.setPreference(preferences.PREF_DISABLED_FOLDERS,
+            disabledFolders);
     if (notShowAgain) {
-        preferences.setPreference(
-            preferences.PREF_ABOUT, about);
+        preferences.setPreference(preferences.PREF_ABOUT, about);
     }
-    preferences.setPreference(
-        preferences.PREF_GLODA_ENABLED, glodaEnabled);
+    preferences.setPreference(preferences.PREF_GLODA_ENABLED, glodaEnabled);
 }
 
-
-
-/** ****************************************************************************
+/*******************************************************************************
  * Select all folders for an account
- *
+ * 
  * @param element
- *          The account element
- * @return
- *          void
+ *            The account element
+ * @return void
  ******************************************************************************/
 function selectAll(element) {
     var accountKey = element.getAttribute("accountkey");
 
     var accountBox = document.getElementById("enableAccounts");
-    var folderCheckboxes = accountBox
-        .getElementsByAttribute("checkboxtype", "folder");
-    for (var j = 0; j < folderCheckboxes.length; j++) {
+    var folderCheckboxes = accountBox.getElementsByAttribute("checkboxtype",
+            "folder");
+    for ( var j = 0; j < folderCheckboxes.length; j++) {
         var folderCheckbox = folderCheckboxes.item(j);
         if (folderCheckbox.getAttribute("accountkey") == accountKey) {
             folderCheckbox.checked = true;
@@ -472,23 +426,20 @@ function selectAll(element) {
     buildFolderPreference();
 }
 
-
-
-/** ****************************************************************************
+/*******************************************************************************
  * Deselect all folders for an account
- *
+ * 
  * @param element
- *          The account element
- * @return
- *          void
+ *            The account element
+ * @return void
  ******************************************************************************/
 function selectNone(element) {
     var accountKey = element.getAttribute("accountkey");
 
     var accountBox = document.getElementById("enableAccounts");
-    var folderCheckboxes = accountBox
-        .getElementsByAttribute("checkboxtype", "folder");
-    for (var j = 0; j < folderCheckboxes.length; j++) {
+    var folderCheckboxes = accountBox.getElementsByAttribute("checkboxtype",
+            "folder");
+    for ( var j = 0; j < folderCheckboxes.length; j++) {
         var folderCheckbox = folderCheckboxes.item(j);
         if (folderCheckbox.getAttribute("accountkey") == accountKey) {
             folderCheckbox.checked = false;

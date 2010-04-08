@@ -52,12 +52,12 @@
             style="list-style-image: url('chrome://threadvis/content/images/statusbar.png')">
             <menupopup id="ThreadVisStatusPopUp">
                 <menuitem id="ThreadVisStatusMenuEnableFolder" disabled="true" label="&statusbar.enableFolder;" 
-                    oncommand="THREADVIS.enableCurrentFolder();" />
+                    oncommand="ThreadVis.enableCurrentFolder();" />
                 <menuitem id="ThreadVisStatusMenuDisableFolder" disabled="true" label="&statusbar.disableFolder;"
-                    oncommand="THREADVIS.disableCurrentFolder();" />
+                    oncommand="ThreadVis.disableCurrentFolder();" />
                 <menuseparator />
                 <menuitem label="&popup.settings;" 
-                    oncommand="THREADVIS.openThreadVisOptionsDialog();" />
+                    oncommand="ThreadVis.openThreadVisOptionsDialog();" />
             </menupopup>
             <label id="ThreadVisStatusText" value="&extension.name;"
                 defaultvalue="&extension.name;" />

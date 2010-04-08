@@ -8,7 +8,7 @@ content/Legend.js
 content/Legend.xul
 content/Message.js
 content/Preferences.xul
-content/PreferenceObserver.js
+content/Preferences.js
 content/References.js
 content/Scrollbar.js
 content/Settings.css

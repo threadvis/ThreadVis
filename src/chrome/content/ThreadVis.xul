@@ -44,7 +44,7 @@
     <script src="chrome://threadvis/content/Container.js" />
     <script src="chrome://threadvis/content/ContainerVisualisation.js" />
     <script src="chrome://threadvis/content/Message.js" />
-    <script src="chrome://threadvis/content/PreferenceObserver.js" />
+    <script src="chrome://threadvis/content/Preferences.js" />
     <script src="chrome://threadvis/content/References.js" />
     <script src="chrome://threadvis/content/Scrollbar.js" />
     <script src="chrome://threadvis/content/Threader.js" />
@@ -65,13 +65,13 @@
             <popupset>
                 <popup id="ThreadVisPopUp">
                     <menuitem label="&popup.settings;" 
-                        oncommand="THREADVIS.openThreadVisOptionsDialog();" />
+                        oncommand="ThreadVis.openThreadVisOptionsDialog();" />
                     <menuitem label="&popup.popupwindow;"
-                        oncommand="THREADVIS.displayVisualisationWindow();" />
+                        oncommand="ThreadVis.displayVisualisationWindow();" />
                     <menuitem label="&popup.legend;"
-                        oncommand="THREADVIS.displayLegendWindow();" />
+                        oncommand="ThreadVis.displayLegendWindow();" />
                     <menuitem label="&popup.exportsvg;"
-                        oncommand="THREADVIS.visualisation.exportToSVG();" />
+                        oncommand="ThreadVis.visualisation.exportToSVG();" />
                 </popup>
             </popupset>
             <popupset id="ThreadVisPopUpSet">
