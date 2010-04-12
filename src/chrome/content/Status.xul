@@ -42,6 +42,8 @@
     <statusbar id="status-bar">
         <tooltip id="ThreadVisStatusTooltip" orient="vertical">
             <description value="&extension.name; &extension.version;" />
+            <description id="ThreadVisStatusTooltipError"
+                         hidden="true" />
             <description id="ThreadVisStatusTooltipDisabled"
                          value="&statusbar.disabled;"
                          hidden="true" />

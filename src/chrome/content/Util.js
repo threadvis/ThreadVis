@@ -39,78 +39,6 @@ var ThreadVis = (function(ThreadVis) {
     ThreadVis.Util = {}
 
     /***************************************************************************
-     * Format remaining time to process array
-     * 
-     * @param remaining
-     *            The remaining time in milliseconds
-     * @return A formatted string
-     **************************************************************************/
-    ThreadVis.Util.formatTimeRemaining = function(remaining) {
-        // remaining is in miliseconds
-        remaining = remaining - (remaining % 1000);
-        remaining = remaining / 1000;
-        var seconds = remaining % 60;
-        remaining = remaining - seconds;
-        remaining = remaining / 60;
-        var minutes = remaining % 60;
-        remaining = remaining - minutes;
-        remaining = remaining / 60;
-        var hours = remaining % 24;
-        remaining = remaining - hours;
-        remaining = remaining / 24;
-        var days = remaining % 365;
-        remaining = remaining - days;
-        remaining = remaining / 365;
-        var years = remaining;
-
-        var strings = ThreadVis.strings;
-
-        var label = "";
-        if (years == 1) {
-            label += years + " "
-                    + strings.getString("visualisation.timedifference.year");
-        }
-        if (years > 1) {
-            label += years + " "
-                    + strings.getString("visualisation.timedifference.years");
-        }
-        if (days == 1) {
-            label += " " + days + " "
-                    + strings.getString("visualisation.timedifference.day");
-        }
-        if (days > 1) {
-            label += " " + days + " "
-                    + strings.getString("visualisation.timedifference.days");
-        }
-        if (hours == 1) {
-            label += " " + hours + " "
-                    + strings.getString("visualisation.timedifference.hour");
-        }
-        if (hours > 1) {
-            label += " " + hours + " "
-                    + strings.getString("visualisation.timedifference.hours");
-        }
-        if (minutes == 1) {
-            label += " " + minutes + " "
-                    + strings.getString("visualisation.timedifference.minute");
-        }
-        if (minutes > 1) {
-            label += " " + minutes + " "
-                    + strings.getString("visualisation.timedifference.minutes");
-        }
-        if (seconds == 1) {
-            label += " " + seconds + " "
-                    + strings.getString("visualisation.timedifference.second");
-        }
-        if (seconds > 1) {
-            label += " " + seconds + " "
-                    + strings.getString("visualisation.timedifference.seconds");
-        }
-
-        return label;
-    }
-
-    /***************************************************************************
      * Convert a RGB colour to a HSV colour
      * 
      * @param r
@@ -264,6 +192,118 @@ var ThreadVis = (function(ThreadVis) {
      **************************************************************************/
     ThreadVis.Util.HEXtoDEC = function(hex) {
         return parseInt(hex, 16);
+    }
+
+    /***************************************************************************
+     * Format the time difference for the label and the tooltip
+     * 
+     * @param timeDifference
+     *            The time difference to display
+     **************************************************************************/
+    ThreadVis.Util.formatTimeDifference = function(timeDifference) {
+        // timedifference is in miliseconds
+        timeDifference = timeDifference - (timeDifference % 1000);
+        timeDifference = timeDifference / 1000;
+        var seconds = timeDifference % 60;
+        timeDifference = timeDifference - seconds;
+        timeDifference = timeDifference / 60;
+        var minutes = timeDifference % 60;
+        timeDifference = timeDifference - minutes;
+        timeDifference = timeDifference / 60;
+        var hours = timeDifference % 24;
+        timeDifference = timeDifference - hours;
+        timeDifference = timeDifference / 24;
+        var days = timeDifference % 365;
+        timeDifference = timeDifference - days;
+        timeDifference = timeDifference / 365;
+        var years = timeDifference;
+
+        var string = "";
+        var toolTip = "";
+
+        // label
+        // only display years if >= 1
+        if (years >= 1) {
+            string = (years + (Math.round((days / 365) * 10) / 10))
+                    + ThreadVis.strings
+                            .getString("visualisation.timedifference.years.short");
+            // only display days if >= 1
+        } else if (days >= 1) {
+            string = Math.round(days + hours / 24)
+                    + ThreadVis.strings
+                            .getString("visualisation.timedifference.days.short");
+            // display hours if >= 1
+        } else if (hours >= 1) {
+            string = Math.round(hours + minutes / 60)
+                    + ThreadVis.strings
+                            .getString("visualisation.timedifference.hours.short");
+            // display minutes otherwise
+        } else {
+            string = minutes
+                    + ThreadVis.strings
+                            .getString("visualisation.timedifference.minutes.short");
+        }
+
+        // tooltip
+        if (years == 1) {
+            toolTip = years
+                    + " "
+                    + ThreadVis.strings
+                            .getString("visualisation.timedifference.year");
+        }
+        if (years > 1) {
+            toolTip = years
+                    + " "
+                    + ThreadVis.strings
+                            .getString("visualisation.timedifference.years");
+        }
+        if (days == 1) {
+            toolTip += " "
+                    + days
+                    + " "
+                    + ThreadVis.strings
+                            .getString("visualisation.timedifference.day");
+        }
+        if (days > 1) {
+            toolTip += " "
+                    + days
+                    + " "
+                    + ThreadVis.strings
+                            .getString("visualisation.timedifference.days");
+        }
+        if (hours == 1) {
+            toolTip += " "
+                    + hours
+                    + " "
+                    + ThreadVis.strings
+                            .getString("visualisation.timedifference.hour");
+        }
+        if (hours > 1) {
+            toolTip += " "
+                    + hours
+                    + " "
+                    + ThreadVis.strings
+                            .getString("visualisation.timedifference.hours");
+        }
+        if (minutes == 1) {
+            toolTip += " "
+                    + minutes
+                    + " "
+                    + ThreadVis.strings
+                            .getString("visualisation.timedifference.minute");
+        }
+        if (minutes > 1) {
+            toolTip += " "
+                    + minutes
+                    + " "
+                    + ThreadVis.strings
+                            .getString("visualisation.timedifference.minutes");
+        }
+
+        return {
+            string : string,
+            toolTip : toolTip
+        };
     }
 
     return ThreadVis;

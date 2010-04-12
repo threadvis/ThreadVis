@@ -58,10 +58,6 @@
             <hbox id="expandedHeadersBottomBox">
                 <hbox insertbefore="otherActionsBox" flex="10" pack="end">
 
-            <stringbundleset>
-                <stringbundle id="ThreadVisStrings" 
-                    src="chrome://threadvis/locale/ThreadVis.properties" />
-            </stringbundleset>
             <popupset>
                 <popup id="ThreadVisPopUp">
                     <menuitem label="&popup.settings;" 

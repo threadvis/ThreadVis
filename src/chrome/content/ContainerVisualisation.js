@@ -36,8 +36,6 @@ var ThreadVis = (function(ThreadVis) {
      * 
      * @param stack
      *            The stack on which to draw
-     * @param strings
-     *            The strings object
      * @param container
      *            The container to visualise
      * @param colour
@@ -62,18 +60,13 @@ var ThreadVis = (function(ThreadVis) {
      *            True to draw circle, false to draw square
      * @return A new container visualisation
      **************************************************************************/
-    ThreadVis.ContainerVisualisation = function(stack, strings, container,
+    ThreadVis.ContainerVisualisation = function(stack, container,
             colour, left, top, selected, dotSize, resize, circle,
             spacing, opacity, messageCircles) {
         /**
          * XUL stack on which container gets drawn
          */
         this.stack = stack;
-
-        /**
-         * the stringbundle element to access localised strings
-         */
-        this.strings = strings;
 
         /**
          * the container which gets visualised
@@ -267,7 +260,7 @@ var ThreadVis = (function(ThreadVis) {
                     "hbox");
             author.appendChild(authorLabel);
             author.appendChild(authorText);
-            authorLabel.setAttribute("value", this.strings
+            authorLabel.setAttribute("value", ThreadVis.strings
                     .getString("tooltip.from"));
             authorLabel.style.fontWeight = "bold";
             authorText.setAttribute("value", this.container.getMessage()
@@ -281,7 +274,7 @@ var ThreadVis = (function(ThreadVis) {
                     .createElementNS(ThreadVis.XUL_NAMESPACE, "hbox");
             date.appendChild(dateLabel);
             date.appendChild(dateText);
-            dateLabel.setAttribute("value", this.strings
+            dateLabel.setAttribute("value", ThreadVis.strings
                     .getString("tooltip.date"));
             dateLabel.style.fontWeight = "bold";
             dateText.setAttribute("value", this.formatDate(this.container
@@ -295,7 +288,7 @@ var ThreadVis = (function(ThreadVis) {
                     "hbox");
             subject.appendChild(subjectLabel);
             subject.appendChild(subjectText);
-            subjectLabel.setAttribute("value", this.strings
+            subjectLabel.setAttribute("value", ThreadVis.strings
                     .getString("tooltip.subject"));
             subjectLabel.style.fontWeight = "bold";
             subjectText.setAttribute("value", this.container.getMessage()
@@ -319,9 +312,9 @@ var ThreadVis = (function(ThreadVis) {
                     "description");
             var desc2 = document.createElementNS(ThreadVis.XUL_NAMESPACE,
                     "description");
-            desc1.setAttribute("value", this.strings
+            desc1.setAttribute("value", ThreadVis.strings
                     .getString("tooltip.missingmessage"));
-            desc2.setAttribute("value", this.strings
+            desc2.setAttribute("value", ThreadVis.strings
                     .getString("tooltip.missingmessagedetail"));
             this.tooltip.appendChild(desc1);
             this.tooltip.appendChild(desc2);

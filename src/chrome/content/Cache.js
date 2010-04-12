@@ -45,12 +45,12 @@ var ThreadVis = (function(ThreadVis) {
      * 
      * @param msg
      *            The message for which to get the cache
+     * @callback the callback function to invoke
      * @return void
      **************************************************************************/
-    ThreadVis.Cache.getCache = function(msg, callback, numTry) {
-        if (numTry == null) {
-            numTry = 1;
-        }
+    ThreadVis.Cache.getCache = function(msg, callback) {
+        // first, clear data
+        ThreadVis.Cache.clearData();
         Gloda.getMessageCollectionForHeader(msg, {
             onItemsAdded : function(items, collection) {
             },
@@ -79,14 +79,13 @@ var ThreadVis = (function(ThreadVis) {
                         }
                     }, null);
                 } else {
-                    if (numTry > 10) {
-                        // tried 10 times to fetch message from gloda,
-                        // display error.
-                    } else {
-                        setTimeout(function() {
-                            ThreadVis.Cache.getCache(msg, callback, numTry++);
-                        }, 5000);
-                    }
+                    // tried to find message in global index but failed. display
+                    // an error
+                    ThreadVis.setStatus(null, {
+                        error : true,
+                        errorText : ThreadVis.strings
+                                .getString("error.messagenotfound")
+                    });
                 }
             }
         }, null);
@@ -107,22 +106,10 @@ var ThreadVis = (function(ThreadVis) {
             ThreadVis.log("Cache",
                     "Could not find 'real' message for gloda message with msg-id '"
                             + glodaMessage.headerMessageID + "' in folder '"
-                            + glodaMessage.folder + "'")
-            return null;
+                            + glodaMessage.folderURI + "'");
         }
 
-        // it is sent if it is stored in a folder that is marked as sent (if
-        // enabled)
-        issent |= glodaMessage.folderMessage.folder.isSpecialFolder(
-                Components.interfaces.nsMsgFolderFlags.SentMail, true)
-                && ThreadVis.Preferences
-                        .getPreference(ThreadVis.Preferences.PREF_SENTMAIL_FOLDERFLAG);
-        // or it is sent if the sender address is a local identity (if enabled)
-        issent |= ThreadVis.sentMailIdentities[glodaMessage.from.value] == true
-                && ThreadVis.Preferences
-                        .getPreference(ThreadVis.Preferences.PREF_SENTMAIL_IDENTITY);
-
-        var message = new ThreadVis.Message(glodaMessage, issent);
+        var message = new ThreadVis.Message(glodaMessage);
 
         return message;
     }
@@ -136,108 +123,6 @@ var ThreadVis = (function(ThreadVis) {
      **************************************************************************/
     ThreadVis.Cache.addToThreader = function(message) {
         ThreadVis.Threader.addMessage(message);
-    }
-
-    /***************************************************************************
-     * Search for message id in current account
-     * 
-     * @param messageId
-     *            The message id to search
-     * @param rootFolder
-     *            The root folder in which to search
-     * @return The message
-     **************************************************************************/
-    ThreadVis.Cache.searchMessageByMsgId = function(messageId, rootFolder) {
-        return this.searchInFolder(rootFolder, messageId);
-    }
-
-    /***************************************************************************
-     * Search for message id in folder
-     * 
-     * @param folder
-     *            The folder in which to search
-     * @param messageId
-     *            The message id to search
-     * @return The message
-     **************************************************************************/
-    ThreadVis.Cache.searchInFolder = function(folder, messageId) {
-        // first, search in this folder
-        // check for enabled/disabled folders
-        if (ThreadVis.checkEnabledAccountOrFolder(folder)) {
-            // exclude virtual folders in search
-            if (!(folder.flags & Components.interfaces.nsMsgFolderFlags.Virtual)
-                    && !folder.noSelect) {
-                try {
-                    var msgDB = folder.msgDatabase;
-                } catch (ex) {
-                    ThreadVis.log("Cache",
-                            "Getting message database from folder threw exception.\n"
-                                    + ex + "\nFolder: " + folder.URI
-                                    + "\nFolder-Flags: " + folder.flags);
-                    // try refreshing the folder
-                    ThreadVis.log("Cache", "Trying to refresh folder " + folder.URI);
-                    try {
-                        folder.updateFolder(null);
-                    } catch (ex) {
-                        ThreadVis.log("Cache",
-                                "Refreshing folder threw exception.\n" + ex);
-                    }
-                    try {
-                        msgDB = folder.msgDatabase;
-                    } catch (ex) {
-                        ThreadVis
-                                .log(
-                                        "Cache",
-                                        "Getting message database from folder threw exception, for the second time. Giving up.\n"
-                                                + ex
-                                                + "\nFolder: "
-                                                + folder.URI
-                                                + "\nFolder-Flags: "
-                                                + folder.flags);
-                    }
-                }
-
-                if (msgDB) {
-                    msgHdr = msgDB.getMsgHdrForMessageID(messageId);
-                    msgDB = null;
-                }
-
-                if (msgHdr) {
-                    return msgHdr;
-                }
-            }
-        }
-
-        // if not found, loop over subfolders and search them
-        if (folder.hasSubFolders) {
-            var subfolders = folder.subFolders;
-            var subfolder = null;
-            var msgHdr = null;
-            var msgDB = null;
-            var currentFolderURI = "";
-
-            var done = false;
-            while (!done) {
-                var currentItem = null;
-                currentItem = subfolders.getNext();
-                currentFolderURI = currentItem
-                        .QueryInterface(Components.interfaces.nsIRDFResource).Value;
-                subfolder = MailUtils.getFolderForURI(currentFolderURI, true);
-
-                var foundHeader = this.searchInFolder(subfolder, messageId);
-                subfolder = null;
-                if (foundHeader) {
-                    return foundHeader;
-                }
-
-                try {
-                    done = !subfolders.hasMoreElements();
-                } catch (e) {
-                    done = true;
-                }
-            }
-        }
-        return null;
     }
 
     /***************************************************************************

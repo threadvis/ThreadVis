@@ -42,7 +42,6 @@ var ThreadVis = (function(ThreadVis) {
 
         this.box = null;
         this.stack = null;
-        this.strings = null;
         // set default resize parameter
         this.resize = 1;
         this.zoom = 1;
@@ -68,7 +67,6 @@ var ThreadVis = (function(ThreadVis) {
                 .getElementById("ThreadVisHorizontalScrollbar");
         this.buttonsBox = document.getElementById("ThreadVisButtons");
         this.stack = document.getElementById("ThreadVisStack");
-        this.strings = document.getElementById("ThreadVisStrings");
         this.popups = document.getElementById("ThreadVisPopUpSet");
         this.expandedHeaders = document.getElementById("expandedHeaders");
     }
@@ -413,7 +411,7 @@ var ThreadVis = (function(ThreadVis) {
 
         var loading = document.createElementNS(ThreadVis.XUL_NAMESPACE,
                 "description");
-        loading.setAttribute("value", this.strings
+        loading.setAttribute("value", ThreadVis.strings
                 .getString("visualisation.loading"));
         loading.style.position = "relative";
         loading.style.top = "20px"
@@ -443,7 +441,7 @@ var ThreadVis = (function(ThreadVis) {
 
         var warning = document
                 .createElementNS(ThreadVis.XUL_NAMESPACE, "label");
-        warning.setAttribute("value", this.strings
+        warning.setAttribute("value", ThreadVis.strings
                 .getString("visualisation.disabledWarning"));
         warning.style.position = "relative";
         warning.style.top = "10px"
@@ -452,7 +450,7 @@ var ThreadVis = (function(ThreadVis) {
         this.stack.appendChild(warning);
 
         var link = document.createElementNS(ThreadVis.XUL_NAMESPACE, "label");
-        link.setAttribute("value", this.strings
+        link.setAttribute("value", ThreadVis.strings
                 .getString("visualisation.disabledWarningLink"));
         link.style.position = "relative";
         link.style.top = "30px"
@@ -486,7 +484,7 @@ var ThreadVis = (function(ThreadVis) {
         var warning = document
                 .createElementNS(ThreadVis.XUL_NAMESPACE, "label");
         warning
-                .setAttribute("value", this.strings
+                .setAttribute("value", ThreadVis.strings
                         .getString("visualisation.warningCount")
                         + " ["
                         + container.getTopContainer().getCountRecursive()
@@ -498,7 +496,7 @@ var ThreadVis = (function(ThreadVis) {
         this.stack.appendChild(warning);
 
         var link = document.createElementNS(ThreadVis.XUL_NAMESPACE, "label");
-        link.setAttribute("value", this.strings
+        link.setAttribute("value", ThreadVis.strings
                 .getString("visualisation.warningCountLink"));
         link.style.position = "relative";
         link.style.top = "30px"
@@ -647,10 +645,9 @@ var ThreadVis = (function(ThreadVis) {
         var prefMessageCircles = ThreadVis.Preferences
                 .getPreference(ThreadVis.Preferences.PREF_VIS_MESSAGE_CIRCLES);
 
-        var msg = new ThreadVis.ContainerVisualisation(this.stack,
-                this.strings, container, colour, left, top, selected,
-                prefDotSize, this.resize, circle, prefSpacing, opacity,
-                prefMessageCircles);
+        var msg = new ThreadVis.ContainerVisualisation(this.stack, container,
+                colour, left, top, selected, prefDotSize, this.resize, circle,
+                prefSpacing, opacity, prefMessageCircles);
 
         return msg;
     }
@@ -1443,9 +1440,9 @@ var ThreadVis = (function(ThreadVis) {
         popupBox.setAttribute("context", "ThreadVisPopUp");
 
         if (prefTimeline) {
-            this.timeline = new ThreadVis.Timeline(this.stack, this.strings,
-                    this.containers, this.resize, prefDotSize, topHeight,
-                    prefArcMinHeight + prefDotSize - prefArcWidth - 2);
+            this.timeline = new ThreadVis.Timeline(this.stack, this.containers,
+                    this.resize, topHeight, prefArcMinHeight + prefDotSize
+                            - prefArcWidth - 2);
             this.timeline.draw();
         } else {
             this.timeline = null;

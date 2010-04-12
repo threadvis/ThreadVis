@@ -36,14 +36,15 @@ addEventListener("load", function() {
 
 var ThreadVis = (function(ThreadVis) {
 
+    Components.utils.import("resource://app/modules/stringbundle.js");
+
     ThreadVis.XUL_NAMESPACE = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
     // increment this to trigger about dialog
     ThreadVis.ABOUT = 1;
 
-    ThreadVis.clear = false;
-
-    ThreadVis.strings = document.getElementById("ThreadVisStrings");
+    ThreadVis.strings = new StringBundle(
+            "chrome://threadvis/locale/ThreadVis.properties");
 
     // remember all local accounts, for sent-mail comparison
     var accountManager = Components.classes["@mozilla.org/messenger/account-manager;1"]
@@ -82,10 +83,17 @@ var ThreadVis = (function(ThreadVis) {
             return;
         }
 
-        // re-search message in case its folder has changed
-        var folder = MailUtils.getFolderForURI(message.getFolder(), true);
-        var msg = ThreadVis.Cache.searchMessageByMsgId(message.getId(),
-                folder.rootFolder);
+        // get the original nsIMsgDBHdr from the message. this may be null if it
+        // is not found (i.e. index out-of-date or folder index (msf) corrupt).
+        var msg = message.getMsgDbHdr();
+        if (msg == null) {
+            ThreadVis.setStatus(null, {
+                error : true,
+                errorText : ThreadVis.strings
+                        .getString("error.messagenotfound")
+            });
+            return;
+        }
 
         if (gFolderTreeView) {
             gFolderTreeView.selectFolder(msg.folder);
@@ -204,12 +212,7 @@ var ThreadVis = (function(ThreadVis) {
             return;
         }
 
-        if (ThreadVis.clear) {
-            return;
-        }
-
         ThreadVis.visualisation.createStack();
-        ThreadVis.clear = true;
 
         // also clear popup
         if (ThreadVis.hasPopupVisualisation()) {
@@ -542,12 +545,7 @@ var ThreadVis = (function(ThreadVis) {
         }
 
         // set initial status
-        ThreadVis.setStatus(null, {
-            enabled : ThreadVis.checkEnabledThreadVis(),
-            accountEnabled : ThreadVis.checkEnabledAccount(),
-            folderEnabled : ThreadVis.checkEnabledFolder(),
-            glodaEnabled : ThreadVis.checkEnabledGloda()
-        });
+        ThreadVis.setStatus(null, {});
     }
 
     /***************************************************************************
@@ -607,32 +605,17 @@ var ThreadVis = (function(ThreadVis) {
             ThreadVis.visualisation.disabled = true;
             ThreadVis.visualisation.displayDisabled();
             ThreadVis.visualisedMsgId = null;
-            ThreadVis.setStatus(null, {
-                enabled : ThreadVis.checkEnabledThreadVis(),
-                accountEnabled : ThreadVis.checkEnabledAccount(),
-                folderEnabled : ThreadVis.checkEnabledFolder(),
-                glodaEnabled : ThreadVis.checkEnabledGloda()
-            });
+            ThreadVis.setStatus(null, {});
             return;
         }
         if (!ThreadVis.checkEnabledAccountOrFolder()) {
             ThreadVis.visualisation.disabled = true;
             ThreadVis.visualisation.displayDisabled();
             ThreadVis.visualisedMsgId = null;
-            ThreadVis.setStatus(null, {
-                enabled : ThreadVis.checkEnabledThreadVis(),
-                glodaEnabled : ThreadVis.checkEnabledGloda(),
-                accountEnabled : ThreadVis.checkEnabledAccount(),
-                folderEnabled : ThreadVis.checkEnabledFolder()
-            });
+            ThreadVis.setStatus(null, {});
             return;
         }
-        ThreadVis.setStatus(null, {
-            enabled : ThreadVis.checkEnabledThreadVis(),
-            glodaEnabled : ThreadVis.checkEnabledGloda(),
-            accountEnabled : ThreadVis.checkEnabledAccount(),
-            folderEnabled : ThreadVis.checkEnabledFolder()
-        });
+        ThreadVis.setStatus(null, {});
 
         ThreadVis.visualisation.disabled = false;
 
@@ -689,7 +672,6 @@ var ThreadVis = (function(ThreadVis) {
             return;
         }
 
-        ThreadVis.clear = false;
         ThreadVis.createBox();
         ThreadVis.visualisation.disabled = false;
         ThreadVis.visualisation.visualise(container);
@@ -703,9 +685,12 @@ var ThreadVis = (function(ThreadVis) {
      *            The message to visualise
      * @param force
      *            True to force the display of the visualisation
+     * @param lastTry
+     *            True if already tried to find message in cache, if still not
+     *            in threader, display error
      * @return void
      **************************************************************************/
-    ThreadVis.visualiseMessage = function(message, force) {
+    ThreadVis.visualiseMessage = function(message, force, lastTry) {
         if (ThreadVis.visualisedMsgId == message.messageId && !force) {
             return;
         }
@@ -718,38 +703,38 @@ var ThreadVis = (function(ThreadVis) {
         // try to find in threader
         var container = ThreadVis.Threader.findContainer(message.messageId);
 
-        // if not in threader, try to get from cache
-        if (container == null || container.isDummy()) {
-            ThreadVis.Cache.getCache(message, function() {
-                ThreadVis.visualiseMessage(message, force);
+        // if not in threader and already tried to fetch from cache, display
+        // error
+        if ((container == null || container.isDummy()) && lastTry) {
+            // - message id not found, or
+            // - container with id was dummy
+            // this means the message was not indexed
+            if (ThreadVis.popupWindow && ThreadVis.popupWindow.ThreadVis) {
+                ThreadVis.popupWindow.ThreadVis.clearVisualisation();
+            } else {
+                ThreadVis.clearVisualisation();
+                ThreadVis.deleteBox();
+            }
+            ThreadVis.setStatus(null, {
+                error : true,
+                errorText : ThreadVis.strings
+                        .getString("error.messagenotfound")
             });
             return;
         }
-
-        // not in threader, not in cache, start caching
+        // if not in threader, try to get from cache
         if (container == null || container.isDummy()) {
-            alert("NOT IN CACHE");
+            // first, clear threader
+            ThreadVis.Cache.clearData();
+            ThreadVis.Cache.getCache(message, function() {
+                ThreadVis.visualiseMessage(message, force, true);
+            });
             return;
         }
 
         ThreadVis.visualisedMsgId = message.messageId;
 
-        // clear threader
-        // this.threader.reset();
-
-        if (container != null && !container.isDummy()) {
-            ThreadVis.visualise(container);
-        } else {
-            // - message id not found, or
-            // - container with id was dummy
-            // this means we somehow missed to thread this message
-            // TODO: check this error
-            if (ThreadVis.popupWindow && ThreadVis.popupWindow.ThreadVis) {
-                ThreadVis.popupWindow.ThreadVis.clearVisualisation();
-            } else {
-                ThreadVis.clearVisualisation();
-            }
-        }
+        ThreadVis.visualise(container);
         container = null;
     }
 
@@ -776,35 +761,41 @@ var ThreadVis = (function(ThreadVis) {
      * 
      * @param text
      *            The text to display
-     * @param tooltip
-     *            Tooltip data to display
+     * @param info
+     *            Data to display
      * @return void
      **************************************************************************/
-    ThreadVis.setStatus = function(text, tooltip) {
+    ThreadVis.setStatus = function(text, info) {
+        var elem = document.getElementById("ThreadVisStatusText");
         if (text != null) {
-            var elem = document.getElementById("ThreadVisStatusText");
-            if (text != "") {
-                elem.value = text;
-            } else {
-                elem.value = elem.getAttribute("defaultvalue");
-            }
+            elem.value = text;
+        } else {
+            elem.value = elem.getAttribute("defaultvalue");
         }
-        var disabled = false;
-        var disabledGloda = false;
-        var disabledAccount = false;
-        var disabledFolder = false;
-        if (typeof (tooltip) != "undefined") {
-            if (typeof (tooltip.enabled) != "undefined") {
-                disabled = !tooltip.enabled;
+        var error = false;
+        var errorText = null;
+        var disabled = !ThreadVis.checkEnabledThreadVis();
+        var disabledGloda = !ThreadVis.checkEnabledGloda();
+        var disabledAccount = !ThreadVis.checkEnabledAccount();
+        var disabledFolder = !ThreadVis.checkEnabledFolder();
+        if (typeof (info) != "undefined") {
+            if (typeof (info.error) != "undefined") {
+                error = info.error;
             }
-            if (typeof (tooltip.glodaEnabled) != "undefined") {
-                disabledGloda = !tooltip.glodaEnabled;
+            if (typeof (info.errorText) != "undefined") {
+                errorText = info.errorText;
             }
-            if (typeof (tooltip.folderEnabled) != "undefined") {
-                disabledFolder = !tooltip.folderEnabled;
+            if (typeof (info.enabled) != "undefined") {
+                disabled = !info.enabled;
             }
-            if (typeof (tooltip.accountEnabled) != "undefined") {
-                disabledAccount = !tooltip.accountEnabled;
+            if (typeof (info.glodaEnabled) != "undefined") {
+                disabledGloda = !info.glodaEnabled;
+            }
+            if (typeof (info.folderEnabled) != "undefined") {
+                disabledFolder = !info.folderEnabled;
+            }
+            if (typeof (info.accountEnabled) != "undefined") {
+                disabledAccount = !info.accountEnabled;
             }
             if (disabled) {
                 document.getElementById("ThreadVisStatusTooltipDisabled").hidden = false;
@@ -818,6 +809,21 @@ var ThreadVis = (function(ThreadVis) {
                         .setAttribute("checked", true);
                 document.getElementById("ThreadVisStatusMenuDisable")
                         .setAttribute("checked", false);
+            }
+            if (error && errorText != null) {
+                while (document.getElementById("ThreadVisStatusTooltipError").firstChild != null) {
+                    document
+                            .getElementById("ThreadVisStatusTooltipError")
+                            .removeChild(
+                                    document
+                                            .getElementById("ThreadVisStatusTooltipError").firstChild);
+                }
+                document.getElementById("ThreadVisStatusTooltipError").hidden = false;
+                var text = document.createTextNode(errorText);
+                document.getElementById("ThreadVisStatusTooltipError")
+                        .appendChild(text);
+            } else {
+                document.getElementById("ThreadVisStatusTooltipError").hidden = true;
             }
             if (!disabled && disabledGloda) {
                 document.getElementById("ThreadVisStatusTooltipGlodaDisabled").hidden = false;
@@ -881,22 +887,18 @@ var ThreadVis = (function(ThreadVis) {
                 document.getElementById("ThreadVisStatusMenuDisableFolder").disabled = true;
             }
 
-            if (disabled || disabledGloda || disabledAccount || disabledFolder) {
+            if (error) {
                 document.getElementById("ThreadVisStatusBarPanel")
-                        .setAttribute(
-                                "class",
-                                document.getElementById(
-                                        "ThreadVisStatusBarPanel")
-                                        .getAttribute("class")
-                                        + " disabled");
+                        .setAttribute("class",
+                                "statusbarpanel-menu-iconic error");
+            } else if (disabled || disabledGloda || disabledAccount
+                    || disabledFolder) {
+                document.getElementById("ThreadVisStatusBarPanel")
+                        .setAttribute("class",
+                                "statusbarpanel-menu-iconic disabled");
             } else {
                 document.getElementById("ThreadVisStatusBarPanel")
-                        .setAttribute(
-                                "class",
-                                document.getElementById(
-                                        "ThreadVisStatusBarPanel")
-                                        .getAttribute("class").replace(
-                                                /disabled/g, ""));
+                        .setAttribute("class", "statusbarpanel-menu-iconic");
             }
         }
     }

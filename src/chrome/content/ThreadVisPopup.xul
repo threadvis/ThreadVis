@@ -51,12 +51,9 @@
     <script src="chrome://threadvis/content/Threader.js" />
     <script src="chrome://threadvis/content/ThreadVis.js" />
     <script src="chrome://threadvis/content/Timeline.js" />
+    <script src="chrome://threadvis/content/Util.js" />
     <script src="chrome://threadvis/content/Visualisation.js" />
 
-    <stringbundleset>
-        <stringbundle id="ThreadVisStrings"
-            src="chrome://threadvis/locale/ThreadVis.properties" />
-    </stringbundleset>
     <popupset>
         <popup id="ThreadVisPopUp">
             <menuitem label="&popup.settings;" 

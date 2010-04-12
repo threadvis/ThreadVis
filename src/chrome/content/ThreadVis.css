@@ -47,6 +47,10 @@ splitter.mousehidden:hover {
     list-style-image: url('chrome://threadvis/content/images/statusbar-disabled.png');
 }
 
+#ThreadVisStatusBarPanel.error {
+    list-style-image: url('chrome://threadvis/content/images/statusbar-error.png');
+}
+
 #ThreadVisStatusBarPanel.disabled #ThreadVisStatusText {
     color: #cccccc;
 }

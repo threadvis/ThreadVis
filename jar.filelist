@@ -34,6 +34,8 @@ content/images/legend.png
 content/images/minus.png
 content/images/plus.png
 content/images/statusbar.png
+content/images/statusbar-disabled.png
+content/images/statusbar-error.png
 content/images/timescaling_disabled.png
 content/images/timescaling_enabled.png
 content/images/window.png

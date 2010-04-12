@@ -36,26 +36,23 @@ var ThreadVis = (function(ThreadVis) {
      * 
      * @param glodaMessage
      *            The gloda message object
-     * @param sent
-     *            True if the message was sent
      * @return A new message
      **************************************************************************/
-    ThreadVis.Message = function(glodaMessage, sent) {
+    ThreadVis.Message = function(glodaMessage) {
         /**
          * Gloda message
          */
         this.glodaMessage = glodaMessage;
 
         /**
-         * Flag for sent mail
-         */
-        this.sent = sent;
-
-        /**
          * References of this message
          */
-        this.references = new ThreadVis.References(glodaMessage.folderMessage
-                .getStringProperty("references"));
+        if (glodaMessage.folderMessage != null) {
+            this.references = new ThreadVis.References(
+                    glodaMessage.folderMessage.getStringProperty("references"));
+        } else {
+            this.references = new ThreadVis.References("");
+        }
     }
 
     /***************************************************************************
@@ -82,7 +79,10 @@ var ThreadVis = (function(ThreadVis) {
      * @return The sender of the message
      **************************************************************************/
     ThreadVis.Message.prototype.getFrom = function() {
-        return this.glodaMessage.folderMessage.mime2DecodedAuthor;
+        if (this.glodaMessage.folderMessage != null) {
+            return this.glodaMessage.folderMessage.mime2DecodedAuthor;
+        }
+        return this.glodaMessage.from;
     }
 
     /***************************************************************************
@@ -125,7 +125,20 @@ var ThreadVis = (function(ThreadVis) {
      * See if message is sent (i.e. in sent-mail folder)
      **************************************************************************/
     ThreadVis.Message.prototype.isSent = function() {
-        return this.sent;
+        var issent = false;
+        // it is sent if it is stored in a folder that is marked as sent (if
+        // enabled)
+        if (this.glodaMessage.folderMessage != null) {
+            issent |= this.glodaMessage.folderMessage.folder.isSpecialFolder(
+                    Components.interfaces.nsMsgFolderFlags.SentMail, true)
+                    && ThreadVis.Preferences
+                            .getPreference(ThreadVis.Preferences.PREF_SENTMAIL_FOLDERFLAG);
+        }
+        // or it is sent if the sender address is a local identity (if enabled)
+        issent |= ThreadVis.sentMailIdentities[this.glodaMessage.from.value] == true
+                && ThreadVis.Preferences
+                        .getPreference(ThreadVis.Preferences.PREF_SENTMAIL_IDENTITY);
+        return issent;
     }
 
     /***************************************************************************
@@ -146,6 +159,25 @@ var ThreadVis = (function(ThreadVis) {
                 + this.getDate() + "'. Folder: '" + this.getFolder()
                 + "'. Refs: '" + this.getReferences() + "'. Sent: '"
                 + this.isSent() + "'";
+    }
+
+    /***************************************************************************
+     * Get the underlying nsIMsgDBHdr
+     * 
+     * @return The original nsIMsgDBHdr or null if not found
+     **************************************************************************/
+    ThreadVis.Message.prototype.getMsgDbHdr = function() {
+        if (this.glodaMessage.folderMessage == null) {
+            ThreadVis
+                    .log(
+                            "Cache",
+                            "Unable to find nsIMsgDBHdr for message "
+                                    + this.getId()
+                                    + ", probably in folder "
+                                    + this.getFolder()
+                                    + ". Either the message database (msf) for this folder is corrupt, or the global index is out-of-date.");
+        }
+        return this.glodaMessage.folderMessage;
     }
 
     return ThreadVis;
