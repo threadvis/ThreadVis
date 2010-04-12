@@ -1,10 +1,7 @@
 content     threadvis    jar:chrome/threadvis.jar!/content/
-content     threadvis    chrome/content/ #[[DEV]]
 
 locale      threadvis    en-US   jar:chrome/threadvis.jar!/locale/en-US/
-locale      threadvis    en-US   chrome/locale/en-US/ #[[DEV]]
 locale      threadvis    de-DE   jar:chrome/threadvis.jar!/locale/de-DE/
-locale      threadvis    de-DE   chrome/locale/de-DE/ #[[DEV]]
 
 overlay     chrome://messenger/content/msgHdrViewOverlay.xul          chrome://threadvis/content/ThreadVis.xul
 overlay     chrome://messenger/content/preferences/preferences.xul    chrome://threadvis/content/Preferences.xul
