@@ -42,11 +42,9 @@ var ThreadVis = (function(ThreadVis) {
      *            The resize parameter [0..1]
      * @param top
      *            The top position of the timeline
-     * @param topDelta
-     *            The delta position of the timeline
      * @return A new timeline object
      **************************************************************************/
-    ThreadVis.Timeline = function(stack, containers, resize, top, topDelta) {
+    ThreadVis.Timeline = function(stack, containers, resize, top) {
         /**
          * XUL stack to draw timeline on
          */
@@ -66,11 +64,6 @@ var ThreadVis = (function(ThreadVis) {
          * top position of center of visualisation in px
          */
         this.top = top;
-
-        /**
-         * delta of timeline (moved to top by delta)
-         */
-        this.topDelta = topDelta;
 
         this.times = {};
     }
@@ -120,6 +113,12 @@ var ThreadVis = (function(ThreadVis) {
      **************************************************************************/
     ThreadVis.Timeline.prototype.drawTime = function(container, left, right,
             string, toolTip) {
+        var dotSize = ThreadVis.Preferences
+                .getPreference(ThreadVis.Preferences.PREF_VIS_DOTSIZE);
+        var minArcHeight = ThreadVis.Preferences
+                .getPreference(ThreadVis.Preferences.PREF_VIS_ARC_MINHEIGHT);
+        var fontSize = ThreadVis.Preferences
+                .getPreference(ThreadVis.Preferences.PREF_TIMELINE_FONTSIZE);
         // check to see if we already created the label and the tooltip
         var elem = null;
         var newElem = false;
@@ -137,9 +136,9 @@ var ThreadVis = (function(ThreadVis) {
         var styleBorderLeft = "";
         var styleBorderRight = "";
         var styleBorderTop = "";
-        var styleFontSize = "9px";
+        var styleFontSize = fontSize + "px";
         var styleLeft = (left * this.resize) + "px";
-        var styleTop = (this.top - this.topDelta) * this.resize + "px";
+        var styleTop = (this.top - dotSize / 2 - fontSize) * this.resize - 1 + "px";
         var styleWidth = ((right - left) * this.resize) + "px";
 
         // set style
@@ -152,7 +151,6 @@ var ThreadVis = (function(ThreadVis) {
         elem.style.position = "relative";
         elem.style.textAlign = "center";
         elem.style.top = styleTop;
-        elem.style.width = styleWidth;
         elem.style.zIndex = "1";
         // elem.style.cursor = "move";
 
@@ -170,12 +168,14 @@ var ThreadVis = (function(ThreadVis) {
             }, true);
         }
 
-        // hide if not enough space
-        if (((right - left) * this.resize < 20)
-                || (this.topDelta * this.resize < 9)) {
+        // hide if not enough space (need to show first, otherwise .clientWidth is 0
+        elem.hidden = false;
+        if ((elem.clientWidth > Math.floor((right - left) * this.resize))
+                || (fontSize + 2 > minArcHeight * this.resize)) {
             elem.hidden = true;
         } else {
             elem.hidden = false;
+            elem.style.width = styleWidth;
         }
     }
 

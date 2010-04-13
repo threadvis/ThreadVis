@@ -34,70 +34,81 @@
 
 <!DOCTYPE overlay SYSTEM "chrome://threadvis/locale/Settings.dtd">
 <overlay id="ThreadVisPaneOverlay"
-    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-    <prefpane id="paneThreadVis" onpaneload="init();">
+    <prefpane id="paneThreadVis"
+              onpaneload="init();">
 
         <script type="application/x-javascript"
-            src="chrome://threadvis/content/Settings.js" />
+                src="chrome://threadvis/content/Settings.js" />
 
         <stringbundleset>
             <stringbundle id="threadVisStrings" 
-                src="chrome://threadvis/locale/ThreadVis.properties" />
+                          src="chrome://threadvis/locale/ThreadVis.properties" />
         </stringbundleset>
 
         <preferences>
             <preference id="extensions.threadvis.enabled"
-                name="extensions.threadvis.enabled"
-                type="bool" />
+                        name="extensions.threadvis.enabled"
+                        type="bool" />
             <preference id="extensions.threadvis.disabledaccounts"
-                name="extensions.threadvis.disabledaccounts"
-                type="string" />
+                        name="extensions.threadvis.disabledaccounts"
+                        type="string" />
             <preference id="extensions.threadvis.disabledfolders"
-                name="extensions.threadvis.disabledfolders"
-                type="string" />
+                        name="extensions.threadvis.disabledfolders"
+                        type="string" />
             <preference id="extensions.threadvis.timescaling.enabled"
-                name="extensions.threadvis.timescaling.enabled"
-                type="bool" />
+                        name="extensions.threadvis.timescaling.enabled"
+                        type="bool" />
+            <preference id="extensions.threadvis.timescaling.method"
+                        name="extensions.threadvis.timescaling.method"
+                        type="string" />
+            <preference id="extensions.threadvis.timescaling.mintimediff"
+                        name="extensions.threadvis.timescaling.mintimediff"
+                        type="int" />
             <preference id="extensions.threadvis.timeline.enabled"
-                name="extensions.threadvis.timeline.enabled"
-                type="bool" />
+                        name="extensions.threadvis.timeline.enabled"
+                        type="bool" />
+            <preference id="extensions.threadvis.timeline.fontsize"
+                        name="extensions.threadvis.timeline.fontsize"
+                        type="int" />
             <preference id="extensions.threadvis.visualisation.dotsize"
-                name="extensions.threadvis.visualisation.dotsize"
-                type="int" />
+                        name="extensions.threadvis.visualisation.dotsize"
+                        type="int" />
             <preference id="extensions.threadvis.visualisation.arcminheight"
-                name="extensions.threadvis.visualisation.arcminheight"
-                type="int" />
+                        name="extensions.threadvis.visualisation.arcminheight"
+                        type="int" />
             <preference id="extensions.threadvis.visualisation.arcradius"
-                name="extensions.threadvis.visualisation.arcradius"
-                type="int" />
+                        name="extensions.threadvis.visualisation.arcradius"
+                        type="int" />
             <preference id="extensions.threadvis.visualisation.arcdifference"
-                name="extensions.threadvis.visualisation.arcdifference"
-                type="int" />
+                        name="extensions.threadvis.visualisation.arcdifference"
+                        type="int" />
             <preference id="extensions.threadvis.visualisation.arcwidth"
-                name="extensions.threadvis.visualisation.arcwidth"
-                type="int" />
+                        name="extensions.threadvis.visualisation.arcwidth"
+                        type="int" />
             <preference id="extensions.threadvis.visualisation.spacing"
-                name="extensions.threadvis.visualisation.spacing"
-                type="int" />
+                        name="extensions.threadvis.visualisation.spacing"
+                        type="int" />
             <preference id="extensions.threadvis.visualisation.messagecircles"
-                name="extensions.threadvis.visualisation.messagecircles"
-                type="bool" />
+                        name="extensions.threadvis.visualisation.messagecircles"
+                        type="bool" />
             <preference id="extensions.threadvis.visualisation.zoom"
-                name="extensions.threadvis.visualisation.zoom"
-                type="string" />
+                        name="extensions.threadvis.visualisation.zoom"
+                        type="string" />
             <preference id="extensions.threadvis.visualisation.colour"
-                name="extensions.threadvis.visualisation.colour"
-                type="string" />
+                        name="extensions.threadvis.visualisation.colour"
+                        type="string" />
             <preference id="extensions.threadvis.visualisation.highlight"
-                name="extensions.threadvis.visualisation.highlight"
-                type="bool" />
+                        name="extensions.threadvis.visualisation.highlight"
+                        type="bool" />
             <preference id="extensions.threadvis.visualisation.opacity"
-                name="extensions.threadvis.visualisation.opacity"
-                type="int" />
+                        name="extensions.threadvis.visualisation.opacity"
+                        type="int" />
         </preferences>
 
-        <tabbox flex="1" id="threadVisTabBox">
+        <tabbox flex="1"
+                id="threadVisTabBox">
             <tabs>
                 <tab label="&about.tab;" />
                 <tab label="&visualisation.timescaling.caption;" />
@@ -108,16 +119,18 @@
 
             <tabpanels flex="1">
 
-                <tabpanel id="about" orient="vertical">
+                <tabpanel id="about"
+                          orient="vertical">
                     <vbox>
                         <hbox pack="center">
                            <vbox>
                                 <image src="chrome://threadvis/content/images/about.png" />
                                 <label value="&about.version; &extension.version;"
-                                    id="aboutVersion" />
+                                       id="aboutVersion" />
                             </vbox>
                         </hbox>
-                        <description class="indent" id="aboutDescription">
+                        <description class="indent"
+                                     id="aboutDescription">
                             &extension.description;
                         </description>
                         <label class="indent aboutCopyright">
@@ -126,28 +139,35 @@
                         <label class="indent aboutCopyright">
                             &extension.copyright2;
                         </label>
-                        <label class="indent" value="&extension.email;" onclick="writeEmail();"
-                            id="aboutEmail" />
-                        <label class="indent" value="&extension.homepage;"
-                            onclick="openURL('&extension.homepage;');"
-                            id="aboutHomepage" />
-                        <checkbox id="enableThreadVis" class="indent"
-                            label="&extension.enabled;"
-                            preference="extensions.threadvis.enabled" />
+                        <label class="indent"
+                               value="&extension.email;"
+                               onclick="writeEmail();"
+                               id="aboutEmail" />
+                        <label class="indent"
+                               value="&extension.homepage;"
+                               onclick="openURL('&extension.homepage;');"
+                               id="aboutHomepage" />
+                        <checkbox id="enableThreadVis"
+                                  class="indent"
+                                  label="&extension.enabled;"
+                                  preference="extensions.threadvis.enabled" />
                     </vbox>
                 </tabpanel>
 
-                <tabpanel id="visualisation.timescaling" orient="vertical">
+                <tabpanel id="visualisation.timescaling"
+                          orient="vertical">
                     <radiogroup id="doTimeScaling"
-                        preference="extensions.threadvis.timescaling.enabled">
+                                preference="extensions.threadvis.timescaling.enabled"
+                                oncommand="toggleTimescaling();">
                         <vbox>
                             <radio value="false"
-                                label="&visualisation.timescaling.disable;" />
+                                   label="&visualisation.timescaling.disable;" />
                             <hbox class="indent">
                                 <vbox>
                                     <image src="chrome://threadvis/content/images/timescaling_disabled.png" />
                                 </vbox>
-                                <vbox flex="1" class="detailedDescription">
+                                <vbox flex="1"
+                                      class="detailedDescription">
                                     <label class="indent">
                                         &visualisation.timescaling.description.disabled;
                                     </label>
@@ -157,23 +177,69 @@
                         <separator />
                         <vbox>
                             <radio value="true"
-                                label="&visualisation.timescaling.enable;" />
+                                   label="&visualisation.timescaling.enable;"
+                                   id="doTimeScalingEnabled" />
                             <hbox class="indent">
                                 <vbox>
                                     <image src="chrome://threadvis/content/images/timescaling_enabled.png"/>
                                 </vbox>
-                                <vbox flex="1" class="detailedDescription">
+                                <vbox flex="1"
+                                      class="detailedDescription">
                                     <label class="indent">
                                         &visualisation.timescaling.description.enabled;
                                     </label>
+                                    <hbox class="indent">
+                                        <label control="timescalingMethod"
+                                               value="&visualisation.timescaling.method;" />
+                                        <menulist id="timescalingMethod"
+                                                  preference="extensions.threadvis.timescaling.method">
+                                            <menupopup>
+                                                <menuitem label="&visualisation.timescaling.method.linear;"
+                                                          value="linear" />
+                                                <menuitem label="&visualisation.timescaling.method.logarithmic10;"
+                                                          value="log10" />
+                                                <menuitem label="&visualisation.timescaling.method.logarithmice;"
+                                                          value="loge" />
+                                                <menuitem label="&visualisation.timescaling.method.logarithmic2;"
+                                                          value="log2" />
+                                            </menupopup>
+                                        </menulist>
+                                    </hbox>
+                                    <hbox class="indent">
+                                        <label control="timescalingMinTimeDifference"
+                                               value="&visualisation.timescaling.mintimediff;" />
+                                        <menulist id="timescalingMinTimeDifference"
+                                                  preference="extensions.threadvis.timescaling.mintimediff">
+                                            <menupopup>
+                                                <menuitem label="&visualisation.timescaling.mintimediff.automatic;"
+                                                          value="0" />
+                                                <menuitem label="&visualisation.timescaling.mintimediff.1min;"
+                                                          value="60000" />
+                                                <menuitem label="&visualisation.timescaling.mintimediff.10min;"
+                                                          value="600000" />
+                                                <menuitem label="&visualisation.timescaling.mintimediff.30min;"
+                                                          value="1800000" />
+                                                <menuitem label="&visualisation.timescaling.mintimediff.1hour;"
+                                                          value="3600000" />
+                                                <menuitem label="&visualisation.timescaling.mintimediff.12hours;"
+                                                          value="43200000" />
+                                                <menuitem label="&visualisation.timescaling.mintimediff.1day;"
+                                                          value="86400000" />
+                                                <menuitem label="&visualisation.timescaling.mintimediff.2days;"
+                                                          value="172800000" />
+                                                <menuitem label="&visualisation.timescaling.mintimediff.10days;"
+                                                          value="864000000" />
+                                            </menupopup>
+                                        </menulist>
+                                    </hbox>
                                 </vbox>
                             </hbox>
                         </vbox>
                     </radiogroup>
                     <separator />
                     <checkbox id="enableTimeline"
-                        label="&visualisation.timeline.enable;"
-                        preference="extensions.threadvis.timeline.enabled" />
+                              label="&visualisation.timeline.enable;"
+                              preference="extensions.threadvis.timeline.enabled" />
                 </tabpanel>
 
                 <tabpanel id="visualisationSizeTab" orient="vertical">
@@ -185,138 +251,161 @@
                         <rows>
                             <row>
                                 <label control="visualisationDotSize"
-                                    value="&visualisation.size.dotsize;" />
+                                       value="&visualisation.size.dotsize;" />
                                 <textbox id="visualisationDotSize"
-                                    preference="extensions.threadvis.visualisation.dotsize"
-                                    type="number"
-                                    min="1"
-                                    size="2" />
+                                         preference="extensions.threadvis.visualisation.dotsize"
+                                         type="number"
+                                         min="1"
+                                         size="2" />
                             </row>
                             <row>
                                 <label control="visualisationArcMinHeight"
-                                    value="&visualisation.size.arcminheight;" />
+                                       value="&visualisation.size.arcminheight;" />
                                 <textbox id="visualisationArcMinHeight"
-                                    preference="extensions.threadvis.visualisation.arcminheight"
-                                    type="number"
-                                    min="0"
-                                    size="2" />
+                                         preference="extensions.threadvis.visualisation.arcminheight"
+                                         type="number"
+                                         min="0"
+                                         size="2" />
                             </row>
                             <row>
                                 <label control="visualisationArcRadius"
-                                    value="&visualisation.size.arcradius;" />
+                                       value="&visualisation.size.arcradius;" />
                                 <textbox id="visualisationArcRadius"
-                                    preference="extensions.threadvis.visualisation.arcradius"
-                                    type="number"
-                                    min="0"
-                                    size="2" />
+                                         preference="extensions.threadvis.visualisation.arcradius"
+                                         type="number"
+                                         min="0"
+                                         size="2" />
                             </row>
                             <row>
                                 <label control="visualisation.ArcDifference"
-                                    value="&visualisation.size.arcdifference;" />
+                                       value="&visualisation.size.arcdifference;" />
                                 <textbox id="visualisationArcDifference"
-                                    preference="extensions.threadvis.visualisation.arcdifference"
-                                    type="number"
-                                    min="1"
-                                    size="2" />
+                                         preference="extensions.threadvis.visualisation.arcdifference"
+                                         type="number"
+                                         min="1"
+                                         size="2" />
                             </row>
                             <row>
                                 <label control="visualisationArcWidth"
-                                    value="&visualisation.size.arcwidth;" />
+                                       value="&visualisation.size.arcwidth;" />
                                 <textbox id="visualisationArcWidth"
-                                    preference="extensions.threadvis.visualisation.arcwidth"
-                                    type="number"
-                                    min="1"
-                                    size="2" />
+                                         preference="extensions.threadvis.visualisation.arcwidth"
+                                         type="number"
+                                         min="1"
+                                         size="2" />
                             </row>
                             <row>
                                 <label control="visualisationSpacing"
-                                    value="&visualisation.size.spacing;" />
+                                       value="&visualisation.size.spacing;" />
                                 <textbox  id="visualisationSpacing"
-                                    preference="extensions.threadvis.visualisation.spacing"
-                                    type="number"
-                                    min="1"
-                                    size="2" />
+                                         preference="extensions.threadvis.visualisation.spacing"
+                                         type="number"
+                                         min="1"
+                                         size="2" />
+                            </row>
+                            <row>
+                                <label control="visualisationTimelineFontsize"
+                                      value="&visualisation.timeline.fontsize;" />
+                                <textbox id="visualisationTimelineFontsize"
+                                         preference="extensions.threadvis.timeline.fontsize"
+                                         type="number"
+                                         min="1"
+                                         size="2" />
                             </row>
                             <separator />
                             <hbox>
                                 <label control="visualisationZoom"
-                                    value="&visualisation.zoom.caption;" />
+                                       value="&visualisation.zoom.caption;" />
                                 <menulist id="visualisationZoom"
-                                    preference="extensions.threadvis.visualisation.zoom">
+                                          preference="extensions.threadvis.visualisation.zoom">
                                     <menupopup>
-                                        <menuitem label="&visualisation.zoom.fit;" value="fit" />
-                                        <menuitem label="&visualisation.zoom.full;" value="full" />
+                                        <menuitem label="&visualisation.zoom.fit;"
+                                                  value="fit" />
+                                        <menuitem label="&visualisation.zoom.full;"
+                                                  value="full" />
                                     </menupopup>
                                 </menulist>
                             </hbox>
                             <separator />
                             <hbox>
                                 <label control="visualisationMessageCircles"
-                                    value="&visualisation.size.messagecircles;" />
+                                       value="&visualisation.size.messagecircles;" />
                                 <checkbox id="visualisationMessageCircles"
-                                    label=""
-                                    preference="extensions.threadvis.visualisation.messagecircles" />
+                                          label=""
+                                          preference="extensions.threadvis.visualisation.messagecircles" />
                             </hbox>
                         </rows>
                     </grid>
                 </tabpanel>
 
-                <tabpanel id="visualisationColourTab" orient="vertical">
+                <tabpanel id="visualisationColourTab"
+                          orient="vertical">
                     <radiogroup id="visualisationColour"
-                        preference="extensions.threadvis.visualisation.colour"
-                        oncommand="toggleHighlight();">
+                                preference="extensions.threadvis.visualisation.colour"
+                                oncommand="toggleHighlight();">
                         <radio value="single"
-                        label="&visualisation.colour.single.caption;" />
+                               label="&visualisation.colour.single.caption;" />
                         <label class="indent detailedDescription">
                             &visualisation.colour.single.description;
                         </label>
                         <radio value="author"
-                            label="&visualisation.colour.author.caption;"
-                            id="visualisationColourAuthor" />
+                               label="&visualisation.colour.author.caption;"
+                               id="visualisationColourAuthor" />
                         <label class="indent detailedDescription">
                             &visualisation.colour.author.description;
                         </label>
                     </radiogroup>
                     <checkbox id="visualisationHighlight"
-                        label="&visualisation.colour.highlight;"
-                        class="indent"
-                        preference="extensions.threadvis.visualisation.highlight" />
+                              label="&visualisation.colour.highlight;"
+                              class="indent"
+                              preference="extensions.threadvis.visualisation.highlight" />
                     <separator />
                     <hbox>
                         <label control="visualisationOpacity"
-                            value="&visualisation.opacity;" />
+                               value="&visualisation.opacity;" />
                         <menulist id="visualisationOpacity"
-                            preference="extensions.threadvis.visualisation.opacity">
+                                  preference="extensions.threadvis.visualisation.opacity">
                             <menupopup>
-                                <menuitem label="10%" value="10" />
-                                <menuitem label="20%" value="20" />
-                                <menuitem label="30%" value="30" />
-                                <menuitem label="40%" value="40" />
-                                <menuitem label="50%" value="50" />
-                                <menuitem label="60%" value="60" />
-                                <menuitem label="70%" value="70" />
-                                <menuitem label="80%" value="80" />
-                                <menuitem label="90%" value="90" />
-                                <menuitem label="100%" value="100" />
+                                <menuitem label="10%"
+                                          value="10" />
+                                <menuitem label="20%"
+                                          value="20" />
+                                <menuitem label="30%"
+                                          value="30" />
+                                <menuitem label="40%"
+                                          value="40" />
+                                <menuitem label="50%"
+                                          value="50" />
+                                <menuitem label="60%"
+                                          value="60" />
+                                <menuitem label="70%"
+                                          value="70" />
+                                <menuitem label="80%"
+                                          value="80" />
+                                <menuitem label="90%"
+                                          value="90" />
+                                <menuitem label="100%"
+                                          value="100" />
                             </menupopup>
                         </menulist>
                     </hbox>
                 </tabpanel>
 
-                <tabpanel id="visualisationAccountsFoldersTab" orient="vertical">
+                <tabpanel id="visualisationAccountsFoldersTab"
+                          orient="vertical">
                     <textbox id="hiddenDisabledAccounts"
-                        preference="extensions.threadvis.disabledaccounts"
-                        hidden="true" />
+                             preference="extensions.threadvis.disabledaccounts"
+                             hidden="true" />
                     <label class="indent">
                         &visualisation.enabledaccounts.description;
                     </label>
                     <groupbox>
                             <vbox id="enableAccounts"
-                                style="overflow: auto;"
-                                class="indent" />
+                                  style="overflow: auto;"
+                                  class="indent" />
                             <textbox id="hiddenDisabledFolders"
-                                preference="extensions.threadvis.disabledfolders"
-                                hidden="true" />
+                                     preference="extensions.threadvis.disabledfolders"
+                                     hidden="true" />
                     </groupbox>
                 </tabpanel>
 

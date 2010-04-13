@@ -44,7 +44,23 @@
 <!ENTITY visualisation.timescaling.disable                  "Time Scaling deaktivieren">
 <!ENTITY visualisation.timescaling.description.disabled     "Wenn Time Scaling deaktiviert ist, ist der horizontale Abstand zwischen benachbarten Nachrichten immer konstant.">
 <!ENTITY visualisation.timescaling.description.enabled      "Wenn Time Scaling aktiviert ist, ist der horizontale Abstand zwischen benachbarten Nachrichten proportional zum zeitlichen Abstand dieser Nachrichten.">
+<!ENTITY visualisation.timescaling.method                   "Time Scaling Methode">
+<!ENTITY visualisation.timescaling.method.linear            "linear">
+<!ENTITY visualisation.timescaling.method.logarithmic10     "logarithmisch (Basis 10)">
+<!ENTITY visualisation.timescaling.method.logarithmice      "logarithmisch (nat&#xFC;rlich)">
+<!ENTITY visualisation.timescaling.method.logarithmic2      "logarithmisch (Basis 2)">
+<!ENTITY visualisation.timescaling.mintimediff              "Minimal dargestellte Zeitdifferenz">
+<!ENTITY visualisation.timescaling.mintimediff.automatic    "automatisch">
+<!ENTITY visualisation.timescaling.mintimediff.1min         "1 Minute">
+<!ENTITY visualisation.timescaling.mintimediff.10min        "10 Minuten">
+<!ENTITY visualisation.timescaling.mintimediff.30min        "30 Minuten">
+<!ENTITY visualisation.timescaling.mintimediff.1hour        "1 Stunde">
+<!ENTITY visualisation.timescaling.mintimediff.12hours      "12 Stunden">
+<!ENTITY visualisation.timescaling.mintimediff.1day         "1 Tag">
+<!ENTITY visualisation.timescaling.mintimediff.2days        "2 Tage">
+<!ENTITY visualisation.timescaling.mintimediff.10days       "10 Tage">
 <!ENTITY visualisation.timeline.enable                      "Die vergangene Zeit zwischen den einzelnen Nachrichten einblenden.">
+<!ENTITY visualisation.timeline.fontsize                    "Schriftgr&#xF6;&#xDF;e der Timeline">
 <!ENTITY visualisation.size.caption                         "Gr&#xF6;&#xDF;e">
 <!ENTITY visualisation.size.dotsize                         "Nachrichtengr&#xF6;&#xDF;e">
 <!ENTITY visualisation.size.arcminheight                    "Minimale Bogenh&#xF6;he">

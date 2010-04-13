@@ -44,7 +44,23 @@
 <!ENTITY visualisation.timescaling.disable                  "Disable Time Scaling">
 <!ENTITY visualisation.timescaling.description.disabled     "If Time Scaling is disabled, the horizontal spacing between two adjacent messages is always constant.">
 <!ENTITY visualisation.timescaling.description.enabled      "If Time Scaling is enabled, the horizontal spacing between two adjacent messages is proportional to the time difference between those two messages.">
+<!ENTITY visualisation.timescaling.method                   "Time Scaling Method">
+<!ENTITY visualisation.timescaling.method.linear            "linear">
+<!ENTITY visualisation.timescaling.method.logarithmic10     "logarithmic (base 10)">
+<!ENTITY visualisation.timescaling.method.logarithmice      "logarithmic (natural)">
+<!ENTITY visualisation.timescaling.method.logarithmic2      "logarithmic (base 2)">
+<!ENTITY visualisation.timescaling.mintimediff              "Minimal displayed time difference">
+<!ENTITY visualisation.timescaling.mintimediff.automatic    "automatic">
+<!ENTITY visualisation.timescaling.mintimediff.1min         "1 minute">
+<!ENTITY visualisation.timescaling.mintimediff.10min        "10 minutes">
+<!ENTITY visualisation.timescaling.mintimediff.30min        "30 minutes">
+<!ENTITY visualisation.timescaling.mintimediff.1hour        "1 hour">
+<!ENTITY visualisation.timescaling.mintimediff.12hours      "12 hours">
+<!ENTITY visualisation.timescaling.mintimediff.1day         "1 day">
+<!ENTITY visualisation.timescaling.mintimediff.2days        "2 days">
+<!ENTITY visualisation.timescaling.mintimediff.10days       "10 days">
 <!ENTITY visualisation.timeline.enable                      "Display the time between two messages.">
+<!ENTITY visualisation.timeline.fontsize                    "Timeline Font Size">
 <!ENTITY visualisation.size.caption                         "Size">
 <!ENTITY visualisation.size.dotsize                         "Size of Messages">
 <!ENTITY visualisation.size.arcminheight                    "Minimum Arc Height">

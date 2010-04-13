@@ -425,7 +425,22 @@ var ThreadVis = (function(ThreadVis) {
                         ThreadVis.preferenceChanged();
                     });
             ThreadVis.Preferences.registerCallback(
+                    ThreadVis.Preferences.PREF_TIMELINE_FONTSIZE, function(
+                            value) {
+                        ThreadVis.preferenceChanged();
+                    });
+            ThreadVis.Preferences.registerCallback(
                     ThreadVis.Preferences.PREF_TIMESCALING, function(value) {
+                        ThreadVis.preferenceChanged();
+                    });
+            ThreadVis.Preferences.registerCallback(
+                    ThreadVis.Preferences.PREF_TIMESCALING_METHOD, function(
+                            value) {
+                        ThreadVis.preferenceChanged();
+                    });
+            ThreadVis.Preferences.registerCallback(
+                    ThreadVis.Preferences.PREF_TIMESCALING_MINTIMEDIFF,
+                    function(value) {
                         ThreadVis.preferenceChanged();
                     });
             ThreadVis.Preferences.registerCallback(

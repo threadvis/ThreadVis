@@ -58,8 +58,14 @@ var ThreadVis = (function(ThreadVis) {
             + "svg.width";
     ThreadVis.Preferences.PREF_TIMELINE = ThreadVis.Preferences.PREF_BRANCH
             + "timeline.enabled";
+    ThreadVis.Preferences.PREF_TIMELINE_FONTSIZE = ThreadVis.Preferences.PREF_BRANCH
+            + "timeline.fontsize";
     ThreadVis.Preferences.PREF_TIMESCALING = ThreadVis.Preferences.PREF_BRANCH
             + "timescaling.enabled";
+    ThreadVis.Preferences.PREF_TIMESCALING_METHOD = ThreadVis.Preferences.PREF_BRANCH
+            + "timescaling.method";
+    ThreadVis.Preferences.PREF_TIMESCALING_MINTIMEDIFF = ThreadVis.Preferences.PREF_BRANCH
+            + "timescaling.mintimediff";
     ThreadVis.Preferences.PREF_VIS_DOTSIZE = ThreadVis.Preferences.PREF_BRANCH
             + "visualisation.dotsize";
     ThreadVis.Preferences.PREF_VIS_ARC_MINHEIGHT = ThreadVis.Preferences.PREF_BRANCH
@@ -222,8 +228,17 @@ var ThreadVis = (function(ThreadVis) {
                 ThreadVis.Preferences.PREF_TIMELINE,
                 ThreadVis.Preferences.PREF_BOOL, true);
         ThreadVis.Preferences.loadPreference(
+                ThreadVis.Preferences.PREF_TIMELINE_FONTSIZE,
+                ThreadVis.Preferences.PREF_INT, 9);
+        ThreadVis.Preferences.loadPreference(
                 ThreadVis.Preferences.PREF_TIMESCALING,
                 ThreadVis.Preferences.PREF_BOOL, true);
+        ThreadVis.Preferences.loadPreference(
+                ThreadVis.Preferences.PREF_TIMESCALING_METHOD,
+                ThreadVis.Preferences.PREF_STRING, "linear");
+        ThreadVis.Preferences.loadPreference(
+                ThreadVis.Preferences.PREF_TIMESCALING_MINTIMEDIFF,
+                ThreadVis.Preferences.PREF_INT, 0);
         ThreadVis.Preferences.loadPreference(
                 ThreadVis.Preferences.PREF_VIS_DOTSIZE,
                 ThreadVis.Preferences.PREF_INT, 12);
@@ -319,7 +334,8 @@ var ThreadVis = (function(ThreadVis) {
                 }
                 // reload preferences
                 ThreadVis.Preferences.preferenceReload();
-                ThreadVis.Preferences.doCallback(ThreadVis.Preferences.PREF_GLODA_ENABLED);
+                ThreadVis.Preferences
+                        .doCallback(ThreadVis.Preferences.PREF_GLODA_ENABLED);
             }
         }, false);
     }

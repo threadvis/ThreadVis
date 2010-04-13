@@ -38,6 +38,7 @@ var XUL_NAMESPACE = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.x
  ******************************************************************************/
 function init() {
     toggleHighlight();
+    toggleTimescaling();
     buildAccountList();
     buildAccountPreference();
 }
@@ -350,6 +351,25 @@ function toggleHighlight() {
         highlightCheckbox.disabled = false;
     } else {
         highlightCheckbox.disabled = true;
+    }
+}
+
+/*******************************************************************************
+ * Enable or disable the timescaling settings
+ * 
+ * @return void
+ ******************************************************************************/
+function toggleTimescaling() {
+    var timescalingRadio = document.getElementById("doTimeScalingEnabled");
+    var timescalingMethod = document.getElementById("timescalingMethod");
+    var timescalingMinTimeDifference = document
+            .getElementById("timescalingMinTimeDifference");
+    if (timescalingRadio.selected) {
+        timescalingMethod.disabled = false;
+        timescalingMinTimeDifference.disabled = false;
+    } else {
+        timescalingMethod.disabled = true;
+        timescalingMinTimeDifference.disabled = true;
     }
 }
 

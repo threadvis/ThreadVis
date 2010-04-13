@@ -1117,6 +1117,10 @@ var ThreadVis = (function(ThreadVis) {
                 .getPreference(ThreadVis.Preferences.PREF_VIS_SPACING);
         var prefTimescaling = ThreadVis.Preferences
                 .getPreference(ThreadVis.Preferences.PREF_TIMESCALING);
+        var prefTimescalingMethod = ThreadVis.Preferences
+                .getPreference(ThreadVis.Preferences.PREF_TIMESCALING_METHOD);
+        var prefTimescalingMinimalTimeDifference = ThreadVis.Preferences
+                .getPreference(ThreadVis.Preferences.PREF_TIMESCALING_MINTIMEDIFF);
 
         // if we do not want to do timescaling, reset all scaling info to 1
         for ( var counter = 0; counter < containers.length; counter++) {
@@ -1130,6 +1134,9 @@ var ThreadVis = (function(ThreadVis) {
         // we want to scale the messages horizontally according to their
         // time difference
         // therefore we calculate the overall scale factor
+        if (prefTimescalingMinimalTimeDifference > 0) {
+            minimalTimeDifference = prefTimescalingMinimalTimeDifference;
+        }
         var totalTimeScale = 0;
         for ( var counter = 0; counter < containers.length - 1; counter++) {
             var thisContainer = containers[counter];
@@ -1138,6 +1145,16 @@ var ThreadVis = (function(ThreadVis) {
             // have a difference of 1)
             thisContainer.xScaled = thisContainer.timeDifference
                     / minimalTimeDifference;
+            // instead of linear scaling, we might use other scaling factor
+            if (prefTimescalingMethod == "log10") {
+                thisContainer.xScaled = Math.log(thisContainer.xScaled)
+                        / Math.LN10 + 1;
+            } else if (prefTimescalingMethod == "loge") {
+                thisContainer.xScaled = Math.log(thisContainer.xScaled) + 1;
+            } else if (prefTimescalingMethod == "log2") {
+                thisContainer.xScaled = Math.log(thisContainer.xScaled)
+                        / Math.LN2 + 1;
+            }
             // check if we might encounter a dummy container, see above
             if (thisContainer.xScaled < 1) {
                 thisContainer.xScaled = 1;
@@ -1153,8 +1170,7 @@ var ThreadVis = (function(ThreadVis) {
         var maxCountX = width / prefSpacing;
 
         // if the time scaling factor is bigger than what we can display, we
-        // have
-        // a problem
+        // have a problem
         // this means, we have to scale the timing factor down
         var scaling = 0.9;
         while (totalTimeScale > maxCountX) {
@@ -1441,8 +1457,7 @@ var ThreadVis = (function(ThreadVis) {
 
         if (prefTimeline) {
             this.timeline = new ThreadVis.Timeline(this.stack, this.containers,
-                    this.resize, topHeight, prefArcMinHeight + prefDotSize
-                            - prefArcWidth - 2);
+                    this.resize, topHeight);
             this.timeline.draw();
         } else {
             this.timeline = null;
@@ -1641,8 +1656,7 @@ var ThreadVis = (function(ThreadVis) {
         this.createLegend(this.authors);
 
         if (prefTimeline && this.timeline != null) {
-            this.timeline.redraw(this.resize, topHeight, prefArcMinHeight
-                    + prefDotSize - prefArcWidth - 2);
+            this.timeline.redraw(this.resize, topHeight);
         }
 
         // reset vertical position before drawing scrollbars
