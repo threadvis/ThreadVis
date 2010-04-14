@@ -781,7 +781,11 @@ var ThreadVis = (function(ThreadVis) {
      * @return void
      **************************************************************************/
     ThreadVis.setStatus = function(text, info) {
-        var elem = document.getElementById("ThreadVisStatusText");
+        var parent = document;
+        if (ThreadVis.isPopupVisualisation()) {
+            parent = ThreadVis.getMainWindow().document;
+        }
+        var elem = parent.getElementById("ThreadVisStatusText");
         if (text != null) {
             elem.value = text;
         } else {
@@ -813,107 +817,103 @@ var ThreadVis = (function(ThreadVis) {
                 disabledAccount = !info.accountEnabled;
             }
             if (disabled) {
-                document.getElementById("ThreadVisStatusTooltipDisabled").hidden = false;
-                document.getElementById("ThreadVisStatusMenuEnable")
+                parent.getElementById("ThreadVisStatusTooltipDisabled").hidden = false;
+                parent.getElementById("ThreadVisStatusMenuEnable")
                         .setAttribute("checked", false);
-                document.getElementById("ThreadVisStatusMenuDisable")
+                parent.getElementById("ThreadVisStatusMenuDisable")
                         .setAttribute("checked", true);
             } else {
-                document.getElementById("ThreadVisStatusTooltipDisabled").hidden = true;
-                document.getElementById("ThreadVisStatusMenuEnable")
+                parent.getElementById("ThreadVisStatusTooltipDisabled").hidden = true;
+                parent.getElementById("ThreadVisStatusMenuEnable")
                         .setAttribute("checked", true);
-                document.getElementById("ThreadVisStatusMenuDisable")
+                parent.getElementById("ThreadVisStatusMenuDisable")
                         .setAttribute("checked", false);
             }
             if (error && errorText != null) {
-                while (document.getElementById("ThreadVisStatusTooltipError").firstChild != null) {
-                    document
+                while (parent.getElementById("ThreadVisStatusTooltipError").firstChild != null) {
+                    parent
                             .getElementById("ThreadVisStatusTooltipError")
                             .removeChild(
-                                    document
+                                    parent
                                             .getElementById("ThreadVisStatusTooltipError").firstChild);
                 }
-                document.getElementById("ThreadVisStatusTooltipError").hidden = false;
-                var text = document.createTextNode(errorText);
-                document.getElementById("ThreadVisStatusTooltipError")
+                parent.getElementById("ThreadVisStatusTooltipError").hidden = false;
+                var text = parent.createTextNode(errorText);
+                parent.getElementById("ThreadVisStatusTooltipError")
                         .appendChild(text);
             } else {
-                document.getElementById("ThreadVisStatusTooltipError").hidden = true;
+                parent.getElementById("ThreadVisStatusTooltipError").hidden = true;
             }
             if (!disabled && disabledGloda) {
-                document.getElementById("ThreadVisStatusTooltipGlodaDisabled").hidden = false;
+                parent.getElementById("ThreadVisStatusTooltipGlodaDisabled").hidden = false;
             } else {
-                document.getElementById("ThreadVisStatusTooltipGlodaDisabled").hidden = true;
+                parent.getElementById("ThreadVisStatusTooltipGlodaDisabled").hidden = true;
             }
             if (!disabled && !disabledGloda && disabledAccount) {
-                document
-                        .getElementById("ThreadVisStatusTooltipAccountDisabled").hidden = false;
-                document.getElementById("ThreadVisStatusMenuEnableAccount")
+                parent.getElementById("ThreadVisStatusTooltipAccountDisabled").hidden = false;
+                parent.getElementById("ThreadVisStatusMenuEnableAccount")
                         .setAttribute("checked", false);
-                document.getElementById("ThreadVisStatusMenuDisableAccount")
+                parent.getElementById("ThreadVisStatusMenuDisableAccount")
                         .setAttribute("checked", true);
             } else {
-                document
-                        .getElementById("ThreadVisStatusTooltipAccountDisabled").hidden = true;
-                document.getElementById("ThreadVisStatusMenuEnableAccount")
+                parent.getElementById("ThreadVisStatusTooltipAccountDisabled").hidden = true;
+                parent.getElementById("ThreadVisStatusMenuEnableAccount")
                         .setAttribute("checked", true);
-                document.getElementById("ThreadVisStatusMenuDisableAccount")
+                parent.getElementById("ThreadVisStatusMenuDisableAccount")
                         .setAttribute("checked", false);
             }
             if (!disabled && !disabledGloda && !disabledAccount
                     && disabledFolder) {
-                document.getElementById("ThreadVisStatusTooltipFolderDisabled").hidden = false;
-                document.getElementById("ThreadVisStatusMenuEnableFolder")
+                parent.getElementById("ThreadVisStatusTooltipFolderDisabled").hidden = false;
+                parent.getElementById("ThreadVisStatusMenuEnableFolder")
                         .setAttribute("checked", false);
-                document.getElementById("ThreadVisStatusMenuDisableFolder")
+                parent.getElementById("ThreadVisStatusMenuDisableFolder")
                         .setAttribute("checked", true);
             } else {
-                document.getElementById("ThreadVisStatusTooltipFolderDisabled").hidden = true;
-                document.getElementById("ThreadVisStatusMenuEnableFolder")
+                parent.getElementById("ThreadVisStatusTooltipFolderDisabled").hidden = true;
+                parent.getElementById("ThreadVisStatusMenuEnableFolder")
                         .setAttribute("checked", true);
-                document.getElementById("ThreadVisStatusMenuDisableFolder")
+                parent.getElementById("ThreadVisStatusMenuDisableFolder")
                         .setAttribute("checked", false);
             }
 
             // global disable
             if (!disabledGloda) {
-                document.getElementById("ThreadVisStatusMenuEnable").disabled = false;
-                document.getElementById("ThreadVisStatusMenuDisable").disabled = false;
+                parent.getElementById("ThreadVisStatusMenuEnable").disabled = false;
+                parent.getElementById("ThreadVisStatusMenuDisable").disabled = false;
             } else {
-                document.getElementById("ThreadVisStatusMenuEnable").disabled = true;
-                document.getElementById("ThreadVisStatusMenuDisable").disabled = true;
+                parent.getElementById("ThreadVisStatusMenuEnable").disabled = true;
+                parent.getElementById("ThreadVisStatusMenuDisable").disabled = true;
             }
 
             // account disable
             if (!disabled && !disabledGloda) {
-                document.getElementById("ThreadVisStatusMenuEnableAccount").disabled = false;
-                document.getElementById("ThreadVisStatusMenuDisableAccount").disabled = false;
+                parent.getElementById("ThreadVisStatusMenuEnableAccount").disabled = false;
+                parent.getElementById("ThreadVisStatusMenuDisableAccount").disabled = false;
             } else {
-                document.getElementById("ThreadVisStatusMenuEnableAccount").disabled = true;
-                document.getElementById("ThreadVisStatusMenuDisableAccount").disabled = true;
+                parent.getElementById("ThreadVisStatusMenuEnableAccount").disabled = true;
+                parent.getElementById("ThreadVisStatusMenuDisableAccount").disabled = true;
             }
 
             // folder disable
             if (!disabled && !disabledGloda && !disabledAccount) {
-                document.getElementById("ThreadVisStatusMenuEnableFolder").disabled = false;
-                document.getElementById("ThreadVisStatusMenuDisableFolder").disabled = false;
+                parent.getElementById("ThreadVisStatusMenuEnableFolder").disabled = false;
+                parent.getElementById("ThreadVisStatusMenuDisableFolder").disabled = false;
             } else {
-                document.getElementById("ThreadVisStatusMenuEnableFolder").disabled = true;
-                document.getElementById("ThreadVisStatusMenuDisableFolder").disabled = true;
+                parent.getElementById("ThreadVisStatusMenuEnableFolder").disabled = true;
+                parent.getElementById("ThreadVisStatusMenuDisableFolder").disabled = true;
             }
 
             if (error) {
-                document.getElementById("ThreadVisStatusBarPanel")
-                        .setAttribute("class",
-                                "statusbarpanel-menu-iconic error");
+                parent.getElementById("ThreadVisStatusBarPanel").setAttribute(
+                        "class", "statusbarpanel-menu-iconic error");
             } else if (disabled || disabledGloda || disabledAccount
                     || disabledFolder) {
-                document.getElementById("ThreadVisStatusBarPanel")
-                        .setAttribute("class",
-                                "statusbarpanel-menu-iconic disabled");
+                parent.getElementById("ThreadVisStatusBarPanel").setAttribute(
+                        "class", "statusbarpanel-menu-iconic disabled");
             } else {
-                document.getElementById("ThreadVisStatusBarPanel")
-                        .setAttribute("class", "statusbarpanel-menu-iconic");
+                parent.getElementById("ThreadVisStatusBarPanel").setAttribute(
+                        "class", "statusbarpanel-menu-iconic");
             }
         }
     }
