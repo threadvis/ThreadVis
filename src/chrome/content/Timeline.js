@@ -170,6 +170,7 @@ var ThreadVis = (function(ThreadVis) {
 
         // hide if not enough space (need to show first, otherwise .clientWidth is 0
         elem.hidden = false;
+        elem.style.width = "";
         if ((elem.clientWidth > Math.floor((right - left) * this.resize))
                 || (fontSize + 2 > minArcHeight * this.resize)) {
             elem.hidden = true;
