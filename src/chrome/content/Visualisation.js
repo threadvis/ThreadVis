@@ -1146,14 +1146,9 @@ var ThreadVis = (function(ThreadVis) {
             thisContainer.xScaled = thisContainer.timeDifference
                     / minimalTimeDifference;
             // instead of linear scaling, we might use other scaling factor
-            if (prefTimescalingMethod == "log10") {
+            if (prefTimescalingMethod == "log") {
                 thisContainer.xScaled = Math.log(thisContainer.xScaled)
-                        / Math.LN10 + 1;
-            } else if (prefTimescalingMethod == "loge") {
-                thisContainer.xScaled = Math.log(thisContainer.xScaled) + 1;
-            } else if (prefTimescalingMethod == "log2") {
-                thisContainer.xScaled = Math.log(thisContainer.xScaled)
-                        / Math.LN2 + 1;
+                        / Math.log(2) + 1;
             }
             // check if we might encounter a dummy container, see above
             if (thisContainer.xScaled < 1) {
@@ -1169,15 +1164,25 @@ var ThreadVis = (function(ThreadVis) {
         // width / spacing would lead to 3
         var maxCountX = width / prefSpacing;
 
+        ThreadVis.log("timescaling", "totaltimescale " + totalTimeScale + " maxcount " + maxCountX);
         // if the time scaling factor is bigger than what we can display, we
         // have a problem
         // this means, we have to scale the timing factor down
         var scaling = 0.9;
+        var iteration = 0;
         while (totalTimeScale > maxCountX) {
+            iteration++;
             totalTimeScale = 0;
             for ( var counter = 0; counter < containers.length - 1; counter++) {
                 var thisContainer = containers[counter];
-                thisContainer.xScaled = thisContainer.xScaled * scaling;
+                if (prefTimescalingMethod == "linear") {
+                    thisContainer.xScaled = thisContainer.xScaled * scaling;
+                } else if (prefTimescalingMethod == "log") {
+                    thisContainer.xScaled = Math
+                            .log(thisContainer.timeDifference
+                                    / minimalTimeDifference)
+                            / Math.log(2 / Math.pow(scaling, iteration)) + 1;
+                }
                 if (thisContainer.xScaled < 1) {
                     thisContainer.xScaled = 1;
                 }

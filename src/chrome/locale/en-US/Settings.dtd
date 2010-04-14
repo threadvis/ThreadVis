@@ -46,9 +46,7 @@
 <!ENTITY visualisation.timescaling.description.enabled      "If Time Scaling is enabled, the horizontal spacing between two adjacent messages is proportional to the time difference between those two messages.">
 <!ENTITY visualisation.timescaling.method                   "Time Scaling Method">
 <!ENTITY visualisation.timescaling.method.linear            "linear">
-<!ENTITY visualisation.timescaling.method.logarithmic10     "logarithmic (base 10)">
-<!ENTITY visualisation.timescaling.method.logarithmice      "logarithmic (natural)">
-<!ENTITY visualisation.timescaling.method.logarithmic2      "logarithmic (base 2)">
+<!ENTITY visualisation.timescaling.method.logarithmic       "logarithmic">
 <!ENTITY visualisation.timescaling.mintimediff              "Minimal displayed time difference">
 <!ENTITY visualisation.timescaling.mintimediff.automatic    "automatic">
 <!ENTITY visualisation.timescaling.mintimediff.1min         "1 minute">

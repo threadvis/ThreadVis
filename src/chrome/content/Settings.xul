@@ -196,12 +196,8 @@
                                             <menupopup>
                                                 <menuitem label="&visualisation.timescaling.method.linear;"
                                                           value="linear" />
-                                                <menuitem label="&visualisation.timescaling.method.logarithmic10;"
-                                                          value="log10" />
-                                                <menuitem label="&visualisation.timescaling.method.logarithmice;"
-                                                          value="loge" />
-                                                <menuitem label="&visualisation.timescaling.method.logarithmic2;"
-                                                          value="log2" />
+                                                <menuitem label="&visualisation.timescaling.method.logarithmic;"
+                                                          value="log" />
                                             </menupopup>
                                         </menulist>
                                     </hbox>

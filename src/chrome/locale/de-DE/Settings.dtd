@@ -46,9 +46,7 @@
 <!ENTITY visualisation.timescaling.description.enabled      "Wenn Time Scaling aktiviert ist, ist der horizontale Abstand zwischen benachbarten Nachrichten proportional zum zeitlichen Abstand dieser Nachrichten.">
 <!ENTITY visualisation.timescaling.method                   "Time Scaling Methode">
 <!ENTITY visualisation.timescaling.method.linear            "linear">
-<!ENTITY visualisation.timescaling.method.logarithmic10     "logarithmisch (Basis 10)">
-<!ENTITY visualisation.timescaling.method.logarithmice      "logarithmisch (nat&#xFC;rlich)">
-<!ENTITY visualisation.timescaling.method.logarithmic2      "logarithmisch (Basis 2)">
+<!ENTITY visualisation.timescaling.method.logarithmic       "logarithmisch">
 <!ENTITY visualisation.timescaling.mintimediff              "Minimal dargestellte Zeitdifferenz">
 <!ENTITY visualisation.timescaling.mintimediff.automatic    "automatisch">
 <!ENTITY visualisation.timescaling.mintimediff.1min         "1 Minute">
