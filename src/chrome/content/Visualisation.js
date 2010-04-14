@@ -1164,7 +1164,6 @@ var ThreadVis = (function(ThreadVis) {
         // width / spacing would lead to 3
         var maxCountX = width / prefSpacing;
 
-        ThreadVis.log("timescaling", "totaltimescale " + totalTimeScale + " maxcount " + maxCountX);
         // if the time scaling factor is bigger than what we can display, we
         // have a problem
         // this means, we have to scale the timing factor down
