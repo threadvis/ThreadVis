@@ -1143,16 +1143,20 @@ var ThreadVis = (function(ThreadVis) {
             // we norm the scale factor to the minimal time
             // (this means, the two messages that are the nearest in time
             // have a difference of 1)
-            thisContainer.xScaled = thisContainer.timeDifference
-                    / minimalTimeDifference;
-            // instead of linear scaling, we might use other scaling factor
-            if (prefTimescalingMethod == "log") {
-                thisContainer.xScaled = Math.log(thisContainer.xScaled)
-                        / Math.log(2) + 1;
-            }
-            // check if we might encounter a dummy container, see above
-            if (thisContainer.xScaled < 1) {
+            if (thisContainer.timeDifference == 0) {
                 thisContainer.xScaled = 1;
+            } else {
+                thisContainer.xScaled = thisContainer.timeDifference
+                        / minimalTimeDifference;
+                // instead of linear scaling, we might use other scaling factor
+                if (prefTimescalingMethod == "log") {
+                    thisContainer.xScaled = Math.log(thisContainer.xScaled)
+                            / Math.log(2) + 1;
+                }
+                // check if we might encounter a dummy container, see above
+                if (thisContainer.xScaled < 1) {
+                    thisContainer.xScaled = 1;
+                }
             }
             totalTimeScale += thisContainer.xScaled;
         }
@@ -1174,16 +1178,21 @@ var ThreadVis = (function(ThreadVis) {
             totalTimeScale = 0;
             for ( var counter = 0; counter < containers.length - 1; counter++) {
                 var thisContainer = containers[counter];
-                if (prefTimescalingMethod == "linear") {
-                    thisContainer.xScaled = thisContainer.xScaled * scaling;
-                } else if (prefTimescalingMethod == "log") {
-                    thisContainer.xScaled = Math
-                            .log(thisContainer.timeDifference
-                                    / minimalTimeDifference)
-                            / Math.log(2 / Math.pow(scaling, iteration)) + 1;
-                }
-                if (thisContainer.xScaled < 1) {
+                if (thisContainer.timeDifference == 0) {
                     thisContainer.xScaled = 1;
+                } else {
+                    if (prefTimescalingMethod == "linear") {
+                        thisContainer.xScaled = thisContainer.xScaled * scaling;
+                    } else if (prefTimescalingMethod == "log") {
+                        thisContainer.xScaled = Math
+                                .log(thisContainer.timeDifference
+                                        / minimalTimeDifference)
+                                / Math.log(2 / Math.pow(scaling, iteration))
+                                + 1;
+                    }
+                    if (thisContainer.xScaled < 1) {
+                        thisContainer.xScaled = 1;
+                    }
                 }
                 totalTimeScale += thisContainer.xScaled;
             }
