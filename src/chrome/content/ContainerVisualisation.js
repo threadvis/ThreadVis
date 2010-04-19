@@ -60,9 +60,9 @@ var ThreadVis = (function(ThreadVis) {
      *            True to draw circle, false to draw square
      * @return A new container visualisation
      **************************************************************************/
-    ThreadVis.ContainerVisualisation = function(stack, container,
-            colour, left, top, selected, dotSize, resize, circle,
-            spacing, opacity, messageCircles) {
+    ThreadVis.ContainerVisualisation = function(stack, container, colour, left,
+            top, selected, dotSize, resize, circle, spacing, opacity,
+            messageCircles) {
         /**
          * XUL stack on which container gets drawn
          */
@@ -405,39 +405,18 @@ var ThreadVis = (function(ThreadVis) {
         }
 
         // check for double click
-        if (event.detail > 1) {
-            clearTimeout(this.clickTimeout);
-            if (ThreadVis.hasPopupVisualisation()) {
-                ThreadVis.getMainWindow().ThreadPaneDoubleClick();
-            } else {
-                ThreadPaneDoubleClick();
-            }
-        } else {
-            var ref = this;
-            this.clickTimeout = setTimeout(function() {
-                ref.onMouseClickDelayed(event);
-            }, 100);
+        var elem = ThreadVis;
+        if (elem.isPopupVisualisation()) {
+            elem = ThreadVis.getMainWindow().ThreadVis;
         }
-    }
-
-    /***************************************************************************
-     * Mouse click delayed, to catch for double click
-     * 
-     * @param event
-     *            The mouse event
-     * @return void
-     **************************************************************************/
-    ThreadVis.ContainerVisualisation.prototype.onMouseClickDelayed = function(
-            event) {
-        var container = event.target.container;
-        if (container && !container.isDummy()) {
-            // check to see if this visualisation is in the popup window
-            // if so, call functions in opener
-            var elem = window;
-            if (ThreadVis.isPopupVisualisation()) {
-                elem = window.opener;
+        if (event.detail > 1) {
+            elem.openNewMessage(this.container.getMessage().getMsgDbHdr());
+        } else {
+            if (!this.container.isDummy()) {
+                // check to see if this visualisation is in the popup window
+                // if so, call functions in opener
+                elem.callback(this.container.getMessage());
             }
-            elem.ThreadVis.callback(container.getMessage());
         }
     }
 

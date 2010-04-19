@@ -95,12 +95,30 @@ var ThreadVis = (function(ThreadVis) {
             return;
         }
 
-        if (gFolderTreeView) {
-            gFolderTreeView.selectFolder(msg.folder);
+        // for sake of simplicity, assume we are in a folder view, unless told
+        // otherwise
+        var currentTabMode = "folder";
+        var tabmail = document.getElementById("tabmail");
+        if (tabmail) {
+            currentTabMode = tabmail.selectedTab.mode.name;
         }
-        gFolderDisplay.show(msg.folder);
 
-        gFolderDisplay.selectMessage(msg);
+        // if in standard 3-pane (folder) view, select new
+        // folder, switch to folder and display message
+        if (currentTabMode == "folder") {
+            if (gFolderTreeView) {
+                gFolderTreeView.selectFolder(msg.folder);
+            }
+            if (gFolderDisplay) {
+                gFolderDisplay.show(msg.folder);
+                gFolderDisplay.selectMessage(msg);
+            }
+        } else if (currentTabMode == "message") {
+            ThreadVis
+                    .log(
+                            "message switching",
+                            "Currently, switching messages is not possible when viewing a message in a tab.")
+        }
     }
 
     /***************************************************************************
@@ -1049,6 +1067,17 @@ var ThreadVis = (function(ThreadVis) {
         scriptError.init(message, source, null, null, null,
                 Components.interfaces.nsIScriptError.errorFlag, null);
         consoleService.logMessage(scriptError);
+    }
+
+    /***************************************************************************
+     * Open a message in a new tab or window
+     * 
+     * @param msg
+     *            The message to open
+     * @return void
+     **************************************************************************/
+    ThreadVis.openNewMessage = function(msg) {
+        MailUtils.displayMessage(msg, gFolderDisplay.view, null);
     }
 
     return ThreadVis;
