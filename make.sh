@@ -134,7 +134,7 @@ cp build/src/ThreadVis.xpi build/ThreadVis.xpi
 # (remove the updateURL and updateKey lines)
 # ##############################################################################
 
-sed -i -e '/<em:updateURL>.*<\/em:updateUrl>/d' build/src/install.rdf
+sed -i -e '/<em:updateURL>.*<\/em:updateURL>/d' build/src/install.rdf
 sed -i -e '/<em:updateKey>.*<\/em:updateKey>/d' build/src/install.rdf
 cd build/src
 zip -q -r ThreadVis-addons.mozilla.org.xpi . -i@../../xpi.filelist
