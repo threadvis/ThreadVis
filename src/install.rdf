@@ -61,8 +61,9 @@
 
     <em:localized>
         <Description>
-        <em:locale>de-DE</em:locale>
-        <em:description>Zeigt eine kleine Grafik, die den Kontext (Thread) der aktuell angezeigten Nachricht visualisiert.</em:description>
+            <em:locale>de-DE</em:locale>
+            <em:name>ThreadVis</em:name>
+            <em:description>Zeigt eine kleine Grafik, die den Kontext (Thread) der aktuell angezeigten Nachricht visualisiert.</em:description>
         </Description>
     </em:localized>
 
