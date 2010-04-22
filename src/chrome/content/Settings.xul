@@ -37,15 +37,10 @@
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
     <prefpane id="paneThreadVis"
-              onpaneload="init();">
+              onpaneload="ThreadVis.Settings.init();">
 
         <script type="application/x-javascript"
                 src="chrome://threadvis/content/Settings.js" />
-
-        <stringbundleset>
-            <stringbundle id="threadVisStrings" 
-                          src="chrome://threadvis/locale/ThreadVis.properties" />
-        </stringbundleset>
 
         <preferences>
             <preference id="extensions.threadvis.enabled"
@@ -141,11 +136,11 @@
                         </label>
                         <label class="indent"
                                value="&extension.email;"
-                               onclick="writeEmail();"
+                               onclick="ThreadVis.Settings.writeEmail();"
                                id="aboutEmail" />
                         <label class="indent"
                                value="&extension.homepage;"
-                               onclick="openURL('&extension.homepage;');"
+                               onclick="ThreadVis.Settings.openURL('&extension.homepage;');"
                                id="aboutHomepage" />
                         <checkbox id="enableThreadVis"
                                   class="indent"
@@ -158,7 +153,7 @@
                           orient="vertical">
                     <radiogroup id="doTimeScaling"
                                 preference="extensions.threadvis.timescaling.enabled"
-                                oncommand="toggleTimescaling();">
+                                oncommand="ThreadVis.Settings.toggleTimescaling();">
                         <vbox>
                             <radio value="false"
                                    label="&visualisation.timescaling.disable;" />
@@ -338,7 +333,7 @@
                           orient="vertical">
                     <radiogroup id="visualisationColour"
                                 preference="extensions.threadvis.visualisation.colour"
-                                oncommand="toggleHighlight();">
+                                oncommand="ThreadVis.Settings.toggleHighlight();">
                         <radio value="single"
                                label="&visualisation.colour.single.caption;" />
                         <label class="indent detailedDescription">

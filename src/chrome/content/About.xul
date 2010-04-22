@@ -45,17 +45,12 @@
 <wizard id="ThreadVisAbout" title="&window.title;"
     width="600"
     height="420"
-    onload="loadAboutPreference(); buildAccountList();"
-    onwizardfinish="saveAboutSettings();"
+    onload="ThreadVis.Settings.loadAboutPreference(); ThreadVis.Settings.buildAccountList();"
+    onwizardfinish="ThreadVis.Settings.saveAboutSettings();"
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
     <script type="application/x-javascript"
         src="chrome://threadvis/content/Settings.js" />
-
-    <stringbundleset>
-        <stringbundle id="threadVisStrings" 
-            src="chrome://threadvis/locale/ThreadVis.properties" />
-    </stringbundleset>
 
     <wizardpage label=" ">
         <hbox>
@@ -72,11 +67,11 @@
         <label class="aboutCopyright">
             &about.copyright2;
         </label>
-        <label value="&about.email;" onclick="writeEmail();"
+        <label value="&about.email;" onclick="ThreadVis.Settings.writeEmail();"
             id="aboutEmail" />
         <label href="&about.homepage;"
             value="&about.homepage;"
-            onclick="openURL(event.target.getAttribute('href'));"
+            onclick="ThreadVis.Settings.openURL(event.target.getAttribute('href'));"
             id="aboutHomepage" />
         <separator class="thin" />
     </wizardpage>
