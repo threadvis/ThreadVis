@@ -36,7 +36,7 @@ addEventListener("load", function() {
 
 var ThreadVis = (function(ThreadVis) {
 
-    Components.utils.import("resource://app/modules/stringbundle.js");
+    Components.utils.import("resource://app/modules/StringBundle.js");
 
     ThreadVis.XUL_NAMESPACE = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
