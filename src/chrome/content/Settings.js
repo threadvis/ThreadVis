@@ -158,7 +158,7 @@ var ThreadVis = (function(ThreadVis) {
         for ( var i = 0; i < checkboxes.length; i++) {
             var checkbox = checkboxes.item(i);
             if (!checkbox.checked) {
-                prefString += checkbox.getAttribute("accountkey") + " ";
+                prefString += " " + checkbox.getAttribute("accountkey") + " ";
             }
 
             var folderCheckboxes = accountBox.getElementsByAttribute(
@@ -213,7 +213,8 @@ var ThreadVis = (function(ThreadVis) {
             var checkbox = document.createElementNS(
                     ThreadVis.Settings.XUL_NAMESPACE, "checkbox");
             checkbox.setAttribute("label", folder.name);
-            checkbox.setAttribute("oncommand", "buildFolderPreference();");
+            checkbox.setAttribute("oncommand",
+                    "ThreadVis.Settings.buildFolderPreference();");
             checkbox.setAttribute("folderuri", folder.URI);
             checkbox.setAttribute("checkboxtype", "folder");
             checkbox.setAttribute("accountkey", account);
@@ -244,7 +245,7 @@ var ThreadVis = (function(ThreadVis) {
         for ( var i = 0; i < checkboxes.length; i++) {
             var checkbox = checkboxes.item(i);
             if (!checkbox.checked) {
-                prefString += checkbox.getAttribute("folderuri") + " ";
+                prefString += " " + checkbox.getAttribute("folderuri") + " ";
             }
         }
         pref.value = prefString;
@@ -260,7 +261,7 @@ var ThreadVis = (function(ThreadVis) {
      * 
      * @param to
      *            The address to which the email should be sent
-     * @param subjet
+     * @param subject
      *            The subject of the email
      * @param body
      *            The body of the email

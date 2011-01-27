@@ -33,6 +33,14 @@
 addEventListener("load", function() {
     ThreadVis.init();
 }, false);
+addEventListener("close", function() {
+    if (ThreadVis.hasPopupVisualisation()) {
+        ThreadVis.popupWindow.close();
+    }
+    if (ThreadVis.legendWindow && !ThreadVis.legendWindow.closed) {
+        ThreadVis.legendWindow.close();
+    }
+}, false);
 
 var ThreadVis = (function(ThreadVis) {
 
@@ -162,9 +170,6 @@ var ThreadVis = (function(ThreadVis) {
      **************************************************************************/
     ThreadVis.checkEnabledAccount = function(folder) {
         if (!folder) {
-            folder = ThreadVis.getMainWindow().gFolderDisplay.displayedFolder;
-        }
-        if (!folder) {
             return false;
         }
 
@@ -191,9 +196,6 @@ var ThreadVis = (function(ThreadVis) {
      * @return True if the folder is enabled, false if not.
      **************************************************************************/
     ThreadVis.checkEnabledFolder = function(folder) {
-        if (!folder) {
-            folder = ThreadVis.getMainWindow().gFolderDisplay.displayedFolder;
-        }
         if (!folder) {
             return false;
         }
@@ -364,24 +366,6 @@ var ThreadVis = (function(ThreadVis) {
         } else {
             return ThreadVis.visualisation.legend;
         }
-    }
-
-    /***************************************************************************
-     * Return main window object
-     * 
-     * @return The main window
-     **************************************************************************/
-    ThreadVis.getMainWindow = function() {
-        var w = window;
-
-        while (w != null) {
-            if (typeof (w.GetThreadTree) == "function") {
-                return w;
-            }
-            w = w.opener;
-        }
-
-        return null;
     }
 
     /***************************************************************************
@@ -596,8 +580,13 @@ var ThreadVis = (function(ThreadVis) {
      * @return void
      **************************************************************************/
     ThreadVis.openThreadVisOptionsDialog = function() {
-        ThreadVis.getMainWindow().openOptionsDialog('paneThreadVis', null);
-    }
+        // check if popup visualisation
+        var w = window;
+        if (ThreadVis.isPopupVisualisation()) {
+            w = window.opener;
+        }
+        w.openOptionsDialog('paneThreadVis', null);
+    };
 
     /***************************************************************************
      * Preference changed
@@ -638,14 +627,9 @@ var ThreadVis = (function(ThreadVis) {
             ThreadVis.visualisation.disabled = true;
             ThreadVis.visualisation.displayDisabled();
             ThreadVis.visualisedMsgId = null;
-            ThreadVis.setStatus(null, {});
-            return;
-        }
-        if (!ThreadVis.checkEnabledAccountOrFolder()) {
-            ThreadVis.visualisation.disabled = true;
-            ThreadVis.visualisation.displayDisabled();
-            ThreadVis.visualisedMsgId = null;
-            ThreadVis.setStatus(null, {});
+            ThreadVis.setStatus(null, {
+                enabled: false
+            });
             return;
         }
         ThreadVis.setStatus(null, {});
@@ -657,6 +641,17 @@ var ThreadVis = (function(ThreadVis) {
                 .messageURIToMsgHdr(ThreadVis.selectedMsgUri);
 
         var loadedMsgFolder = msg.folder;
+        if (!ThreadVis.checkEnabledAccountOrFolder(loadedMsgFolder)) {
+            ThreadVis.visualisation.disabled = true;
+            ThreadVis.visualisation.displayDisabled();
+            ThreadVis.visualisedMsgId = null;
+            ThreadVis.setStatus(null, {
+                accountEnabled: ThreadVis.checkEnabledAccount(loadedMsgFolder),
+                folderEnabled: ThreadVis.checkEnabledFolder(loadedMsgFolder)
+            });
+            return;
+        }
+
         var server = loadedMsgFolder.server;
         ThreadVis.account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
                 .getService(Components.interfaces.nsIMsgAccountManager))
@@ -679,8 +674,9 @@ var ThreadVis = (function(ThreadVis) {
      * @return void
      **************************************************************************/
     ThreadVis.visualise = function(container, forceNoPopup) {
+        var msg = container.getMessage().getMsgDbHdr();
         if (!ThreadVis.checkEnabled()
-                || !ThreadVis.checkEnabledAccountOrFolder()) {
+                || !ThreadVis.checkEnabledAccountOrFolder(msg.folder)) {
             return;
         }
 
@@ -729,7 +725,7 @@ var ThreadVis = (function(ThreadVis) {
         }
 
         if (!ThreadVis.checkEnabled()
-                || !ThreadVis.checkEnabledAccountOrFolder()) {
+                || !ThreadVis.checkEnabledAccountOrFolder(message.folder)) {
             return;
         }
 
@@ -801,7 +797,7 @@ var ThreadVis = (function(ThreadVis) {
     ThreadVis.setStatus = function(text, info) {
         var parent = document;
         if (ThreadVis.isPopupVisualisation()) {
-            parent = ThreadVis.getMainWindow().document;
+            parent = window.opener.document;
         }
         var elem = parent.getElementById("ThreadVisStatusText");
         if (text != null) {
@@ -813,8 +809,8 @@ var ThreadVis = (function(ThreadVis) {
         var errorText = null;
         var disabled = !ThreadVis.checkEnabledThreadVis();
         var disabledGloda = !ThreadVis.checkEnabledGloda();
-        var disabledAccount = !ThreadVis.checkEnabledAccount();
-        var disabledFolder = !ThreadVis.checkEnabledFolder();
+        var disabledAccount = false;
+        var disabledFolder = false;
         if (typeof (info) != "undefined") {
             if (typeof (info.error) != "undefined") {
                 error = info.error;
@@ -943,12 +939,12 @@ var ThreadVis = (function(ThreadVis) {
      **************************************************************************/
     ThreadVis.disableCurrentFolder = function() {
         // get currently displayed folder
-        var folder = ThreadVis.getMainWindow().gFolderDisplay.displayedFolder;
+        var folder = window.gFolderDisplay.displayedFolder;
         if (folder) {
             var folderSetting = ThreadVis.Preferences
                     .getPreference(ThreadVis.Preferences.PREF_DISABLED_FOLDERS);
 
-            folderSetting = folderSetting + " " + folder.URI;
+            folderSetting = folderSetting + " " + folder.URI + " ";
 
             ThreadVis.Preferences.setPreference(
                     ThreadVis.Preferences.PREF_DISABLED_FOLDERS, folderSetting,
@@ -963,14 +959,14 @@ var ThreadVis = (function(ThreadVis) {
      **************************************************************************/
     ThreadVis.enableCurrentFolder = function() {
         // get currently displayed folder
-        var folder = ThreadVis.getMainWindow().gFolderDisplay.displayedFolder;
+        var folder = window.gFolderDisplay.displayedFolder;
         if (folder) {
             var folderSetting = ThreadVis.Preferences
                     .getPreference(ThreadVis.Preferences.PREF_DISABLED_FOLDERS);
 
             var index = folderSetting.indexOf(" " + folder.URI + " ");
             folderSetting = folderSetting.substring(0, index)
-                    + folderSetting.substring(index + folder.URI.length);
+                    + folderSetting.substring(index + folder.URI.length + 2);
 
             ThreadVis.Preferences.setPreference(
                     ThreadVis.Preferences.PREF_DISABLED_FOLDERS, folderSetting,
@@ -985,7 +981,7 @@ var ThreadVis = (function(ThreadVis) {
      **************************************************************************/
     ThreadVis.enableCurrentAccount = function() {
         // get currently displayed folder
-        var folder = ThreadVis.getMainWindow().gFolderDisplay.displayedFolder;
+        var folder = window.gFolderDisplay.displayedFolder;
         if (folder) {
             var server = folder.server;
             var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
@@ -997,7 +993,7 @@ var ThreadVis = (function(ThreadVis) {
 
             var index = accountSetting.indexOf(" " + account.key + " ");
             accountSetting = accountSetting.substring(0, index)
-                    + accountSetting.substring(index + account.key.length);
+                    + accountSetting.substring(index + account.key.length + 2);
 
             ThreadVis.Preferences.setPreference(
                     ThreadVis.Preferences.PREF_DISABLED_ACCOUNTS,
@@ -1012,7 +1008,7 @@ var ThreadVis = (function(ThreadVis) {
      **************************************************************************/
     ThreadVis.disableCurrentAccount = function() {
         // get currently displayed folder
-        var folder = ThreadVis.getMainWindow().gFolderDisplay.displayedFolder;
+        var folder = window.gFolderDisplay.displayedFolder;
         if (folder) {
             var server = folder.server;
             var account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
@@ -1022,7 +1018,7 @@ var ThreadVis = (function(ThreadVis) {
             var accountSetting = ThreadVis.Preferences
                     .getPreference(ThreadVis.Preferences.PREF_DISABLED_ACCOUNTS);
 
-            accountSetting = accountSetting + " " + account.key;
+            accountSetting = accountSetting + " " + account.key + " ";
 
             ThreadVis.Preferences.setPreference(
                     ThreadVis.Preferences.PREF_DISABLED_ACCOUNTS,
@@ -1038,7 +1034,7 @@ var ThreadVis = (function(ThreadVis) {
     ThreadVis.enable = function() {
         ThreadVis.Preferences.setPreference(ThreadVis.Preferences.PREF_ENABLED,
                 true, ThreadVis.Preferences.PREF_BOOL);
-    }
+    };
 
     /***************************************************************************
      * Disable
