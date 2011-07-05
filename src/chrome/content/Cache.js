@@ -68,8 +68,8 @@ var ThreadVis = (function(ThreadVis) {
                                 },
                                 onQueryCompleted : function(collection) {
                                     for (var i = 0; i < collection.items.length; i++) {
-                                        var message = createMessage(collection.items[i]);
-                                        addToThreader(message);
+                                        var message = ThreadVis.Cache._createMessage(collection.items[i]);
+                                        ThreadVis.Cache._addToThreader(message);
                                     }
                                     callback();
                                 }
