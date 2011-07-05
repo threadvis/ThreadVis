@@ -9,7 +9,7 @@
  * http://www.iicm.tugraz.at/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008, 2009, 2010 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -31,154 +31,187 @@
 
 var ThreadVis = (function(ThreadVis) {
 
-    /***************************************************************************
+    /**
      * Constructor
      * 
-     * @param glodaMessage
-     *            The gloda message object
-     * @return A new message
-     **************************************************************************/
+     * @constructor
+     * @param {glodaMessage} glodaMessage
+     *              The gloda message object
+     * @return {ThreadVis.Message} A new message
+     * @type ThreadVis.Message
+     */
     ThreadVis.Message = function(glodaMessage) {
         /**
          * Gloda message
          */
-        this.glodaMessage = glodaMessage;
+        this._glodaMessage = glodaMessage;
 
         /**
          * References of this message
          */
         if (glodaMessage.folderMessage != null) {
-            this.references = new ThreadVis.References(
+            this._references = new ThreadVis.References(
                     glodaMessage.folderMessage.getStringProperty("references"));
         } else {
-            this.references = new ThreadVis.References("");
+            this._references = new ThreadVis.References("");
         }
-    }
+    };
 
-    /***************************************************************************
-     * Get date of message
-     * 
-     * @return The date of the message
-     **************************************************************************/
-    ThreadVis.Message.prototype.getDate = function() {
-        return this.glodaMessage.date;
-    }
+    /**
+     * Prototype / instance methods
+     */
+    ThreadVis.Message.prototype = {
+        /**
+         * Gloda message
+         */
+        _glodaMessage : null,
 
-    /***************************************************************************
-     * Get folder message is in
-     * 
-     * @return The folder of the message
-     **************************************************************************/
-    ThreadVis.Message.prototype.getFolder = function() {
-        return this.glodaMessage.folderURI;
-    }
+        /**
+         * References of this message
+         */
+        _references : null,
 
-    /***************************************************************************
-     * Get sender of message
-     * 
-     * @return The sender of the message
-     **************************************************************************/
-    ThreadVis.Message.prototype.getFrom = function() {
-        if (this.glodaMessage.folderMessage != null) {
-            return this.glodaMessage.folderMessage.mime2DecodedAuthor;
+        /**
+         * Get date of message
+         * 
+         * @return {Date} The date of the message
+         * @type Date
+         */
+        getDate : function() {
+            return this._glodaMessage.date;
+        },
+
+        /**
+         * Get folder message is in
+         * 
+         * @return {String} The folder of the message
+         * @type String
+         */
+        getFolder : function() {
+            return this._glodaMessage.folderURI;
+        },
+
+        /**
+         * Get sender of message
+         * 
+         * @return {String} The sender of the message
+         * @type String
+         */
+        getFrom : function() {
+            if (this._glodaMessage.folderMessage != null) {
+                return this._glodaMessage.folderMessage.mime2DecodedAuthor;
+            }
+            return this._glodaMessage.from;
+        },
+
+        /**
+         * Parse email address from "From" header
+         * 
+         * @return {String} The parsed email address
+         * @type String
+         */
+        getFromEmail : function() {
+            return this._glodaMessage.from.value;
+        },
+
+        /**
+         * Get message id
+         * 
+         * @return {String} The message id
+         * @type String
+         */
+        getId : function() {
+            return this._glodaMessage.headerMessageID;
+        },
+
+        /**
+         * Get references
+         * 
+         * @return {String} The referenced header
+         * @type String
+         */
+        getReferences : function() {
+            return this._references;
+        },
+
+        /**
+         * Get original subject
+         * 
+         * @return {String} The subject
+         * @type String
+         */
+        getSubject : function() {
+            return this._glodaMessage.subject;
+        },
+
+        /**
+         * See if message is sent (i.e. in sent-mail folder)
+         * 
+         * @return {Boolean} True if the message was sent by the user, false if
+         *         not
+         * @type Boolean
+         */
+        isSent : function() {
+            var issent = false;
+            // it is sent if it is stored in a folder that is marked as sent
+            // (if enabled)
+            if (this._glodaMessage.folderMessage != null) {
+                issent |= this._glodaMessage.folderMessage.folder.isSpecialFolder(
+                                Components.interfaces.nsMsgFolderFlags.SentMail,
+                                true)
+                        && ThreadVis.Preferences.getPreference(
+                                ThreadVis.Preferences.PREF_SENTMAIL_FOLDERFLAG);
+            }
+            // or it is sent if the sender address is a local identity
+            // (if enabled)
+            issent |= ThreadVis.sentMailIdentities[this._glodaMessage.from.value] == true
+                    && ThreadVis.Preferences.getPreference(
+                            ThreadVis.Preferences.PREF_SENTMAIL_IDENTITY);
+            return issent;
+        },
+
+        /**
+         * Get body of message
+         * 
+         * @return {String} The body of the message
+         * @type String
+         */
+        getBody : function() {
+            return this._glodaMessage.indexedBodyText;
+        },
+
+        /**
+         * Return message as string
+         * 
+         * @return {String} The string representation of the message
+         * @type String
+         */
+        toString : function() {
+            return "Message: Subject: '" + this.getSubject() + "'. From: '"
+                    + this.getFrom() + "'. MsgId: '" + this.getId()
+                    + "'. Date: '" + this.getDate() + "'. Folder: '"
+                    + this.getFolder() + "'. Refs: '" + this.getReferences()
+                    + "'. Sent: '" + this.isSent() + "'";
+        },
+
+        /**
+         * Get the underlying nsIMsgDBHdr
+         * 
+         * @return {nsIMsgDBHdr} The original nsIMsgDBHdr or null if not found
+         * @type nsIMsgDBHdr
+         */
+        getMsgDbHdr : function() {
+            if (this._glodaMessage.folderMessage == null) {
+                ThreadVis.log(
+                        "Cache",
+                        "Unable to find nsIMsgDBHdr for message " 
+                        + this.getId() + ", probably in folder "
+                        + this.getFolder()
+                        + ". Either the message database (msf) for this folder is corrupt, or the global index is out-of-date.");
+            }
+            return this._glodaMessage.folderMessage;
         }
-        return this.glodaMessage.from;
-    }
-
-    /***************************************************************************
-     * Parse email address from "From" header
-     * 
-     * @return The parsed email address
-     **************************************************************************/
-    ThreadVis.Message.prototype.getFromEmail = function() {
-        return this.glodaMessage.from.value;
-    }
-
-    /***************************************************************************
-     * Get message id
-     * 
-     * @return The message id
-     **************************************************************************/
-    ThreadVis.Message.prototype.getId = function() {
-        return this.glodaMessage.headerMessageID;
-    }
-
-    /***************************************************************************
-     * Get references
-     * 
-     * @return The referenced header
-     **************************************************************************/
-    ThreadVis.Message.prototype.getReferences = function() {
-        return this.references;
-    }
-
-    /***************************************************************************
-     * Get original subject
-     * 
-     * @return The subject
-     **************************************************************************/
-    ThreadVis.Message.prototype.getSubject = function() {
-        return this.glodaMessage.subject;
-    }
-
-    /***************************************************************************
-     * See if message is sent (i.e. in sent-mail folder)
-     **************************************************************************/
-    ThreadVis.Message.prototype.isSent = function() {
-        var issent = false;
-        // it is sent if it is stored in a folder that is marked as sent (if
-        // enabled)
-        if (this.glodaMessage.folderMessage != null) {
-            issent |= this.glodaMessage.folderMessage.folder.isSpecialFolder(
-                    Components.interfaces.nsMsgFolderFlags.SentMail, true)
-                    && ThreadVis.Preferences
-                            .getPreference(ThreadVis.Preferences.PREF_SENTMAIL_FOLDERFLAG);
-        }
-        // or it is sent if the sender address is a local identity (if enabled)
-        issent |= ThreadVis.sentMailIdentities[this.glodaMessage.from.value] == true
-                && ThreadVis.Preferences
-                        .getPreference(ThreadVis.Preferences.PREF_SENTMAIL_IDENTITY);
-        return issent;
-    }
-
-    /***************************************************************************
-     * Get body of message
-     **************************************************************************/
-    ThreadVis.Message.prototype.getBody = function() {
-        return this.glodaMessage.indexedBodyText;
-    }
-
-    /***************************************************************************
-     * Return message as string
-     * 
-     * @return The string representation of the message
-     **************************************************************************/
-    ThreadVis.Message.prototype.toString = function() {
-        return "Message: Subject: '" + this.getSubject() + "'. From: '"
-                + this.getFrom() + "'. MsgId: '" + this.getId() + "'. Date: '"
-                + this.getDate() + "'. Folder: '" + this.getFolder()
-                + "'. Refs: '" + this.getReferences() + "'. Sent: '"
-                + this.isSent() + "'";
-    }
-
-    /***************************************************************************
-     * Get the underlying nsIMsgDBHdr
-     * 
-     * @return The original nsIMsgDBHdr or null if not found
-     **************************************************************************/
-    ThreadVis.Message.prototype.getMsgDbHdr = function() {
-        if (this.glodaMessage.folderMessage == null) {
-            ThreadVis
-                    .log(
-                            "Cache",
-                            "Unable to find nsIMsgDBHdr for message "
-                                    + this.getId()
-                                    + ", probably in folder "
-                                    + this.getFolder()
-                                    + ". Either the message database (msf) for this folder is corrupt, or the global index is out-of-date.");
-        }
-        return this.glodaMessage.folderMessage;
-    }
+    };
 
     return ThreadVis;
 }(ThreadVis || {}));

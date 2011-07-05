@@ -9,7 +9,7 @@
  * http://www.iicm.tugraz.at/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008, 2009, 2010 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -44,7 +44,7 @@ addEventListener("close", function() {
 
 var ThreadVis = (function(ThreadVis) {
 
-    Components.utils.import("resource://app/modules/StringBundle.js");
+    Components.utils.import("resource:///modules/StringBundle.js");
 
     ThreadVis.XUL_NAMESPACE = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
@@ -78,14 +78,13 @@ var ThreadVis = (function(ThreadVis) {
         }
     }
 
-    /***************************************************************************
+    /**
      * Callback function from extension. Called after mouse click in extension
      * Select message in mail view.
      * 
      * @param message
      *            The message to display
-     * @return void
-     **************************************************************************/
+     */
     ThreadVis.callback = function(message) {
         if (!ThreadVis.checkEnabled()) {
             return;
@@ -125,49 +124,49 @@ var ThreadVis = (function(ThreadVis) {
             ThreadVis
                     .log(
                             "message switching",
-                            "Currently, switching messages is not possible when viewing a message in a tab.")
+                            "Currently, switching messages is not possible when viewing a message in a tab.");
         }
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Check if extension and all needed other parts (e.g. gloda) are enabled
      * 
      * @return True if the extension is enabled, false if not.
-     **************************************************************************/
+     */
     ThreadVis.checkEnabled = function() {
         return ThreadVis.checkEnabledThreadVis()
                 && ThreadVis.checkEnabledGloda();
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Check if extension is disabled
      * 
      * @return True if the extension is enabled, false if not.
-     **************************************************************************/
+     */
     ThreadVis.checkEnabledThreadVis = function() {
         var threadvisEnabled = ThreadVis.Preferences
                 .getPreference(ThreadVis.Preferences.PREF_ENABLED);
         return threadvisEnabled;
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Check GloDa is enabled
      * 
      * @return True if the gloda is enabled, false if not.
-     **************************************************************************/
+     */
     ThreadVis.checkEnabledGloda = function() {
         var glodaEnabled = ThreadVis.Preferences
                 .getPreference(ThreadVis.Preferences.PREF_GLODA_ENABLED);
         return glodaEnabled;
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Check if current account is enabled in extension
      * 
      * @param folder
      *            The folder to check
      * @return True if the account is enabled, false if not.
-     **************************************************************************/
+     */
     ThreadVis.checkEnabledAccount = function(folder) {
         if (!folder) {
             return false;
@@ -186,15 +185,15 @@ var ThreadVis = (function(ThreadVis) {
             return false;
         }
         return true;
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Check if current folder is enabled in extension
      * 
      * @param folder
      *            The folder to check
      * @return True if the folder is enabled, false if not.
-     **************************************************************************/
+     */
     ThreadVis.checkEnabledFolder = function(folder) {
         if (!folder) {
             return false;
@@ -208,25 +207,23 @@ var ThreadVis = (function(ThreadVis) {
             return false;
         }
         return true;
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Check if current account is enabled in extension
      * 
      * @param folder
      *            The folder to check
      * @return True if the folder/account is enabled, false if not.
-     **************************************************************************/
+     */
     ThreadVis.checkEnabledAccountOrFolder = function(folder) {
         return ThreadVis.checkEnabledAccount(folder)
                 && ThreadVis.checkEnabledFolder(folder);
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Clear visualisation
-     * 
-     * @return void
-     **************************************************************************/
+     */
     ThreadVis.clearVisualisation = function() {
         if (!ThreadVis.checkEnabled()) {
             return;
@@ -249,33 +246,27 @@ var ThreadVis = (function(ThreadVis) {
                 && !opener.ThreadVis.legendWindow.closed) {
             opener.ThreadVis.legendWindow.clearLegend();
         }
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Create threadvis XUL box
-     * 
-     * @return void
-     **************************************************************************/
+     */
     ThreadVis.createBox = function() {
         var elem = document.getElementById("ThreadVis");
         elem.hidden = false;
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Delete threadvis XUL box
-     * 
-     * @return void
-     **************************************************************************/
+     */
     ThreadVis.deleteBox = function() {
         var elem = document.getElementById("ThreadVis");
         elem.hidden = true;
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Display legend popup
-     * 
-     * @return void
-     **************************************************************************/
+     */
     ThreadVis.displayLegend = function() {
         if (window.opener && window.opener.ThreadVis) {
             window.opener.ThreadVis.displayLegend();
@@ -284,13 +275,11 @@ var ThreadVis = (function(ThreadVis) {
         if (ThreadVis.legendWindow != null && !ThreadVis.legendWindow.closed) {
             ThreadVis.legendWindow.displayLegend();
         }
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Display legend popup
-     * 
-     * @return void
-     **************************************************************************/
+     */
     ThreadVis.displayLegendWindow = function() {
         if (ThreadVis.visualisation.disabled) {
             return;
@@ -310,13 +299,11 @@ var ThreadVis = (function(ThreadVis) {
         ThreadVis.legendWindow = window.openDialog(
                 "chrome://threadvis/content/Legend.xul", "ThreadVisLegend",
                 flags);
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Display about dialog when first starting ThreadVis
-     * 
-     * @return void
-     **************************************************************************/
+     */
     ThreadVis.displayAbout = function() {
         var showedAbout = ThreadVis.Preferences
                 .getPreference(ThreadVis.Preferences.PREF_ABOUT);
@@ -326,13 +313,11 @@ var ThreadVis = (function(ThreadVis) {
                             "ThreadVisAbout",
                             "chrome=yes,resizable=true;alwaysRaised=false,dependent=yes");
         }
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Display a popup window for the visualisation
-     * 
-     * @return void
-     **************************************************************************/
+     */
     ThreadVis.displayVisualisationWindow = function() {
         if (ThreadVis.visualisation.disabled) {
             return;
@@ -353,50 +338,48 @@ var ThreadVis = (function(ThreadVis) {
 
         ThreadVis.deleteBox();
         clearInterval(ThreadVis.visualisation.checkResizeInterval);
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Get legend object
      * 
      * @return The legend object, null if it doesn't exist
-     **************************************************************************/
+     */
     ThreadVis.getLegend = function() {
         if (ThreadVis.popupWindow && ThreadVis.popupWindow.ThreadVis) {
             return ThreadVis.popupWindow.ThreadVis.visualisation.legend;
         } else {
             return ThreadVis.visualisation.legend;
         }
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Get popup visualisation
      * 
      * @return The popup window, null if no popup exists
-     **************************************************************************/
+     */
     ThreadVis.getPopupVisualisation = function() {
         if (ThreadVis.popupWindow != null && !ThreadVis.popupWindow.closed) {
             return ThreadVis.popupWindow;
         }
         return null;
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Check if a popup visualisation exists
      * 
      * @return True if a popup exists, false if not
-     **************************************************************************/
+     */
     ThreadVis.hasPopupVisualisation = function() {
         if (ThreadVis.popupWindow != null && !ThreadVis.popupWindow.closed) {
             return true;
         }
         return false;
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Init object
-     * 
-     * @return void
-     **************************************************************************/
+     */
     ThreadVis.init = function() {
         // visualisation object
         ThreadVis.visualisation = new ThreadVis.Visualisation();
@@ -538,7 +521,7 @@ var ThreadVis = (function(ThreadVis) {
             // register for message selection
             var observerService = Components.classes["@mozilla.org/observer-service;1"]
                     .getService(Components.interfaces.nsIObserverService);
-            observerService.addObserver( {
+            observerService.addObserver({
                 observe : function(subject, topic, data) {
                     // only observe events in the same window, otherwise opening
                     // a second
@@ -563,22 +546,20 @@ var ThreadVis = (function(ThreadVis) {
 
         // set initial status
         ThreadVis.setStatus(null, {});
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Check if this window is a popup
      * 
      * @return True if this window is a popup, false if not
-     **************************************************************************/
+     */
     ThreadVis.isPopupVisualisation = function() {
         return document.documentElement.id == "ThreadVisPopup";
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Open the options dialog for this extension
-     * 
-     * @return void
-     **************************************************************************/
+     */
     ThreadVis.openThreadVisOptionsDialog = function() {
         // check if popup visualisation
         var w = window;
@@ -588,11 +569,9 @@ var ThreadVis = (function(ThreadVis) {
         w.openOptionsDialog('paneThreadVis', null);
     };
 
-    /***************************************************************************
+    /**
      * Preference changed
-     * 
-     * @return void
-     **************************************************************************/
+     */
     ThreadVis.preferenceChanged = function() {
         ThreadVis.visualisation.changed = true;
 
@@ -600,28 +579,25 @@ var ThreadVis = (function(ThreadVis) {
             ThreadVis.popupWindow.ThreadVis.visualisation.changed = true;
 
         ThreadVis.setSelectedMessage(true);
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Called after user resized visualisation using splitter
-     * 
-     * @return void
-     **************************************************************************/
+     */
     ThreadVis.setMinimalWidth = function() {
         var width = document.getElementById("ThreadVis").boxObject.width;
         ThreadVis.Preferences.setPreference(
                 ThreadVis.Preferences.PREF_VIS_MINIMAL_WIDTH, width,
                 ThreadVis.Preferences.PREF_INT);
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Called when a message is selected Call visualisation with messageid to
      * visualise
      * 
      * @param force
      *            True to force display of message
-     * @return void
-     **************************************************************************/
+     */
     ThreadVis.setSelectedMessage = function(force) {
         if (!ThreadVis.checkEnabled()) {
             ThreadVis.visualisation.disabled = true;
@@ -661,18 +637,17 @@ var ThreadVis = (function(ThreadVis) {
         setTimeout(function() {
             ThreadVis.visualiseMessage(msg, force);
         }, 100);
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Visualise a container
      * 
-     * @param container
+     * @param {ThreadVis.Container} container
      *            The container to visualise
      * @param forceNoPopup
      *            True to force visualisation in this window, even if popup
      *            still exists
-     * @return void
-     **************************************************************************/
+     */
     ThreadVis.visualise = function(container, forceNoPopup) {
         var msg = container.getMessage().getMsgDbHdr();
         if (!ThreadVis.checkEnabled()
@@ -686,7 +661,7 @@ var ThreadVis = (function(ThreadVis) {
             return;
         }
 
-        var msgCount = container.getTopContainer().getCountRecursive();
+        var msgCount = container.getTopContainer().getCount();
 
         // if user wants to hide visualisation if it only consists of a single
         // message, do so, but not in popup visualisation
@@ -705,9 +680,9 @@ var ThreadVis = (function(ThreadVis) {
         ThreadVis.visualisation.disabled = false;
         ThreadVis.visualisation.visualise(container);
         ThreadVis.selectedContainer = container;
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Visualise a message. Find the container. Call visualise()
      * 
      * @param message
@@ -717,13 +692,11 @@ var ThreadVis = (function(ThreadVis) {
      * @param lastTry
      *            True if already tried to find message in cache, if still not
      *            in threader, display error
-     * @return void
-     **************************************************************************/
+     */
     ThreadVis.visualiseMessage = function(message, force, lastTry) {
         if (ThreadVis.visualisedMsgId == message.messageId && !force) {
             return;
         }
-
         if (!ThreadVis.checkEnabled()
                 || !ThreadVis.checkEnabledAccountOrFolder(message.folder)) {
             return;
@@ -754,7 +727,6 @@ var ThreadVis = (function(ThreadVis) {
         // if not in threader, try to get from cache
         if (container == null || container.isDummy()) {
             // first, clear threader
-            ThreadVis.Cache.clearData();
             ThreadVis.Cache.getCache(message, function() {
                 ThreadVis.visualiseMessage(message, force, true);
             });
@@ -765,35 +737,30 @@ var ThreadVis = (function(ThreadVis) {
 
         ThreadVis.visualise(container);
         container = null;
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Zoom function to call from user click
-     * 
-     * @return void
-     **************************************************************************/
+     */
     ThreadVis.zoomIn = function() {
         ThreadVis.visualisation.zoomIn();
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Zoom function to call from user click
-     * 
-     * @return void
-     **************************************************************************/
+     */
     ThreadVis.zoomOut = function() {
         ThreadVis.visualisation.zoomOut();
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Set the status text in the statusbar
      * 
      * @param text
      *            The text to display
      * @param info
      *            Data to display
-     * @return void
-     **************************************************************************/
+     */
     ThreadVis.setStatus = function(text, info) {
         var parent = document;
         if (ThreadVis.isPopupVisualisation()) {
@@ -930,13 +897,11 @@ var ThreadVis = (function(ThreadVis) {
                         "class", "statusbarpanel-menu-iconic");
             }
         }
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Disable for current folder
-     * 
-     * @return void
-     **************************************************************************/
+     */
     ThreadVis.disableCurrentFolder = function() {
         // get currently displayed folder
         var folder = window.gFolderDisplay.displayedFolder;
@@ -950,13 +915,11 @@ var ThreadVis = (function(ThreadVis) {
                     ThreadVis.Preferences.PREF_DISABLED_FOLDERS, folderSetting,
                     ThreadVis.Preferences.PREF_STRING);
         }
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Enable for current folder
-     * 
-     * @return void
-     **************************************************************************/
+     */
     ThreadVis.enableCurrentFolder = function() {
         // get currently displayed folder
         var folder = window.gFolderDisplay.displayedFolder;
@@ -972,13 +935,11 @@ var ThreadVis = (function(ThreadVis) {
                     ThreadVis.Preferences.PREF_DISABLED_FOLDERS, folderSetting,
                     ThreadVis.Preferences.PREF_STRING);
         }
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Enable for current account
-     * 
-     * @return void
-     **************************************************************************/
+     */
     ThreadVis.enableCurrentAccount = function() {
         // get currently displayed folder
         var folder = window.gFolderDisplay.displayedFolder;
@@ -999,13 +960,11 @@ var ThreadVis = (function(ThreadVis) {
                     ThreadVis.Preferences.PREF_DISABLED_ACCOUNTS,
                     accountSetting, ThreadVis.Preferences.PREF_STRING);
         }
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Disable for current account
-     * 
-     * @return void
-     **************************************************************************/
+     */
     ThreadVis.disableCurrentAccount = function() {
         // get currently displayed folder
         var folder = window.gFolderDisplay.displayedFolder;
@@ -1024,37 +983,32 @@ var ThreadVis = (function(ThreadVis) {
                     ThreadVis.Preferences.PREF_DISABLED_ACCOUNTS,
                     accountSetting, ThreadVis.Preferences.PREF_STRING);
         }
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Enable
-     * 
-     * @return void
-     **************************************************************************/
+     */
     ThreadVis.enable = function() {
         ThreadVis.Preferences.setPreference(ThreadVis.Preferences.PREF_ENABLED,
                 true, ThreadVis.Preferences.PREF_BOOL);
     };
 
-    /***************************************************************************
+    /**
      * Disable
-     * 
-     * @return void
-     **************************************************************************/
+     */
     ThreadVis.disable = function() {
         ThreadVis.Preferences.setPreference(ThreadVis.Preferences.PREF_ENABLED,
                 false, ThreadVis.Preferences.PREF_BOOL);
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Log to error console
      * 
      * @param source
      *            The source file.
      * @param message
      *            The log message
-     * @return void
-     **************************************************************************/
+     */
     ThreadVis.log = function(source, message) {
         var consoleService = Components.classes["@mozilla.org/consoleservice;1"]
                 .getService(Components.interfaces.nsIConsoleService);
@@ -1063,18 +1017,17 @@ var ThreadVis = (function(ThreadVis) {
         scriptError.init(message, source, null, null, null,
                 Components.interfaces.nsIScriptError.errorFlag, null);
         consoleService.logMessage(scriptError);
-    }
+    };
 
-    /***************************************************************************
+    /**
      * Open a message in a new tab or window
      * 
      * @param msg
      *            The message to open
-     * @return void
-     **************************************************************************/
+     */
     ThreadVis.openNewMessage = function(msg) {
         MailUtils.displayMessage(msg, gFolderDisplay.view, null);
-    }
+    };
 
     return ThreadVis;
 }(ThreadVis || {}));

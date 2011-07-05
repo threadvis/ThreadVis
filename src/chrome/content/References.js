@@ -9,7 +9,7 @@
  * http://www.iicm.tugraz.at/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008, 2009, 2010 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -32,74 +32,80 @@
 
 var ThreadVis = (function(ThreadVis) {
 
-    /***************************************************************************
+    /**
      * Constructor
      * 
      * @param references
      *            The "References" header
-     **************************************************************************/
+     */
     ThreadVis.References = function(references) {
+        this._buildReferences(references);
+    };
+
+    /**
+     * Prototype / instance methods
+     */
+    ThreadVis.References.prototype = {
         // Store message ids of references
-        this.references = [];
+        _references : [],
 
-        this.buildReferences(references);
-    }
+        /**
+         * Build references array
+         * 
+         * @param references
+         *            The references string
+         */
+        _buildReferences : function(references) {
+            if (references != null && references != "") {
+                var result = references.match(/[^<>\s]+/g);
 
-    /***************************************************************************
-     * Build references array
-     * 
-     * @param references
-     *            The references string
-     **************************************************************************/
-    ThreadVis.References.prototype.buildReferences = function(references) {
-        if (references != null && references != "") {
-            var result = references.match(/[^<>\s]+/g);
+                var dupes = new Object();
+                var distinct = new Array();
 
-            var dupes = new Object();
-            var distinct = new Array();
-
-            // result can be null if no matches have been found
-            if (result) {
-                for ( var i = result.length - 1; i >= 0; i--) {
-                    // TODO
-                    // email from user: some mail servers seem to change the
-                    // message id after the @ sign
-                    // add switch to ignore mail host after @ (setting in
-                    // preferences)
-                    var msgid = result[i];
-                    if (dupes[msgid]) {
-                        continue;
+                // result can be null if no matches have been found
+                if (result) {
+                    for (var i = result.length - 1; i >= 0; i--) {
+                        // TODO
+                        // email from user: some mail servers seem to change the
+                        // message id after the @ sign
+                        // add switch to ignore mail host after @ (setting in
+                        // preferences)
+                        var msgid = result[i];
+                        if (dupes[msgid]) {
+                            continue;
+                        }
+                        dupes[msgid] = msgid;
+                        distinct.push(msgid);
                     }
-                    dupes[msgid] = msgid;
-                    distinct.push(msgid);
                 }
+                distinct.reverse();
+                this._references = distinct;
             }
-            distinct.reverse();
-            this.references = distinct;
-        }
-    }
+        },
 
-    /***************************************************************************
-     * Get references array. Return all references of the message as an array.
-     * 
-     * @return An array of all referenced message ids
-     **************************************************************************/
-    ThreadVis.References.prototype.getReferences = function() {
-        return this.references;
-    }
+        /**
+         * Get references array. Return all references of the message as an
+         * array.
+         * 
+         * @return An array of all referenced message ids
+         */
+        getReferences : function() {
+            return this._references;
+        },
 
-    /***************************************************************************
-     * Get string representation of object
-     * 
-     * @return A string containing all referenced message ids
-     **************************************************************************/
-    ThreadVis.References.prototype.toString = function() {
-        var string = "";
-        for (referenceskey in this.references) {
-            string += ", " + this.references[referenceskey];
+        /**
+         * Get string representation of object
+         * 
+         * @return A string containing all referenced message ids
+         */
+        toString : function() {
+            var string = "";
+            for (referenceskey in this._references) {
+                string += ", " + this._references[referenceskey];
+            }
+            return string;
         }
-        return string;
-    }
+    };
 
     return ThreadVis;
 }(ThreadVis || {}));

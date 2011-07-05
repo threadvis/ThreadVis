@@ -9,7 +9,7 @@
  * http://www.iicm.tugraz.at/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008, 2009, 2010 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -31,388 +31,338 @@
 
 var ThreadVis = (function(ThreadVis) {
 
-    /***************************************************************************
+    /**
      * Preference observer
-     * 
-     * @return A new observer object
-     **************************************************************************/
-    ThreadVis.Preferences = {};
+     */
+    ThreadVis.Preferences = {
+        _PREF_BRANCH : "extensions.threadvis.",
 
-    ThreadVis.Preferences.PREF_BRANCH = "extensions.threadvis.";
+        PREF_ABOUT :
+            "extensions.threadvis.about",
+        PREF_DISABLED_ACCOUNTS :
+            "extensions.threadvis.disabledaccounts",
+        PREF_DISABLED_FOLDERS :
+            "extensions.threadvis.disabledfolders",
+        PREF_ENABLED :
+            "extensions.threadvis.enabled",
+        PREF_SENTMAIL_FOLDERFLAG :
+            "extensions.threadvis.sentmail.folderflag",
+        PREF_SENTMAIL_IDENTITY :
+            "extensions.threadvis.sentmail.identity",
+        PREF_SVG_HEIGHT :
+            "extensions.threadvis.svg.height",
+        PREF_SVG_WIDTH :
+            "extensions.threadvis.svg.width",
+        PREF_TIMELINE :
+            "extensions.threadvis.timeline.enabled",
+        PREF_TIMELINE_FONTSIZE :
+            "extensions.threadvis.timeline.fontsize",
+        PREF_TIMESCALING :
+            "extensions.threadvis.timescaling.enabled",
+        PREF_TIMESCALING_METHOD :
+            "extensions.threadvis.timescaling.method",
+        PREF_TIMESCALING_MINTIMEDIFF :
+            "extensions.threadvis.timescaling.mintimediff",
+        PREF_VIS_DOTSIZE :
+            "extensions.threadvis.visualisation.dotsize",
+        PREF_VIS_ARC_MINHEIGHT :
+            "extensions.threadvis.visualisation.arcminheight",
+        PREF_VIS_ARC_RADIUS :
+            "extensions.threadvis.visualisation.arcradius",
+        PREF_VIS_ARC_DIFFERENCE :
+            "extensions.threadvis.visualisation.arcdifference",
+        PREF_VIS_ARC_WIDTH :
+            "extensions.threadvis.visualisation.arcwidth",
+        PREF_VIS_SPACING :
+            "extensions.threadvis.visualisation.spacing",
+        PREF_VIS_MESSAGE_CIRCLES :
+            "extensions.threadvis.visualisation.messagecircles",
+        PREF_VIS_COLOUR :
+            "extensions.threadvis.visualisation.colour",
+        PREF_VIS_COLOURS_BACKGROUND :
+            "extensions.threadvis.visualisation.colours.background",
+        PREF_VIS_COLOURS_BORDER :
+            "extensions.threadvis.visualisation.colours.border",
+        PREF_VIS_COLOURS_RECEIVED :
+            "extensions.threadvis.visualisation.colours.received",
+        PREF_VIS_COLOURS_SENT :
+            "extensions.threadvis.visualisation.colours.sent",
+        PREF_VIS_HIDE_ON_DISABLE :
+            "extensions.threadvis.visualisation.hideondisable",
+        PREF_VIS_HIDE_ON_SINGLE :
+            "extensions.threadvis.visualisation.hideonsingle",
+        PREF_VIS_HIGHLIGHT :
+            "extensions.threadvis.visualisation.highlight",
+        PREF_VIS_MINIMAL_WIDTH :
+            "extensions.threadvis.visualisation.minimalwidth",
+        PREF_VIS_OPACITY :
+            "extensions.threadvis.visualisation.opacity",
+        PREF_VIS_ZOOM :
+            "extensions.threadvis.visualisation.zoom",
+        PREF_GLODA_ENABLED :
+            "mailnews.database.global.indexer.enabled",
 
-    ThreadVis.Preferences.PREF_ABOUT = ThreadVis.Preferences.PREF_BRANCH
-            + "about";
-    ThreadVis.Preferences.PREF_DISABLED_ACCOUNTS = ThreadVis.Preferences.PREF_BRANCH
-            + "disabledaccounts";
-    ThreadVis.Preferences.PREF_DISABLED_FOLDERS = ThreadVis.Preferences.PREF_BRANCH
-            + "disabledfolders";
-    ThreadVis.Preferences.PREF_ENABLED = ThreadVis.Preferences.PREF_BRANCH
-            + "enabled";
-    ThreadVis.Preferences.PREF_SENTMAIL_FOLDERFLAG = ThreadVis.Preferences.PREF_BRANCH
-            + "sentmail.folderflag";
-    ThreadVis.Preferences.PREF_SENTMAIL_IDENTITY = ThreadVis.Preferences.PREF_BRANCH
-            + "sentmail.identity";
-    ThreadVis.Preferences.PREF_SVG_HEIGHT = ThreadVis.Preferences.PREF_BRANCH
-            + "svg.height";
-    ThreadVis.Preferences.PREF_SVG_WIDTH = ThreadVis.Preferences.PREF_BRANCH
-            + "svg.width";
-    ThreadVis.Preferences.PREF_TIMELINE = ThreadVis.Preferences.PREF_BRANCH
-            + "timeline.enabled";
-    ThreadVis.Preferences.PREF_TIMELINE_FONTSIZE = ThreadVis.Preferences.PREF_BRANCH
-            + "timeline.fontsize";
-    ThreadVis.Preferences.PREF_TIMESCALING = ThreadVis.Preferences.PREF_BRANCH
-            + "timescaling.enabled";
-    ThreadVis.Preferences.PREF_TIMESCALING_METHOD = ThreadVis.Preferences.PREF_BRANCH
-            + "timescaling.method";
-    ThreadVis.Preferences.PREF_TIMESCALING_MINTIMEDIFF = ThreadVis.Preferences.PREF_BRANCH
-            + "timescaling.mintimediff";
-    ThreadVis.Preferences.PREF_VIS_DOTSIZE = ThreadVis.Preferences.PREF_BRANCH
-            + "visualisation.dotsize";
-    ThreadVis.Preferences.PREF_VIS_ARC_MINHEIGHT = ThreadVis.Preferences.PREF_BRANCH
-            + "visualisation.arcminheight";
-    ThreadVis.Preferences.PREF_VIS_ARC_RADIUS = ThreadVis.Preferences.PREF_BRANCH
-            + "visualisation.arcradius";
-    ThreadVis.Preferences.PREF_VIS_ARC_DIFFERENCE = ThreadVis.Preferences.PREF_BRANCH
-            + "visualisation.arcdifference";
-    ThreadVis.Preferences.PREF_VIS_ARC_WIDTH = ThreadVis.Preferences.PREF_BRANCH
-            + "visualisation.arcwidth";
-    ThreadVis.Preferences.PREF_VIS_SPACING = ThreadVis.Preferences.PREF_BRANCH
-            + "visualisation.spacing";
-    ThreadVis.Preferences.PREF_VIS_MESSAGE_CIRCLES = ThreadVis.Preferences.PREF_BRANCH
-            + "visualisation.messagecircles";
-    ThreadVis.Preferences.PREF_VIS_COLOUR = ThreadVis.Preferences.PREF_BRANCH
-            + "visualisation.colour";
-    ThreadVis.Preferences.PREF_VIS_COLOURS_BACKGROUND = ThreadVis.Preferences.PREF_BRANCH
-            + "visualisation.colours.background";
-    ThreadVis.Preferences.PREF_VIS_COLOURS_BORDER = ThreadVis.Preferences.PREF_BRANCH
-            + "visualisation.colours.border";
-    ThreadVis.Preferences.PREF_VIS_COLOURS_RECEIVED = ThreadVis.Preferences.PREF_BRANCH
-            + "visualisation.colours.received";
-    ThreadVis.Preferences.PREF_VIS_COLOURS_SENT = ThreadVis.Preferences.PREF_BRANCH
-            + "visualisation.colours.sent";
-    ThreadVis.Preferences.PREF_VIS_HIDE_ON_DISABLE = ThreadVis.Preferences.PREF_BRANCH
-            + "visualisation.hideondisable";
-    ThreadVis.Preferences.PREF_VIS_HIDE_ON_SINGLE = ThreadVis.Preferences.PREF_BRANCH
-            + "visualisation.hideonsingle";
-    ThreadVis.Preferences.PREF_VIS_HIGHLIGHT = ThreadVis.Preferences.PREF_BRANCH
-            + "visualisation.highlight";
-    ThreadVis.Preferences.PREF_VIS_MINIMAL_WIDTH = ThreadVis.Preferences.PREF_BRANCH
-            + "visualisation.minimalwidth";
-    ThreadVis.Preferences.PREF_VIS_OPACITY = ThreadVis.Preferences.PREF_BRANCH
-            + "visualisation.opacity";
-    ThreadVis.Preferences.PREF_VIS_ZOOM = ThreadVis.Preferences.PREF_BRANCH
-            + "visualisation.zoom";
+        _preferences : {},
+        _prefBranch : Components.classes["@mozilla.org/preferences-service;1"]
+                .getService(Components.interfaces.nsIPrefService).getBranch(
+                        "extensions.threadvis."),
+        _glodaPrefBranch : Components.classes["@mozilla.org/preferences-service;1"]
+                .getService(Components.interfaces.nsIPrefService).getBranch(
+                        "mailnews.database.global.indexer.enabled"),
 
-    ThreadVis.Preferences.PREF_GLODA_ENABLED = "mailnews.database.global.indexer.enabled";
+        PREF_BOOL : Components.interfaces.nsIPrefBranch.PREF_BOOL,
+        PREF_INT : Components.interfaces.nsIPrefBranch.PREF_INT,
+        PREF_STRING : Components.interfaces.nsIPrefBranch.PREF_STRING,
 
-    ThreadVis.Preferences.prefBranch = null;
-    ThreadVis.Preferences.preferences = {};
-
-    var prefService = Components.classes["@mozilla.org/preferences-service;1"]
-            .getService(Components.interfaces.nsIPrefService);
-    ThreadVis.Preferences.prefBranch = prefService
-            .getBranch(ThreadVis.Preferences.PREF_BRANCH);
-    ThreadVis.Preferences.glodaPrefBranch = prefService
-            .getBranch(ThreadVis.Preferences.PREF_GLODA_ENABLED);
-
-    ThreadVis.Preferences.PREF_BOOL = ThreadVis.Preferences.prefBranch.PREF_BOOL;
-    ThreadVis.Preferences.PREF_INT = ThreadVis.Preferences.prefBranch.PREF_INT;
-    ThreadVis.Preferences.PREF_STRING = ThreadVis.Preferences.prefBranch.PREF_STRING;
-
-    /***************************************************************************
-     * Do callbacks after preference change
-     * 
-     * @param pref
-     *            The pref that changed
-     * @return void
-     **************************************************************************/
-    ThreadVis.Preferences.doCallback = function(pref) {
-        var value = ThreadVis.Preferences.getPreference(pref);
-        var callbacks = ThreadVis.Preferences.preferences[pref].callbacks;
-        for ( var key in callbacks) {
-            var func = callbacks[key];
-            func(value);
-        }
-    }
-
-    /***************************************************************************
-     * Get preference value for given preference
-     * 
-     * @param pref
-     *            The preference to get
-     * @return The value of the preference
-     **************************************************************************/
-    ThreadVis.Preferences.getPreference = function(pref) {
-        return ThreadVis.Preferences.preferences[pref].value;
-    }
-
-    /***************************************************************************
-     * Load a preference from the store
-     * 
-     * @param pref
-     *            The preference to load
-     * @param type
-     *            The type of the preference (bool, string, int)
-     * @param def
-     *            The default value
-     * @param prefBranch
-     *            The branch to use to read the value
-     * @return void
-     **************************************************************************/
-    ThreadVis.Preferences.loadPreference = function(pref, type, def, prefBranch) {
-        if (ThreadVis.Preferences.preferences[pref] == null) {
-            ThreadVis.Preferences.preferences[pref] = {};
-            ThreadVis.Preferences.preferences[pref].value = def;
-            ThreadVis.Preferences.preferences[pref].callbacks = [];
-            ThreadVis.Preferences.preferences[pref].type = type;
-            if (!prefBranch) {
-                prefBranch = ThreadVis.Preferences.prefBranch;
+        /**
+         * Do callbacks after preference change
+         * 
+         * @param {String}
+         *            pref The pref that changed
+         */
+        _doCallback : function(pref) {
+            var value = this._preferences[pref].value;
+            var callbacks = this._preferences[pref].callbacks;
+            for (var key in callbacks) {
+                var func = callbacks[key];
+                func(value);
             }
-            ThreadVis.Preferences.preferences[pref].branch = prefBranch;
-        }
+        },
 
-        // remove leading branch from pref name
-        var loadPref = pref
-                .substring(ThreadVis.Preferences.preferences[pref].branch.root.length);
-        if (ThreadVis.Preferences.preferences[pref].branch
-                .getPrefType(loadPref) != type) {
-            return;
-        }
+        /**
+         * Get preference value for given preference
+         * 
+         * @param {String}
+         *            pref The preference to get
+         * @return {String} The value of the preference
+         * @type String
+         */
+        getPreference : function(pref) {
+            return this._preferences[pref].value;
+        },
 
-        switch (type) {
-            case ThreadVis.Preferences.PREF_BOOL:
-                ThreadVis.Preferences.preferences[pref].value = ThreadVis.Preferences.preferences[pref].branch
-                        .getBoolPref(loadPref);
-                break;
-            case ThreadVis.Preferences.PREF_STRING:
-                ThreadVis.Preferences.preferences[pref].value = ThreadVis.Preferences.preferences[pref].branch
-                        .getCharPref(loadPref);
-                break;
-            case ThreadVis.Preferences.PREF_INT:
-                ThreadVis.Preferences.preferences[pref].value = ThreadVis.Preferences.preferences[pref].branch
-                        .getIntPref(loadPref);
-                break;
-        }
-    }
+        /**
+         * Load a preference from the store
+         * 
+         * @param {String}
+         *            pref The preference to load
+         * @param {PrefType}
+         *            type The type of the preference (bool, string, int)
+         * @param {String}
+         *            def The default value
+         * @param {nsIPrefBranch}
+         *            prefBranch The branch to use to read the value
+         */
+        _loadPreference : function(pref, type, def, prefBranch) {
+            if (this._preferences[pref] == null) {
+                this._preferences[pref] = {
+                    value : def,
+                    callbacks : [],
+                    type : type,
+                    branch : prefBranch
+                };
+            }
 
-    /***************************************************************************
-     * Reload preferences
-     * 
-     * @return void
-     **************************************************************************/
-    ThreadVis.Preferences.preferenceReload = function() {
-        ThreadVis.Preferences.loadPreference(ThreadVis.Preferences.PREF_ABOUT,
-                ThreadVis.Preferences.PREF_INT, 0);
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_DISABLED_ACCOUNTS,
-                ThreadVis.Preferences.PREF_STRING, "");
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_DISABLED_FOLDERS,
-                ThreadVis.Preferences.PREF_STRING, "");
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_ENABLED,
-                ThreadVis.Preferences.PREF_BOOL, true);
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_SENTMAIL_FOLDERFLAG,
-                ThreadVis.Preferences.PREF_BOOL, true);
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_SENTMAIL_IDENTITY,
-                ThreadVis.Preferences.PREF_BOOL, true);
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_SVG_HEIGHT,
-                ThreadVis.Preferences.PREF_INT, 1000);
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_SVG_WIDTH,
-                ThreadVis.Preferences.PREF_INT, 1000);
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_TIMELINE,
-                ThreadVis.Preferences.PREF_BOOL, true);
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_TIMELINE_FONTSIZE,
-                ThreadVis.Preferences.PREF_INT, 9);
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_TIMESCALING,
-                ThreadVis.Preferences.PREF_BOOL, true);
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_TIMESCALING_METHOD,
-                ThreadVis.Preferences.PREF_STRING, "linear");
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_TIMESCALING_MINTIMEDIFF,
-                ThreadVis.Preferences.PREF_INT, 0);
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_VIS_DOTSIZE,
-                ThreadVis.Preferences.PREF_INT, 12);
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_VIS_ARC_MINHEIGHT,
-                ThreadVis.Preferences.PREF_INT, 12);
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_VIS_ARC_RADIUS,
-                ThreadVis.Preferences.PREF_INT, 32);
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_VIS_ARC_DIFFERENCE,
-                ThreadVis.Preferences.PREF_INT, 6);
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_VIS_ARC_WIDTH,
-                ThreadVis.Preferences.PREF_INT, 2);
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_VIS_SPACING,
-                ThreadVis.Preferences.PREF_INT, 24);
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_VIS_MESSAGE_CIRCLES,
-                ThreadVis.Preferences.PREF_BOOL, true);
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_VIS_COLOUR,
-                ThreadVis.Preferences.PREF_STRING, "author");
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_VIS_COLOURS_BACKGROUND,
-                ThreadVis.Preferences.PREF_STRING, "");
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_VIS_COLOURS_BORDER,
-                ThreadVis.Preferences.PREF_STRING, "");
-        ThreadVis.Preferences
-                .loadPreference(
-                        ThreadVis.Preferences.PREF_VIS_COLOURS_RECEIVED,
-                        ThreadVis.Preferences.PREF_STRING,
-                        "#7FFF00,#00FFFF,#7F00FF,#997200,#009926,#002699,#990072,#990000,#4C9900,#009999,#4C0099,#FFBF00,#00FF3F,#003FFF,#FF00BF");
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_VIS_COLOURS_SENT,
-                ThreadVis.Preferences.PREF_STRING, "#ff0000");
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_VIS_HIDE_ON_DISABLE,
-                ThreadVis.Preferences.PREF_BOOL, true);
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_VIS_HIDE_ON_SINGLE,
-                ThreadVis.Preferences.PREF_BOOL, false);
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_VIS_HIGHLIGHT,
-                ThreadVis.Preferences.PREF_BOOL, true);
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_VIS_MINIMAL_WIDTH,
-                ThreadVis.Preferences.PREF_INT, 0);
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_VIS_OPACITY,
-                ThreadVis.Preferences.PREF_INT, 30);
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_VIS_ZOOM,
-                ThreadVis.Preferences.PREF_STRING, "full");
+            // remove leading branch from pref name
+            var loadPref = pref
+                    .substring(this._preferences[pref].branch.root.length);
 
-        ThreadVis.Preferences.loadPreference(
-                ThreadVis.Preferences.PREF_GLODA_ENABLED,
-                ThreadVis.Preferences.PREF_BOOL, true,
-                ThreadVis.Preferences.glodaPrefBranch);
+            // check if we are loading right pref type
+            if (this._preferences[pref].branch.getPrefType(loadPref) != type) {
+                return;
+            }
 
-    }
+            switch (type) {
+                case this.PREF_BOOL:
+                    this._preferences[pref].value = this._preferences[pref].branch
+                            .getBoolPref(loadPref);
+                    break;
+                case this.PREF_STRING:
+                    this._preferences[pref].value = this._preferences[pref].branch
+                            .getCharPref(loadPref);
+                    break;
+                case this.PREF_INT:
+                    this._preferences[pref].value = this._preferences[pref].branch
+                            .getIntPref(loadPref);
+                    break;
+            }
+        },
 
-    /***************************************************************************
-     * Register as preference changing observer
-     * 
-     * @return void
-     **************************************************************************/
-    ThreadVis.Preferences.register = function() {
-        // add observer for our own branch
-        var pbi = ThreadVis.Preferences.prefBranch
-                .QueryInterface(Components.interfaces.nsIPrefBranch2);
-        pbi.addObserver("", {
-            observe : function(subject, topic, data) {
-                if (topic != "nsPref:changed") {
-                    return;
+        /**
+         * Reload preferences
+         */
+        _preferenceReload : function() {
+            this._loadPreference(this.PREF_ABOUT,
+                    this.PREF_INT, 0, this._prefBranch);
+            this._loadPreference(this.PREF_DISABLED_ACCOUNTS,
+                    this.PREF_STRING, "", this._prefBranch);
+            this._loadPreference(this.PREF_DISABLED_FOLDERS,
+                    this.PREF_STRING, "", this._prefBranch);
+            this._loadPreference(this.PREF_ENABLED,
+                    this.PREF_BOOL, true, this._prefBranch);
+            this._loadPreference(this.PREF_SENTMAIL_FOLDERFLAG,
+                    this.PREF_BOOL, true, this._prefBranch);
+            this._loadPreference(this.PREF_SENTMAIL_IDENTITY,
+                    this.PREF_BOOL, true, this._prefBranch);
+            this._loadPreference(this.PREF_SVG_HEIGHT,
+                    this.PREF_INT, 1000, this._prefBranch);
+            this._loadPreference(this.PREF_SVG_WIDTH,
+                    this.PREF_INT, 1000, this._prefBranch);
+            this._loadPreference(this.PREF_TIMELINE,
+                    this.PREF_BOOL, true, this._prefBranch);
+            this._loadPreference(this.PREF_TIMELINE_FONTSIZE,
+                    this.PREF_INT, 9, this._prefBranch);
+            this._loadPreference(this.PREF_TIMESCALING,
+                    this.PREF_BOOL, true, this._prefBranch);
+            this._loadPreference(this.PREF_TIMESCALING_METHOD,
+                    this.PREF_STRING, "linear", this._prefBranch);
+            this._loadPreference(this.PREF_TIMESCALING_MINTIMEDIFF,
+                    this.PREF_INT, 0, this._prefBranch);
+            this._loadPreference(this.PREF_VIS_DOTSIZE,
+                    this.PREF_INT, 12, this._prefBranch);
+            this._loadPreference(this.PREF_VIS_ARC_MINHEIGHT,
+                    this.PREF_INT, 12, this._prefBranch);
+            this._loadPreference(this.PREF_VIS_ARC_RADIUS,
+                    this.PREF_INT, 32, this._prefBranch);
+            this._loadPreference(this.PREF_VIS_ARC_DIFFERENCE,
+                    this.PREF_INT, 6, this._prefBranch);
+            this._loadPreference(this.PREF_VIS_ARC_WIDTH,
+                    this.PREF_INT, 2, this._prefBranch);
+            this._loadPreference(this.PREF_VIS_SPACING,
+                    this.PREF_INT, 24, this._prefBranch);
+            this._loadPreference(this.PREF_VIS_MESSAGE_CIRCLES,
+                    this.PREF_BOOL, true, this._prefBranch);
+            this._loadPreference(this.PREF_VIS_COLOUR,
+                    this.PREF_STRING, "author", this._prefBranch);
+            this._loadPreference(this.PREF_VIS_COLOURS_BACKGROUND,
+                    this.PREF_STRING, "", this._prefBranch);
+            this._loadPreference(this.PREF_VIS_COLOURS_BORDER,
+                    this.PREF_STRING, "", this._prefBranch);
+            this._loadPreference(this.PREF_VIS_COLOURS_RECEIVED,
+                    this.PREF_STRING,
+                    "#7FFF00,#00FFFF,#7F00FF,#997200,#009926,#002699,#990072,#990000,#4C9900,#009999,#4C0099,#FFBF00,#00FF3F,#003FFF,#FF00BF",
+                    this._prefBranch);
+            this._loadPreference(this.PREF_VIS_COLOURS_SENT,
+                    this.PREF_STRING, "#ff0000", this._prefBranch);
+            this._loadPreference(this.PREF_VIS_HIDE_ON_DISABLE,
+                    this.PREF_BOOL, true, this._prefBranch);
+            this._loadPreference(this.PREF_VIS_HIDE_ON_SINGLE,
+                    this.PREF_BOOL, false, this._prefBranch);
+            this._loadPreference(this.PREF_VIS_HIGHLIGHT,
+                    this.PREF_BOOL, true, this._prefBranch);
+            this._loadPreference(this.PREF_VIS_MINIMAL_WIDTH,
+                    this.PREF_INT, 0, this._prefBranch);
+            this._loadPreference(this.PREF_VIS_OPACITY,
+                    this.PREF_INT, 30, this._prefBranch);
+            this._loadPreference(this.PREF_VIS_ZOOM,
+                    this.PREF_STRING, "full", this._prefBranch);
+
+            this._loadPreference(ThreadVis.Preferences.PREF_GLODA_ENABLED,
+                    ThreadVis.Preferences.PREF_BOOL, true, this._glodaPrefBranch);
+        },
+
+        /**
+         * Register as preference changing observer
+         */
+        _register : function() {
+            // add observer for our own branch
+            var pbi = this._prefBranch
+                    .QueryInterface(Components.interfaces.nsIPrefBranch2);
+            pbi.addObserver("", {
+                observe : function(subject, topic, data) {
+                    if (topic != "nsPref:changed") {
+                        return;
+                    }
+                    // reload preferences
+                    this._preferenceReload();
+                    this._doCallback(this._PREF_BRANCH + data);
                 }
-                // reload preferences
-                ThreadVis.Preferences.preferenceReload();
-                ThreadVis.Preferences
-                        .doCallback(ThreadVis.Preferences.PREF_BRANCH + data);
-            }
-        }, false);
+            }, false);
 
-        // add observer for gloda
-        var glodaObserver = ThreadVis.Preferences.glodaPrefBranch
-                .QueryInterface(Components.interfaces.nsIPrefBranch2);
-        glodaObserver.addObserver("", {
-            observe : function(subject, topic, data) {
-                if (topic != "nsPref:changed") {
-                    return;
+            // add observer for gloda
+            var glodaObserver = this._glodaPrefBranch
+                    .QueryInterface(Components.interfaces.nsIPrefBranch2);
+            glodaObserver.addObserver("", {
+                observe : function(subject, topic, data) {
+                    if (topic != "nsPref:changed") {
+                        return;
+                    }
+                    // reload preferences
+                    this._preferenceReload();
+                    this._doCallback(this._PREF_GLODA_ENABLED);
                 }
-                // reload preferences
-                ThreadVis.Preferences.preferenceReload();
-                ThreadVis.Preferences
-                        .doCallback(ThreadVis.Preferences.PREF_GLODA_ENABLED);
+            }, false);
+        },
+
+        /**
+         * Register a callback hook
+         * 
+         * @param {String}
+         *            preference The preference
+         * @param {Function}
+         *            func The function that has to be called if the preference
+         *            value changes
+         */
+        registerCallback : function(preference, func) {
+            this._preferences[preference].callbacks.push(func);
+        },
+
+        /**
+         * Set preference value for given preference
+         * 
+         * @param {String}
+         *            pref The name of the preference
+         * @param {String}
+         *            val The value of the preference
+         */
+        setPreference : function(pref, val) {
+            this._preferences[pref].value = val;
+            this._storePreference(pref, val);
+        },
+
+        /**
+         * Store a preference to the store
+         * 
+         * @param {String}
+         *            pref The name of the preference
+         * @param {String}
+         *            val The value of the preference
+         */
+        _storePreference : function(pref, val) {
+            var branch = this._preferences[pref].branch;
+            var type = this._preferences[pref].type;
+            // remove leading branch from pref name
+            pref = pref.substring(branch.root.length);
+
+            switch (type) {
+                case this.PREF_BOOL:
+                    branch.setBoolPref(pref, val);
+                    break;
+                case this.PREF_STRING:
+                    branch.setCharPref(pref, val);
+                    break;
+                case this.PREF_INT:
+                    branch.setIntPref(pref, val);
+                    break;
             }
-        }, false);
-    }
+        },
 
-    /***************************************************************************
-     * Register a callback hook
-     * 
-     * @param preference
-     *            The preference
-     * @param func
-     *            The function that has to be called if the preference value
-     *            changes
-     * @return void
-     **************************************************************************/
-    ThreadVis.Preferences.registerCallback = function(preference, func) {
-        ThreadVis.Preferences.preferences[preference].callbacks.push(func);
-    }
+        /**
+         * Unregister observer
+         */
+        _unregister : function() {
+            if (!this._prefBranch) {
+                return;
+            }
 
-    /***************************************************************************
-     * Set preference value for given preference
-     * 
-     * @param pref
-     *            The name of the preference
-     * @param val
-     *            The value of the preference
-     * @return void
-     **************************************************************************/
-    ThreadVis.Preferences.setPreference = function(pref, val) {
-        ThreadVis.Preferences.preferences[pref].value = val;
-        ThreadVis.Preferences.storePreference(pref, val);
-    }
-
-    /***************************************************************************
-     * Store a preference to the store
-     * 
-     * @param pref
-     *            The name of the preference
-     * @param val
-     *            The value of the preference
-     * @return void
-     **************************************************************************/
-    ThreadVis.Preferences.storePreference = function(pref, val) {
-        var branch = ThreadVis.Preferences.preferences[pref].branch;
-        var type = ThreadVis.Preferences.preferences[pref].type;
-        // remove leading branch from pref name
-        pref = pref.substring(branch.root.length);
-
-        switch (type) {
-            case ThreadVis.Preferences.PREF_BOOL:
-                branch.setBoolPref(pref, val);
-                break;
-            case ThreadVis.Preferences.PREF_STRING:
-                branch.setCharPref(pref, val);
-                break;
-            case ThreadVis.Preferences.PREF_INT:
-                branch.setIntPref(pref, val);
-                break;
+            var pbi = this._prefBranch
+                    .QueryInterface(Components.interfaces.nsIPrefBranch2);
+            pbi.removeObserver("", this);
         }
-    }
+    };
 
-    /***************************************************************************
-     * Unregister observer
-     * 
-     * @return void
-     **************************************************************************/
-    ThreadVis.Preferences.unregister = function() {
-        if (!ThreadVis.Preferences.prefBranch) {
-            return;
-        }
-
-        var pbi = ThreadVis.Preferences.prefBranch
-                .QueryInterface(Components.interfaces.nsIPrefBranch2);
-        pbi.removeObserver("", ThreadVis.Preferences);
-    }
-
-    ThreadVis.Preferences.register();
-    ThreadVis.Preferences.preferenceReload();
+    ThreadVis.Preferences._register();
+    ThreadVis.Preferences._preferenceReload();
 
     return ThreadVis;
 }(ThreadVis || {}));

@@ -9,7 +9,7 @@
  * http://www.iicm.tugraz.at/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008, 2009, 2010 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -31,211 +31,241 @@
 
 var ThreadVis = (function(ThreadVis) {
 
-    /***************************************************************************
+    /**
      * Constructor for visualisation class
      * 
-     * @param stack
-     *            The stack to draw on
-     * @param dotSize
-     *            The size of the dot
-     * @param resize
-     *            The resize parameter
-     * @param arcMinHeight
-     *            The minimal arc height
-     * @param arcDifference
-     *            The height difference between two arcs
-     * @param arcRadius
-     *            The corner radius of an arc
-     * @param arcWidth
-     *            The width of the arc
-     * @param colour
-     *            The colour of the arc
-     * @param vPosition
-     *            The vertical position (top/bottom)
-     * @param height
-     *            The height of the arc
-     * @param left
-     *            The left position of the arc
-     * @param right
-     *            The right position of the arc
-     * @param top
-     *            The top position
-     * @param opacity
-     *            The opacity
-     * @return A new arc visualisation object
-     **************************************************************************/
+     * @constructor
+     * @param {DOMElement}
+     *            stack The stack to draw on
+     * @param {Number}
+     *            dotSize The size of the dot
+     * @param {Number}
+     *            resize The resize parameter
+     * @param {Number}
+     *            arcMinHeight The minimal arc height
+     * @param {Number}
+     *            arcDifference The height difference between two arcs
+     * @param {Number}
+     *            arcRadius The corner radius of an arc
+     * @param {Nuumber}
+     *            arcWidth The width of the arc
+     * @param {String}
+     *            colour The colour of the arc
+     * @param {String}
+     *            vPosition The vertical position (top/bottom)
+     * @param {Number}
+     *            height The height of the arc
+     * @param {Number}
+     *            left The left position of the arc
+     * @param {Number}
+     *            right The right position of the arc
+     * @param {Number}
+     *            top The top position
+     * @param {Number}
+     *            opacity The opacity
+     * @return {ThreadVis.ArcVisualisation} A new arc visualisation object
+     * @type ThreadVis.ArcVisualisation
+     */
     ThreadVis.ArcVisualisation = function(stack, dotSize, resize, arcMinHeight,
             arcDifference, arcRadius, arcWidth, colour, vPosition, height,
             left, right, top, opacity) {
 
+        this._stack = stack;
+        this._dotSize = dotSize;
+        this._resize = resize;
+        this._arcMinHeight = arcMinHeight;
+        this._arcDifference = arcDifference;
+        this._arcRadius = arcRadius;
+        this._arcWidth = arcWidth;
+        this._colour = colour;
+        this._vPosition = vPosition;
+        this._height = height;
+        this._left = left;
+        this._right = right;
+        this._top = top;
+        this._opacity = opacity;
+
+        this._draw();
+    };
+
+    /**
+     * Prototype / instance methods
+     */
+    ThreadVis.ArcVisualisation.prototype = {
+        /**
+         * XUL box element which visualises the arc
+         */
+        _arc : null,
+
         /**
          * XUL stack on which to draw
          */
-        this.stack = stack;
+        _stack : null,
 
         /**
          * size of the dot representing a message in px
          */
-        this.dotSize = dotSize;
+        _dotSize : 0,
 
         /**
          * resize multiplicator
          */
-        this.resize = resize;
+        _resize : 1,
 
         /**
          * the minimum arc height in px
          */
-        this.arcMinHeight = arcMinHeight;
+        _arcMinHeight : 0,
 
         /**
          * the (height) difference between two arcs in px
          */
-        this.arcDifference = arcDifference;
+        _arcDifference : 0,
 
         /**
          * the corner radius for an arc in px
          */
-        this.arcRadius = arcRadius;
+        _arcRadius : 0,
 
         /**
          * width of an arc in px
          */
-        this.arcWidth = arcWidth;
+        _arcWidth : 0,
 
         /**
          * colour of the arc
          */
-        this.colour = colour;
+        _colour : "",
 
         /**
          * vertical position of arc ("top" or "bottom")
          */
-        this.vPosition = vPosition;
+        _vPosition : "top",
 
         /**
          * height of arc (counting from 0) multiplied by arc_difference_ to get
          * height in px
          */
-        this.height = height;
+        _height : 0,
 
         /**
          * left edge of arc in px
          */
-        this.left = left;
+        _left : 0,
 
         /**
          * right edge of arc in pc
          */
-        this.right = right;
+        _right : 0,
 
         /**
          * top edge of arc in px
          */
-        this.top = top;
+        _top : 0,
 
         /**
          * opacity of item
          */
-        this.opacity = opacity;
+        _opacity : 1,
 
-        this.drawArc();
-    }
+        /**
+         * Draw arc
+         */
+        _draw : function() {
+            this._arc = document
+                    .createElementNS(ThreadVis.XUL_NAMESPACE, "box");
 
-    /***************************************************************************
-     * Draw arc
-     * 
-     * @return void
-     **************************************************************************/
-    ThreadVis.ArcVisualisation.prototype.drawArc = function() {
-        this.arc = document.createElementNS(ThreadVis.XUL_NAMESPACE, "box");
+            this._visualise();
+            this._stack.appendChild(this._arc);
+        },
 
-        this.visualise();
-        this.stack.appendChild(this.arc);
-    }
+        /**
+         * Re-Draw arc
+         * 
+         * @param {Number}
+         *            resize The resize parameter
+         * @param {Number}
+         *            left The left position
+         * @param {Number}
+         *            right The right position
+         * @param {Number}
+         *            top The top position
+         * @param {String}
+         *            colour The colour
+         * @param {Number}
+         *            opacity The opacity
+         */
+        redraw : function(resize, left, right, top, colour, opacity) {
+            this._resize = resize;
+            this._left = left;
+            this._top = top;
+            this._right = right;
+            this._colour = colour;
+            this._opacity = opacity;
 
-    /***************************************************************************
-     * Re-Draw arc
-     * 
-     * @param resize
-     *            The resize parameter
-     * @param left
-     *            The left position
-     * @param right
-     *            The right position
-     * @param top
-     *            The top position
-     * @param colour
-     *            The colour
-     * @param opacity
-     *            The opacity
-     * @return void
-     **************************************************************************/
-    ThreadVis.ArcVisualisation.prototype.redrawArc = function(resize, left,
-            right, top, colour, opacity) {
-        this.resize = resize;
-        this.left = left;
-        this.top = top;
-        this.right = right;
-        this.colour = colour;
-        this.opacity = opacity;
+            this._visualise();
+        },
 
-        this.visualise();
-    }
+        /**
+         * Visualise arc
+         */
+        _visualise : function() {
+            var arcTop = 0;
+            var fillTop = 0;
+            if (this._vPosition == "top") {
+                arcTop = (this._top - ((this._dotSize / 2) + this._arcMinHeight
+                        + (this._arcDifference * this._height))) * this._resize;
+            } else {
+                arcTop = (this._top + (this._dotSize / 2)) * this._resize;
+            }
 
-    /***************************************************************************
-     * Visualise arc
-     * 
-     * @return void
-     **************************************************************************/
-    ThreadVis.ArcVisualisation.prototype.visualise = function() {
-        var arcTop = 0;
-        var fillTop = 0;
-        if (this.vPosition == "top") {
-            arcTop = (this.top - ((this.dotSize / 2) + this.arcMinHeight + (this.arcDifference * this.height)))
-                    * this.resize;
-        } else {
-            arcTop = (this.top + (this.dotSize / 2)) * this.resize;
+            var posTop = arcTop;
+            var posLeft = (this._left - (this._arcWidth / 2)) * this._resize;
+            var posHeight = (this._arcMinHeight + this._arcDifference
+                    * this._height)
+                    * this._resize;
+            var posWidth = (this._right - this._left + this._arcWidth)
+                    * this._resize;
+            var styleBackground = this._colour;
+            var styleOpacity = this._opacity;
+
+            this._arc.top = posTop + "px";
+            this._arc.left = posLeft + "px";
+            this._arc.height = posHeight + "px";
+            this._arc.width = posWidth + "px";
+            this._arc.style.opacity = styleOpacity;
+            if (this._vPosition == "top") {
+                // Thunderbird 5 uses CSS3
+                this._arc.style.borderTopLeftRadius = this._arcRadius + "px";
+                this._arc.style.borderTopRightRadius = this._arcRadius + "px";
+                // Thundbird 3 uses -moz* custom CSS
+                this._arc.style.MozBorderRadiusTopleft = this._arcRadius + "px";
+                this._arc.style.MozBorderRadiusTopright = this._arcRadius + "px";
+                this._arc.style.borderTop = (this._arcWidth * this._resize)
+                        + "px solid " + styleBackground;
+                this._arc.style.borderLeft = (this._arcWidth * this._resize)
+                        + "px solid " + styleBackground;
+                this._arc.style.borderRight = (this._arcWidth * this._resize)
+                        + "px solid " + styleBackground;
+            } else {
+                // Thunderbird 5 uses CSS3
+                this._arc.style.borderBottomLeftRadius = this._arcRadius + "px";
+                this._arc.style.borderBottomRightRadius = this._arcRadius
+                        + "px";
+                // Thunderbird 3 uses -moz* custom CSS
+                this._arc.style.MozBorderRadiusBottomleft = this._arcRadius
+                        + "px";
+                this._arc.style.MozBorderRadiusBottomright = this._arcRadius
+                        + "px";
+                this._arc.style.borderBottom = (this._arcWidth * this._resize)
+                        + "px solid " + styleBackground;
+                this._arc.style.borderLeft = (this._arcWidth * this._resize)
+                        + "px solid " + styleBackground;
+                this._arc.style.borderRight = (this._arcWidth * this._resize)
+                        + "px solid " + styleBackground;
+            }
         }
-
-        var styleTop = (arcTop) + "px";
-        var styleLeft = ((this.left - (this.arcWidth / 2)) * this.resize)
-                + "px";
-        var styleHeight = ((this.arcMinHeight + this.arcDifference
-                * this.height) * this.resize)
-                + "px";
-        var styleWidth = ((this.right - this.left + this.arcWidth) * this.resize)
-                + "px";
-        var styleBackground = this.colour;
-        var styleOpacity = this.opacity;
-
-        this.arc.style.position = "relative";
-        this.arc.style.top = styleTop;
-        this.arc.style.left = styleLeft;
-        this.arc.style.height = styleHeight;
-        this.arc.style.width = styleWidth;
-        this.arc.style.verticalAlign = "top";
-        this.arc.style.opacity = styleOpacity;
-        if (this.vPosition == "top") {
-            this.arc.style.MozBorderRadiusTopleft = this.arcRadius + "px";
-            this.arc.style.MozBorderRadiusTopright = this.arcRadius + "px"
-            this.arc.style.borderTop = (this.arcWidth * this.resize)
-                    + "px solid " + styleBackground;
-            this.arc.style.borderLeft = (this.arcWidth * this.resize)
-                    + "px solid " + styleBackground;
-            this.arc.style.borderRight = (this.arcWidth * this.resize)
-                    + "px solid " + styleBackground;
-        } else {
-            this.arc.style.MozBorderRadiusBottomleft = this.arcRadius + "px";
-            this.arc.style.MozBorderRadiusBottomright = this.arcRadius + "px";
-            this.arc.style.borderBottom = (this.arcWidth * this.resize)
-                    + "px solid " + styleBackground;
-            this.arc.style.borderLeft = (this.arcWidth * this.resize)
-                    + "px solid " + styleBackground;
-            this.arc.style.borderRight = (this.arcWidth * this.resize)
-                    + "px solid " + styleBackground;
-        }
-    }
+    };
 
     return ThreadVis;
 }(ThreadVis || {}));

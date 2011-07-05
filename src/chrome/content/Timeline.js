@@ -9,7 +9,7 @@
  * http://www.iicm.tugraz.at/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008, 2009, 2010 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -31,7 +31,7 @@
 
 var ThreadVis = (function(ThreadVis) {
 
-    /***************************************************************************
+    /**
      * Constructor for timeline class
      * 
      * @param stack
@@ -43,156 +43,153 @@ var ThreadVis = (function(ThreadVis) {
      * @param top
      *            The top position of the timeline
      * @return A new timeline object
-     **************************************************************************/
+     */
     ThreadVis.Timeline = function(stack, containers, resize, top) {
+        this._stack = stack;
+        this._containers = containers;
+        this._resize = resize;
+        this._top = top;
+    };
+
+    /**
+     * Prototype / instance methods
+     */
+    ThreadVis.Timeline.prototype = {
         /**
          * XUL stack to draw timeline on
          */
-        this.stack = stack;
+        _stack : null,
 
         /**
          * containers of current thread
          */
-        this.containers = containers;
+        _containers : null,
 
         /**
          * resize multiplicator
          */
-        this.resize = resize;
+        _resize : 1,
 
         /**
          * top position of center of visualisation in px
          */
-        this.top = top;
+        _top : 0,
 
-        this.times = {};
-    }
+        _times : {},
 
-    /***************************************************************************
-     * Draw the timeline
-     * 
-     * @return void
-     **************************************************************************/
-    ThreadVis.Timeline.prototype.draw = function() {
-        // start with second container
-        for ( var i = 1; i < this.containers.length; i++) {
-            // look at two adjacent containers
-            var first = this.containers[i - 1];
-            var second = this.containers[i];
+        /**
+         * Draw the timeline
+         */
+        draw : function() {
+            // start with second container
+            for (var i = 1; i < this._containers.length; i++) {
+                // look at two adjacent containers
+                var first = this._containers[i - 1];
+                var second = this._containers[i];
 
-            // don't calculate time if one of them is a dummy
-            if (first.isDummy() || second.isDummy()) {
-                continue;
+                // don't calculate time if one of them is a dummy
+                if (first.isDummy() || second.isDummy()) {
+                    continue;
+                }
+
+                var timeDifference = first.timeDifference;
+
+                // get the formatted strings
+                var formatted = ThreadVis.Util
+                        .formatTimeDifference(timeDifference);
+
+                // draw the labels and tooltips
+                this._drawTime(first, first.xPosition, second.xPosition,
+                        formatted.string, formatted.toolTip);
+            }
+        },
+
+        /**
+         * Draw the label and the tooltip
+         * 
+         * @param container
+         *            The container to draw
+         * @param left
+         *            The left position
+         * @param right
+         *            The right position
+         * @param string
+         *            The string to display
+         * @param toolTip
+         *            The tooltip to add
+         */
+        _drawTime : function(container, left, right, string, toolTip) {
+            var dotSize = ThreadVis.Preferences
+                    .getPreference(ThreadVis.Preferences.PREF_VIS_DOTSIZE);
+            var minArcHeight = ThreadVis.Preferences
+                    .getPreference(ThreadVis.Preferences.PREF_VIS_ARC_MINHEIGHT);
+            var fontSize = ThreadVis.Preferences
+                    .getPreference(ThreadVis.Preferences.PREF_TIMELINE_FONTSIZE);
+            // check to see if we already created the label and the tooltip
+            var elem = null;
+            var newElem = false;
+            if (this._times[container]) {
+                elem = this._times[container];
+            } else {
+                elem = document.createElementNS(ThreadVis.XUL_NAMESPACE,
+                        "description");
+                newElem = true;
+                this._times[container] = elem;
             }
 
-            var timeDifference = first.timeDifference;
+            // calculate position
+            var posLeft = (left * this._resize);
+            var posTop = (this._top - dotSize / 2 - fontSize) * this._resize
+                    - 1;
+            var posWidth = ((right - left) * this._resize);
 
-            // get the formatted strings
-            var formatted = ThreadVis.Util.formatTimeDifference(timeDifference);
+            // set style
+            elem.style.fontSize = fontSize + "px";
+            elem.left = posLeft + "px";
+            elem.style.textAlign = "center";
+            elem.top = posTop + "px";
+            elem.style.zIndex = "1";
 
-            // draw the labels and tooltips
-            this.drawTime(first, first.xPosition, second.xPosition,
-                    formatted.string, formatted.toolTip);
-        }
-    }
+            elem.setAttribute("value", string);
+            elem.setAttribute("tooltiptext", toolTip);
 
-    /***************************************************************************
-     * Draw the label and the tooltip
-     * 
-     * @param container
-     *            The container to draw
-     * @param left
-     *            The left position
-     * @param right
-     *            The right position
-     * @param string
-     *            The string to display
-     * @param toolTip
-     *            The tooltip to add
-     * @return void
-     **************************************************************************/
-    ThreadVis.Timeline.prototype.drawTime = function(container, left, right,
-            string, toolTip) {
-        var dotSize = ThreadVis.Preferences
-                .getPreference(ThreadVis.Preferences.PREF_VIS_DOTSIZE);
-        var minArcHeight = ThreadVis.Preferences
-                .getPreference(ThreadVis.Preferences.PREF_VIS_ARC_MINHEIGHT);
-        var fontSize = ThreadVis.Preferences
-                .getPreference(ThreadVis.Preferences.PREF_TIMELINE_FONTSIZE);
-        // check to see if we already created the label and the tooltip
-        var elem = null;
-        var newElem = false;
-        if (this.times[container]) {
-            elem = this.times[container];
-        } else {
-            elem = document.createElementNS(ThreadVis.XUL_NAMESPACE,
-                    "description");
-            newElem = true;
-            this.times[container] = elem;
-        }
+            // and add to stack only if we just created the element
+            if (newElem) {
+                this._stack.appendChild(elem);
 
-        // calculate style
-        var styleBorderBottom = "";
-        var styleBorderLeft = "";
-        var styleBorderRight = "";
-        var styleBorderTop = "";
-        var styleFontSize = fontSize + "px";
-        var styleLeft = (left * this.resize) + "px";
-        var styleTop = (this.top - dotSize / 2 - fontSize) * this.resize - 1 + "px";
-        var styleWidth = ((right - left) * this.resize) + "px";
+                // prevent mousedown event from bubbling to box object
+                // prevent dragging of visualisation by clicking on message
+                elem.addEventListener("mousedown", function(event) {
+                    event.stopPropagation();
+                }, true);
+            }
 
-        // set style
-        elem.style.borderBottom = styleBorderBottom;
-        elem.style.borderLeft = styleBorderLeft;
-        elem.style.borderRight = styleBorderRight;
-        elem.style.borderTop = styleBorderTop;
-        elem.style.fontSize = styleFontSize;
-        elem.style.left = styleLeft;
-        elem.style.position = "relative";
-        elem.style.textAlign = "center";
-        elem.style.top = styleTop;
-        elem.style.zIndex = "1";
-        // elem.style.cursor = "move";
-
-        elem.setAttribute("value", string);
-        elem.setAttribute("tooltiptext", toolTip);
-
-        // and add to stack only if we just created the element
-        if (newElem) {
-            this.stack.appendChild(elem);
-
-            // prevent mousedown event from bubbling to box object
-            // prevent dragging of visualisation by clicking on message
-            elem.addEventListener("mousedown", function(event) {
-                event.stopPropagation();
-            }, true);
-        }
-
-        // hide if not enough space (need to show first, otherwise .clientWidth is 0
-        elem.hidden = false;
-        elem.style.width = "";
-        if ((elem.clientWidth > Math.floor((right - left) * this.resize))
-                || (fontSize + 2 > minArcHeight * this.resize)) {
-            elem.hidden = true;
-        } else {
+            // hide if not enough space (need to show first, otherwise .clientWidth is 0
             elem.hidden = false;
-            elem.style.width = styleWidth;
-        }
-    }
+            elem.width = "";
+            if ((elem.clientWidth > Math.floor((right - left) * this._resize))
+                    || (fontSize + 2 > minArcHeight * this._resize)) {
+                elem.hidden = true;
+            } else {
+                elem.hidden = false;
+                elem.width = posWidth + "px";
+            }
+        },
 
-    /***************************************************************************
-     * Re-Draw the timeline
-     * 
-     * @param resize
-     *            The resize parameter
-     * @param top
-     *            The top position
-     **************************************************************************/
-    ThreadVis.Timeline.prototype.redraw = function(resize, top) {
-        this.resize = resize;
-        this.top = top;
-        this.draw();
-    }
+        /**
+         * Re-Draw the timeline
+         * 
+         * @param resize
+         *            The resize parameter
+         * @param top
+         *            The top position
+         */
+        redraw : function(resize, top) {
+            this._resize = resize;
+            this._top = top;
+            this.draw();
+        }
+    };
 
     return ThreadVis;
 }(ThreadVis || {}));

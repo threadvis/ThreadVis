@@ -9,7 +9,7 @@
  * http://www.iicm.tugraz.at/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008, 2009, 2010 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -31,108 +31,103 @@
 
 var ThreadVis = (function(ThreadVis) {
 
-    Components.utils.import("resource://app/modules/gloda/public.js");
+    Components.utils.import("resource:///modules/gloda/public.js");
 
-    /***************************************************************************
-     * Create cache object
-     * 
-     * @return A new cache object
-     **************************************************************************/
-    ThreadVis.Cache = {}
-
-    /***************************************************************************
-     * Get cache array for message
-     * 
-     * @param msg
-     *            The message for which to get the cache
-     * @callback the callback function to invoke
-     * @return void
-     **************************************************************************/
-    ThreadVis.Cache.getCache = function(msg, callback) {
-        // first, clear data
-        ThreadVis.Cache.clearData();
-        Gloda.getMessageCollectionForHeader(msg, {
-            onItemsAdded : function(items, collection) {
-            },
-            onItemsModified : function(items, collection) {
-            },
-            onItemsRemoved : function(items, collection) {
-            },
-            onQueryCompleted : function(collection) {
-                var found = collection.items.length > 0;
-                if (found) {
-                    var message = collection.items[0];
-                    message.conversation.getMessagesCollection( {
-                        onItemsAdded : function(items, collection) {
-                        },
-                        onItemsModified : function(items, collection) {
-                        },
-                        onItemsRemoved : function(items, collection) {
-                        },
-                        onQueryCompleted : function(collection) {
-                            for ( var i = 0; i < collection.items.length; i++) {
-                                var message = ThreadVis.Cache
-                                        .createMessage(collection.items[i]);
-                                ThreadVis.Cache.addToThreader(message);
-                            }
-                            callback();
+    /**
+     * Static cache object
+     */
+    ThreadVis.Cache = {
+            /**
+             * Get cache array for message
+             * 
+             * @param {nsIMsgDBHdr} msg
+             *              The message for which to get the cache
+             * @param {Function} callback
+             *              The callback function to invoke
+             */
+            getCache : function(msg, callback) {
+                // first, clear data
+                clearData();
+                Gloda.getMessageCollectionForHeader(msg, {
+                    onItemsAdded : function(items, collection) {
+                    },
+                    onItemsModified : function(items, collection) {
+                    },
+                    onItemsRemoved : function(items, collection) {
+                    },
+                    onQueryCompleted : function(collection) {
+                        var found = collection.items.length > 0;
+                        if (found) {
+                            var message = collection.items[0];
+                            message.conversation.getMessagesCollection({
+                                onItemsAdded : function(items, collection) {
+                                },
+                                onItemsModified : function(items, collection) {
+                                },
+                                onItemsRemoved : function(items, collection) {
+                                },
+                                onQueryCompleted : function(collection) {
+                                    for (var i = 0; i < collection.items.length; i++) {
+                                        var message = createMessage(collection.items[i]);
+                                        addToThreader(message);
+                                    }
+                                    callback();
+                                }
+                            }, null);
+                        } else {
+                            // tried to find message in global index but failed. display
+                            // an error
+                            ThreadVis.setStatus(null, {
+                                error : true,
+                                errorText : ThreadVis.strings
+                                    .getString("error.messagenotfound")
+                            });
                         }
-                    }, null);
-                } else {
-                    // tried to find message in global index but failed. display
-                    // an error
-                    ThreadVis.setStatus(null, {
-                        error : true,
-                        errorText : ThreadVis.strings
-                                .getString("error.messagenotfound")
-                    });
+                    }
+                }, null);
+            },
+
+            /**
+             * Create a message
+             * 
+             * @param {GlodaMessage} glodaMessage
+             *              The gloda message to add
+             * @return {ThreadVis.Message} The wrapped message
+             * @type ThreadVis.Message
+             */
+            _createMessage : function(glodaMessage) {
+                // check if msg is a sent mail
+                var issent = false;
+
+                if (glodaMessage.folderMessage == null) {
+                    ThreadVis.log("Cache",
+                            "Could not find 'real' message for gloda message with msg-id '"
+                                + glodaMessage.headerMessageID + "' in folder '"
+                                + glodaMessage.folderURI + "'");
                 }
+
+                var message = new ThreadVis.Message(glodaMessage);
+
+                return message;
+            },
+
+            /**
+             * Add a message to the threader
+             * 
+             * @param {ThreadVis.Message} message
+             *              The message to add
+             */
+            _addToThreader : function(message) {
+                ThreadVis.Threader.addMessage(message);
+            },
+
+            /**
+             * Clear in-memory data
+             */
+            clearData : function() {
+                ThreadVis.Threader.reset();
             }
-        }, null);
-    }
-
-    /***************************************************************************
-     * Create a message
-     * 
-     * @param glodaMessage
-     *            The gloda message to add
-     * @return void
-     **************************************************************************/
-    ThreadVis.Cache.createMessage = function(glodaMessage) {
-        // check if msg is a sent mail
-        var issent = false;
-
-        if (glodaMessage.folderMessage == null) {
-            ThreadVis.log("Cache",
-                    "Could not find 'real' message for gloda message with msg-id '"
-                            + glodaMessage.headerMessageID + "' in folder '"
-                            + glodaMessage.folderURI + "'");
-        }
-
-        var message = new ThreadVis.Message(glodaMessage);
-
-        return message;
-    }
-
-    /***************************************************************************
-     * Add a message to the threader
-     * 
-     * @param message
-     *            The message to ad
-     * @return void
-     **************************************************************************/
-    ThreadVis.Cache.addToThreader = function(message) {
-        ThreadVis.Threader.addMessage(message);
-    }
-
-    /***************************************************************************
-     * Clear in-memory data
-     * 
-     * @return void
-     **************************************************************************/
-    ThreadVis.Cache.clearData = function() {
-        ThreadVis.Threader.reset();
-    }
+    };
 
     return ThreadVis;
 }(ThreadVis || {}));

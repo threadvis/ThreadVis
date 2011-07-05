@@ -10,7 +10,7 @@
  * http://www.iicm.tugraz.at/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008, 2009, 2010 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -29,7 +29,7 @@
  * *****************************************************************************
  * DTD file containing EN localisation of UI elements
  ******************************************************************************/
- -->
+-->
 <!ENTITY popup.legend               "Display Legend">
 <!ENTITY popup.popupwindow          "Display in Separate Window">
 <!ENTITY popup.settings             "Settings...">

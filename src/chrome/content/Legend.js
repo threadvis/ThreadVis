@@ -9,7 +9,7 @@
  * http://www.iicm.tugraz.at/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008, 2009, 2010 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -29,11 +29,9 @@
  * JavaScript file to visualise legend
  ******************************************************************************/
 
-/*******************************************************************************
+/**
  * Clear the legend box
- * 
- * @return void
- ******************************************************************************/
+ */
 function clearLegend() {
     var legendBox = document.getElementById("LegendContent");
     while (legendBox.firstChild != null) {
@@ -41,11 +39,9 @@ function clearLegend() {
     }
 }
 
-/*******************************************************************************
+/**
  * Display the legend
- * 
- * @return void
- ******************************************************************************/
+ */
 function displayLegend() {
     clearLegend();
 
