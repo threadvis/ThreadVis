@@ -47,7 +47,7 @@ var ThreadVis = (function(ThreadVis) {
              */
             getCache : function(msg, callback) {
                 // first, clear data
-                clearData();
+                ThreadVis.Cache.clearData();
                 Gloda.getMessageCollectionForHeader(msg, {
                     onItemsAdded : function(items, collection) {
                     },
