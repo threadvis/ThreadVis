@@ -38,8 +38,8 @@
 <!ENTITY zoomin.tooltip             "Visualisierung vergr&#xF6;&#xDF;ern">
 <!ENTITY zoomout.tooltip            "Visualisierung verkleinern">
 <!ENTITY legend.title               "ThreadVis Legende">
-<!ENTITY statusbar.disabled         "In den Einstellungen deaktiviert..">
-<!ENTITY statusbar.disabledGloda    "Deaktiviert, da das '' Feature nicht aktiviert ist.">
+<!ENTITY statusbar.disabled         "In den Einstellungen deaktiviert.">
+<!ENTITY statusbar.disabledGloda    "Deaktiviert, da das Feature 'Globale Suche und Nachrichtenindizierung' nicht aktiviert ist.">
 <!ENTITY statusbar.disabledAccount  "F&#xFC;r den aktuellen Account deaktiviert.">
 <!ENTITY statusbar.disabledFolder   "F&#xFC;r den aktuellen Ordner deaktiviert.">
 <!ENTITY statusbar.enable           "Aktiviert">
