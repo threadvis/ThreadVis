@@ -257,14 +257,15 @@ var ThreadVis = (function(ThreadVis) {
             this._loadPreference(this.PREF_VIS_ZOOM,
                     this.PREF_STRING, "full", this._prefBranch);
 
-            this._loadPreference(ThreadVis.Preferences.PREF_GLODA_ENABLED,
-                    ThreadVis.Preferences.PREF_BOOL, true, this._glodaPrefBranch);
+            this._loadPreference(this.PREF_GLODA_ENABLED,
+                    this.PREF_BOOL, true, this._glodaPrefBranch);
         },
 
         /**
          * Register as preference changing observer
          */
         _register : function() {
+            var ref = this;
             // add observer for our own branch
             var pbi = this._prefBranch
                     .QueryInterface(Components.interfaces.nsIPrefBranch2);
@@ -274,8 +275,8 @@ var ThreadVis = (function(ThreadVis) {
                         return;
                     }
                     // reload preferences
-                    this._preferenceReload();
-                    this._doCallback(this._PREF_BRANCH + data);
+                    ref._preferenceReload();
+                    ref._doCallback(ref._PREF_BRANCH + data);
                 }
             }, false);
 
@@ -288,8 +289,8 @@ var ThreadVis = (function(ThreadVis) {
                         return;
                     }
                     // reload preferences
-                    this._preferenceReload();
-                    this._doCallback(this._PREF_GLODA_ENABLED);
+                    ref._preferenceReload();
+                    ref._doCallback(this.PREF_GLODA_ENABLED);
                 }
             }, false);
         },
