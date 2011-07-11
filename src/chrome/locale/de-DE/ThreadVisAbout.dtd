@@ -34,7 +34,7 @@
 <!ENTITY about.version                                      "Version">
 <!ENTITY about.description                                  "Zeigt eine kleine Grafik, die den Kontext (Thread) der aktuell angezeigten Nachricht visualisiert.">
 <!ENTITY about.copyright1                                   "&#xA9; 2005, 2006, 2007 Alexander C. Hubmann">
-<!ENTITY about.copyright2                                   "&#xA9; 2007, 2008, 2009, 2010 Alexander C. Hubmann-Haidvogel">
+<!ENTITY about.copyright2                                   "&#xA9; 2007, 2008, 2009, 2010, 2011 Alexander C. Hubmann-Haidvogel">
 <!ENTITY about.homepage                                     "http://threadvis.mozdev.org/">
 <!ENTITY about.email                                        "ahubmann@gmail.com">
 <!ENTITY about.name                                         "ThreadVis">
