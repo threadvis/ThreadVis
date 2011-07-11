@@ -603,9 +603,7 @@ var ThreadVis = (function(ThreadVis) {
             ThreadVis.visualisation.disabled = true;
             ThreadVis.visualisation.displayDisabled();
             ThreadVis.visualisedMsgId = null;
-            ThreadVis.setStatus(null, {
-                enabled: false
-            });
+            ThreadVis.setStatus(null, {});
             return;
         }
         ThreadVis.setStatus(null, {});
