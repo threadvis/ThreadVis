@@ -42,7 +42,7 @@ var ThreadVis = (function(ThreadVis) {
         init : function() {
             this.toggleHighlight();
             this.toggleTimescaling();
-            this._buildAccountList();
+            this.buildAccountList();
             this.buildAccountPreference();
         },
 
@@ -72,7 +72,7 @@ var ThreadVis = (function(ThreadVis) {
         /**
          * Build the account list Get all accounts, display checkbox for each
          */
-        _buildAccountList : function() {
+        buildAccountList : function() {
             var accountBox = document.getElementById("enableAccounts");
             var pref = document.getElementById("hiddenDisabledAccounts").value;
 
@@ -396,7 +396,7 @@ var ThreadVis = (function(ThreadVis) {
         /**
          * Load preferences in about dialog
          */
-        _loadAboutPreference : function() {
+        loadAboutPreference : function() {
             var disabledAccounts = this._preferences
                     .getPreference(this._preferences.PREF_DISABLED_ACCOUNTS);
             var disabledFolders = this._preferences
@@ -411,7 +411,7 @@ var ThreadVis = (function(ThreadVis) {
         /**
          * Save preferences in about dialog
          */
-        _saveAboutSettings : function() {
+        saveAboutSettings : function() {
             var disabledAccounts = document
                     .getElementById("hiddenDisabledAccounts").value;
             var disabledFolders = document
