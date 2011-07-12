@@ -40,6 +40,10 @@
               onpaneload="ThreadVis.Settings.init();">
 
         <script type="application/x-javascript"
+                src="chrome://threadvis/content/ThreadVis.js" />
+        <script type="application/x-javascript"
+                src="chrome://threadvis/content/Preferences.js" />
+        <script type="application/x-javascript"
                 src="chrome://threadvis/content/Settings.js" />
 
         <preferences>

@@ -40,7 +40,8 @@
     persist="screenX screenY"
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-    <script src="chrome://threadvis/content/Legend.js" />
+    <script type="application/x-javascript"
+        src="chrome://threadvis/content/Legend.js" />
 
     <vbox id="LegendBox">
         <vbox id="LegendContent" />

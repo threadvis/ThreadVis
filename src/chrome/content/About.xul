@@ -50,6 +50,10 @@
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
     <script type="application/x-javascript"
+        src="chrome://threadvis/content/ThreadVis.js" />
+    <script type="application/x-javascript"
+        src="chrome://threadvis/content/Preferences.js" />
+    <script type="application/x-javascript"
         src="chrome://threadvis/content/Settings.js" />
 
     <wizardpage label=" ">

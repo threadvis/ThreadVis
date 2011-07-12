@@ -32,5 +32,9 @@
  ******************************************************************************/
 -->
 <dialog xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-    onload="window.opener.opener.ThreadVis.openThreadVisOptionsDialog(); window.close();">
+    onload="window.close(); openOptionsDialog('paneThreadVis', null);">
+    
+    <script type="application/x-javascript"
+        src="chrome://messenger/content/mailCore.js"/>
+    
 </dialog>

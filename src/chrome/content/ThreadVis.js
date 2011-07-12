@@ -29,19 +29,6 @@
  * Main JavaScript file.
  ******************************************************************************/
 
-// add visualisation at startup
-addEventListener("load", function() {
-    ThreadVis.init();
-}, false);
-addEventListener("close", function() {
-    if (ThreadVis.hasPopupVisualisation()) {
-        ThreadVis.popupWindow.close();
-    }
-    if (ThreadVis.legendWindow && !ThreadVis.legendWindow.closed) {
-        ThreadVis.legendWindow.close();
-    }
-}, false);
-
 var ThreadVis = (function(ThreadVis) {
 
     Components.utils.import("resource:///modules/StringBundle.js");
@@ -381,6 +368,15 @@ var ThreadVis = (function(ThreadVis) {
      * Init object
      */
     ThreadVis.init = function() {
+        addEventListener("close", function() {
+            if (ThreadVis.hasPopupVisualisation()) {
+                ThreadVis.popupWindow.close();
+            }
+            if (ThreadVis.legendWindow && !ThreadVis.legendWindow.closed) {
+                ThreadVis.legendWindow.close();
+            }
+        }, false);
+
         // visualisation object
         ThreadVis.visualisation = new ThreadVis.Visualisation();
 

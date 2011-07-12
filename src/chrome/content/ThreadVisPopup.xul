@@ -41,18 +41,36 @@
     orient="vertical"
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-    <script src="chrome://threadvis/content/ArcVisualisation.js" />
-    <script src="chrome://threadvis/content/Container.js" />
-    <script src="chrome://threadvis/content/ContainerVisualisation.js" />
-    <script src="chrome://threadvis/content/Message.js" />
-    <script src="chrome://threadvis/content/Preferences.js" />
-    <script src="chrome://threadvis/content/References.js" />
-    <script src="chrome://threadvis/content/Scrollbar.js" />
-    <script src="chrome://threadvis/content/Threader.js" />
-    <script src="chrome://threadvis/content/ThreadVis.js" />
-    <script src="chrome://threadvis/content/Timeline.js" />
-    <script src="chrome://threadvis/content/Util.js" />
-    <script src="chrome://threadvis/content/Visualisation.js" />
+    <script type="application/x-javascript"
+        src="chrome://threadvis/content/ArcVisualisation.js" />
+    <script type="application/x-javascript"
+        src="chrome://threadvis/content/Container.js" />
+    <script type="application/x-javascript"
+        src="chrome://threadvis/content/ContainerVisualisation.js" />
+    <script type="application/x-javascript"
+        src="chrome://threadvis/content/Message.js" />
+    <script type="application/x-javascript"
+        src="chrome://threadvis/content/Preferences.js" />
+    <script type="application/x-javascript"
+        src="chrome://threadvis/content/References.js" />
+    <script type="application/x-javascript"
+        src="chrome://threadvis/content/Scrollbar.js" />
+    <script type="application/x-javascript"
+        src="chrome://threadvis/content/Threader.js" />
+    <script type="application/x-javascript"
+        src="chrome://threadvis/content/ThreadVis.js" />
+    <script type="application/x-javascript"
+        src="chrome://threadvis/content/Timeline.js" />
+    <script type="application/x-javascript"
+        src="chrome://threadvis/content/Util.js" />
+    <script type="application/x-javascript"
+        src="chrome://threadvis/content/Visualisation.js" />
+    <script type="application/x-javascript">
+        // add visualisation at startup
+        addEventListener("load", function() {
+            ThreadVis.init();
+        }, false);
+    </script>
 
     <popupset>
         <popup id="ThreadVisPopUp">

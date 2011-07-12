@@ -32,9 +32,6 @@
 var ThreadVis = (function(ThreadVis) {
 
     ThreadVis.Settings = {
-        _XUL_NAMESPACE : window.opener.ThreadVis.XUL_NAMESPACE,
-        _strings : window.opener.ThreadVis.strings,
-        _preferences : window.opener.ThreadVis.Preferences,
 
         /**
          * Init the dialog, read all settings, build the account list, ...
@@ -89,7 +86,7 @@ var ThreadVis = (function(ThreadVis) {
                 var folders = this._getAllFolders(rootFolder);
 
                 var checkbox = document.createElementNS(
-                        this._XUL_NAMESPACE, "checkbox");
+                        ThreadVis.XUL_NAMESPACE, "checkbox");
                 checkbox.setAttribute("label",
                         account.incomingServer.prettyName);
                 checkbox.setAttribute("oncommand",
@@ -103,24 +100,24 @@ var ThreadVis = (function(ThreadVis) {
                 }
 
                 var buttonAll = document.createElementNS(
-                        this._XUL_NAMESPACE, "button");
-                buttonAll.setAttribute("label", this._strings
+                        ThreadVis.XUL_NAMESPACE, "button");
+                buttonAll.setAttribute("label", ThreadVis.strings
                         .getString("enabledaccounts.button.all"));
                 buttonAll.setAttribute("accountkey", account.key);
                 buttonAll.setAttribute("oncommand",
                         "ThreadVis.Settings.selectAll(this);");
                 var buttonNone = document.createElementNS(
-                        this._XUL_NAMESPACE, "button");
-                buttonNone.setAttribute("label", this._strings
+                        ThreadVis.XUL_NAMESPACE, "button");
+                buttonNone.setAttribute("label", ThreadVis.strings
                         .getString("enabledaccounts.button.none"));
                 buttonNone.setAttribute("accountkey", account.key);
                 buttonNone.setAttribute("oncommand",
                         "ThreadVis.Settings.selectNone(this);");
                 var spacer = document.createElementNS(
-                        this._XUL_NAMESPACE, "spacer");
+                        ThreadVis.XUL_NAMESPACE, "spacer");
                 spacer.setAttribute("flex", "1");
                 var hbox = document.createElementNS(
-                        this._XUL_NAMESPACE, "hbox");
+                        ThreadVis.XUL_NAMESPACE, "hbox");
 
                 hbox.appendChild(checkbox);
                 hbox.appendChild(spacer);
@@ -132,7 +129,7 @@ var ThreadVis = (function(ThreadVis) {
                         account.key, 1);
 
                 var separator = document.createElementNS(
-                        this._XUL_NAMESPACE, "separator");
+                        ThreadVis.XUL_NAMESPACE, "separator");
                 separator.setAttribute("class", "groove");
                 accountBox.appendChild(separator);
             }
@@ -205,7 +202,7 @@ var ThreadVis = (function(ThreadVis) {
                 }
 
                 var checkbox = document.createElementNS(
-                        this._XUL_NAMESPACE, "checkbox");
+                        ThreadVis.XUL_NAMESPACE, "checkbox");
                 checkbox.setAttribute("label", folder.name);
                 checkbox.setAttribute("oncommand",
                         "ThreadVis.Settings.buildFolderPreference();");
@@ -397,12 +394,12 @@ var ThreadVis = (function(ThreadVis) {
          * Load preferences in about dialog
          */
         loadAboutPreference : function() {
-            var disabledAccounts = this._preferences
-                    .getPreference(this._preferences.PREF_DISABLED_ACCOUNTS);
-            var disabledFolders = this._preferences
-                    .getPreference(this._preferences.PREF_DISABLED_FOLDERS);
-            var glodaEnabled = this._preferences
-                    .getPreference(this._preferences.PREF_GLODA_ENABLED);
+            var disabledAccounts = ThreadVis.Preferences
+                    .getPreference(ThreadVis.Preferences.PREF_DISABLED_ACCOUNTS);
+            var disabledFolders = ThreadVis.Preferences
+                    .getPreference(ThreadVis.Preferences.PREF_DISABLED_FOLDERS);
+            var glodaEnabled = ThreadVis.Preferences
+                    .getPreference(ThreadVis.Preferences.PREF_GLODA_ENABLED);
             document.getElementById("hiddenDisabledAccounts").value = disabledAccounts;
             document.getElementById("hiddenDisabledFolders").value = disabledFolders;
             document.getElementById("enableGloda").checked = glodaEnabled;
@@ -419,19 +416,19 @@ var ThreadVis = (function(ThreadVis) {
             var notShowAgain = document.getElementById("donotshowagain").checked;
             var glodaEnabled = document.getElementById("enableGloda").checked;
 
-            var about = window.opener.ThreadVis.ABOUT;
-            this._preferences.setPreference(
-                    this._preferences.PREF_DISABLED_ACCOUNTS,
+            var about = ThreadVis.ABOUT;
+            ThreadVis.Preferences.setPreference(
+                    ThreadVis.Preferences.PREF_DISABLED_ACCOUNTS,
                     disabledAccounts);
-            this._preferences.setPreference(
-                    this._preferences.PREF_DISABLED_FOLDERS,
+            ThreadVis.Preferences.setPreference(
+                    ThreadVis.Preferences.PREF_DISABLED_FOLDERS,
                     disabledFolders);
             if (notShowAgain) {
-                this._preferences.setPreference(
-                        this._preferences.PREF_ABOUT, about);
+                ThreadVis.Preferences.setPreference(
+                        ThreadVis.Preferences.PREF_ABOUT, about);
             }
-            this._preferences.setPreference(
-                    this._preferences.PREF_GLODA_ENABLED,
+            ThreadVis.Preferences.setPreference(
+                    ThreadVis.Preferences.PREF_GLODA_ENABLED,
                     glodaEnabled);
         },
 
