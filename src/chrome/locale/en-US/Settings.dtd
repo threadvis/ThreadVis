@@ -1,7 +1,7 @@
 <!--
 /* *****************************************************************************
  * This file is part of ThreadVis.
- * http://threadvis.mozdev.org/
+ * http://threadvis.github.io
  *
  * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
  * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
@@ -78,8 +78,8 @@
 <!ENTITY about.version                                      "Version">
 <!ENTITY extension.description                              "Displays a small graphic visualising the context (thread) of the currently selected email.">
 <!ENTITY extension.copyright1                                "&#xA9; 2005, 2006, 2007 Alexander C. Hubmann">
-<!ENTITY extension.copyright2                                "&#xA9; 2007, 2008, 2009, 2010, 2011 Alexander C. Hubmann-Haidvogel">
-<!ENTITY extension.homepage                                 "http://threadvis.mozdev.org/">
+<!ENTITY extension.copyright2                                "&#xA9; 2007, 2008, 2009, 2010, 2011, 2013 Alexander C. Hubmann-Haidvogel">
+<!ENTITY extension.homepage                                 "http://threadvis.github.io">
 <!ENTITY extension.email                                    "ahubmann@gmail.com">
 <!ENTITY extension.name                                     "ThreadVis">
 <!ENTITY extension.version                                  "[[version]].[[build]]">
