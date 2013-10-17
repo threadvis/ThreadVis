@@ -76,11 +76,8 @@ var ThreadVis = (function(ThreadVis) {
             var accountManager = Components.classes["@mozilla.org/messenger/account-manager;1"]
                     .getService(Components.interfaces.nsIMsgAccountManager);
 
-            var accounts = accountManager.accounts;
-            for (var i = 0; i < accounts.Count(); i++) {
-                var account = accounts.QueryElementAt(i,
-                        Components.interfaces.nsIMsgAccount);
-
+            for (let account in fixIterator(accountManager.accounts,
+                    Components.interfaces.nsIMsgAccount)) {
                 // get folders
                 var rootFolder = account.incomingServer.rootFolder;
                 var folders = this._getAllFolders(rootFolder);

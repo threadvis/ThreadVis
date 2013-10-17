@@ -832,7 +832,7 @@ var ThreadVis = (function(ThreadVis) {
 
         var originalWidth = this.box.boxObject.width;
         var originalHeight = this.box.boxObject.height;
-        var height = originalHeight * this.zoom;// * prefDefaultZoomHeight;
+        var height = originalHeight * this.zoom;
 
         if (container.xPosition * this.resize + oldMargin > originalWidth) {
             // calculate necessary margin
@@ -1756,10 +1756,6 @@ var ThreadVis = (function(ThreadVis) {
                 .getPreference(ThreadVis.Preferences.PREF_VIS_SPACING);
         var prefDotSize = ThreadVis.Preferences
                 .getPreference(ThreadVis.Preferences.PREF_VIS_DOTSIZE);
-        var prefDefaultZoomHeight = parseFloat(ThreadVis.Preferences
-                .getPreference(ThreadVis.Preferences.PREF_ZOOM_HEIGHT));
-        var prefDefaultZoomWidth = parseFloat(ThreadVis.Preferences
-                .getPreference(ThreadVis.Preferences.PREF_ZOOM_WIDTH));
         var prefColour = ThreadVis.Preferences
                 .getPreference(ThreadVis.Preferences.PREF_VIS_COLOUR);
         var prefTimeline = ThreadVis.Preferences

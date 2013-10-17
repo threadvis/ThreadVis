@@ -49,6 +49,7 @@ var ThreadVis = (function(ThreadVis) {
         this._containers = containers;
         this._resize = resize;
         this._top = top;
+        this._times = {};
     };
 
     /**
