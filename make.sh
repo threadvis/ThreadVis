@@ -2,7 +2,7 @@
 
 # * *****************************************************************************
 # * This file is part of ThreadVis.
-# * http://threadvis.mozdev.org/
+# * http://threadvis.github.io/
 # *
 # * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
 # * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
@@ -138,6 +138,3 @@ rm -Rf build/src
 
 
 echo "Build $version.$revision successful."
-
-# copy to desktop for easy installation
-cp build/ThreadVis.xpi /Users/sascha/Desktop/ThreadVis.xpi
