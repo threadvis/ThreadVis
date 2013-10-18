@@ -1,6 +1,6 @@
 /* *****************************************************************************
  * This file is part of ThreadVis.
- * http://threadvis.mozdev.org/
+ * http://threadvis.github.io
  *
  * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
  * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
@@ -9,7 +9,8 @@
  * http://www.iicm.tugraz.at/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008, 2009, 2010, 2011 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011,
+ *               2013 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -33,6 +34,10 @@ var ThreadVis = (function(ThreadVis) {
 
     Components.utils.import("resource:///modules/StringBundle.js");
 
+    // also import iterator utilities to deal with the change from nsISupportsArray
+    // to nsIArray in accountManager.allIdentities transparently
+    Components.utils.import("resource:///modules/iteratorUtils.jsm");
+
     ThreadVis.XUL_NAMESPACE = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
     // increment this to trigger about dialog
@@ -44,25 +49,10 @@ var ThreadVis = (function(ThreadVis) {
     // remember all local accounts, for sent-mail comparison
     var accountManager = Components.classes["@mozilla.org/messenger/account-manager;1"]
             .getService(Components.interfaces.nsIMsgAccountManager);
-    var identities = accountManager.allIdentities.QueryInterface(
-            Components.interfaces.nsICollection).Enumerate();
-    var done = false;
     ThreadVis.sentMailIdentities = {};
-    while (!done) {
-        try {
-            var identity = identities.currentItem().QueryInterface(
-                    Components.interfaces.nsIMsgIdentity);
-        } catch (e) {
-            done = true;
-        }
-        if (identity) {
-            ThreadVis.sentMailIdentities[identity.email] = true;
-        }
-        try {
-            identities.next();
-        } catch (e) {
-            done = true;
-        }
+    for (let identity in fixIterator(accountManager.allIdentities,
+            Components.interfaces.nsIMsgIdentity)) {
+        ThreadVis.sentMailIdentities[identity.email] = true;
     }
 
     /**

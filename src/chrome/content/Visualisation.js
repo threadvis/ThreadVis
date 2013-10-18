@@ -1,6 +1,6 @@
 /* *****************************************************************************
  * This file is part of ThreadVis.
- * http://threadvis.mozdev.org/
+ * http://threadvis.github.io
  *
  * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
  * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
@@ -9,7 +9,8 @@
  * http://www.iicm.tugraz.at/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008, 2009, 2010, 2011 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011,
+ *               2013 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -832,7 +833,7 @@ var ThreadVis = (function(ThreadVis) {
 
         var originalWidth = this.box.boxObject.width;
         var originalHeight = this.box.boxObject.height;
-        var height = originalHeight * this.zoom;// * prefDefaultZoomHeight;
+        var height = originalHeight * this.zoom;
 
         if (container.xPosition * this.resize + oldMargin > originalWidth) {
             // calculate necessary margin
@@ -1756,10 +1757,6 @@ var ThreadVis = (function(ThreadVis) {
                 .getPreference(ThreadVis.Preferences.PREF_VIS_SPACING);
         var prefDotSize = ThreadVis.Preferences
                 .getPreference(ThreadVis.Preferences.PREF_VIS_DOTSIZE);
-        var prefDefaultZoomHeight = parseFloat(ThreadVis.Preferences
-                .getPreference(ThreadVis.Preferences.PREF_ZOOM_HEIGHT));
-        var prefDefaultZoomWidth = parseFloat(ThreadVis.Preferences
-                .getPreference(ThreadVis.Preferences.PREF_ZOOM_WIDTH));
         var prefColour = ThreadVis.Preferences
                 .getPreference(ThreadVis.Preferences.PREF_VIS_COLOUR);
         var prefTimeline = ThreadVis.Preferences

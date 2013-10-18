@@ -1,6 +1,6 @@
 /* *****************************************************************************
  * This file is part of ThreadVis.
- * http://threadvis.mozdev.org/
+ * http://threadvis.github.io
  *
  * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
  * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
@@ -9,7 +9,8 @@
  * http://www.iicm.tugraz.at/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008, 2009, 2010, 2011 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011,
+ *               2013 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -49,6 +50,7 @@ var ThreadVis = (function(ThreadVis) {
         this._containers = containers;
         this._resize = resize;
         this._top = top;
+        this._times = {};
     };
 
     /**

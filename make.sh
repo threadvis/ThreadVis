@@ -2,7 +2,7 @@
 
 # * *****************************************************************************
 # * This file is part of ThreadVis.
-# * http://threadvis.mozdev.org/
+# * http://threadvis.github.io/
 # *
 # * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
 # * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
@@ -11,7 +11,8 @@
 # * http://www.iicm.tugraz.at/ahubmann.pdf
 # *
 # * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
-# * Copyright (C) 2007, 2008, 2009, 2010 Alexander C. Hubmann-Haidvogel
+# * Copyright (C) 2007, 2008, 2009, 2010, 2011,
+# *               2013 Alexander C. Hubmann-Haidvogel
 # *
 # * ThreadVis is free software: you can redistribute it and/or modify it under
 # * the terms of the GNU Affero General Public License as published by the Free
@@ -38,26 +39,11 @@ SVN=/usr/bin/svn
 
 
 # ##############################################################################
-# Get newest revision
-# ##############################################################################
-
-svninfo=`$SVN info -r HEAD --xml src`
-revision=`echo $svninfo | sed -e 's/.*\<commit revision="\([0-9]*\)"\>.*/\1/'`
-
-# check if any changed files exist
-svnstatus=`$SVN status src`
-modified=`echo $svnstatus | grep "M "`
-if [ "$modified" != "" ]; then
-	revision="$revision.dev"
-fi
-
-
-
-# ##############################################################################
 # Get newest version
 # ##############################################################################
 
 version=`cat src/version`
+revision=`cat src/revision`
 
 
 
@@ -82,29 +68,18 @@ cp -r src/* build/src
 # Update code with version and revision
 # ##############################################################################
 
-sed -i -e "s/\[\[version\]\]/${version}/g" build/src/chrome/locale/de-DE/Settings.dtd
-sed -i -e "s/\[\[build\]\]/${revision}/g" build/src/chrome/locale/de-DE/Settings.dtd
+# update in user-visible files
+for f in $(find build/ -name '*.dtd' -or -name '*.rdf')
+do
+    sed -i '' -e "s/\[\[version\]\]/${version}/g" $f
+    sed -i '' -e "s/\[\[build\]\]/${revision}/g" $f
+done
 
-sed -i -e "s/\[\[version\]\]/${version}/g" build/src/chrome/locale/de-DE/ThreadVis.dtd
-sed -i -e "s/\[\[build\]\]/${revision}/g" build/src/chrome/locale/de-DE/ThreadVis.dtd
-
-sed -i -e "s/\[\[version\]\]/${version}/g" build/src/chrome/locale/de-DE/ThreadVisAbout.dtd
-sed -i -e "s/\[\[build\]\]/${revision}/g" build/src/chrome/locale/de-DE/ThreadVisAbout.dtd
-
-sed -i -e "s/\[\[version\]\]/${version}/g" build/src/chrome/locale/en-US/Settings.dtd
-sed -i -e "s/\[\[build\]\]/${revision}/g" build/src/chrome/locale/en-US/Settings.dtd
-
-sed -i -e "s/\[\[version\]\]/${version}/g" build/src/chrome/locale/en-US/ThreadVis.dtd
-sed -i -e "s/\[\[build\]\]/${revision}/g" build/src/chrome/locale/en-US/ThreadVis.dtd
-
-sed -i -e "s/\[\[version\]\]/${version}/g" build/src/chrome/locale/en-US/ThreadVisAbout.dtd
-sed -i -e "s/\[\[build\]\]/${revision}/g" build/src/chrome/locale/en-US/ThreadVisAbout.dtd
-
-sed -i -e "s/\[\[version\]\]/${version}/g" build/src/install.rdf
-sed -i -e "s/\[\[build\]\]/${revision}/g" build/src/install.rdf
-
-sed -i -e "s/\[\[version\]\]/${version}/g" build/src/update.rdf
-sed -i -e "s/\[\[build\]\]/${revision}/g" build/src/update.rdf
+# update in all files
+for f in $(find build/ -name '*.dtd' -or -name '*.rdf' -or -name '*.js' -or -name '*.xul' -or -name '*.css')
+do
+    sed -i '' -e "s/[$]Id[$]/${version}.${revision}/g" $f
+done
 
 
 
@@ -134,8 +109,8 @@ cp build/src/ThreadVis.xpi build/ThreadVis.xpi
 # (remove the updateURL and updateKey lines)
 # ##############################################################################
 
-sed -i -e '/<em:updateURL>.*<\/em:updateURL>/d' build/src/install.rdf
-sed -i -e '/<em:updateKey>.*<\/em:updateKey>/d' build/src/install.rdf
+sed -i '' -e '/<em:updateURL>.*<\/em:updateURL>/d' build/src/install.rdf
+sed -i '' -e '/<em:updateKey>.*<\/em:updateKey>/d' build/src/install.rdf
 cd build/src
 zip -q -r ThreadVis-addons.mozilla.org.xpi . -i@../../xpi.filelist
 cd ../..
@@ -150,7 +125,7 @@ cp build/src/ThreadVis-addons.mozilla.org.xpi build/ThreadVis-addons.mozilla.org
 # ##############################################################################
 
 sha512sum=`shasum -a 512 build/ThreadVis.xpi | awk '{print $1}'`
-sed -i -e "s/\[\[updatehash\]\]/sha512:${sha512sum}/g" build/src/update.rdf
+sed -i '' -e "s/\[\[updatehash\]\]/sha512:${sha512sum}/g" build/src/update.rdf
 cp build/src/update.rdf build/update.rdf
 
 
@@ -162,7 +137,4 @@ rm -Rf build/src
 
 
 
-echo "Build $revision successful."
-
-# copy to desktop for easy installation
-cp build/ThreadVis.xpi /Users/sascha/Desktop/ThreadVis.xpi
+echo "Build $version.$revision successful."
