@@ -295,6 +295,20 @@ var ThreadVis = (function(ThreadVis) {
                 subjectLabel.style.fontWeight = "bold";
                 subjectText.setAttribute("value", this._container.getMessage()
                         .getSubject());
+                
+                var folderLabel = document.createElementNS(
+                        ThreadVis.XUL_NAMESPACE, "label");
+                var folderText = document.createElementNS(
+                        ThreadVis.XUL_NAMESPACE, "label");
+                var folder = document.createElementNS(ThreadVis.XUL_NAMESPACE,
+                        "hbox");
+                folder.appendChild(folderLabel);
+                folder.appendChild(folderText);
+                folderLabel.setAttribute("value", ThreadVis.strings
+                        .getString("tooltip.folder"));
+                folderLabel.style.fontWeight = "bold";
+                folderText.setAttribute("value", this._container.getMessage()
+                        .getFolderName());
 
                 var body = document.createElementNS(ThreadVis.XUL_NAMESPACE,
                         "description");
@@ -305,6 +319,7 @@ var ThreadVis = (function(ThreadVis) {
                 this._tooltip.appendChild(author);
                 this._tooltip.appendChild(date);
                 this._tooltip.appendChild(subject);
+                this._tooltip.appendChild(folder);
                 this._tooltip.appendChild(document.createElementNS(
                         ThreadVis.XUL_NAMESPACE, "separator"));
                 this._tooltip.appendChild(body);
