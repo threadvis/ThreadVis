@@ -10,7 +10,7 @@
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
  * Copyright (C) 2007, 2008, 2009, 2010, 2011,
- *               2013 Alexander C. Hubmann-Haidvogel
+ *               2013, 2018 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -38,11 +38,14 @@ var ThreadVis = (function(ThreadVis) {
     ThreadVis.Util = {
         /**
          * Built-in date formatter service
-         * 
-         * @type nsIScriptableDateFormat
          */
-        _dateFormatService : Components.classes["@mozilla.org/intl/scriptabledateformat;1"]
-                .getService(Components.interfaces.nsIScriptableDateFormat),
+        _dateFormatter: new Intl.DateTimeFormat(undefined, {
+                'year': '2-digit',
+                'month': '2-digit',
+                'day': '2-digit',
+                'hour': '2-digit',
+                'minute': '2-digit'
+            }),
 
         /**
          * Convert a RGB colour to a HSV colour
@@ -321,14 +324,7 @@ var ThreadVis = (function(ThreadVis) {
          * @return The formatted date
          */
         formatDate : function(date) {
-            var dateString = this._dateFormatService.FormatDateTime("",
-                    this._dateFormatService.dateFormatShort,
-                    this._dateFormatService.timeFormatNoSeconds, date
-                            .getFullYear(), date.getMonth() + 1,
-                    date.getDate(), date.getHours(), date.getMinutes(), date
-                            .getSeconds());
-
-            return dateString;
+            return this._dateFormatter.format(date);
         }
     };
 

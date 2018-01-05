@@ -10,7 +10,7 @@
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
  * Copyright (C) 2007, 2008, 2009, 2010, 2011,
- *               2013 Alexander C. Hubmann-Haidvogel
+ *               2013, 2018 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -76,8 +76,7 @@ var ThreadVis = (function(ThreadVis) {
 
             var accountManager = Components.classes["@mozilla.org/messenger/account-manager;1"]
                     .getService(Components.interfaces.nsIMsgAccountManager);
-
-            for (let account in fixIterator(accountManager.accounts,
+            for (let account of fixIterator(accountManager.accounts,
                     Components.interfaces.nsIMsgAccount)) {
                 // get folders
                 var rootFolder = account.incomingServer.rootFolder;

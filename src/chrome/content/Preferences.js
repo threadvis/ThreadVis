@@ -10,7 +10,7 @@
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
  * Copyright (C) 2007, 2008, 2009, 2010, 2011,
- *               2013 Alexander C. Hubmann-Haidvogel
+ *               2013, 2018 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -269,7 +269,7 @@ var ThreadVis = (function(ThreadVis) {
             var ref = this;
             // add observer for our own branch
             var pbi = this._prefBranch
-                    .QueryInterface(Components.interfaces.nsIPrefBranch2);
+                    .QueryInterface(Components.interfaces.nsIPrefBranch);
             pbi.addObserver("", {
                 observe : function(subject, topic, data) {
                     if (topic != "nsPref:changed") {
@@ -283,7 +283,7 @@ var ThreadVis = (function(ThreadVis) {
 
             // add observer for gloda
             var glodaObserver = this._glodaPrefBranch
-                    .QueryInterface(Components.interfaces.nsIPrefBranch2);
+                    .QueryInterface(Components.interfaces.nsIPrefBranch);
             glodaObserver.addObserver("", {
                 observe : function(subject, topic, data) {
                     if (topic != "nsPref:changed") {
@@ -358,7 +358,7 @@ var ThreadVis = (function(ThreadVis) {
             }
 
             var pbi = this._prefBranch
-                    .QueryInterface(Components.interfaces.nsIPrefBranch2);
+                    .QueryInterface(Components.interfaces.nsIPrefBranch);
             pbi.removeObserver("", this);
         }
     };
