@@ -1,4 +1,3 @@
-<?xml version="1.0"?>
 <!--
 /* *****************************************************************************
  * This file is part of ThreadVis.
@@ -29,12 +28,24 @@
  *
  * Version: $Id$
  * *****************************************************************************
- * XUL file to display settings dialog
+ * DTD file containing EN localisation of UI elements
  ******************************************************************************/
 -->
-
-<dialog id="ThreadVisPreferencesDialog"
-        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        xmlns:html="http://www.w3.org/1999/xhtml"
-        onload="window.opener.openOptionsDialog('paneThreadVis', null); window.close();">
-</dialog>
+<!ENTITY popup.legend               "Display Legend">
+<!ENTITY popup.popupwindow          "Display in Separate Window">
+<!ENTITY popup.settings             "Settings...">
+<!ENTITY popup.exportsvg            "Export as SVG...">
+<!ENTITY popupwindow.title          "ThreadVis Visualisation">
+<!ENTITY zoomin.tooltip             "Zoom In">
+<!ENTITY zoomout.tooltip            "Zoom Out">
+<!ENTITY legend.title               "ThreadVis Legend">
+<!ENTITY statusbar.disabled         "Disabled in preferences.">
+<!ENTITY statusbar.disabledGloda    "Disabled because the 'Global Search and Indexer' feature is disabled.">
+<!ENTITY statusbar.disabledAccount  "Disabled for the current account.">
+<!ENTITY statusbar.disabledFolder   "Disabled for the current folder.">
+<!ENTITY statusbar.enable           "Enabled">
+<!ENTITY statusbar.disable          "Disabled">
+<!ENTITY statusbar.enableAccount    "For current account">
+<!ENTITY statusbar.enableFolder     "For current folder">
+<!ENTITY extension.name             "ThreadVis">
+<!ENTITY extension.version          "[[version]]">

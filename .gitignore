@@ -1,2 +1,2 @@
-build
-signing-key.db
+/build
+.DS_Store

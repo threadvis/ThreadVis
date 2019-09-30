@@ -1,4 +1,3 @@
-<?xml version="1.0"?>
 <!--
 /* *****************************************************************************
  * This file is part of ThreadVis.
@@ -29,12 +28,24 @@
  *
  * Version: $Id$
  * *****************************************************************************
- * XUL file to display settings dialog
+ * DTD file containing DE localisation of UI elements
  ******************************************************************************/
 -->
-
-<dialog id="ThreadVisPreferencesDialog"
-        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        xmlns:html="http://www.w3.org/1999/xhtml"
-        onload="window.opener.openOptionsDialog('paneThreadVis', null); window.close();">
-</dialog>
+<!ENTITY popup.legend               "Legende einblenden">
+<!ENTITY popup.popupwindow          "In eigenem Fenster darstellen">
+<!ENTITY popup.settings             "Einstellungen...">
+<!ENTITY popup.exportsvg            "Als SVG exportieren...">
+<!ENTITY popupwindow.title          "ThreadVis Visualisierung">
+<!ENTITY zoomin.tooltip             "Visualisierung vergr&#xF6;&#xDF;ern">
+<!ENTITY zoomout.tooltip            "Visualisierung verkleinern">
+<!ENTITY legend.title               "ThreadVis Legende">
+<!ENTITY statusbar.disabled         "In den Einstellungen deaktiviert.">
+<!ENTITY statusbar.disabledGloda    "Deaktiviert, da das Feature 'Globale Suche und Nachrichtenindizierung' nicht aktiviert ist.">
+<!ENTITY statusbar.disabledAccount  "F&#xFC;r den aktuellen Account deaktiviert.">
+<!ENTITY statusbar.disabledFolder   "F&#xFC;r den aktuellen Ordner deaktiviert.">
+<!ENTITY statusbar.enable           "Aktiviert">
+<!ENTITY statusbar.disable          "Deaktiviert">
+<!ENTITY statusbar.enableAccount    "F&#xFC;r den aktuellen Account">
+<!ENTITY statusbar.enableFolder     "F&#xFC;r den aktuellen Ordner">
+<!ENTITY extension.name             "ThreadVis">
+<!ENTITY extension.version          "[[version]]">

@@ -29,12 +29,23 @@
  *
  * Version: $Id$
  * *****************************************************************************
- * XUL file to display settings dialog
+ * XUL file to display ThreadVis Legend
  ******************************************************************************/
 -->
 
-<dialog id="ThreadVisPreferencesDialog"
-        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        xmlns:html="http://www.w3.org/1999/xhtml"
-        onload="window.opener.openOptionsDialog('paneThreadVis', null); window.close();">
-</dialog>
+
+
+<!DOCTYPE overlay SYSTEM "chrome://threadvis/locale/threadvis.dtd">
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<window id="ThreadVisLegend" title="&legend.title;" onload="displayLegend();"
+        persist="screenX screenY"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+    <script type="application/javascript"
+            src="chrome://threadvis/content/legend.js" />
+
+    <vbox id="LegendBox">
+        <vbox id="LegendContent" />
+    </vbox>
+
+</window>

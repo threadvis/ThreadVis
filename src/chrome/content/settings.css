@@ -1,5 +1,3 @@
-<?xml version="1.0"?>
-<!--
 /* *****************************************************************************
  * This file is part of ThreadVis.
  * https://threadvis.github.io
@@ -29,12 +27,50 @@
  *
  * Version: $Id$
  * *****************************************************************************
- * XUL file to display settings dialog
+ * CSS file to layout preferences dialog
  ******************************************************************************/
--->
 
-<dialog id="ThreadVisPreferencesDialog"
-        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        xmlns:html="http://www.w3.org/1999/xhtml"
-        onload="window.opener.openOptionsDialog('paneThreadVis', null); window.close();">
-</dialog>
+.aboutVersion {
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: rgb(144,144,144);
+    text-align: right;
+}
+
+.aboutDescription {
+    color: rgb(64,64,64);
+    margin-bottom: 10px;
+}
+
+.aboutHomepage {
+    text-decoration: underline;
+    color: rgb(49, 106, 197);
+    cursor: pointer;
+}
+
+.aboutEmail {
+    text-decoration: underline;
+    color: rgb(49, 106, 197);
+    cursor: pointer;
+}
+
+.enableThreadVis {
+    margin-top: 20px;
+}
+
+radio[pane="ThreadVisSettingsPane"] > .radio-check {
+    list-style-image: url("chrome://threadvis/content/images/icon.png");
+}
+
+#ThreadVisVisualisationAccountsFoldersTab groupbox {
+    overflow: auto;
+}
+
+.detailedDescription {
+    font-size: 90%;
+    color: rgb(70,70,70);
+}
+
+html|input[type="number"].size2 {
+  width: calc(2ch + 55px);
+}

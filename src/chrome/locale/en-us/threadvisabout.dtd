@@ -1,0 +1,54 @@
+<!--
+/* *****************************************************************************
+ * This file is part of ThreadVis.
+ * https://threadvis.github.io
+ *
+ * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
+ * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
+ * Mozilla Thunderbird Email Client" at Graz University of Technology, Austria.
+ * An electronic version of the thesis is available online at
+ * https://ftp.isds.tugraz.at/pub/theses/ahubmann.pdf
+ *
+ * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011,
+ *               2013, 2018, 2019 Alexander C. Hubmann-Haidvogel
+ *
+ * ThreadVis is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ *
+ * ThreadVis is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with ThreadVis. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Version: $Id$
+ * *****************************************************************************
+ * DTD file containing EN localisation of UI elements
+ ******************************************************************************/
+-->
+<!ENTITY window.title                                       "ThreadVis">
+<!ENTITY about.version                                      "Version">
+<!ENTITY about.description                                  "Displays a small graphic visualising the context (thread) of the currently selected email.">
+<!ENTITY about.copyright1                                   "&#xA9; 2005, 2006, 2007 Alexander C. Hubmann">
+<!ENTITY about.copyright2                                   "&#xA9; 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019 Alexander C. Hubmann-Haidvogel">
+<!ENTITY about.homepage                                     "https://threadvis.github.io">
+<!ENTITY about.email                                        "ahubmann@gmail.com">
+<!ENTITY about.name                                         "ThreadVis">
+<!ENTITY extension.version                                  "[[version]]">
+<!ENTITY wizard.about.title                                 "About the Visualisation">
+<!ENTITY wizard.about.1                                     "The extension adds a visualisation of the currently displayed thread to the header view. This visualisation displays all messages of the current conversation in a clear and compact way.">
+<!ENTITY wizard.about.2                                     "The messages are displayed as dots on a horizontal axis, the oldest message to the left. Received messages are visualised using full circles, sent messages as hollow circles. The currently selected message is highlighted using a black circle.">
+<!ENTITY wizard.about.3                                     "Time Scaling spaces the messages proportional to the time difference between messages, a Timeline adds detailed information. The visualisation can also be used to navigate between the messages of the conversation.">
+<!ENTITY wizard.workings.title                              "How it works">
+<!ENTITY wizard.workings.1                                  "ThreadVis uses the Global Search and Indexer feature in Thunderbird, which has to be activated.">
+<!ENTITY wizard.workings.2                                  "Additionally, the accounts and folders the extension should analyze can be selected in the next step.">
+<!ENTITY wizard.accounts.title                              "Enabled Accounts and Folders">
+<!ENTITY wizard.accounts.1                                  "Please select all accounts and folders in which the extension should look for messages to analyze:">
+<!ENTITY wizard.end.title                                   "">
+<!ENTITY wizard.end.1                                       "All settings can be changed at any time in the settings dialog of the add-on, which can be found in the general settings dialog of the mail client or by right clicking the visualisation and choosing 'Settings'.">
+<!ENTITY wizard.end.showagain                               "Do not show this message again.">

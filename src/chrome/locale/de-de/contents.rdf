@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0"?> 
 <!--
 /* *****************************************************************************
  * This file is part of ThreadVis.
@@ -29,12 +29,22 @@
  *
  * Version: $Id$
  * *****************************************************************************
- * XUL file to display settings dialog
+ * RDF file describing DE localisation
  ******************************************************************************/
 -->
+<RDF:RDF xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+         xmlns:chrome="http://www.mozilla.org/rdf/chrome#"> 
 
-<dialog id="ThreadVisPreferencesDialog"
-        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        xmlns:html="http://www.w3.org/1999/xhtml"
-        onload="window.opener.openOptionsDialog('paneThreadVis', null); window.close();">
-</dialog>
+    <RDF:Seq about="urn:mozilla:locale:root"> 
+        <RDF:li resource="urn:mozilla:locale:de-DE"/> 
+    </RDF:Seq> 
+
+    <RDF:Description about="urn:mozilla:locale:de-DE" chrome:name="de-DE"> 
+        <chrome:packages> 
+            <RDF:Seq about="urn:mozilla:locale:de-DE:packages"> 
+                <RDF:li resource="urn:mozilla:locale:de-DE:threadvis" /> 
+            </RDF:Seq> 
+        </chrome:packages> 
+    </RDF:Description> 
+
+</RDF:RDF>

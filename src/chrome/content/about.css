@@ -1,5 +1,3 @@
-<?xml version="1.0"?>
-<!--
 /* *****************************************************************************
  * This file is part of ThreadVis.
  * https://threadvis.github.io
@@ -29,12 +27,44 @@
  *
  * Version: $Id$
  * *****************************************************************************
- * XUL file to display settings dialog
+ * CSS file to layout preferences dialog
  ******************************************************************************/
--->
 
-<dialog id="ThreadVisPreferencesDialog"
-        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        xmlns:html="http://www.w3.org/1999/xhtml"
-        onload="window.opener.openOptionsDialog('paneThreadVis', null); window.close();">
-</dialog>
+
+
+.extensionName {
+    font-size: large;
+    font-weight: bold;
+}
+
+.aboutVersion {
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: rgb(144,144,144);
+    text-align: right;
+}
+
+.aboutDescription {
+    color: rgb(64,64,64);
+}
+
+.aboutHomepage {
+    text-decoration: underline;
+    color: rgb(0,0,255);
+    cursor: pointer;
+}
+
+.aboutEmail {
+    text-decoration: underline;
+    color: rgb(0,0,255);
+    cursor: pointer;
+}
+
+.enableAccounts {
+    overflow: auto;
+    height: 195px;
+}
+
+.screenshot {
+    padding: 10px;
+}

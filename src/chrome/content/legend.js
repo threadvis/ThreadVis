@@ -1,5 +1,3 @@
-<?xml version="1.0"?>
-<!--
 /* *****************************************************************************
  * This file is part of ThreadVis.
  * https://threadvis.github.io
@@ -29,12 +27,27 @@
  *
  * Version: $Id$
  * *****************************************************************************
- * XUL file to display settings dialog
+ * JavaScript file to visualise legend
  ******************************************************************************/
--->
 
-<dialog id="ThreadVisPreferencesDialog"
-        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        xmlns:html="http://www.w3.org/1999/xhtml"
-        onload="window.opener.openOptionsDialog('paneThreadVis', null); window.close();">
-</dialog>
+/**
+ * Clear the legend box
+ */
+function clearLegend() {
+    var legendBox = document.getElementById("LegendContent");
+    while (legendBox.firstChild != null) {
+        legendBox.removeChild(legendBox.firstChild);
+    }
+}
+
+/**
+ * Display the legend
+ */
+function displayLegend() {
+    clearLegend();
+
+    var legendBox = document.getElementById("LegendContent");
+    var legend = opener.ThreadVis.getLegend();
+    legendBox.appendChild(legend);
+    window.sizeToContent();
+}
