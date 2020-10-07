@@ -1,562 +1,527 @@
-/* *****************************************************************************
+/* *********************************************************************************************************************
  * This file is part of ThreadVis.
  * https://threadvis.github.io
  *
- * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
- * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
- * Mozilla Thunderbird Email Client" at Graz University of Technology, Austria.
- * An electronic version of the thesis is available online at
+ * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis titled
+ * "ThreadVis for Thunderbird: A Thread Visualisation Extension for the Mozilla Thunderbird Email Client"
+ * at Graz University of Technology, Austria. An electronic version of the thesis is available online at
  * https://ftp.isds.tugraz.at/pub/theses/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008, 2009, 2010, 2011,
- *               2013, 2018, 2019 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020 Alexander C. Hubmann-Haidvogel
  *
- * ThreadVis is free software: you can redistribute it and/or modify it under
- * the terms of the GNU Affero General Public License as published by the Free
- * Software Foundation, either version 3 of the License, or (at your option) any
- * later version.
+ * ThreadVis is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
- * ThreadVis is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
- * details.
+ * ThreadVis is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with ThreadVis. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License along with ThreadVis.
+ * If not, see <http://www.gnu.org/licenses/>.
  *
  * Version: $Id$
- * *****************************************************************************
+ * *********************************************************************************************************************
  * JavaScript file to visualise message in threadvis
- ******************************************************************************/
+ **********************************************************************************************************************/
 
-var ThreadVis = (function(ThreadVis) {
+var EXPORTED_SYMBOLS = [ "ContainerVisualisation" ];
+
+const { Strings } = ChromeUtils.import("chrome://threadvis/content/strings.js");
+const { Util } = ChromeUtils.import("chrome://threadvis/content/util.js");
+
+class ContainerVisualisation {
+
+    /**
+     * Main object
+     */
+    threadvis = null;
+
+    /**
+     * The XUL/DOM document the visualisation is drawn on
+     */
+    document = null;
+
+    /**
+     * XUL stack on which container gets drawn
+     */
+    stack = null;
+
+    /**
+     * the container which gets visualised
+     */
+    container = null;
+
+    /**
+     * colour of container
+     */
+    colour = "";
+
+    /**
+     * left position of container in px
+     */
+    left = 0;
+
+    /**
+     * top position of container in px
+     */
+    top = 0;
+
+    /**
+     * is container selected (boolean)
+     */
+    selected = false;
+
+    /**
+     * size of the dot to draw in px
+     */
+    dotSize = 0;
+
+    /**
+     * resize multiplicator
+     */
+    resize = 1;
+
+    /**
+     * should we draw a circle around the dot to mark it as selected (boolean)
+     */
+    isCircle = false;
+
+    /**
+     * the spacing between two messages in px
+     */
+    spacing = 0;
+
+    /**
+     * the opacity of the item
+     */
+    opacity = 1;
+
+    /**
+     * if true, draw circle, else draw square
+     */
+    messageCircles = true;
+
+    /**
+     * DOM element to handle the context popup
+     */
+    popup = null;
+
+    style = "full";
 
     /**
      * Constructor for visualisation class
      * 
      * @constructor
-     * @param {DOMElement} stack
-     *              The stack on which to draw
-     * @param {ThreadVis.Container} container
-     *              The container to visualise
-     * @param {String} colour
-     *              The colour for the container
-     * @param {Number} left
-     *              The left position
-     * @param {Number} top
-     *              The top position
-     * @param {Boolean} selected
-     *              True if the message is selected
-     * @param {Number} dotSize
-     *              The size of the dot
-     * @param {Number} resize
-     *              The resize parameter
-     * @param {Boolean} circle
-     *              True to draw a circle
-     * @param {Number} spacing
-     *              The spacing
-     * @param {Number} opacity
-     *              The opacity
-     * @param {Boolean} messageCircles
-     *              True to draw circle, false to draw square
-     * @return {ThreadVis.ContainerVisualisation} A new container visualisation
-     * @type ThreadVis.ContainerVisualisation
+     * @param {ThreadVis} threadvis Main element
+     * @param {DOMElement} document The document this visualisation is drawn in
+     * @param {DOMElement} stack The stack on which to draw
+     * @param {Container} container The container to visualise
+     * @param {String} colour The colour for the container
+     * @param {Number} left The left position
+     * @param {Number} top The top position
+     * @param {Boolean} selected True if the message is selected
+     * @param {Number} dotSize The size of the dot
+     * @param {Number} resize The resize parameter
+     * @param {Boolean} circle True to draw a circle
+     * @param {Number} spacing The spacing
+     * @param {Number} opacity The opacity
+     * @param {Boolean} messageCircles True to draw circle, false to draw square
+     * @return {ContainerVisualisation} A new container visualisation
+     * @type ContainerVisualisation
      */
-    ThreadVis.ContainerVisualisation = function(stack, container, colour, left,
-            top, selected, dotSize, resize, circle, spacing, opacity,
-            messageCircles) {
+    constructor(threadvis, document, stack, container, colour, left, top, selected, dotSize, resize, circle, spacing,
+            opacity, messageCircles) {
 
-        this._stack = stack;
-        this._container = container;
-        this._colour = colour;
-        this._left = left;
-        this._top = top;
-        this._selected = selected;
-        this._dotSize = dotSize;
-        this._resize = resize;
-        this._isCircle = circle;
-        this._spacing = spacing;
-        this._opacity = opacity;
-        this._messageCircles = messageCircles;
+        this.threadvis = threadvis;
+        this.document = document;
+        this.stack = stack;
+        this.container = container;
+        this.colour = colour;
+        this.left = left;
+        this.top = top;
+        this.selected = selected;
+        this.dotSize = dotSize;
+        this.resize = resize;
+        this.isCircle = circle;
+        this.spacing = spacing;
+        this.opacity = opacity;
+        this.messageCircles = messageCircles;
 
         // calculate style
         // full == received message
         // half == sent message
         // dummy == unknown message
-        if (!this._container.isDummy()) {
-            if (this._container.getMessage().isSent()) {
-                this._style = "half";
+        if (!this.container.isDummy()) {
+            if (this.container.getMessage().isSent()) {
+                this.style = "half";
             }
         } else {
-            this._style = "dummy";
+            this.style = "dummy";
         }
 
-        this._drawDot();
+        this.drawDot();
 
-        this._drawCircle("black");
-        if (!(this._selected && this._isCircle)) {
-            this._hideCircle();
+        this.drawCircle("black");
+        if (!(this.selected && this.isCircle)) {
+            this.hideCircle();
         } else {
-            this._showCircle();
+            this.showCircle();
         }
 
-        this._drawClick();
+        this.drawClick();
 
-        this._createToolTip();
-        this._createMenu();
+        this.createToolTip();
+        this.createMenu();
     };
 
     /**
-     * Prototype / instance methods
+     * Create popup menu
      */
-    ThreadVis.ContainerVisualisation.prototype = {
-        /**
-         * XUL stack on which container gets drawn
-         */
-        _stack : null,
+    createMenu() {
+        let menuname = "dot_popup_" + this.left;
+        this.click.setAttribute("context", menuname);
 
-        /**
-         * the container which gets visualised
-         */
-        _container : null,
+        let popupset = this.document.getElementById("ThreadVisPopUpSet");
+        let popup = this.document.createXULElement("popup");
+        popup.setAttribute("id", menuname);
 
-        /**
-         * colour of container
-         */
-        _colour : "",
+        this.popup = popup;
 
-        /**
-         * left position of container in px
-         */
-        _left : 0,
+        popup.addEventListener("popupshowing", function() {
+            this.getMenu();
+        }.bind(this), true);
 
-        /**
-         * top position of container in px
-         */
-        _top : 0,
+        popupset.appendChild(popup);
+    }
 
-        /**
-         * is container selected (boolean)
-         */
-        _selected : false,
-
-        /**
-         * size of the dot to draw in px
-         */
-        _dotSize : 0,
-
-        /**
-         * resize multiplicator
-         */
-        _resize : 1,
-
-        /**
-         * should we draw a circle around the dot to mark it as selected
-         * (boolean)
-         */
-        _isCircle : false,
-
-        /**
-         * the spacing between two messages in px
-         */
-        _spacing : 0,
-
-        /**
-         * the opacity of the item
-         */
-        _opacity : 1,
-
-        /**
-         * if true, draw circle, else draw square
-         */
-        _messageCircles : true,
-
-        /**
-         * DOM element to handle the context popup
-         */
-        _popup : null,
-
-        _style : "full",
-
-        /**
-         * Create popup menu
-         */
-        _createMenu : function() {
-            var menuname = "dot_popup_" + this._left;
-            this._click.setAttribute("context", menuname);
-
-            var popupset = document.getElementById("ThreadVisPopUpSet");
-            var popup = document.createXULElement("popup");
-            popup.setAttribute("id", menuname);
-
-            this._popup = popup;
-
-            var ref = this;
-            popup.addEventListener("popupshowing", function() {
-                ref._getMenu();
-            }, true);
-
-            popupset.appendChild(popup);
-        },
-
-        /**
-         * Fill popup menu
-         */
-        _getMenu : function() {
-            if (this._popup.rendered == true) {
-                return;
-            }
-
-            // include normal menu items
-            var defaultPopup = document.getElementById("ThreadVisPopUp");
-            var items = defaultPopup.getElementsByTagName("menuitem");
-            for (var i = 0; i < items.length; i++) {
-                var item = document.createXULElement("menuitem");
-                item.setAttribute("label", items[i].getAttribute("label"));
-                item.setAttribute("oncommand", items[i]
-                        .getAttribute("oncommand"));
-                this._popup.appendChild(item);
-            }
-
-            this._popup.rendered = true;
-        },
-
-        /**
-         * Create tooltip for container containing information about container.
-         * Just create stub menu
-         */
-        _createToolTip : function() {
-            var tooltip = document.createXULElement("tooltip");
-            tooltip.setAttribute("orient", "vertical");
-            tooltip.setAttribute("id", "ThreadVis_" + this._left);
-
-            this._tooltip = tooltip;
-            var ref = this;
-            tooltip.addEventListener("popupshowing", function() {
-                ref._getToolTip();
-            }, true);
-
-            var popupset = document.getElementById("ThreadVisPopUpSet");
-            popupset.appendChild(tooltip);
-        },
-
-        /**
-         * Fill tooltip for container containing information about container
-         */
-        _getToolTip : function() {
-            if (this._tooltip.rendered == true) {
-                return;
-            }
-
-            if (!this._container.isDummy()) {
-                // if container container message, view details
-                var authorLabel = document.createXULElement("label");
-                var authorText = document.createXULElement("label");
-                var author = document.createXULElement("hbox");
-                author.appendChild(authorLabel);
-                author.appendChild(authorText);
-                authorLabel.setAttribute("value", ThreadVis.strings
-                        .getString("tooltip.from"));
-                authorLabel.style.fontWeight = "bold";
-                authorText.setAttribute("value", this._container.getMessage()
-                        .getFrom());
-
-                var dateLabel = document.createXULElement("label");
-                var dateText = document.createXULElement("label");
-                var date = document.createXULElement("hbox");
-                date.appendChild(dateLabel);
-                date.appendChild(dateText);
-                dateLabel.setAttribute("value", ThreadVis.strings
-                        .getString("tooltip.date"));
-                dateLabel.style.fontWeight = "bold";
-                dateText.setAttribute("value", ThreadVis.Util
-                        .formatDate(this._container.getMessage().getDate()));
-
-                var subjectLabel = document.createXULElement("label");
-                var subjectText = document.createXULElement("label");
-                var subject = document.createXULElement("hbox");
-                subject.appendChild(subjectLabel);
-                subject.appendChild(subjectText);
-                subjectLabel.setAttribute("value", ThreadVis.strings
-                        .getString("tooltip.subject"));
-                subjectLabel.style.fontWeight = "bold";
-                subjectText.setAttribute("value", this._container.getMessage()
-                        .getSubject());
-
-                var body = document.createXULElement("description");
-                var bodyText = document.createTextNode(this._container
-                        .getMessage().getBody());
-                body.appendChild(bodyText);
-
-                this._tooltip.appendChild(author);
-                this._tooltip.appendChild(date);
-                this._tooltip.appendChild(subject);
-                this._tooltip.appendChild(document.createXULElement("separator"));
-                this._tooltip.appendChild(body);
-            } else {
-                // otherwise we display info about missing message
-                var desc1 = document.createXULElement("description");
-                var desc2 = document.createXULElement("description");
-                desc1.setAttribute("value", ThreadVis.strings
-                        .getString("tooltip.missingmessage"));
-                desc2.setAttribute("value", ThreadVis.strings
-                        .getString("tooltip.missingmessagedetail"));
-                this._tooltip.appendChild(desc1);
-                this._tooltip.appendChild(desc2);
-            }
-            this._tooltip.rendered = true;
-        },
-
-        /**
-         * Draw circle around container if container is selected
-         * 
-         * @param {String}
-         *            colour The colour of the message
-         */
-        _drawCircle : function(colour) {
-            if (!this._circle) {
-                this._circle = document.createXULElement("box");
-            }
-
-            this._visualiseCircle(colour);
-
-            this._stack.appendChild(this._circle);
-        },
-
-        /**
-         * Draw container around dot to catch click events and show tooltip
-         */
-        _drawClick : function() {
-            if (!this._click) {
-                this._click = document.createXULElement("box");
-            }
-
-            this._visualiseClick();
-
-            this._click.container = this._container;
-            this._click.setAttribute("tooltip", "ThreadVis_" + this._left);
-
-            this._stack.appendChild(this._click);
-            var ref = this;
-            this._click.addEventListener("click", function(event) {
-                ref._onMouseClick(event);
-            }, true);
-
-            // prevent mousedown event from bubbling to box object
-            // prevent dragging of visualisation by clicking on message
-            this._click.addEventListener("mousedown", function(event) {
-                event.stopPropagation();
-            }, true);
-        },
-
-        /**
-         * Draw dot for container
-         */
-        _drawDot : function() {
-            this._dot = document.createXULElement("box");
-
-            this._visualiseDot();
-
-            this._stack.appendChild(this._dot);
-        },
-
-        /**
-         * Hide circle
-         */
-        _hideCircle : function() {
-            this._circle.hidden = true;
-        },
-
-        /**
-         * Mouse click event handler Display message user clicked on
-         * 
-         * @param {DOMEvent}
-         *            event The mouse event
-         */
-        _onMouseClick : function(event) {
-            // only react to left mouse click
-            if (event.button != 0) {
-                return;
-            }
-
-            // check for double click
-            var elem = ThreadVis;
-            if (elem.isPopupVisualisation()) {
-                elem = window.opener.ThreadVis;
-            }
-            if (event.detail > 1) {
-                elem.openNewMessage(this._container.getMessage().getMsgDbHdr());
-            } else {
-                if (!this._container.isDummy()) {
-                    // check to see if this visualisation is in the popup window
-                    // if so, call functions in opener
-                    elem.callback(this._container.getMessage());
-                }
-            }
-        },
-
-        /**
-         * Re-Draw all elements
-         * 
-         * @param {Number}
-         *            resize The resize parameter
-         * @param {Number}
-         *            left The left position
-         * @param {Number}
-         *            top The top position
-         * @param {Boolean}
-         *            selected True if container is selected
-         * @param {String}
-         *            colour The colour
-         * @param {Number}
-         *            opacity The opacity
-         */
-        redraw : function(resize, left, top, selected, colour, opacity) {
-            this._resize = resize;
-            this._left = left;
-            this._top = top;
-            this._selected = selected;
-            this._colour = colour;
-            this._opacity = opacity;
-
-            this._redrawDot();
-            this._redrawCircle("black");
-            if (!(this._selected && this._isCircle)) {
-                this._hideCircle();
-            } else {
-                this._showCircle();
-            }
-
-            this._redrawClick();
-        },
-
-        /**
-         * Re-Draw circle around container if container is selected
-         * 
-         * @param {String}
-         *            colour The colour
-         */
-        _redrawCircle : function(colour) {
-            this._visualiseCircle(colour);
-        },
-
-        /**
-         * Re-Draw container around dot to catch click events and show tooltip
-         */
-        _redrawClick : function() {
-            this._visualiseClick();
-        },
-
-        /**
-         * Re-Draw dot for container
-         */
-        _redrawDot : function() {
-            this._visualiseDot();
-        },
-
-        /**
-         * Show circle
-         */
-        _showCircle : function() {
-            this._circle.hidden = false;
-        },
-
-        /**
-         * Visualise circle around container if container is selected
-         * 
-         * @param {String}
-         *            colour The colour
-         */
-        _visualiseCircle : function(colour) {
-            var posTop = ((this._top - (this._dotSize * 4 / 6)) * this._resize);
-            var posLeft = ((this._left - (this._dotSize * 4 / 6)) * this._resize);
-            var posHeight = (this._dotSize * 8 / 6 * this._resize);
-            var posWidth = (this._dotSize * 8 / 6 * this._resize);
-            var styleBorder = styleBorder = (this._dotSize / 6 * this._resize)
-                    + "px solid " + colour;
-
-            this._circle.top = posTop + "px";
-            this._circle.left = posLeft + "px";
-            this._circle.width = posWidth + "px";
-            this._circle.height = posHeight + "px";
-            this._circle.style.border = styleBorder;
-            if (this._messageCircles) {
-                // Thunderbird 5 uses CSS3
-                this._circle.style.borderRadius = posWidth + "px";
-                // Thunderbird 3 uses custom -moz* CSS
-                this._circle.style.MozBorderRadius = posWidth + "px";
-            } else {
-                this._circle.style.borderRadius = "";
-                this._circle.style.MozBorderRadius = "";
-            }
-        },
-
-        /**
-         * Visualise container around dot to catch click events and show tooltip
-         */
-        _visualiseClick : function() {
-            var posTop = ((this._top - (this._spacing / 2)) * this._resize);
-            var posLeft = ((this._left - this._spacing / 2) * this._resize);
-            var posHeight = (this._spacing * this._resize);
-            var posWidth = (this._spacing * this._resize);
-
-            this._click.top = posTop + "px";
-            this._click.left = posLeft + "px";
-            this._click.width = posWidth + "px";
-            this._click.height = posHeight + "px";
-
-            if (this._style == "dummy") {
-                this._click.style.cursor = "default";
-            } else {
-                this._click.style.cursor = "pointer";
-            }
-            this._click.style.zIndex = "2";
-        },
-
-        /**
-         * Draw dot for container
-         */
-        _visualiseDot : function() {
-            var posTop = ((this._top - (this._dotSize / 2)) * this._resize);
-            var posLeft = ((this._left - (this._dotSize / 2)) * this._resize);
-            var posHeight = (this._dotSize * this._resize);
-            var posWidth = (this._dotSize * this._resize);
-            var styleBackground = "";
-            var styleBorder = "";
-            var styleOpacity = this._opacity;
-            if (this._style != "half") {
-                styleBackground = this._colour;
-            } else {
-                styleBorder = (this._dotSize / 4 * this._resize) + "px solid "
-                        + this._colour;
-            }
-
-            this._dot.top = posTop + "px";
-            this._dot.left = posLeft + "px";
-            this._dot.width = posWidth + "px";
-            this._dot.height = posHeight + "px";
-            this._dot.style.background = styleBackground;
-            this._dot.style.border = styleBorder;
-            this._dot.style.opacity = styleOpacity;
-
-            if (this._style != "dummy") {
-                if (this._messageCircles) {
-                    // Thunderbird 5 uses CSS3
-                    this._dot.style.borderRadius = posWidth + "px";
-                    // Thunderbird 3 uses custom -moz* CSS
-                    this._dot.style.MozBorderRadius = posWidth + "px";
-                } else {
-                    this._dot.style.borderRadius = "";
-                    this._dot.style.MozBorderRadius = "";
-                }
-            } else {
-                this._dot.style.borderRadius = "";
-                this._dot.style.MozBorderRadius = "";
-            }
-            this._dot.style.cursor = "default";
+    /**
+     * Fill popup menu
+     */
+    getMenu() {
+        if (this.popup.rendered == true) {
+            return;
         }
-    };
 
-    return ThreadVis;
-}(ThreadVis || {}));
+        // include normal menu items
+        let defaultPopup = this.document.getElementById("ThreadVisPopUp");
+        let items = defaultPopup.getElementsByTagName("menuitem");
+        for (let i = 0; i < items.length; i++) {
+            let item = this.document.createXULElement("menuitem");
+            item.setAttribute("label", items[i].getAttribute("label"));
+            item.setAttribute("oncommand", items[i].getAttribute("oncommand"));
+            this.popup.appendChild(item);
+        }
+
+        this.popup.rendered = true;
+    }
+
+    /**
+     * Create tooltip for container containing information about container.
+     * Just create stub menu
+     */
+    createToolTip() {
+        let tooltip = this.document.createXULElement("tooltip");
+        tooltip.setAttribute("orient", "vertical");
+        tooltip.setAttribute("id", "ThreadVis_" + this.left);
+
+        this.tooltip = tooltip;
+        tooltip.addEventListener("popupshowing", function() {
+            this.getToolTip();
+        }.bind(this), true);
+
+        let popupset = this.document.getElementById("ThreadVisPopUpSet");
+        popupset.appendChild(tooltip);
+    }
+
+    /**
+     * Fill tooltip for container containing information about container
+     */
+    getToolTip() {
+        if (this.tooltip.rendered == true) {
+            return;
+        }
+
+        if (!this.container.isDummy()) {
+            // if container container message, view details
+            let authorLabel = this.document.createXULElement("label");
+            let authorText = this.document.createXULElement("label");
+            let author = this.document.createXULElement("hbox");
+            author.appendChild(authorLabel);
+            author.appendChild(authorText);
+            authorLabel.setAttribute("value", Strings.getString("tooltip.from"));
+            authorLabel.style.fontWeight = "bold";
+            authorText.setAttribute("value", this.container.getMessage().getFrom());
+
+            let dateLabel = this.document.createXULElement("label");
+            let dateText = this.document.createXULElement("label");
+            let date = this.document.createXULElement("hbox");
+            date.appendChild(dateLabel);
+            date.appendChild(dateText);
+            dateLabel.setAttribute("value", Strings.getString("tooltip.date"));
+            dateLabel.style.fontWeight = "bold";
+            dateText.setAttribute("value", Util.formatDate(this.container.getMessage().getDate()));
+
+            let subjectLabel = this.document.createXULElement("label");
+            let subjectText = this.document.createXULElement("label");
+            let subject = this.document.createXULElement("hbox");
+            subject.appendChild(subjectLabel);
+            subject.appendChild(subjectText);
+            subjectLabel.setAttribute("value", Strings.getString("tooltip.subject"));
+            subjectLabel.style.fontWeight = "bold";
+            subjectText.setAttribute("value", this.container.getMessage().getSubject());
+
+            let body = this.document.createXULElement("description");
+            let bodyText = this.document.createTextNode(this.container.getMessage().getBody());
+            body.appendChild(bodyText);
+
+            this.tooltip.appendChild(author);
+            this.tooltip.appendChild(date);
+            this.tooltip.appendChild(subject);
+            this.tooltip.appendChild(this.document.createXULElement("separator"));
+            this.tooltip.appendChild(body);
+        } else {
+            // otherwise we display info about missing message
+            let desc1 = this.document.createXULElement("description");
+            let desc2 = this.document.createXULElement("description");
+            desc1.setAttribute("value", Strings.getString("tooltip.missingmessage"));
+            desc2.setAttribute("value", Strings.getString("tooltip.missingmessagedetail"));
+            this.tooltip.appendChild(desc1);
+            this.tooltip.appendChild(desc2);
+        }
+        this.tooltip.rendered = true;
+    }
+
+    /**
+     * Draw circle around container if container is selected
+     * 
+     * @param {String}
+     *            colour The colour of the message
+     */
+    drawCircle(colour) {
+        if (!this.circle) {
+            this.circle = this.document.createXULElement("box");
+            this.circle.style.position = "relative";
+        }
+
+        this.visualiseCircle(colour);
+
+        this.stack.appendChild(this.circle);
+    }
+
+    /**
+     * Draw container around dot to catch click events and show tooltip
+     */
+    drawClick() {
+        if (!this.click) {
+            this.click = this.document.createXULElement("box");
+            this.click.style.position = "relative";
+        }
+
+        this.visualiseClick();
+
+        this.click.container = this.container;
+        this.click.setAttribute("tooltip", "ThreadVis_" + this.left);
+
+        this.stack.appendChild(this.click);
+        this.click.addEventListener("click", function(event) {
+            this.onMouseClick(event);
+        }.bind(this), true);
+
+        // prevent mousedown event from bubbling to box object
+        // prevent dragging of visualisation by clicking on message
+        this.click.addEventListener("mousedown", function(event) {
+            event.stopPropagation();
+        }, true);
+    }
+
+    /**
+     * Draw dot for container
+     */
+    drawDot() {
+        this.dot = this.document.createXULElement("box");
+        this.dot.style.position = "relative";
+
+        this.visualiseDot();
+
+        this.stack.appendChild(this.dot);
+    }
+
+    /**
+     * Hide circle
+     */
+    hideCircle() {
+        this.circle.hidden = true;
+    }
+
+    /**
+     * Mouse click event handler Display message user clicked on
+     * 
+     * @param {DOMEvent} event The mouse event
+     */
+    onMouseClick(event) {
+        // only react to left mouse click
+        if (event.button != 0) {
+            return;
+        }
+
+        // check for double click
+        let elem = this.threadvis;
+        if (elem.isPopupVisualisation()) {
+            elem = window.opener.ThreadVis;
+        }
+        if (event.detail > 1) {
+            elem.openNewMessage(this.container.getMessage().getMsgDbHdr());
+        } else {
+            if (!this.container.isDummy()) {
+                // check to see if this visualisation is in the popup window
+                // if so, call functions in opener
+                elem.callback(this.container.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Re-Draw all elements
+     * 
+     * @param {Number} resize The resize parameter
+     * @param {Number} left The left position
+     * @param {Number} top The top position
+     * @param {Boolean} selected True if container is selected
+     * @param {String} colour The colour
+     * @param {Number} opacity The opacity
+     */
+    redraw(resize, left, top, selected, colour, opacity) {
+        this.resize = resize;
+        this.left = left;
+        this.top = top;
+        this.selected = selected;
+        this.colour = colour;
+        this.opacity = opacity;
+
+        this.redrawDot();
+        this.redrawCircle("black");
+        if (!(this.selected && this.isCircle)) {
+            this.hideCircle();
+        } else {
+            this.showCircle();
+        }
+
+        this.redrawClick();
+    }
+
+    /**
+     * Re-Draw circle around container if container is selected
+     * 
+     * @param {String} colour The colour
+     */
+    redrawCircle(colour) {
+        this.visualiseCircle(colour);
+    }
+
+    /**
+     * Re-Draw container around dot to catch click events and show tooltip
+     */
+    redrawClick() {
+        this.visualiseClick();
+    }
+
+    /**
+     * Re-Draw dot for container
+     */
+    redrawDot() {
+        this.visualiseDot();
+    }
+
+    /**
+     * Show circle
+     */
+    showCircle() {
+        this.circle.hidden = false;
+    }
+
+    /**
+     * Visualise circle around container if container is selected
+     * 
+     * @param {String} colour The colour
+     */
+    visualiseCircle(colour) {
+        let posTop = ((this.top - (this.dotSize * 4 / 6)) * this.resize);
+        let posLeft = ((this.left - (this.dotSize * 4 / 6)) * this.resize);
+        let posHeight = (this.dotSize * 8 / 6 * this.resize);
+        let posWidth = (this.dotSize * 8 / 6 * this.resize);
+        let styleBorder = (this.dotSize / 6 * this.resize) + "px solid " + colour;
+
+        this.circle.style.top = posTop + "px";
+        this.circle.style.left = posLeft + "px";
+        this.circle.style.width = posWidth + "px";
+        this.circle.style.height = posHeight + "px";
+        this.circle.style.border = styleBorder;
+        if (this.messageCircles) {
+            this.circle.style.borderRadius = posWidth + "px";
+        } else {
+            this.circle.style.borderRadius = "";
+        }
+    }
+
+    /**
+     * Visualise container around dot to catch click events and show tooltip
+     */
+    visualiseClick() {
+        let posTop = ((this.top - (this.spacing / 2)) * this.resize);
+        let posLeft = ((this.left - this.spacing / 2) * this.resize);
+        let posHeight = (this.spacing * this.resize);
+        let posWidth = (this.spacing * this.resize);
+
+        this.click.style.top = posTop + "px";
+        this.click.style.left = posLeft + "px";
+        this.click.style.width = posWidth + "px";
+        this.click.style.height = posHeight + "px";
+
+        if (this.style == "dummy") {
+            this.click.style.cursor = "default";
+        } else {
+            this.click.style.cursor = "pointer";
+        }
+        this.click.style.zIndex = "2";
+    }
+
+    /**
+     * Draw dot for container
+     */
+    visualiseDot() {
+        let posTop = ((this.top - (this.dotSize / 2)) * this.resize);
+        let posLeft = ((this.left - (this.dotSize / 2)) * this.resize);
+        let posHeight = (this.dotSize * this.resize);
+        let posWidth = (this.dotSize * this.resize);
+        let styleBackground = "";
+        let styleBorder = "";
+        let styleOpacity = this.opacity;
+        if (this.style != "half") {
+            styleBackground = this.colour;
+        } else {
+            styleBorder = (this.dotSize / 4 * this.resize) + "px solid " + this.colour;
+        }
+
+        this.dot.style.top = posTop + "px";
+        this.dot.style.left = posLeft + "px";
+        this.dot.style.width = posWidth + "px";
+        this.dot.style.height = posHeight + "px";
+        this.dot.style.background = styleBackground;
+        this.dot.style.border = styleBorder;
+        this.dot.style.opacity = styleOpacity;
+
+        if (this.style != "dummy") {
+            if (this.messageCircles) {
+                this.dot.style.borderRadius = posWidth + "px";
+            } else {
+                this.dot.style.borderRadius = "";
+            }
+        } else {
+            this.dot.style.borderRadius = "";
+            this.dot.style.MozBorderRadius = "";
+        }
+        this.dot.style.cursor = "default";
+    }
+}

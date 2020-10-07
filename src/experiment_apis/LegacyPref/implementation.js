@@ -23,27 +23,37 @@
  *
  * Version: $Id$
  * *********************************************************************************************************************
- * JavaScript file to visualise legend
+ * Register experiment to access preferences in options.js
  **********************************************************************************************************************/
 
-/**
- * Clear the legend box
- */
-function clearLegend() {
-    let legendBox = document.getElementById("LegendContent");
-    while (legendBox.firstChild != null) {
-        legendBox.removeChild(legendBox.firstChild);
+var { ExtensionCommon } = ChromeUtils.import("resource://gre/modules/ExtensionCommon.jsm");
+
+var { Preferences } = ChromeUtils.import("chrome://threadvis/content/preferences.js");
+
+var LegacyPref = class extends ExtensionCommon.ExtensionAPI {
+    onStartup() {
+        Preferences.register();
     }
-}
-
-/**
- * Display the legend
- */
-function displayLegend() {
-    clearLegend();
-
-    let legendBox = document.getElementById("LegendContent");
-    let legend = opener.ThreadVis.getLegend();
-    legendBox.appendChild(legend);
-    window.sizeToContent();
-}
+    onShutdown(isAppShutdown) {
+        if (isAppShutdown) {
+            return;
+        }
+        Preferences.unregister();
+    }
+    getAPI(context) {
+        return {
+            LegacyPref: {
+                init() {
+                    Preferences.register();
+                    Preferences.reload();
+                },
+                get(name) {
+                    return Preferences.get(name);
+                },
+                set(name, value) {
+                    Preferences.set(name, value);
+                }
+            }
+        }
+    }
+};

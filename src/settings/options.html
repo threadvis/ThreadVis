@@ -1,0 +1,238 @@
+<!--
+/* *********************************************************************************************************************
+ * This file is part of ThreadVis.
+ * https://threadvis.github.io
+ *
+  * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis titled
+ * "ThreadVis for Thunderbird: A Thread Visualisation Extension for the Mozilla Thunderbird Email Client"
+ * at Graz University of Technology, Austria. An electronic version of the thesis is available online at
+ * https://ftp.isds.tugraz.at/pub/theses/ahubmann.pdf
+ *
+ * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020 Alexander C. Hubmann-Haidvogel
+ *
+ * ThreadVis is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * ThreadVis is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with ThreadVis.
+ * If not, see <http://www.gnu.org/licenses/>.
+*
+ * Version: $Id$
+ * *********************************************************************************************************************
+ * HTML file to display options
+ **********************************************************************************************************************/
+-->
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="options.css">
+  </head>
+
+  <body>
+    <!-- ***** ABOUT ***** -->
+    <div>
+      <div>
+        <img src="images/about.png"><br>
+        <span class="aboutVersion">__MSG_options.about.version__ __MSG_extension.version__</span>
+      </div>
+      <div class="aboutCopyright">
+        __MSG_extension.copyright1__
+      </div>
+      <div class="aboutCopyright">
+        __MSG_extension.copyright2__
+      </div>
+      <a class="aboutEmail" href="mailto:ahubmann@gmail.com?subject=[ThreadVis] <insert subject here>">__MSG_extension.email__</a>
+      <a class="aboutHomepage" href="__MSG_extension.homepage__">__MSG_extension.homepage__</a>
+    </div>
+
+    <hr>
+
+    <!-- ***** TIME SCALING ***** -->
+
+    <div class="category">
+      <h1>__MSG_options.visualisation.timescaling.caption__</h1>
+
+      <div class="subcategory">
+        <input type="radio" id="timescaling-disable" name="extensions.threadvis.timescaling.enabled" value="false">
+        <label class="legend" for="timescaling-disable">__MSG_options.visualisation.timescaling.disable__</label>
+        <div class="indent">
+          <img src="images/timescaling_disabled.png">
+          <div class="detailedDescription">
+            __MSG_options.visualisation.timescaling.description.disabled__
+          </div>
+        </div>
+      </div>
+
+      <div class="subcategory">
+        <input type="radio" id="timescaling-enable" name="extensions.threadvis.timescaling.enabled" value="true">
+        <label class="legend" for="timescaling-enable">__MSG_options.visualisation.timescaling.enable__</label>
+        <div class="indent">
+          <img src="images/timescaling_enabled.png">
+          <div class="detailedDescription">
+            __MSG_options.visualisation.timescaling.description.enabled__
+            <div>
+              <label>__MSG_options.visualisation.timescaling.method__</label>
+              <select class="browser-style" name="extensions.threadvis.timescaling.method">
+                <option value="linear">__MSG_options.visualisation.timescaling.method.linear__</option>
+                <option value="log">__MSG_options.visualisation.timescaling.method.logarithmic__</option>
+              </select>
+            </div>
+            <div>
+              <label>__MSG_options.visualisation.timescaling.mintimediff__</label>
+              <select class="browser-style" name="extensions.threadvis.timescaling.mintimediff">
+                <option value="0">__MSG_options.visualisation.timescaling.mintimediff.automatic__</option>
+                <option value="60000">__MSG_options.visualisation.timescaling.mintimediff.1min__</option>
+                <option value="600000">__MSG_options.visualisation.timescaling.mintimediff.10min__</option>
+                <option value="1800000">__MSG_options.visualisation.timescaling.mintimediff.30min__</option>
+                <option value="3600000">__MSG_options.visualisation.timescaling.mintimediff.1hour__</option>
+                <option value="43200000">__MSG_options.visualisation.timescaling.mintimediff.12hours__</option>
+                <option value="86400000">__MSG_options.visualisation.timescaling.mintimediff.1day__</option>
+                <option value="172800000">__MSG_options.visualisation.timescaling.mintimediff.2days__</option>
+                <option value="864000000">__MSG_options.visualisation.timescaling.mintimediff.10days__</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="subcategory">
+        <input type="checkbox" id="timeline-enable" name="extensions.threadvis.timeline.enabled">
+        <label class="legend" for="timeline-enable">__MSG_options.visualisation.timeline.enable__</label>
+      </div>
+    </div>
+
+    <!-- ***** SIZING ***** -->
+    <div class="category">
+      <h1>__MSG_options.visualisation.size.caption__</h1>
+
+      <div class="subcategory">
+        <table>
+          <tr>
+            <td>__MSG_options.visualisation.size.dotsize__</td>
+            <td><input name="extensions.threadvis.visualisation.dotsize" class="size3" type="number" min="1"></td>
+          </tr>
+          <tr>
+            <td>__MSG_options.visualisation.size.arcminheight__</td>
+            <td><input name="extensions.threadvis.visualisation.arcminheight" class="size3" type="number" min="0"></td>
+          </tr>
+          <tr>
+            <td>__MSG_options.visualisation.size.arcradius__</td>
+            <td><input name="extensions.threadvis.visualisation.arcradius" class="size3" type="number" min="0"></td>
+          </tr>
+          <tr>
+            <td>__MSG_options.visualisation.size.arcdifference__</td>
+            <td><input name="extensions.threadvis.visualisation.arcdifference" class="size3" type="number" min="1"></td>
+          </tr>
+          <tr>
+            <td>__MSG_options.visualisation.size.arcwidth__</td>
+            <td><input name="extensions.threadvis.visualisation.arcwidth" class="size3" type="number" min="1"></td>
+          </tr>
+          <tr>
+            <td>__MSG_options.visualisation.size.spacing__</td>
+            <td><input name="extensions.threadvis.visualisation.spacing" class="size3" type="number" min="1"></td>
+          </tr>
+          <tr>
+            <td>__MSG_options.visualisation.timeline.fontsize__</td>
+            <td><input name="extensions.threadvis.timeline.fontsize" class="size3" type="number" min="1"></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="subcategory">
+        <label>__MSG_options.visualisation.zoom.caption__</label>
+        <select class="browser-style" name="extensions.threadvis.visualisation.zoom">
+          <option value="fit">__MSG_options.visualisation.zoom.fit__</option>
+          <option value="full">__MSG_options.visualisation.zoom.full__</option>
+        </select>
+      </div>
+
+      <div class="subcategory">
+        <input type="checkbox" id="messagecircles" name="extensions.threadvis.visualisation.messagecircles">
+        <label class="legend" for="messagecircles">__MSG_options.visualisation.size.messagecircles__</label>
+      </div>
+    </div>
+
+    <!-- ***** COLOURS ***** -->
+    <div class="category">
+      <h1>__MSG_options.visualisation.colour.caption__</h1>
+
+      <div class="subcategory">
+        <input type="radio" id="singlecolor" name="extensions.threadvis.visualisation.colour" value="single">
+        <label class="legend" for="singlecolor">__MSG_options.visualisation.colour.single.caption__</label>
+        <div class="indent detailedDescription">__MSG_options.visualisation.colour.single.description__</div>
+      </div>
+
+      <div class="subcategory">
+        <input type="radio" id="multicolor" name="extensions.threadvis.visualisation.colour" value="author">
+        <label class="legend" for="multicolor">__MSG_options.visualisation.colour.author.caption__</label>
+        <div class="indent detailedDescription">__MSG_options.visualisation.colour.author.description__</div>
+        <div class="indent">
+          <input type="checkbox" id="highlight" name="extensions.threadvis.visualisation.highlight">
+          <label class="legend" for="highlight">__MSG_options.visualisation.colour.highlight__</label>
+        </div>
+      </div>
+
+      <div class="subcategory">
+        <label class="legend">__MSG_options.visualisation.opacity__</label>
+        <select class="browser-style" name="extensions.threadvis.visualisation.opacity">
+          <option value="10">10%</option>
+          <option value="20">20%</option>
+          <option value="30">30%</option>
+          <option value="40">40%</option>
+          <option value="50">50%</option>
+          <option value="60">60%</option>
+          <option value="70">70%</option>
+          <option value="80">80%</option>
+          <option value="90">90%</option>
+          <option value="100">100%</option>
+        </select>
+      </div>
+
+      <div class="subcategory">
+        <label class="legend">__MSG_options.visualisation.colour.sent__</label>
+        <input type="text" name="extensions.threadvis.visualisation.colours.sent" value="">
+    </div>
+
+    <div class="subcategory">
+      <label class="legend">__MSG_options.visualisation.colour.received__</label>
+      <input type="text" name="extensions.threadvis.visualisation.colours.received" value="">
+  </div>
+
+    <!-- ***** SENT DETECTION ***** -->
+    <div class="category">
+      <h1>__MSG_options.sentmail.caption__</h1>
+      <div class="subcategory">
+        <input type="checkbox" id="folderflag" name="extensions.threadvis.sentmail.folderflag">
+        <label class="legend" for="folderflag">__MSG_options.sentmail.folderflag__</label>
+      </div>
+      <div class="subcategory">
+        <input type="checkbox" id="identity" name="extensions.threadvis.sentmail.identity">
+        <label class="legend" for="identity">__MSG_options.sentmail.identity__</label>
+      </div>
+    </div>
+
+    <!-- ***** ENABLED ACCOUNTS/FOLDERS ***** -->
+    <div class="category">
+      <h1>__MSG_options.visualisation.enabledaccounts.caption__</h1>
+
+      <input type="hidden"
+             id="ThreadVisHiddenDisabledAccounts"
+             name="extensions.threadvis.disabledaccounts" />
+      <input type="hidden"
+             id="ThreadVisHiddenDisabledFolders"
+             name="extensions.threadvis.disabledfolders" />
+      <label class="legend">__MSG_options.visualisation.enabledaccounts.description__</label>
+      <div id="ThreadVisEnableAccounts"></div>
+    </div>
+
+    <script src="../chrome/content/preferenceskeys.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>

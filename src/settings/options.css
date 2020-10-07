@@ -23,27 +23,71 @@
  *
  * Version: $Id$
  * *********************************************************************************************************************
- * JavaScript file to visualise legend
+ * CSS file to layout preferences dialog
  **********************************************************************************************************************/
 
-/**
- * Clear the legend box
- */
-function clearLegend() {
-    let legendBox = document.getElementById("LegendContent");
-    while (legendBox.firstChild != null) {
-        legendBox.removeChild(legendBox.firstChild);
-    }
+.category {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #d7d7db;
 }
 
-/**
- * Display the legend
- */
-function displayLegend() {
-    clearLegend();
+.subcategory {
+    margin-top: 16px;
+}
 
-    let legendBox = document.getElementById("LegendContent");
-    let legend = opener.ThreadVis.getLegend();
-    legendBox.appendChild(legend);
-    window.sizeToContent();
+h1 {
+    margin: 0 0 8px;
+    font-size: 1.46em;
+    font-weight: 300;
+    line-height: 1.3em;
+}
+
+img {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.legend {
+    margin-top: 1em;
+    font-size: 1.1em;
+    font-weight: 600;
+    line-height: 1.4em;
+}
+
+.indent {
+    margin-inline-start: 33px;
+}
+
+.aboutVersion {
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: rgb(144,144,144);
+    text-align: right;
+}
+
+.aboutDescription {
+    color: rgb(64,64,64);
+    margin-bottom: 10px;
+}
+
+.aboutHomepage {
+    margin-left: 2em;
+}
+
+.detailedDescription {
+    color: rgb(70,70,70);
+}
+
+input[type="number"].size3 {
+  width: calc(3ch + 20px);
+}
+
+#ThreadVisEnableAccounts button {
+    margin-left: 2em;
+}
+
+#ThreadVisEnableAccounts .account {
+    margin-top: 2em;
+    font-weight: 600;
 }

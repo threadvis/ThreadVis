@@ -1,0 +1,10 @@
+[{
+  "namespace": "LegacyAccountsFolders",
+  "functions": [{
+    "name": "getAccounts",
+    "type": "function",
+    "description": "Gets all accounts.",
+    "async": true,
+    "parameters": []
+  }]
+}]

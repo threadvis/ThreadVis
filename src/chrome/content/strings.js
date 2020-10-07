@@ -23,27 +23,25 @@
  *
  * Version: $Id$
  * *********************************************************************************************************************
- * JavaScript file to visualise legend
+ * Implements strings proxy
  **********************************************************************************************************************/
 
+var EXPORTED_SYMBOLS = [ "Strings" ];
+
+const { Services } = ChromeUtils.import("resource://gre/modules/Services.jsm");
+const strings = Services.strings.createBundle("chrome://threadvis/locale/threadvis.properties");
+
 /**
- * Clear the legend box
+ * Static strings object
  */
-function clearLegend() {
-    let legendBox = document.getElementById("LegendContent");
-    while (legendBox.firstChild != null) {
-        legendBox.removeChild(legendBox.firstChild);
+const Strings = {
+    /**
+     * Get localized string
+     * 
+     * @param {String} key
+     *              The key of the localized string
+     */
+    getString(key) {
+        return strings.GetStringFromName(key);
     }
-}
-
-/**
- * Display the legend
- */
-function displayLegend() {
-    clearLegend();
-
-    let legendBox = document.getElementById("LegendContent");
-    let legend = opener.ThreadVis.getLegend();
-    legendBox.appendChild(legend);
-    window.sizeToContent();
-}
+};

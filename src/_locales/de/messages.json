@@ -1,34 +1,30 @@
-// * *****************************************************************************
+// * *******************************************************************************************************************
 // * This file is part of ThreadVis.
 // * https://threadvis.github.io
 // *
-// * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis
-// * titled "ThreadVis for Thunderbird: A Thread Visualisation Extension for the
-// * Mozilla Thunderbird Email Client" at Graz University of Technology, Austria.
-// * An electronic version of the thesis is available online at
+// * ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis titled
+// * "ThreadVis for Thunderbird: A Thread Visualisation Extension for the Mozilla Thunderbird Email Client"
+// * at Graz University of Technology, Austria. An electronic version of the thesis is available online at
 // * https://ftp.isds.tugraz.at/pub/theses/ahubmann.pdf
 // *
 // * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
-// * Copyright (C) 2007, 2008, 2009, 2010, 2011,
-// *               2013, 2018, 2019 Alexander C. Hubmann-Haidvogel
+// * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020 Alexander C. Hubmann-Haidvogel
 // *
-// * ThreadVis is free software: you can redistribute it and/or modify it under
-// * the terms of the GNU Affero General Public License as published by the Free
-// * Software Foundation, either version 3 of the License, or (at your option) any
-// * later version.
+// * ThreadVis is free software: you can redistribute it and/or modify it under the terms of the
+// * GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License,
+// * or (at your option) any later version.
 // *
-// * ThreadVis is distributed in the hope that it will be useful, but WITHOUT ANY
-// * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-// * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-// * details.
+// * ThreadVis is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// * See the GNU Affero General Public License for more details.
 // *
-// * You should have received a copy of the GNU Affero General Public License
-// * along with ThreadVis. If not, see <http://www.gnu.org/licenses/>.
+// * You should have received a copy of the GNU Affero General Public License along with ThreadVis.
+// * If not, see <http://www.gnu.org/licenses/>.
 // *
 // * Version: $Id$
-// * *****************************************************************************
+// * *******************************************************************************************************************
 // * German translations
-// ******************************************************************************/
+// ********************************************************************************************************************/
 
 {
     "extensionName": {
@@ -38,5 +34,158 @@
     "extensionDescription": {
         "message": "Zeigt eine kleine Grafik, die den Kontext (Thread) der aktuell angezeigten Nachricht visualisiert.",
         "description": "Description of the extension."
+    },
+    "options.sentmail.caption": {
+        "message": "Erkennung gesendeter Nachrichten"
+    },
+    "options.sentmail.folderflag": {
+        "message": "Alle E-Mails in 'Gesendet' Ordnern als gesendet behandeln."
+    },
+    "options.sentmail.identity": {
+        "message": "Alle E-Mails mit einer lokalen Identität als Absender als gesendet behandeln."
+    },
+    "options.visualisation.zoom.caption": {
+        "message": "Standard-Größe"
+    },
+    "options.visualisation.zoom.fit": {
+        "message": "angepasst (Auto-Zoom)"
+    },
+    "options.visualisation.zoom.full": {
+        "message": "normale Größe (kein Zoom)"
+    },
+    "options.visualisation.enabledaccounts.caption": {
+        "message": "Aktivierte Konten und Ordner"
+    },
+    "options.visualisation.enabledaccounts.description": {
+        "message": "Aktiviert die Erweiterung nur für die ausgewählten Konten und Ordner."
+    },
+    "options.visualisation.timescaling.caption": {
+        "message": "Time Scaling"
+    },
+    "options.visualisation.timescaling.enable": {
+        "message": "Time Scaling aktivieren"
+    },
+    "options.visualisation.timescaling.disable": {
+        "message": "Time Scaling deaktivieren"
+    },
+    "options.visualisation.timescaling.description.disabled": {
+        "message": "Wenn Time Scaling deaktiviert ist, ist der horizontale Abstand zwischen benachbarten Nachrichten immer konstant."
+    },
+    "options.visualisation.timescaling.description.enabled": {
+        "message": "Wenn Time Scaling aktiviert ist, ist der horizontale Abstand zwischen benachbarten Nachrichten proportional zum zeitlichen Abstand dieser Nachrichten."
+    },
+    "options.visualisation.timescaling.method": {
+        "message": "Time Scaling-Methode"
+    },
+    "options.visualisation.timescaling.method.linear": {
+        "message": "linear"
+    },
+    "options.visualisation.timescaling.method.logarithmic": {
+        "message": "logarithmisch"
+    },
+    "options.visualisation.timescaling.mintimediff": {
+        "message": "Minimal dargestellte Zeitdifferenz"
+    },
+    "options.visualisation.timescaling.mintimediff.automatic": {
+        "message": "automatisch"
+    },
+    "options.visualisation.timescaling.mintimediff.1min": {
+        "message": "1 Minute"
+    },
+    "options.visualisation.timescaling.mintimediff.10min": {
+        "message": "10 Minuten"
+    },
+    "options.visualisation.timescaling.mintimediff.30min": {
+        "message": "30 Minuten"
+    },
+    "options.visualisation.timescaling.mintimediff.1hour": {
+        "message": "1 Stunde"
+    },
+    "options.visualisation.timescaling.mintimediff.12hours": {
+        "message": "12 Stunden"
+    },
+    "options.visualisation.timescaling.mintimediff.1day": {
+        "message": "1 Tag"
+    },
+    "options.visualisation.timescaling.mintimediff.2days": {
+        "message": "2 Tage"
+    },
+    "options.visualisation.timescaling.mintimediff.10days": {
+        "message": "10 Tage"
+    },
+    "options.visualisation.timeline.enable": {
+        "message": "Die vergangene Zeit zwischen den einzelnen Nachrichten einblenden."
+    },
+    "options.visualisation.timeline.fontsize": {
+        "message": "Schriftgröße der Timeline"
+    },
+    "options.visualisation.size.caption": {
+        "message": "Größe"
+    },
+    "options.visualisation.size.dotsize": {
+        "message": "Nachrichtengröße"
+    },
+    "options.visualisation.size.arcminheight": {
+        "message": "Minimale Bogenhöhe"
+    },
+    "options.visualisation.size.arcradius": {
+        "message": "Bogenradius"
+    },
+    "options.visualisation.size.arcdifference": {
+        "message": "Abstand zwischen zwei Bögen"
+    },
+    "options.visualisation.size.arcwidth": {
+        "message": "Linienbreite"
+    },
+    "options.visualisation.size.spacing": {
+        "message": "Abstand zwischen zwei Nachrichten"
+    },
+    "options.visualisation.size.messagecircles": {
+        "message": "Nachrichten als Kreise zeichnen"
+    },
+    "options.visualisation.colour.caption": {
+        "message": "Farben"
+    },
+    "options.visualisation.colour.single.caption": {
+        "message": "Einzelne Farbe"
+    },
+    "options.visualisation.colour.single.description": {
+        "message": "Verwendet nur eine einzige Farbe in der Visualisierung. Die ausgewählte Nachricht wird blau dargestellt, andere Nachrichten in grau."
+    },
+    "options.visualisation.colour.author.caption": {
+        "message": "Mehrere Farben"
+    },
+    "options.visualisation.colour.author.description": {
+        "message": "Verwendet verschiedene Farben für verschiedene Autoren."
+    },
+    "options.visualisation.colour.highlight": {
+        "message": "Die E-Mail-Adressen der Autoren farbig unterstreichen."
+    },
+    "options.visualisation.opacity": {
+        "message": "Unwichtige Sub-Threads ausblenden:"
+    },
+    "options.visualisation.colour.sent": {
+        "message": "Farbe für gesendete E-Mails"
+    },
+    "options.visualisation.colour.received": {
+        "message": "Farben (durch Beistrich getrennt) für empfangene E-Mails"
+    },
+    "options.about.version": {
+        "message": "Version"
+    },
+    "extension.copyright1": {
+        "message": "\u00a9 2005-2007 Alexander C. Hubmann"
+    },
+    "extension.copyright2": {
+        "message": "\u00a9 2007-2020 Alexander C. Hubmann-Haidvogel"
+    },
+    "extension.homepage": {
+        "message": "https://threadvis.github.io"
+    },
+    "extension.email": {
+        "message": "ahubmann@gmail.com"
+    },
+    "extension.version": {
+        "message": "[[version]]"
     }
 }

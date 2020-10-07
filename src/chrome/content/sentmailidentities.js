@@ -23,27 +23,16 @@
  *
  * Version: $Id$
  * *********************************************************************************************************************
- * JavaScript file to visualise legend
+ * Sent mail identities
  **********************************************************************************************************************/
 
-/**
- * Clear the legend box
- */
-function clearLegend() {
-    let legendBox = document.getElementById("LegendContent");
-    while (legendBox.firstChild != null) {
-        legendBox.removeChild(legendBox.firstChild);
-    }
-}
+const EXPORTED_SYMBOLS = [ "SentMailIdentities" ];
 
-/**
- * Display the legend
- */
-function displayLegend() {
-    clearLegend();
+const SentMailIdentities = {};
 
-    let legendBox = document.getElementById("LegendContent");
-    let legend = opener.ThreadVis.getLegend();
-    legendBox.appendChild(legend);
-    window.sizeToContent();
+// remember all local accounts, for sent-mail comparison
+let accountManager = Components.classes["@mozilla.org/messenger/account-manager;1"]
+        .getService(Components.interfaces.nsIMsgAccountManager);
+for (let identity in accountManager.allIdentities) {
+    SentMailIdentities[identity.email] = true;
 }

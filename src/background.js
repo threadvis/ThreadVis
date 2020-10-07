@@ -23,27 +23,24 @@
  *
  * Version: $Id$
  * *********************************************************************************************************************
- * JavaScript file to visualise legend
+ * Main background script for the WebExtension
  **********************************************************************************************************************/
 
-/**
- * Clear the legend box
- */
-function clearLegend() {
-    let legendBox = document.getElementById("LegendContent");
-    while (legendBox.firstChild != null) {
-        legendBox.removeChild(legendBox.firstChild);
-    }
-}
+(async => {
 
-/**
- * Display the legend
- */
-function displayLegend() {
-    clearLegend();
+    messenger.WindowListener.registerDefaultPrefs("defaults/preferences/threadvisdefault.js");
 
-    let legendBox = document.getElementById("LegendContent");
-    let legend = opener.ThreadVis.getLegend();
-    legendBox.appendChild(legend);
-    window.sizeToContent();
-}
+    messenger.WindowListener.registerChromeUrl([ 
+        ["content", "threadvis",           "chrome/content/"],
+        ["locale",  "threadvis", "en-US",  "chrome/locale/en-us/"],
+        ["locale",  "threadvis", "de-DE",  "chrome/locale/de-de/"]
+    ]);
+
+    messenger.WindowListener.registerWindow(
+        "chrome://messenger/content/messenger.xhtml",
+        "chrome://threadvis/content/hooks/init.js");
+
+    messenger.WindowListener.registerShutdownScript("chrome://threadvis/content/hooks/shutdown.js");
+
+    messenger.WindowListener.startListening();
+})();

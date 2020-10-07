@@ -1,0 +1,34 @@
+[{
+  "namespace": "LegacyPref",
+  "functions": [{
+    "name": "init",
+    "type": "function",
+    "description": "Init preferences",
+    "async": true,
+    "parameters": []
+  }, {
+    "name": "get",
+    "type": "function",
+    "description": "Gets a preference.",
+    "async": true,
+    "parameters": [{
+      "name": "name",
+      "type": "string",
+      "description": "The preference name"
+    }]
+  }, {
+    "name": "set",
+    "type": "function",
+    "description": "Sets a preference.",
+    "async": true,
+    "parameters": [{
+      "name": "name",
+      "type": "string",
+      "description": "The preference name"
+    }, {
+      "name": "value",
+      "type": "any",
+      "description": "The preference value"
+    }]
+  }]
+}]
