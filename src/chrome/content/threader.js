@@ -36,7 +36,7 @@ const { Container } = ChromeUtils.import("chrome://threadvis/content/container.j
 /**
  * Link message ids to container objects
  */
-let _idTable = {};
+let idTable = {};
 
 /**
  * Find a message
@@ -46,7 +46,7 @@ let _idTable = {};
  * @return The found message, null if message does not exist
  */
 const findContainer = (messageId) => {
-    return _idTable[messageId];
+    return idTable[messageId];
 };
 
 /**
@@ -57,7 +57,7 @@ const findContainer = (messageId) => {
  */
 const putMessageInContainer = (message) => {
     // try to get message container
-    var messageContainer = _idTable[message.getId()];
+    var messageContainer = idTable[message.getId()];
 
     if (messageContainer != null) {
         // if we found a container for this message id, either it's a dummy or we have two mails with the same message-id
@@ -68,7 +68,7 @@ const putMessageInContainer = (message) => {
             // store message in this container
             messageContainer.setMessage(message);
             // index container in hashtable
-            _idTable[message.getId()] = messageContainer;
+            idTable[message.getId()] = messageContainer;
         } else if (!messageContainer.isDummy() && messageContainer.getMessage().isSent()) {
             // the message in messageContainer is a sent message, the new message is not the sent one
             // in this case we simply ignore the new message, since the sent message takes precedence
@@ -83,7 +83,7 @@ const putMessageInContainer = (message) => {
         messageContainer = new Container();
         messageContainer.setMessage(message);
         // index container in hashtable
-        _idTable[message.getId()] = messageContainer;
+        idTable[message.getId()] = messageContainer;
     }
 
     // for each element in references field of message
@@ -100,12 +100,12 @@ const putMessageInContainer = (message) => {
         }
 
         // try to find container for referenced message
-        var referenceContainer = _idTable[referenceId];
+        var referenceContainer = idTable[referenceId];
         if (referenceContainer == null) {
             // no container found, create new one
             referenceContainer = new Container();
             // index container
-            _idTable[referenceId] = referenceContainer;
+            idTable[referenceId] = referenceContainer;
         }
 
         // link reference container together
@@ -146,7 +146,7 @@ const putMessageInContainer = (message) => {
  * Reset in-memory data
  */
 const reset = () => {
-    _idTable = {};
+    idTable = {};
 };
 
 const Threader = {

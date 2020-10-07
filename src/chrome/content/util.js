@@ -38,7 +38,7 @@ const Util = {
     /**
      * Built-in date formatter service
      */
-    _dateFormatter: new Intl.DateTimeFormat(undefined, {
+    dateFormatter: new Intl.DateTimeFormat(undefined, {
             "year": "2-digit",
             "month": "2-digit",
             "day": "2-digit",
@@ -281,6 +281,6 @@ const Util = {
      * @return The formatted date
      */
     formatDate(date) {
-        return this._dateFormatter.format(date);
+        return this.dateFormatter.format(date);
     }
 };

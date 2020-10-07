@@ -40,11 +40,25 @@ const PREF_STRING = Services.prefs.PREF_STRING;
 
 class PreferencesClass {
 
-    preferences = {};
+    /**
+     * Constructor
+     */
+    constructor() {
+        /**
+         * Internal preferences object
+         */
+        this.preferences = {};
 
-    threadVisPrefBranch = Services.prefs.getBranch(PreferenceBranch);
+        /**
+         * Branch of threadvis preferences
+         */
+        this.threadVisPrefBranch = Services.prefs.getBranch(PreferenceBranch);
 
-    glodaPrefBranch = Services.prefs.getBranch("mailnews.database.global.indexer.enabled");
+        /**
+         * Branch for gloda preference
+         */
+        this.glodaPrefBranch = Services.prefs.getBranch("mailnews.database.global.indexer.enabled");
+    }
 
     /**
      * Do callbacks after preference change

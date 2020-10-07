@@ -29,87 +29,6 @@
 var EXPORTED_SYMBOLS = [ "ArcVisualisation"];
 
  class ArcVisualisation {
-
-    /**
-     * XUL/DOM window to draw in
-     */
-    document = null;
-
-    /**
-     * XUL box element which visualises the arc
-     */
-    arc = null;
-
-    /**
-     * XUL stack on which to draw
-     */
-    stack = null;
-
-    /**
-     * size of the dot representing a message in px
-     */
-    dotSize = 0;
-
-    /**
-     * resize multiplicator
-     */
-    resize = 1;
-
-    /**
-     * the minimum arc height in px
-     */
-    arcMinHeight = 0;
-
-    /**
-     * the (height) difference between two arcs in px
-     */
-    arcDifference = 0;
-
-    /**
-     * the corner radius for an arc in px
-     */
-    arcRadius = 0;
-
-    /**
-     * width of an arc in px
-     */
-    arcWidth = 0;
-
-    /**
-     * colour of the arc
-     */
-    colour = "";
-
-    /**
-     * vertical position of arc ("top" or "bottom")
-     */
-    vPosition = "top";
-
-    /**
-     * height of arc (counting from 0) multiplied by arc_difference_ to get height in px
-     */
-    height = 0;
-
-    /**
-     * left edge of arc in px
-     */
-    left = 0;
-
-    /**
-     * right edge of arc in pc
-     */
-    right = 0;
-
-    /**
-     * top edge of arc in px
-     */
-    top = 0;
-
-    /**
-     * opacity of item
-     */
-    opacity = 1;
-
     /**
      * Constructor for visualisation class
      * 
@@ -135,21 +54,85 @@ var EXPORTED_SYMBOLS = [ "ArcVisualisation"];
     constructor(document, stack, dotSize, resize, arcMinHeight, arcDifference, arcRadius, arcWidth, colour, vPosition,
             height,left, right, top, opacity) {
 
+        /**
+         * XUL/DOM window to draw in
+         */
         this.document = document;
+
+        /**
+         * XUL stack on which to draw
+         */
         this.stack = stack;
+
+        /**
+          * size of the dot representing a message in px
+         */
         this.dotSize = dotSize;
+
+        /**
+         * resize multiplicator
+         */
         this.resize = resize;
+
+        /**
+         * the minimum arc height in px
+         */
         this.arcMinHeight = arcMinHeight;
+
+        /**
+         * the (height) difference between two arcs in px
+         */
         this.arcDifference = arcDifference;
+
+        /**
+         * the corner radius for an arc in px
+         */
         this.arcRadius = arcRadius;
+
+        /**
+         * width of an arc in px
+         */
         this.arcWidth = arcWidth;
+
+        /**
+         * colour of the arc
+         */
         this.colour = colour;
+
+        /**
+         * vertical position of arc ("top" or "bottom")
+         */
         this.vPosition = vPosition;
+
+        /**
+         * height of arc (counting from 0) multiplied by arc_difference_ to get height in px
+         */
         this.height = height;
+
+        /**
+         * left edge of arc in px
+         */
         this.left = left;
+
+        /**
+         * right edge of arc in pc
+         */
         this.right = right;
+
+        /**
+         * top edge of arc in px
+         */
         this.top = top;
+
+        /**
+         * opacity of item
+         */
         this.opacity = opacity;
+
+        /**
+         * XUL box element which visualises the arc
+         */
+        this.arc = null;
 
         this.draw();
     };

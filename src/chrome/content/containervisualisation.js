@@ -32,84 +32,6 @@ const { Strings } = ChromeUtils.import("chrome://threadvis/content/strings.js");
 const { Util } = ChromeUtils.import("chrome://threadvis/content/util.js");
 
 class ContainerVisualisation {
-
-    /**
-     * Main object
-     */
-    threadvis = null;
-
-    /**
-     * The XUL/DOM document the visualisation is drawn on
-     */
-    document = null;
-
-    /**
-     * XUL stack on which container gets drawn
-     */
-    stack = null;
-
-    /**
-     * the container which gets visualised
-     */
-    container = null;
-
-    /**
-     * colour of container
-     */
-    colour = "";
-
-    /**
-     * left position of container in px
-     */
-    left = 0;
-
-    /**
-     * top position of container in px
-     */
-    top = 0;
-
-    /**
-     * is container selected (boolean)
-     */
-    selected = false;
-
-    /**
-     * size of the dot to draw in px
-     */
-    dotSize = 0;
-
-    /**
-     * resize multiplicator
-     */
-    resize = 1;
-
-    /**
-     * should we draw a circle around the dot to mark it as selected (boolean)
-     */
-    isCircle = false;
-
-    /**
-     * the spacing between two messages in px
-     */
-    spacing = 0;
-
-    /**
-     * the opacity of the item
-     */
-    opacity = 1;
-
-    /**
-     * if true, draw circle, else draw square
-     */
-    messageCircles = true;
-
-    /**
-     * DOM element to handle the context popup
-     */
-    popup = null;
-
-    style = "full";
-
     /**
      * Constructor for visualisation class
      * 
@@ -133,21 +55,85 @@ class ContainerVisualisation {
      */
     constructor(threadvis, document, stack, container, colour, left, top, selected, dotSize, resize, circle, spacing,
             opacity, messageCircles) {
-
+        /**
+         * Main object
+         */
         this.threadvis = threadvis;
+
+        /**
+         * The XUL/DOM document the visualisation is drawn on
+         */
         this.document = document;
+
+        /**
+         * XUL stack on which container gets drawn
+         */
         this.stack = stack;
+
+        /**
+         * the container which gets visualised
+         */
         this.container = container;
+
+        /**
+         * colour of container
+         */
         this.colour = colour;
+
+        /**
+         * left position of container in px
+         */
         this.left = left;
+
+        /**
+         * top position of container in px
+         */
         this.top = top;
+
+        /**
+         * is container selected (boolean)
+         */
         this.selected = selected;
+
+        /**
+         * size of the dot to draw in px
+         */
         this.dotSize = dotSize;
+
+        /**
+         * resize multiplicator
+         */
         this.resize = resize;
+
+        /**
+         * should we draw a circle around the dot to mark it as selected (boolean)
+         */
         this.isCircle = circle;
+
+        /**
+         * the spacing between two messages in px
+         */
         this.spacing = spacing;
+
+        /**
+         * the opacity of the item
+         */
         this.opacity = opacity;
+
+        /**
+         * if true, draw circle, else draw square
+         */
         this.messageCircles = messageCircles;
+
+        /**
+         * DOM element to handle the context popup
+         */
+        this.popup = null;
+
+        /**
+         * Style of container (default == full)
+         */
+        this.style = "full";
 
         // calculate style
         // full == received message

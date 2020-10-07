@@ -30,12 +30,6 @@
 var EXPORTED_SYMBOLS = [ "References" ];
 
 class References {
-
-    /**
-     * Store message ids of references
-     */
-    _references = [];
-
     /**
      * Constructor
      * 
@@ -43,7 +37,11 @@ class References {
      *            The "References" header
      */
     constructor(references) {
-        this._buildReferences(references);
+        /**
+         * Store message ids of references
+         */
+        this.references = [];
+        this.buildReferences(references);
     }
 
     /**
@@ -52,7 +50,7 @@ class References {
      * @param references
      *            The references string
      */
-    _buildReferences(references) {
+    buildReferences(references) {
         if (references != null && references != "") {
             let result = references.match(/[^<>\s]+/g);
 
@@ -74,7 +72,7 @@ class References {
                 }
             }
             distinct.reverse();
-            this._references = distinct;
+            this.references = distinct;
         }
     }
 
@@ -84,7 +82,7 @@ class References {
      * @return An array of all referenced message ids
      */
     getReferences() {
-        return this._references;
+        return this.references;
     }
 
     /**
@@ -94,8 +92,8 @@ class References {
      */
     toString() {
         var string = "";
-        for (let referenceskey in this._references) {
-            string += ", " + this._references[referenceskey];
+        for (let referenceskey in this.references) {
+            string += ", " + this.references[referenceskey];
         }
         return string;
     }

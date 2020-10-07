@@ -32,34 +32,6 @@ const { Preferences } = ChromeUtils.import("chrome://threadvis/content/preferenc
 const { Util } = ChromeUtils.import("chrome://threadvis/content/util.js");
 
 class Timeline {
-
-    /**
-     * XUL/DOM document to draw in
-     */
-    document = null;
-
-    /**
-     * XUL stack to draw timeline on
-     */
-    stack = null;
-
-    /**
-     * containers of current thread
-     */
-    containers = null;
-
-    /**
-     * resize multiplicator
-     */
-    resize = 1;
-
-    /**
-     * top position of center of visualisation in px
-     */
-    top = 0;
-
-    times = {};
-
     /**
      * Constructor for timeline class
      * 
@@ -76,11 +48,31 @@ class Timeline {
      * @return A new timeline object
      */
     constructor(document, stack, containers, resize, top) {
+        /**
+         * XUL/DOM document to draw in
+         */
         this.document = document;
+
+        /**
+         * XUL stack to draw timeline on
+         */
         this.stack = stack;
+
+        /**
+         * containers of current thread
+         */
         this.containers = containers;
+
+        /**
+         * resize multiplicator
+         */
         this.resize = resize;
+
+        /**
+         * top position of center of visualisation in px
+        */
         this.top = top;
+
         this.times = {};
     }
 

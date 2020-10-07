@@ -28,59 +28,6 @@
 
 var EXPORTED_SYMBOLS = [ "Scrollbar" ];
 class Scrollbar {
-
-    /**
-     * DOM/XUL window to render in
-     */
-    window = null;
-
-    /**
-     * DOM/XUL document to render in
-     */
-    document = null;
-
-    /**
-     * visualisation object
-     */
-    visualisation = null;
-
-    /**
-     * XUL stack on which visualisation gets drawn
-     */
-    stack = null;
-
-    /**
-     * XUL box containing visualisation
-     */
-    box = null;
-
-    /**
-     * XUL boxes for horizontal scrollbar
-     */
-    boxHorizontal = null;
-    horizontal = null;
-    arrowLeft = null;
-    arrowRight = null;
-
-    /**
-     * XUL boxes for vertical scrollbar
-     */
-    boxVertical = null;
-    vertical = null;
-    arrowDown = null;
-    arrowUp = null;
-
-    /**
-     * Pan intervals
-     */
-    leftPanInterval = null;
-    upPanInterval = null;
-    downPanInterval = null;
-    rightPanInterval = null;
-
-    verticalShown = false;
-    horizontalShown = false;
-
     /**
      * Constructor for scrollbar class
      * 
@@ -95,10 +42,29 @@ class Scrollbar {
      * @return A new scrollbar object.
      */
     constructor(visualisation, window, stack, box) {
+        /**
+         * DOM/XUL window to render in
+         */
         this.window = window;
+
+        /**
+         * DOM/XUL document to render in
+         */
         this.document = window.document;
+
+        /**
+         * visualisation object
+         */
         this.visualisation = visualisation;
+
+        /**
+         * XUL stack on which visualisation gets drawn
+         */
         this.stack = stack;
+
+        /**
+         * XUL box containing visualisation
+         */
         this.box = box;
 
         this.init(box);
@@ -144,6 +110,14 @@ class Scrollbar {
         }, false);
 
         // add event listeners for up/down/left/right buttons
+        /**
+         * Pan intervals
+         */
+        this.leftPanInterval = null;
+        this.upPanInterval = null;
+        this.downPanInterval = null;
+        this.rightPanInterval = null;
+
         this.arrowUp.addEventListener("click", function(event) {
             clearInterval(ref.upPanInterval);
             ref.panUp();
@@ -196,6 +170,12 @@ class Scrollbar {
         this.window.addEventListener("resize", function(event) {
             ref.resize();
         }, false);
+
+        /**
+         * Initial state: no scrollbars shown
+         */
+        this.verticalShown = false;
+        this.horizontalShown = false;
     }
 
     /**

@@ -33,17 +33,6 @@ const { References } = ChromeUtils.import("chrome://threadvis/content/references
 const { SentMailIdentities } = ChromeUtils.import("chrome://threadvis/content/sentmailidentities.js");
 
 class Message {
-
-    /**
-     * Gloda message
-     */
-    glodaMessage = null;
-
-    /**
-     * References of this message
-     */
-    references = null;
-
     /**
      * Constructor
      * 

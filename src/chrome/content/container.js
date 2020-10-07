@@ -28,49 +28,6 @@
 
 var EXPORTED_SYMBOLS = [ "Container", "sortFunction"];
 class Container {
-
-    /**
-     * First container in child list
-     * 
-     * @type {Container}
-     */
-    child = null;
-
-    /**
-     * We are root container
-     * 
-     * @type {Boolean}
-     */
-    root = false;
-
-    /**
-     * Store message in this container
-     * 
-     * @type {Message}
-     */
-    message = null;
-
-    /**
-     * Next container in sibling list
-     * 
-     * @type {Container}
-     */
-    next = null;
-
-    /**
-     * Parent of this container
-     * 
-     * @type {Container}
-     */
-    parent = null;
-
-    /**
-     * Previous container in sibling list
-     * 
-     * @type {Container}
-     */
-    previous = null;
-
     /**
      * Constructor
      * 
@@ -80,6 +37,42 @@ class Container {
      */
     constructor(root) {
         this.root = root;
+
+        /**
+         * First container in child list
+         * 
+         * @type {Container}
+         */
+        this.child = null;
+
+        /**
+         * Store message in this container
+         * 
+         * @type {Message}
+         */
+        this.message = null;
+
+        /**
+         * Next container in sibling list
+         * 
+         * @type {Container}
+         */
+        this.next = null;
+
+        /**
+         * Parent of this container
+         * 
+         * @type {Container}
+         */
+        this.parent = null;
+
+        /**
+         * Previous container in sibling list
+         * 
+         * @type {Container}
+         */
+        this.previous = null;
+
         /**
          * save horizontal position of dot
          */
