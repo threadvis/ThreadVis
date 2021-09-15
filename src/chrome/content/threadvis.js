@@ -30,6 +30,7 @@ const EXPORTED_SYMBOLS = [ "ThreadVis" ];
 
 const { Cache } = ChromeUtils.import("chrome://threadvis/content/cache.js");
 const { Preferences } = ChromeUtils.import("chrome://threadvis/content/preferences.js");
+const { Strings } = ChromeUtils.import("chrome://threadvis/content/strings.js");
 const { Threader } = ChromeUtils.import("chrome://threadvis/content/threader.js");
 const { Visualisation } = ChromeUtils.import("chrome://threadvis/content/visualisation.js");
 
@@ -502,7 +503,7 @@ class ThreadVis {
         // delay display to give UI time to layout
         this.window.setTimeout(function() {
             this.visualiseMessage(msg, force);
-        }.bind(this), 100);
+        }.bind(this), 250);
     }
 
     /**
@@ -588,9 +589,11 @@ class ThreadVis {
         // if not in threader, try to get from cache
         if (container == null || container.isDummy()) {
             // first, clear threader
-            Cache.get(message, function() {
+            Cache.get(message).then(() => {
                 this.visualiseMessage(message, force, true);
-            }.bind(this));
+            }).catch(error => {
+                this.setStatus(null, error);
+            });
             return;
         }
 

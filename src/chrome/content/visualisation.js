@@ -1294,6 +1294,14 @@ class Visualisation {
         this.moveVisualisationTo({
             y : deltaY
         });
+
+        // right align the visualisation
+        if (x < this.boxWidth) {
+            let deltaX = this.boxWidth - x - prefDotSize - prefSpacing;
+            this.moveVisualisationTo({
+                x : deltaX
+            });
+        }
     };
 
     /**

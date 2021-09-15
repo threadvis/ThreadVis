@@ -30,6 +30,16 @@ const { Services } = ChromeUtils.import("resource://gre/modules/Services.jsm");
 
 const { ThreadVis } = ChromeUtils.import("chrome://threadvis/content/threadvis.js");
 
+const { ExtensionParent } = ChromeUtils.import("resource://gre/modules/ExtensionParent.jsm");
+
+const notify = {};
+const extension = ExtensionParent.GlobalManager.getExtension("{A23E4120-431F-4753-AE53-5D028C42CFDC}");
+Services.scriptloader.loadSubScript(
+    extension.rootURI.resolve("chrome/content/helpers/notifyTools.js"),
+    notify,
+    "UTF-8"
+);
+
 var ThreadVisInstance;
 
 var onLoad = (isAddonActivation) => {
@@ -37,11 +47,7 @@ var onLoad = (isAddonActivation) => {
     injectVisualisation();
     injectStatusbar();
 
-    // weird workaround to make flexbox work...
-    document.getElementById("ThreadVis").parentElement.style.display = "none";
-    document.getElementById("ThreadVis").parentElement.style.display = null;
-
-    WL.messenger.LegacyPref.init().then(() => {
+    notify.notifyTools.notifyBackground({command: "initPref"}).then((data) => {
         ThreadVisInstance = new ThreadVis(window);
 
         window.ThreadVis = ThreadVisInstance;
@@ -78,7 +84,7 @@ const injectVisualisation = () => {
         <vbox id="expandedHeadersBox">
             <hbox id="expandedHeadersBottomBox">
                 <hbox insertbefore="otherActionsBox"
-                      style="width: 100%; flex-shrink: 2;"
+                      style="flex: 0.33"
                       pack="end">
                     <popupset>
                         <menupopup id="ThreadVisPopUp">

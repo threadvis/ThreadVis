@@ -57,25 +57,15 @@ var LegacyAccountsFolders = class extends ExtensionCommon.ExtensionAPI {
 
 var getAllFolders = (folder) => {
     let folders = [];
-    let folderEnumerator = folder.subFolders;
-    while (true) {
-        let currentFolder = null;
-        try {
-            currentFolder = folderEnumerator.getNext();
-        } catch(ex) {
-            break;
-        }
+    folder.subFolders.forEach(subFolder  => {
         let folderConfig = {
-            url: currentFolder.folderURL,
-            name: currentFolder.name
+            url: subFolder.folderURL,
+            name: subFolder.name
         };
-        if (currentFolder.hasSubFolders) {
-            folderConfig.folders = getAllFolders(currentFolder);
+        if (subFolder.hasSubFolders) {
+            folderConfig.folders = getAllFolders(subFolder);
         }
         folders.push(folderConfig);
-        if (!folderEnumerator.hasMoreElements()) {
-            break;
-        }
-    }
+    });
     return folders;
 };

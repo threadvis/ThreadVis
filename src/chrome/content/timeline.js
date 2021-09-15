@@ -133,13 +133,15 @@ class Timeline {
         // calculate position
         let posLeft = (left * this.resize);
         let posTop = (this.top - dotSize / 2 - fontSize) * this.resize - 1;
-        let posWidth = ((right - left) * this.resize);
+        let posWidth = ((right - left - dotSize) * this.resize);
 
         // set style
         elem.style.fontSize = fontSize + "px";
-        elem.left = posLeft + "px";
+        elem.style.left = posLeft + "px";
+        elem.style.position = "relative";
         elem.style.textAlign = "center";
-        elem.top = posTop + "px";
+        elem.style.top = posTop + "px";
+        elem.style.width = posWidth + "px";
         elem.style.zIndex = "1";
 
         elem.setAttribute("value", string);
@@ -158,12 +160,10 @@ class Timeline {
 
         // hide if not enough space (need to show first, otherwise .clientWidth is 0)
         elem.hidden = false;
-        elem.width = null;
-        if ((elem.clientWidth > Math.floor((right - left) * this.resize)) || (fontSize + 2 > minArcHeight * this.resize)) {
+        if ((elem.clientWidth > Math.floor((right - left) * this.resize)) || (fontSize > minArcHeight * this.resize)) {
             elem.hidden = true;
         } else {
             elem.hidden = false;
-            elem.width = posWidth + "px";
         }
     }
 

@@ -29,6 +29,7 @@
 var EXPORTED_SYMBOLS = [ "Cache" ];
 
 const { Message } = ChromeUtils.import("chrome://threadvis/content/message.js");
+const { Strings } = ChromeUtils.import("chrome://threadvis/content/strings.js");
 const { Threader } = ChromeUtils.import("chrome://threadvis/content/threader.js");
 
 Components.utils.import("resource:///modules/gloda/Gloda.jsm");
@@ -37,40 +38,42 @@ Components.utils.import("resource:///modules/gloda/Gloda.jsm");
  * Get cache array for message
  * 
  * @param {nsIMsgDBHdr} msg The message for which to get the cache
- * @param {Function} callback The callback function to invoke
+ * @returns Promise when query is done or error occurred
  */
 const get = (msg, callback) => {
     // first, clear data
     clearData();
-    Gloda.getMessageCollectionForHeader(msg, {
-        onItemsAdded : function(items, collection) { },
-        onItemsModified : function(items, collection) { },
-        onItemsRemoved : function(items, collection) { },
-        onQueryCompleted : function(collection) {
-            let found = collection.items.length > 0;
-            if (found) {
-                let message = collection.items[0];
-                message.conversation.getMessagesCollection({
-                    onItemsAdded : function(items, collection) { },
-                    onItemsModified : function(items, collection) { },
-                    onItemsRemoved : function(items, collection) { },
-                    onQueryCompleted : function(collection) {
-                        for (let i = 0; i < collection.items.length; i++) {
-                            let message = createMessage(collection.items[i]);
-                            addToThreader(message);
+    return new Promise((resolve, reject) =>  {
+        Gloda.getMessageCollectionForHeader(msg, {
+            onItemsAdded : function(items, collection) { },
+            onItemsModified : function(items, collection) { },
+            onItemsRemoved : function(items, collection) { },
+            onQueryCompleted : function(collection) {
+                let found = collection.items.length > 0;
+                if (found) {
+                    let message = collection.items[0];
+                    message.conversation.getMessagesCollection({
+                        onItemsAdded : function(items, collection) { },
+                        onItemsModified : function(items, collection) { },
+                        onItemsRemoved : function(items, collection) { },
+                        onQueryCompleted : function(collection) {
+                            for (let i = 0; i < collection.items.length; i++) {
+                                let message = createMessage(collection.items[i]);
+                                addToThreader(message);
+                            }
+                            resolve();
                         }
-                        callback();
-                    }
-                }, null);
-            } else {
-                // tried to find message in global index but failed. display an error
-                ThreadVis.setStatus(null, {
-                    error : true,
-                    errorText : Strings.getString("error.messagenotfound")
-                });
+                    }, null);
+                } else {
+                    // tried to find message in global index but failed. display an error
+                    reject({
+                        error : true,
+                        errorText : Strings.getString("error.messagenotfound")
+                    });
+                }
             }
-        }
-    }, null);
+        }, null);
+    });
 };
 
 /**

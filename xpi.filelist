@@ -7,8 +7,13 @@ experiment_apis/LegacyPref/schema.json
 experiment_apis/LegacyAccountsFolders/implementation.js
 experiment_apis/LegacyAccountsFolders/schema.json
 
+experiment_apis/NotifyTools/implementation.js
+experiment_apis/NotifyTools/schema.json
+
 experiment_apis/WindowListener/implementation.js
 experiment_apis/WindowListener/schema.json
+
+chrome/content/helpers/notifyTools.js
 
 chrome/content/hooks/init.js
 chrome/content/hooks/shutdown.js

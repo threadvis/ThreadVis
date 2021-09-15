@@ -31,7 +31,7 @@
     "applications": {
         "gecko": {
             "id": "{A23E4120-431F-4753-AE53-5D028C42CFDC}",
-            "strict_min_version": "78.0"
+            "strict_min_version": "91.0"
         }
     },
     "name": "__MSG_extensionName__",
@@ -74,6 +74,15 @@
           "scopes": ["addon_parent"],
           "paths": [["WindowListener"]],
           "script": "experiment_apis/WindowListener/implementation.js"
+        }
+      },
+      "NotifyTools": {
+        "schema": "experiment_apis/NotifyTools/schema.json",
+        "parent": {
+          "scopes": ["addon_parent"],
+          "paths": [["NotifyTools"]],
+          "script": "experiment_apis/NotifyTools/implementation.js",
+          "events": ["startup"]
         }
       }
     },
