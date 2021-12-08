@@ -149,7 +149,7 @@ class ContainerVisualisation {
 
         this.drawDot();
 
-        this.drawCircle("black");
+        this.drawCircle("AliceBlue");
         if (!(this.selected && this.isCircle)) {
             this.hideCircle();
         } else {
@@ -387,7 +387,7 @@ class ContainerVisualisation {
         this.opacity = opacity;
 
         this.redrawDot();
-        this.redrawCircle("black");
+        this.redrawCircle("AliceBlue");
         if (!(this.selected && this.isCircle)) {
             this.hideCircle();
         } else {
@@ -433,11 +433,11 @@ class ContainerVisualisation {
      * @param {String} colour The colour
      */
     visualiseCircle(colour) {
-        let posTop = ((this.top - (this.dotSize * 4 / 6)) * this.resize);
-        let posLeft = ((this.left - (this.dotSize * 4 / 6)) * this.resize);
-        let posHeight = (this.dotSize * 8 / 6 * this.resize);
-        let posWidth = (this.dotSize * 8 / 6 * this.resize);
-        let styleBorder = (this.dotSize / 6 * this.resize) + "px solid " + colour;
+        let posTop = ((this.top - (this.dotSize * 2 / 3)) * this.resize);
+        let posLeft = ((this.left - (this.dotSize * 2 / 3)) * this.resize);
+        let posHeight = (this.dotSize * 4 / 3 * this.resize);
+        let posWidth = (this.dotSize * 4 / 3 * this.resize);
+        let styleBorder = (this.dotSize / 4 * this.resize ) + "px solid " + colour;
 
         this.circle.style.top = posTop + "px";
         this.circle.style.left = posLeft + "px";
