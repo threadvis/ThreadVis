@@ -8,7 +8,7 @@
  * https://ftp.isds.tugraz.at/pub/theses/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020, 2021 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020, 2021, 2022 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License,
@@ -29,7 +29,7 @@
 var EXPORTED_SYMBOLS = [ "Preferences" ];
 
 // shared key strings for our preferences
-const { PreferenceKeys, PreferenceBranch } = ChromeUtils.import("chrome://threadvis/content/preferenceskeys.js");
+const { PreferenceKeys, PreferenceBranch } = ChromeUtils.import("chrome://threadvis/content/utils/preferenceskeys.jsm");
 
 // Services
 const { Services } = ChromeUtils.import("resource://gre/modules/Services.jsm");
@@ -155,6 +155,7 @@ class PreferencesClass {
         this.load(PreferenceKeys.VIS_COLOURS_RECEIVED, PREF_STRING,
             "#7FFF00,#00FFFF,#7F00FF,#997200,#009926,#002699,#990072,#990000,#4C9900,#009999,#4C0099,#FFBF00,#00FF3F,#003FFF,#FF00BF");
         this.load(PreferenceKeys.VIS_COLOURS_SENT, PREF_STRING, "#ff0000");
+        this.load(PreferenceKeys.VIS_COLOURS_CURRENT, PREF_STRING, "#000000");
         this.load(PreferenceKeys.VIS_HIDE_ON_SINGLE, PREF_BOOL, false);
         this.load(PreferenceKeys.VIS_HIGHLIGHT, PREF_BOOL, true);
         this.load(PreferenceKeys.VIS_MINIMAL_WIDTH, PREF_INT, 0);
@@ -251,4 +252,4 @@ class PreferencesClass {
     }
 }
 
-var Preferences = Object.assign(new PreferencesClass(), PreferenceKeys);
+const Preferences = Object.assign(new PreferencesClass(), PreferenceKeys);

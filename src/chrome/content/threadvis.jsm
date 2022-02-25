@@ -8,7 +8,7 @@
  * https://ftp.isds.tugraz.at/pub/theses/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020, 2021 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020, 2021, 2022 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License,
@@ -28,11 +28,11 @@
 
 const EXPORTED_SYMBOLS = [ "ThreadVis" ];
 
-const { Cache } = ChromeUtils.import("chrome://threadvis/content/cache.js");
-const { Preferences } = ChromeUtils.import("chrome://threadvis/content/preferences.js");
-const { Strings } = ChromeUtils.import("chrome://threadvis/content/strings.js");
-const { Threader } = ChromeUtils.import("chrome://threadvis/content/threader.js");
-const { Visualisation } = ChromeUtils.import("chrome://threadvis/content/visualisation.js");
+const { Logger } = ChromeUtils.import("chrome://threadvis/content/utils/logger.jsm");
+const { Preferences } = ChromeUtils.import("chrome://threadvis/content/utils/preferences.jsm");
+const { Strings } = ChromeUtils.import("chrome://threadvis/content/utils/strings.jsm");
+const { Threader } = ChromeUtils.import("chrome://threadvis/content/utils/threader.jsm");
+const { Visualisation } = ChromeUtils.import("chrome://threadvis/content/visualisation.jsm");
 
 class ThreadVis {
 
@@ -134,6 +134,10 @@ class ThreadVis {
                     function(value) {
                         this.preferenceChanged();
                     }.bind(this));
+            Preferences.callback(Preferences.VIS_COLOURS_CURRENT,
+                    function(value) {
+                        this.preferenceChanged();
+                    }.bind(this));
             Preferences.callback(Preferences.VIS_HIGHLIGHT,
                     function(value) {
                         this.preferenceChanged();
@@ -230,7 +234,7 @@ class ThreadVis {
                 this.window.gFolderDisplay.selectMessage(msg);
             }
         } else if (currentTabMode == "message") {
-            this.log(
+            Logger.error(
                     "message switching",
                     "Currently, switching messages is not possible when viewing a message in a tab.");
         }
@@ -553,11 +557,8 @@ class ThreadVis {
      *            The message to visualise
      * @param force
      *            True to force the display of the visualisation
-     * @param lastTry
-     *            True if already tried to find message in cache, if still not
-     *            in threader, display error
      */
-    visualiseMessage(message, force, lastTry) {
+    visualiseMessage(message, force) {
         if (this.visualisedMsgId == message.messageId && !force) {
             return;
         }
@@ -565,41 +566,30 @@ class ThreadVis {
             return;
         }
 
-        // try to find in threader
-        let container = Threader.find(message.messageId);
-
-        // if not in threader and already tried to fetch from cache, display
-        // error
-        if ((container == null || container.isDummy()) && lastTry) {
-            // - message id not found, or
-            // - container with id was dummy
-            // this means the message was not indexed
-            if (this.popupWindow && this.popupWindow.ThreadVis) {
-                this.popupWindow.ThreadVis.clearVisualisation();
-            } else {
-                this.clearVisualisation();
-                this.deleteBox();
-            }
-            this.setStatus(null, {
-                error : true,
-                errorText : Strings.getString("error.messagenotfound")
-            });
-            return;
-        }
-        // if not in threader, try to get from cache
-        if (container == null || container.isDummy()) {
-            // first, clear threader
-            Cache.get(message).then(() => {
-                this.visualiseMessage(message, force, true);
-            }).catch(error => {
-                this.setStatus(null, error);
-            });
-            return;
-        }
-
-        this.visualisedMsgId = message.messageId;
-
-        this.visualise(container);
+        // get threaded view for the message
+        Threader.get(message)
+            .then((container) => {
+                if (container.isDummy()) {
+                    throw new Error("Dummy message found.");
+                }
+                this.visualisedMsgId = message.messageId;
+                this.visualise(container);
+            }).catch((error) => {
+                Logger.error("visualise", error);
+                // - message id not found, or
+                // - container with id was dummy
+                // this means the message was not indexed
+                if (this.popupWindow && this.popupWindow.ThreadVis) {
+                    this.popupWindow.ThreadVis.clearVisualisation();
+                } else {
+                    this.clearVisualisation();
+                    this.deleteBox();
+                }
+                this.setStatus(null, {
+                    error : true,
+                    errorText : Strings.getString("error.messagenotfound")
+                });
+            })
     };
 
     /**
@@ -804,23 +794,6 @@ class ThreadVis {
                     accountSetting,
                     Preferences.PREF_STRING);
         }
-    }
-
-    /**
-     * Log to error console
-     * 
-     * @param source
-     *            The source file.
-     * @param message
-     *            The log message
-     */
-    log(source, message) {
-        let consoleService = Components.classes["@mozilla.org/consoleservice;1"]
-                .getService(Components.interfaces.nsIConsoleService);
-        let scriptError = Components.classes["@mozilla.org/scripterror;1"]
-                .createInstance(Components.interfaces.nsIScriptError);
-        scriptError.init(message, source, null, null, null, Components.interfaces.nsIScriptError.errorFlag, null);
-        consoleService.logMessage(scriptError);
     }
 
     /**

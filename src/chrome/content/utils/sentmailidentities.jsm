@@ -8,7 +8,7 @@
  * https://ftp.isds.tugraz.at/pub/theses/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020, 2021 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020, 2021, 2022 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License,
@@ -23,25 +23,16 @@
  *
  * Version: $Id$
  * *********************************************************************************************************************
- * Implements strings proxy
+ * Sent mail identities
  **********************************************************************************************************************/
 
-var EXPORTED_SYMBOLS = [ "Strings" ];
+const EXPORTED_SYMBOLS = [ "SentMailIdentities" ];
 
-const { Services } = ChromeUtils.import("resource://gre/modules/Services.jsm");
-const strings = Services.strings.createBundle("chrome://threadvis/locale/threadvis.properties");
+const SentMailIdentities = {};
 
-/**
- * Static strings object
- */
-const Strings = {
-    /**
-     * Get localized string
-     * 
-     * @param {String} key
-     *              The key of the localized string
-     */
-    getString(key) {
-        return strings.GetStringFromName(key);
-    }
-};
+// remember all local accounts, for sent-mail comparison
+let accountManager = Components.classes["@mozilla.org/messenger/account-manager;1"]
+        .getService(Components.interfaces.nsIMsgAccountManager);
+for (let identity in accountManager.allIdentities) {
+    SentMailIdentities[identity.email] = true;
+}

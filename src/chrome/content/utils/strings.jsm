@@ -23,32 +23,25 @@
  *
  * Version: $Id$
  * *********************************************************************************************************************
- * Main background script for the WebExtension
+ * Implements strings proxy
  **********************************************************************************************************************/
 
-(async => {
+var EXPORTED_SYMBOLS = [ "Strings" ];
 
-    messenger.NotifyTools.onNotifyBackground.addListener(async (info) => {
-        switch (info.command) {
-          case "initPref":
-            return messenger.LegacyPref.init();
-            break;
-        }
-    });
+const { Services } = ChromeUtils.import("resource://gre/modules/Services.jsm");
+const strings = Services.strings.createBundle("chrome://threadvis/locale/threadvis.properties");
 
-    messenger.WindowListener.registerDefaultPrefs("defaults/preferences/threadvisdefault.js");
-
-    messenger.WindowListener.registerChromeUrl([ 
-        ["content", "threadvis",           "chrome/content/"],
-        ["locale",  "threadvis", "en-US",  "chrome/locale/en-us/"],
-        ["locale",  "threadvis", "de-DE",  "chrome/locale/de-de/"]
-    ]);
-
-    messenger.WindowListener.registerWindow(
-        "chrome://messenger/content/messenger.xhtml",
-        "chrome://threadvis/content/hooks/init.js");
-
-    messenger.WindowListener.registerShutdownScript("chrome://threadvis/content/hooks/shutdown.js");
-
-    messenger.WindowListener.startListening();
-})();
+/**
+ * Static strings object
+ */
+const Strings = {
+    /**
+     * Get localized string
+     * 
+     * @param {String} key The key of the localized string
+     * @returns {String} the localized string
+     */
+    getString(key) {
+        return strings.GetStringFromName(key);
+    }
+};

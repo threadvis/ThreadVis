@@ -1,17 +1,17 @@
 background.js
 manifest.json
 
-experiment_apis/LegacyPref/implementation.js
-experiment_apis/LegacyPref/schema.json
+experiments/LegacyPref/implementation.js
+experiments/LegacyPref/schema.json
 
-experiment_apis/LegacyAccountsFolders/implementation.js
-experiment_apis/LegacyAccountsFolders/schema.json
+experiments/LegacyAccountsFolders/implementation.js
+experiments/LegacyAccountsFolders/schema.json
 
-experiment_apis/NotifyTools/implementation.js
-experiment_apis/NotifyTools/schema.json
+experiments/NotifyTools/implementation.js
+experiments/NotifyTools/schema.json
 
-experiment_apis/WindowListener/implementation.js
-experiment_apis/WindowListener/schema.json
+experiments/WindowListener/implementation.js
+experiments/WindowListener/schema.json
 
 chrome/content/helpers/notifyTools.js
 
@@ -29,26 +29,29 @@ settings/images/about.png
 settings/images/timescaling_disabled.png
 settings/images/timescaling_enabled.png
 
-chrome/content/arcvisualisation.js
-chrome/content/cache.js
-chrome/content/container.js
-chrome/content/containervisualisation.js
+chrome/content/arcvisualisation.jsm
+chrome/content/container.jsm
+chrome/content/containervisualisation.jsm
 chrome/content/legend.js
 chrome/content/legend.xhtml
-chrome/content/message.js
-chrome/content/preferences.js
-chrome/content/preferenceskeys.js
-chrome/content/references.js
-chrome/content/scrollbar.js
-chrome/content/sentmailidentities.js
-chrome/content/strings.js
-chrome/content/threader.js
+chrome/content/message.jsm
+chrome/content/scrollbar.jsm
 chrome/content/threadvis.css
-chrome/content/threadvis.js
+chrome/content/threadvis.jsm
 chrome/content/threadvispopup.xhtml
-chrome/content/timeline.js
-chrome/content/util.js
-chrome/content/visualisation.js
+chrome/content/timeline.jsm
+chrome/content/visualisation.jsm
+
+chrome/content/utils/color.jsm
+chrome/content/utils/date.jsm
+chrome/content/utils/logger.jsm
+chrome/content/utils/number.jsm
+chrome/content/utils/preferences.jsm
+chrome/content/utils/preferenceskeys.jsm
+chrome/content/utils/references.jsm
+chrome/content/utils/sentmailidentities.jsm
+chrome/content/utils/strings.jsm
+chrome/content/utils/threader.jsm
 
 chrome/content/images/about.png
 chrome/content/images/arrowbottom.png

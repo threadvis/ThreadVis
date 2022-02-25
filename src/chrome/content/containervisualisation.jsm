@@ -8,7 +8,7 @@
  * https://ftp.isds.tugraz.at/pub/theses/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020, 2021 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020, 2021, 2022 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License,
@@ -28,8 +28,8 @@
 
 var EXPORTED_SYMBOLS = [ "ContainerVisualisation" ];
 
-const { Strings } = ChromeUtils.import("chrome://threadvis/content/strings.js");
-const { Util } = ChromeUtils.import("chrome://threadvis/content/util.js");
+const { Strings } = ChromeUtils.import("chrome://threadvis/content/utils/strings.jsm");
+const { formatDate } = ChromeUtils.import("chrome://threadvis/content/utils/date.jsm");
 
 class ContainerVisualisation {
     /**
@@ -41,6 +41,7 @@ class ContainerVisualisation {
      * @param {DOMElement} stack The stack on which to draw
      * @param {Container} container The container to visualise
      * @param {String} colour The colour for the container
+     * @param {String} colourHighlight The colour for the highlighting
      * @param {Number} left The left position
      * @param {Number} top The top position
      * @param {Boolean} selected True if the message is selected
@@ -53,8 +54,8 @@ class ContainerVisualisation {
      * @return {ContainerVisualisation} A new container visualisation
      * @type ContainerVisualisation
      */
-    constructor(threadvis, document, stack, container, colour, left, top, selected, dotSize, resize, circle, spacing,
-            opacity, messageCircles) {
+    constructor(threadvis, document, stack, container, colour, colourHighlight, left, top, selected, dotSize, resize,
+            circle, spacing, opacity, messageCircles) {
         /**
          * Main object
          */
@@ -79,6 +80,11 @@ class ContainerVisualisation {
          * colour of container
          */
         this.colour = colour;
+
+        /**
+         * colour of highlight
+         */
+         this.colourHighlight = colourHighlight;
 
         /**
          * left position of container in px
@@ -149,7 +155,7 @@ class ContainerVisualisation {
 
         this.drawDot();
 
-        this.drawCircle("black");
+        this.drawCircle();
         if (!(this.selected && this.isCircle)) {
             this.hideCircle();
         } else {
@@ -159,49 +165,7 @@ class ContainerVisualisation {
         this.drawClick();
 
         this.createToolTip();
-        this.createMenu();
     };
-
-    /**
-     * Create popup menu
-     */
-    createMenu() {
-        let menuname = "dot_popup_" + this.left;
-        this.click.setAttribute("context", menuname);
-
-        let popupset = this.document.getElementById("ThreadVisPopUpSet");
-        let popup = this.document.createXULElement("popup");
-        popup.setAttribute("id", menuname);
-
-        this.popup = popup;
-
-        popup.addEventListener("popupshowing", function() {
-            this.getMenu();
-        }.bind(this), true);
-
-        popupset.appendChild(popup);
-    }
-
-    /**
-     * Fill popup menu
-     */
-    getMenu() {
-        if (this.popup.rendered == true) {
-            return;
-        }
-
-        // include normal menu items
-        let defaultPopup = this.document.getElementById("ThreadVisPopUp");
-        let items = defaultPopup.getElementsByTagName("menuitem");
-        for (let i = 0; i < items.length; i++) {
-            let item = this.document.createXULElement("menuitem");
-            item.setAttribute("label", items[i].getAttribute("label"));
-            item.setAttribute("oncommand", items[i].getAttribute("oncommand"));
-            this.popup.appendChild(item);
-        }
-
-        this.popup.rendered = true;
-    }
 
     /**
      * Create tooltip for container containing information about container.
@@ -217,7 +181,7 @@ class ContainerVisualisation {
             this.getToolTip();
         }.bind(this), true);
 
-        let popupset = this.document.getElementById("ThreadVisPopUpSet");
+        let popupset = this.document.getElementById("ThreadVisPopUpTooltips");
         popupset.appendChild(tooltip);
     }
 
@@ -247,7 +211,7 @@ class ContainerVisualisation {
             date.appendChild(dateText);
             dateLabel.setAttribute("value", Strings.getString("tooltip.date"));
             dateLabel.style.fontWeight = "bold";
-            dateText.setAttribute("value", Util.formatDate(this.container.getMessage().getDate()));
+            dateText.setAttribute("value", formatDate(this.container.getMessage().getDate()));
 
             let subjectLabel = this.document.createXULElement("label");
             let subjectText = this.document.createXULElement("label");
@@ -281,17 +245,14 @@ class ContainerVisualisation {
 
     /**
      * Draw circle around container if container is selected
-     * 
-     * @param {String}
-     *            colour The colour of the message
      */
-    drawCircle(colour) {
+    drawCircle() {
         if (!this.circle) {
             this.circle = this.document.createXULElement("box");
             this.circle.style.position = "relative";
         }
 
-        this.visualiseCircle(colour);
+        this.visualiseCircle();
 
         this.stack.appendChild(this.circle);
     }
@@ -355,7 +316,7 @@ class ContainerVisualisation {
         // check for double click
         let elem = this.threadvis;
         if (elem.isPopupVisualisation()) {
-            elem = window.opener.ThreadVis;
+            elem = this.threadvis.window.opener.ThreadVis;
         }
         if (event.detail > 1) {
             elem.openNewMessage(this.container.getMessage().getMsgDbHdr());
@@ -387,7 +348,7 @@ class ContainerVisualisation {
         this.opacity = opacity;
 
         this.redrawDot();
-        this.redrawCircle("black");
+        this.redrawCircle();
         if (!(this.selected && this.isCircle)) {
             this.hideCircle();
         } else {
@@ -399,11 +360,9 @@ class ContainerVisualisation {
 
     /**
      * Re-Draw circle around container if container is selected
-     * 
-     * @param {String} colour The colour
      */
-    redrawCircle(colour) {
-        this.visualiseCircle(colour);
+    redrawCircle() {
+        this.visualiseCircle();
     }
 
     /**
@@ -429,21 +388,20 @@ class ContainerVisualisation {
 
     /**
      * Visualise circle around container if container is selected
-     * 
-     * @param {String} colour The colour
      */
-    visualiseCircle(colour) {
-        let posTop = ((this.top - (this.dotSize * 4 / 6)) * this.resize);
-        let posLeft = ((this.left - (this.dotSize * 4 / 6)) * this.resize);
-        let posHeight = (this.dotSize * 8 / 6 * this.resize);
-        let posWidth = (this.dotSize * 8 / 6 * this.resize);
-        let styleBorder = (this.dotSize / 6 * this.resize) + "px solid " + colour;
+    visualiseCircle() {
+        let posTop = ((this.top - (this.dotSize / 2)) * this.resize);
+        let posLeft = ((this.left - (this.dotSize / 2)) * this.resize);
+        let posHeight = this.dotSize * this.resize;
+        let posWidth = this.dotSize * this.resize;
+        let shadowSpreadSize = this.dotSize * 1/6 * this.resize;
+        let shadowBlurSize = this.dotSize * 1/3 * this.resize;
 
-        this.circle.style.top = posTop + "px";
-        this.circle.style.left = posLeft + "px";
-        this.circle.style.width = posWidth + "px";
-        this.circle.style.height = posHeight + "px";
-        this.circle.style.border = styleBorder;
+        this.circle.style.top = `${posTop}px`;
+        this.circle.style.left = `${posLeft}px`;
+        this.circle.style.width = `${posWidth}px`;
+        this.circle.style.height = `${posHeight}px`;
+        this.circle.style.boxShadow = `0px 0px ${shadowBlurSize}px ${shadowSpreadSize}px ${this.colourHighlight}`;
         if (this.messageCircles) {
             this.circle.style.borderRadius = posWidth + "px";
         } else {

@@ -23,32 +23,36 @@
  *
  * Version: $Id$
  * *********************************************************************************************************************
- * Main background script for the WebExtension
+ * Give access to accounts/folders (folder.folderURL is not available via WebExtension)
  **********************************************************************************************************************/
 
-(async => {
+var { ExtensionCommon } = ChromeUtils.import("resource://gre/modules/ExtensionCommon.jsm");
 
-    messenger.NotifyTools.onNotifyBackground.addListener(async (info) => {
-        switch (info.command) {
-          case "initPref":
-            return messenger.LegacyPref.init();
-            break;
+var accountManager = Components.classes["@mozilla.org/messenger/account-manager;1"]
+    .getService(Components.interfaces.nsIMsgAccountManager);
+
+var LegacyAccountsFolders = class extends ExtensionCommon.ExtensionAPI {
+    onStartup() {}
+    onShutdown(isAppShutdown) {}
+    getAPI(context) {
+        return {
+            LegacyAccountsFolders: {
+                getAccounts() {
+                    return accountManager.accounts.map(account => ({
+                        id: account.key,
+                        name: account.incomingServer.prettyName,
+                        folders: getAllFolders(account.incomingServer.rootFolder)
+                    }));
+                }
+            }
         }
-    });
+    }
+};
 
-    messenger.WindowListener.registerDefaultPrefs("defaults/preferences/threadvisdefault.js");
-
-    messenger.WindowListener.registerChromeUrl([ 
-        ["content", "threadvis",           "chrome/content/"],
-        ["locale",  "threadvis", "en-US",  "chrome/locale/en-us/"],
-        ["locale",  "threadvis", "de-DE",  "chrome/locale/de-de/"]
-    ]);
-
-    messenger.WindowListener.registerWindow(
-        "chrome://messenger/content/messenger.xhtml",
-        "chrome://threadvis/content/hooks/init.js");
-
-    messenger.WindowListener.registerShutdownScript("chrome://threadvis/content/hooks/shutdown.js");
-
-    messenger.WindowListener.startListening();
-})();
+var getAllFolders = (folder) => {
+    return folder.subFolders.map(subFolder  => ({
+        url: subFolder.folderURL,
+        name: subFolder.name,
+        folders: getAllFolders(subFolder)
+    }));
+};

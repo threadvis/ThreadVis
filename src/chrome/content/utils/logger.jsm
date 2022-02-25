@@ -8,7 +8,7 @@
  * https://ftp.isds.tugraz.at/pub/theses/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020, 2021 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020, 2021, 2022 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License,
@@ -23,16 +23,36 @@
  *
  * Version: $Id$
  * *********************************************************************************************************************
- * Sent mail identities
+ * Wrapper for logger
  **********************************************************************************************************************/
 
-const EXPORTED_SYMBOLS = [ "SentMailIdentities" ];
+var EXPORTED_SYMBOLS = [ "Logger" ];
 
-const SentMailIdentities = {};
 
-// remember all local accounts, for sent-mail comparison
-let accountManager = Components.classes["@mozilla.org/messenger/account-manager;1"]
-        .getService(Components.interfaces.nsIMsgAccountManager);
-for (let identity in accountManager.allIdentities) {
-    SentMailIdentities[identity.email] = true;
-}
+/**
+ * Log to error console
+ * 
+ * @param source
+ *            The source file.
+ * @param message
+ *            The log message
+ */
+const error = (source, message) => {
+    let consoleService = Components.classes["@mozilla.org/consoleservice;1"]
+            .getService(Components.interfaces.nsIConsoleService);
+    let scriptError = Components.classes["@mozilla.org/scripterror;1"]
+            .createInstance(Components.interfaces.nsIScriptError);
+    scriptError.init(
+        message,
+        "ThreadVis/" + source,
+        null,
+        null,
+        null,
+        Components.interfaces.nsIScriptError.errorFlag,
+        null);
+    consoleService.logMessage(scriptError);
+};
+
+const Logger = {
+    error
+};

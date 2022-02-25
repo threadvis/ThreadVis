@@ -8,7 +8,7 @@
  * https://ftp.isds.tugraz.at/pub/theses/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020, 2021 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020, 2021, 2022 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License,
@@ -23,37 +23,28 @@
  *
  * Version: $Id$
  * *********************************************************************************************************************
- * Register experiment to access preferences in options.js
+ * Number utilities
  **********************************************************************************************************************/
 
-var { ExtensionCommon } = ChromeUtils.import("resource://gre/modules/ExtensionCommon.jsm");
+var EXPORTED_SYMBOLS = [ "DECtoHEX", "HEXtoDEC" ] ;
 
-var { Preferences } = ChromeUtils.import("chrome://threadvis/content/preferences.js");
-
-var LegacyPref = class extends ExtensionCommon.ExtensionAPI {
-    onStartup() {
-        Preferences.register();
-    }
-    onShutdown(isAppShutdown) {
-        if (isAppShutdown) {
-            return;
-        }
-        Preferences.unregister();
-    }
-    getAPI(context) {
-        return {
-            LegacyPref: {
-                init() {
-                    Preferences.register();
-                    Preferences.reload();
-                },
-                get(name) {
-                    return Preferences.get(name);
-                },
-                set(name, value) {
-                    Preferences.set(name, value);
-                }
-            }
-        }
-    }
+/**
+ * Get hexadecimal representation of a decimal number
+ * 
+ * @param dec The decimal value of the number
+ * @return The hexadecimal string representing the colour
+ */
+const DECtoHEX = (dec) => {
+    let alpha = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F" ];
+    let n_ = Math.floor(dec / 16);
+    let _n = dec - n_ * 16;
+    return alpha[n_] + alpha[_n];
 };
+
+/**
+ * Get decimal representation of a hexadecimal number
+ * 
+ * @param hex The hexadecimal value of the number
+ * @return The decimal value of the number
+ */
+const HEXtoDEC = (hex) => parseInt(hex, 16);

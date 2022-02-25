@@ -8,7 +8,7 @@
  * https://ftp.isds.tugraz.at/pub/theses/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020, 2021 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020, 2021, 2022 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License,
@@ -28,14 +28,15 @@
 
 const EXPORTED_SYMBOLS = [ "Visualisation" ];
 
-const { ArcVisualisation } = ChromeUtils.import("chrome://threadvis/content/arcvisualisation.js");
-const { sortFunction } = ChromeUtils.import("chrome://threadvis/content/container.js");
-const { ContainerVisualisation } = ChromeUtils.import("chrome://threadvis/content/containervisualisation.js");
-const { Preferences } = ChromeUtils.import("chrome://threadvis/content/preferences.js");
-const { Scrollbar } = ChromeUtils.import("chrome://threadvis/content/scrollbar.js");
-const { Strings } = ChromeUtils.import("chrome://threadvis/content/strings.js");
-const { Timeline } = ChromeUtils.import("chrome://threadvis/content/timeline.js");
-const { Util } = ChromeUtils.import("chrome://threadvis/content/util.js");
+const { ArcVisualisation } = ChromeUtils.import("chrome://threadvis/content/arcvisualisation.jsm");
+const { sortFunction } = ChromeUtils.import("chrome://threadvis/content/container.jsm");
+const { ContainerVisualisation } = ChromeUtils.import("chrome://threadvis/content/containervisualisation.jsm");
+const { Preferences } = ChromeUtils.import("chrome://threadvis/content/utils/preferences.jsm");
+const { Scrollbar } = ChromeUtils.import("chrome://threadvis/content/scrollbar.jsm");
+const { Strings } = ChromeUtils.import("chrome://threadvis/content/utils/strings.jsm");
+const { Timeline } = ChromeUtils.import("chrome://threadvis/content/timeline.jsm");
+const { convertHSVtoRGB, convertRGBtoHSV} = ChromeUtils.import("chrome://threadvis/content/utils/color.jsm");
+const { DECtoHEX, HEXtoDEC } = ChromeUtils.import("chrome://threadvis/content/utils/number.jsm");
 
 class Visualisation {
 
@@ -77,7 +78,7 @@ class Visualisation {
         this.horizontalScrollbarBox = this.document.getElementById("ThreadVisHorizontalScrollbar");
         this.buttonsBox = this.document.getElementById("ThreadVisButtons");
         this.stack = this.document.getElementById("ThreadVisStack");
-        this.popups = this.document.getElementById("ThreadVisPopUpSet");
+        this.popups = this.document.getElementById("ThreadVisPopUpTooltips");
     }
 
     /**
@@ -103,7 +104,7 @@ class Visualisation {
             thisContainer.odd = thisContainer.getDepth() % 2 == 0;
 
             let parent = thisContainer.getParent();
-            if (parent != null && !parent.isRoot()) {
+            if (parent != null) {
                 // find a free arc height between the parent message and this one
                 // since we want to draw an arc between this message and its parent,
                 // and we do not want any arcs to overlap
@@ -168,7 +169,7 @@ class Visualisation {
             thisContainer.odd = thisContainer.getDepth() % 2 == 0;
 
             let parent = thisContainer.getParent();
-            if (parent != null && !parent.isRoot()) {
+            if (parent != null) {
                 // also keep track of the current maximal stacked arc height,
                 // so that we can resize the whole extension
                 if (parent.odd && thisContainer.arcHeight > topHeight) {
@@ -579,9 +580,11 @@ class Visualisation {
         let prefDotSize = Preferences.get(Preferences.VIS_DOTSIZE);
         let prefSpacing = Preferences.get(Preferences.VIS_SPACING);
         let prefMessageCircles = Preferences.get(Preferences.VIS_MESSAGE_CIRCLES);
+        let prefColourHighlight = Preferences.get(Preferences.VIS_COLOURS_CURRENT);
 
-        let msg = new ContainerVisualisation(this.threadvis, this.document, this.stack, container, colour, left, top,
-            selected, prefDotSize, this.resize, circle, prefSpacing, opacity, prefMessageCircles);
+        let msg = new ContainerVisualisation(this.threadvis, this.document, this.stack, container, colour,
+            prefColourHighlight, left, top, selected, prefDotSize, this.resize, circle, prefSpacing, opacity,
+            prefMessageCircles);
 
         return msg;
     };
@@ -661,11 +664,11 @@ class Visualisation {
      * @return A colour string in the form "#11AACC"
      */
     getColour(hue, saturation, value) {
-        let rgb = Util.convertHSVtoRGB(hue, saturation, value);
+        let rgb = convertHSVtoRGB(hue, saturation, value);
 
-        return "#" + Util.DECtoHEX(Math.floor(rgb.r))
-                + Util.DECtoHEX(Math.floor(rgb.g))
-                + Util.DECtoHEX(Math.floor(rgb.b));
+        return "#" + DECtoHEX(Math.floor(rgb.r))
+                + DECtoHEX(Math.floor(rgb.g))
+                + DECtoHEX(Math.floor(rgb.b));
     };
 
     /**
@@ -687,10 +690,10 @@ class Visualisation {
             hex = receivedColours[this.lastColour];
         }
         hex = hex.substr(1);
-        return Util.convertRGBtoHSV(
-                Util.HEXtoDEC(hex.substr(0, 2)),
-                Util.HEXtoDEC(hex.substr(2, 2)),
-                Util.HEXtoDEC(hex.substr(4, 2)));
+        return convertRGBtoHSV(
+                HEXtoDEC(hex.substr(0, 2)),
+                HEXtoDEC(hex.substr(2, 2)),
+                HEXtoDEC(hex.substr(4, 2)));
     }
 
     /**
@@ -1212,7 +1215,7 @@ class Visualisation {
 
             // draw arc
             let parent = thisContainer.getParent();
-            if (parent != null && !parent.isRoot()) {
+            if (parent != null) {
                 let position = "bottom";
                 if (parent.odd) {
                     position = "top";
@@ -1424,7 +1427,7 @@ class Visualisation {
 
             // draw arc
             let parent = thisContainer.getParent();
-            if (parent != null && !parent.isRoot()) {
+            if (parent != null) {
                 this.arcVisualisations[thisContainer].redraw(this.resize, parent.xPosition, x, topHeight, colour, opacity);
             }
 
@@ -1633,7 +1636,7 @@ class Visualisation {
 
             // draw arc
             let parent = thisContainer.getParent();
-            if (parent != null && !parent.isRoot()) {
+            if (parent != null) {
                 let position = "bottom";
                 if (parent.odd) {
                     position = "top";

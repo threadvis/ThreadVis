@@ -8,7 +8,7 @@
  * https://ftp.isds.tugraz.at/pub/theses/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020, 2021 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020, 2021, 2022 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License,
@@ -37,7 +37,7 @@ const PreferenceKeys = {
     // list of disabled accounts
     DISABLED_ACCOUNTS :
         PreferenceBranch + "disabledaccounts",
-    
+
     // list of disabled folders
     DISABLED_FOLDERS :
         PreferenceBranch + "disabledfolders",
@@ -45,11 +45,11 @@ const PreferenceKeys = {
     // check for "sent" by folder flag
     SENTMAIL_FOLDERFLAG :
         PreferenceBranch + "sentmail.folderflag",
-    
+
     // check for "sent" by identity
     SENTMAIL_IDENTITY :
         PreferenceBranch + "sentmail.identity",
-    
+
     // height of SVG export image
     SVG_HEIGHT :
         PreferenceBranch + "svg.height",
@@ -57,11 +57,11 @@ const PreferenceKeys = {
     // width of SVG export image
     SVG_WIDTH :
         PreferenceBranch + "svg.width",
-    
+
     // show timeline
     TIMELINE :
         PreferenceBranch + "timeline.enabled",
-    
+
     // font size of timeline
     TIMELINE_FONTSIZE :
         PreferenceBranch + "timeline.fontsize",
@@ -73,7 +73,7 @@ const PreferenceKeys = {
     // timescaling method
     TIMESCALING_METHOD :
         PreferenceBranch + "timescaling.method",
-    
+
     // minimal timedifference to show
     TIMESCALING_MINTIMEDIFF :
         PreferenceBranch + "timescaling.mintimediff",
@@ -85,7 +85,7 @@ const PreferenceKeys = {
     // minimum height of arc
     VIS_ARC_MINHEIGHT :
         PreferenceBranch + "visualisation.arcminheight",
-    
+
     // radius of arc
     VIS_ARC_RADIUS :
         PreferenceBranch + "visualisation.arcradius",
@@ -93,19 +93,19 @@ const PreferenceKeys = {
     // height difference between two arcs
     VIS_ARC_DIFFERENCE :
         PreferenceBranch + "visualisation.arcdifference",
-    
+
     // arc width
     VIS_ARC_WIDTH :
         PreferenceBranch + "visualisation.arcwidth",
-    
+
     // spacing
     VIS_SPACING :
         PreferenceBranch + "visualisation.spacing",
-    
+
     // message circles
     VIS_MESSAGE_CIRCLES :
         PreferenceBranch + "visualisation.messagecircles",
-    
+
     // colour
     VIS_COLOUR :
         PreferenceBranch + "visualisation.colour",
@@ -121,11 +121,15 @@ const PreferenceKeys = {
     // colours for received
     VIS_COLOURS_RECEIVED :
         PreferenceBranch + "visualisation.colours.received",
-    
+
     // colours for sent
     VIS_COLOURS_SENT :
         PreferenceBranch + "visualisation.colours.sent",
-    
+
+    // colour for marking current message
+    VIS_COLOURS_CURRENT :
+        PreferenceBranch + "visualisation.colours.current",
+
     // hide if only one message shown
     VIS_HIDE_ON_SINGLE :
         PreferenceBranch + "visualisation.hideonsingle",
@@ -141,7 +145,7 @@ const PreferenceKeys = {
     // opacity
     VIS_OPACITY :
         PreferenceBranch + "visualisation.opacity",
-    
+
     // zoom
     VIS_ZOOM :
         PreferenceBranch + "visualisation.zoom",

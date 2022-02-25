@@ -8,7 +8,7 @@
 // * https://ftp.isds.tugraz.at/pub/theses/ahubmann.pdf
 // *
 // * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
-// * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020, 2021 Alexander C. Hubmann-Haidvogel
+// * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020, 2021, 2022 Alexander C. Hubmann-Haidvogel
 // *
 // * ThreadVis is free software: you can redistribute it and/or modify it under the terms of the
 // * GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License,
@@ -54,35 +54,35 @@
     },
     "experiment_apis": {
       "LegacyPref": {
-        "schema": "experiment_apis/LegacyPref/schema.json",
+        "schema": "experiments/LegacyPref/schema.json",
         "parent": {
           "scopes": ["addon_parent"],
           "paths": [["LegacyPref"]],
-          "script": "experiment_apis/LegacyPref/implementation.js"
+          "script": "experiments/LegacyPref/implementation.js"
         }
       },
       "LegacyAccountsFolders": {
-        "schema": "experiment_apis/LegacyAccountsFolders/schema.json",
+        "schema": "experiments/LegacyAccountsFolders/schema.json",
         "parent": {
           "scopes": ["addon_parent"],
           "paths": [["LegacyAccountsFolders"]],
-          "script": "experiment_apis/LegacyAccountsFolders/implementation.js"
+          "script": "experiments/LegacyAccountsFolders/implementation.js"
         }
       },
       "WindowListener": {
-        "schema": "experiment_apis/WindowListener/schema.json",
+        "schema": "experiments/WindowListener/schema.json",
         "parent": {
           "scopes": ["addon_parent"],
           "paths": [["WindowListener"]],
-          "script": "experiment_apis/WindowListener/implementation.js"
+          "script": "experiments/WindowListener/implementation.js"
         }
       },
       "NotifyTools": {
-        "schema": "experiment_apis/NotifyTools/schema.json",
+        "schema": "experiments/NotifyTools/schema.json",
         "parent": {
           "scopes": ["addon_parent"],
           "paths": [["NotifyTools"]],
-          "script": "experiment_apis/NotifyTools/implementation.js",
+          "script": "experiments/NotifyTools/implementation.js",
           "events": ["startup"]
         }
       }

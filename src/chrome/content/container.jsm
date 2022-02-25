@@ -8,7 +8,7 @@
  * https://ftp.isds.tugraz.at/pub/theses/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020, 2021 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020, 2021, 2022 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License,
@@ -32,12 +32,9 @@ class Container {
      * Constructor
      * 
      * @constructor
-     * @param {Boolean} root True if container is the root container
      * @return A new container
      */
-    constructor(root) {
-        this.root = root;
-
+    constructor() {
         /**
          * First container in child list
          * 
@@ -244,11 +241,7 @@ class Container {
      */
     getDepth() {
         if (this.hasParent()) {
-            if (this.getParent().isRoot()) {
-                return 0;
-            } else {
-                return 1 + this.getParent().getDepth();
-            }
+            return 1 + this.getParent().getDepth();
         } else {
             return 0;
         }
@@ -309,18 +302,14 @@ class Container {
     }
 
     /**
-     * Get topmost container that is not the root container
+     * Get topmost container
      * 
      * @return {Container} The topmost container of the thread
      * @type Container
      */
     getTopContainer() {
         if (this.hasParent()) {
-            if (!this.getParent().isRoot()) {
-                return this.getParent().getTopContainer();
-            } else {
-                return this;
-            }
+            return this.getParent().getTopContainer();
         }
         return this;
     }
@@ -373,16 +362,6 @@ class Container {
      */
     isDummy() {
         return (this.getMessage() == null);
-    }
-
-    /**
-     * Return if this container is the top most container
-     * 
-     * @return {Boolean} True if this container is the root container
-     * @type Boolean
-     */
-    isRoot() {
-        return this.root;
     }
 
     /**
@@ -513,10 +492,6 @@ class Container {
         }
 
         let string = prefix;
-
-        if (this.isRoot()) {
-            string += "ROOT ";
-        }
 
         if (this.isDummy()) {
             string += "DUMMY";

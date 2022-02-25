@@ -8,7 +8,7 @@
  * https://ftp.isds.tugraz.at/pub/theses/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020, 2021 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020, 2021, 2022 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License,
@@ -28,9 +28,10 @@
 
 var EXPORTED_SYMBOLS = [ "Message" ];
 
-const { Preferences } = ChromeUtils.import("chrome://threadvis/content/preferences.js");
-const { References } = ChromeUtils.import("chrome://threadvis/content/references.js");
-const { SentMailIdentities } = ChromeUtils.import("chrome://threadvis/content/sentmailidentities.js");
+const { Logger } = ChromeUtils.import("chrome://threadvis/content/utils/logger.jsm");
+const { Preferences } = ChromeUtils.import("chrome://threadvis/content/utils/preferences.jsm");
+const { References } = ChromeUtils.import("chrome://threadvis/content/utils/references.jsm");
+const { SentMailIdentities } = ChromeUtils.import("chrome://threadvis/content/utils/sentmailidentities.jsm");
 
 class Message {
     /**
@@ -38,30 +39,19 @@ class Message {
      * 
      * @constructor
      * @param {glodaMessage} glodaMessage The gloda message object
-     * @return {Message} A new message
-     * @type ThreadVis.Message
+     * @returns {Message} A new message
      */
     constructor(glodaMessage) {
         /**
          * Gloda message
          */
         this.glodaMessage = glodaMessage;
-
-        /**
-         * References of this message
-         */
-        if (glodaMessage.folderMessage != null) {
-            this.references = new References(glodaMessage.folderMessage.getStringProperty("references"));
-        } else {
-            this.references = new References("");
-        }
     }
 
     /**
      * Get date of message
      * 
      * @return {Date} The date of the message
-     * @type Date
      */
     getDate() {
         return this.glodaMessage.date;
@@ -71,7 +61,6 @@ class Message {
      * Get folder message is in
      * 
      * @return {String} The folder of the message
-     * @type String
      */
     getFolder() {
         return this.glodaMessage.folderURI;
@@ -81,7 +70,6 @@ class Message {
      * Get sender of message
      * 
      * @return {String} The sender of the message
-     * @type String
      */
     getFrom() {
         if (this.glodaMessage.folderMessage != null) {
@@ -94,7 +82,6 @@ class Message {
      * Parse email address from "From" header
      * 
      * @return {String} The parsed email address
-     * @type String
      */
     getFromEmail() {
         return this.glodaMessage.from.value;
@@ -104,7 +91,6 @@ class Message {
      * Get message id
      * 
      * @return {String} The message id
-     * @type String
      */
     getId() {
         return this.glodaMessage.headerMessageID;
@@ -113,18 +99,19 @@ class Message {
     /**
      * Get references
      * 
-     * @return {String} The referenced header
-     * @type String
+     * @return {Array.<String>} The parsed references header
      */
     getReferences() {
-        return this.references;
+        if (this.glodaMessage.folderMessage != null) {
+            return References.get(this.glodaMessage.folderMessage.getStringProperty("references"));
+        }
+        return [];
     }
 
     /**
      * Get original subject
      * 
      * @return {String} The subject
-     * @type String
      */
     getSubject() {
         return this.glodaMessage.subject;
@@ -133,9 +120,7 @@ class Message {
     /**
      * See if message is sent (i.e. in sent-mail folder)
      * 
-     * @return {Boolean} True if the message was sent by the user, false if
-     *         not
-     * @type Boolean
+     * @return {Boolean} True if the message was sent by the user, false if not
      */
     isSent() {
         let issent = false;
@@ -154,7 +139,6 @@ class Message {
      * Get body of message
      * 
      * @return {String} The body of the message
-     * @type String
      */
     getBody() {
         return this.glodaMessage.indexedBodyText;
@@ -164,7 +148,6 @@ class Message {
      * Return message as string
      * 
      * @return {String} The string representation of the message
-     * @type String
      */
     toString() {
         return "Message: Subject: '" + this.getSubject() + "'."
@@ -180,11 +163,10 @@ class Message {
      * Get the underlying nsIMsgDBHdr
      * 
      * @return {nsIMsgDBHdr} The original nsIMsgDBHdr or null if not found
-     * @type nsIMsgDBHdr
      */
     getMsgDbHdr() {
         if (this.glodaMessage.folderMessage == null) {
-            ThreadVis.log(
+            Logger.error(
                     "Cache",
                     "Unable to find nsIMsgDBHdr for message " + this.getId() + ", probably in folder " + this.getFolder()
                     + ". Either the message database (msf) for this folder is corrupt, or the global index is out-of-date.");

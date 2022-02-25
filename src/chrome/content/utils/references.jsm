@@ -8,7 +8,7 @@
  * https://ftp.isds.tugraz.at/pub/theses/ahubmann.pdf
  *
  * Copyright (C) 2005, 2006, 2007 Alexander C. Hubmann
- * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020, 2021 Alexander C. Hubmann-Haidvogel
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2018, 2019, 2020, 2021, 2022 Alexander C. Hubmann-Haidvogel
  *
  * ThreadVis is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License,
@@ -23,34 +23,19 @@
  *
  * Version: $Id$
  * *********************************************************************************************************************
- * Wrapper for references headers in email. Split message ids in header and
- * return all referenced message ids in an array.
+ * Split message ids in header field "references" and return all referenced message ids in an array.
  **********************************************************************************************************************/
 
 var EXPORTED_SYMBOLS = [ "References" ];
 
-class References {
-    /**
-     * Constructor
-     * 
-     * @param references
-     *            The "References" header
-     */
-    constructor(references) {
-        /**
-         * Store message ids of references
-         */
-        this.references = [];
-        this.buildReferences(references);
-    }
-
+const References = {
     /**
      * Build references array
      * 
-     * @param references
-     *            The references string
+     * @param references The references string
+     * @returns an array of all referenced mssage ids
      */
-    buildReferences(references) {
+    get(references) {
         if (references != null && references != "") {
             let result = references.match(/[^<>\s]+/g);
 
@@ -72,29 +57,9 @@ class References {
                 }
             }
             distinct.reverse();
-            this.references = distinct;
+            return distinct;
+        } else {
+            return [];
         }
-    }
-
-    /**
-     * Get references array. Return all references of the message as an array.
-     * 
-     * @return An array of all referenced message ids
-     */
-    getReferences() {
-        return this.references;
-    }
-
-    /**
-     * Get string representation of object
-     * 
-     * @return A string containing all referenced message ids
-     */
-    toString() {
-        var string = "";
-        for (let referenceskey in this.references) {
-            string += ", " + this.references[referenceskey];
-        }
-        return string;
     }
 }
