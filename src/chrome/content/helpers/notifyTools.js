@@ -1,5 +1,5 @@
-// Set this to the ID of your add-on.
-const ADDON_ID = "{A23E4120-431F-4753-AE53-5D028C42CFDC}";
+// Set this to the ID of your add-on, or call notifyTools.setAddonID().
+var ADDON_ID = "";
 
 /*
  * This file is provided by the addon-developer-support repository at
@@ -7,6 +7,13 @@ const ADDON_ID = "{A23E4120-431F-4753-AE53-5D028C42CFDC}";
  *
  * For usage descriptions, please check:
  * https://github.com/thundernest/addon-developer-support/tree/master/scripts/notifyTools
+ *
+ * Version: 1.5
+ * - deprecate enable(), disable() and registerListener()
+ * - add setAddOnId()
+ *
+ * Version: 1.4
+ * - auto enable/disable
  *
  * Version: 1.3
  * - registered listeners for notifyExperiment can return a value
@@ -24,16 +31,24 @@ var { Services } = ChromeUtils.import("resource://gre/modules/Services.jsm");
 var notifyTools = {
   registeredCallbacks: {},
   registeredCallbacksNextId: 1,
+  addOnId: ADDON_ID,
+
+  setAddOnId: function (addOnId) {
+    this.addOnId = addOnId;
+  },
 
   onNotifyExperimentObserver: {
     observe: async function (aSubject, aTopic, aData) {
-      if (ADDON_ID == "") {
+      if (notifyTools.addOnId == "") {
         throw new Error("notifyTools: ADDON_ID is empty!");
       }
-      if (aData != ADDON_ID) {
+      if (aData != notifyTools.addOnId) {
         return;
       }
       let payload = aSubject.wrappedJSObject;
+
+      // Make sure payload has a resolve function, which we use to resolve the
+      // observer notification.
       if (payload.resolve) {
         let observerTrackerPromises = [];
         // Push listener into promise array, so they can run in parallel
@@ -61,7 +76,8 @@ var notifyTools = {
           payload.resolve(results[0]);
         }
       } else {
-        // Just call the listener.
+        // Older version of NotifyTools, which is not sending a resolve function, deprecated.
+        console.log("Please update the notifyTools API to at least v1.5");
         for (let registeredCallback of Object.values(
           notifyTools.registeredCallbacks
         )) {
@@ -71,7 +87,15 @@ var notifyTools = {
     },
   },
 
-  registerListener: function (listener) {
+  addListener: function (listener) {
+    if (Object.values(this.registeredCallbacks).length == 0) {
+      Services.obs.addObserver(
+        this.onNotifyExperimentObserver,
+        "NotifyExperimentObserver",
+        false
+      );
+    }
+
     let id = this.registeredCallbacksNextId++;
     this.registeredCallbacks[id] = listener;
     return id;
@@ -79,50 +103,61 @@ var notifyTools = {
 
   removeListener: function (id) {
     delete this.registeredCallbacks[id];
+    if (Object.values(this.registeredCallbacks).length == 0) {
+      Services.obs.removeObserver(
+        this.onNotifyExperimentObserver,
+        "NotifyExperimentObserver"
+      );
+    }
+  },
+
+  removeAllListeners: function () {
+    if (Object.values(this.registeredCallbacks).length != 0) {
+      Services.obs.removeObserver(
+        this.onNotifyExperimentObserver,
+        "NotifyExperimentObserver"
+      );
+    }
+    this.registeredCallbacks = {};
   },
 
   notifyBackground: function (data) {
-    if (ADDON_ID == "") {
+    if (this.addOnId == "") {
       throw new Error("notifyTools: ADDON_ID is empty!");
     }
     return new Promise((resolve) => {
       Services.obs.notifyObservers(
         { data, resolve },
         "NotifyBackgroundObserver",
-        ADDON_ID
+        this.addOnId
       );
     });
   },
 
+
+  // Deprecated.
+
   enable: function () {
-    Services.obs.addObserver(
-      this.onNotifyExperimentObserver,
-      "NotifyExperimentObserver",
-      false
-    );
+    console.log("Manually calling notifyTools.enable() is no longer needed.");
   },
 
   disable: function () {
-    Services.obs.removeObserver(
-      this.onNotifyExperimentObserver,
-      "NotifyExperimentObserver"
-    );
+    console.log("notifyTools.disable() has been deprecated, use notifyTools.removeAllListeners() instead.");
+    this.removeAllListeners();
   },
-};
 
+  registerListener: function (listener) {
+    console.log("notifyTools.registerListener() has been deprecated, use notifyTools.addListener() instead.");
+    this.addListener(listener);
+  },
+
+};
 
 if (typeof window != "undefined" && window) {
   window.addEventListener(
-    "load",
+    "unload",
     function (event) {
-      notifyTools.enable();
-      window.addEventListener(
-        "unload",
-        function (event) {
-          notifyTools.disable();
-        },
-        false
-      );
+      notifyTools.removeAllListeners();
     },
     false
   );
