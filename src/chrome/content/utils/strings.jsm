@@ -38,8 +38,8 @@ const Strings = {
     /**
      * Get localized string
      * 
-     * @param {String} key The key of the localized string
-     * @returns {String} the localized string
+     * @param {String} key - The key of the localized string
+     * @return {String} - the localized string
      */
     getString(key) {
         return strings.GetStringFromName(key);

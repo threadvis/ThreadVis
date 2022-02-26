@@ -26,25 +26,25 @@
  * Number utilities
  **********************************************************************************************************************/
 
-var EXPORTED_SYMBOLS = [ "DECtoHEX", "HEXtoDEC" ] ;
+var EXPORTED_SYMBOLS = [ "DECtoHEX", "HEXtoDEC" ];
 
 /**
  * Get hexadecimal representation of a decimal number
  * 
- * @param dec The decimal value of the number
- * @return The hexadecimal string representing the colour
+ * @param {Integer} dec - The decimal value of the number
+ * @return {String} - The hexadecimal string representing the colour
  */
 const DECtoHEX = (dec) => {
-    let alpha = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F" ];
-    let n_ = Math.floor(dec / 16);
-    let _n = dec - n_ * 16;
+    const alpha = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F" ];
+    const n_ = Math.floor(dec / 16);
+    const _n = dec - n_ * 16;
     return alpha[n_] + alpha[_n];
 };
 
 /**
  * Get decimal representation of a hexadecimal number
  * 
- * @param hex The hexadecimal value of the number
- * @return The decimal value of the number
+ * @param {String} hex - The hexadecimal value of the number
+ * @return {Integer} - The decimal value of the number
  */
 const HEXtoDEC = (hex) => parseInt(hex, 16);

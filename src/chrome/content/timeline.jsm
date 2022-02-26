@@ -35,16 +35,11 @@ class Timeline {
     /**
      * Constructor for timeline class
      * 
-     * @param document
-     *            The document to draw in
-     * @param stack
-     *            The stack to draw the timeline on
-     * @param containers
-     *            An array of all containers
-     * @param resize
-     *            The resize parameter [0..1]
-     * @param top
-     *            The top position of the timeline
+     * @param {DOMDocument} document - The document to draw in
+     * @param {XULStack} stack - The stack to draw the timeline on
+     * @param {Array<ThreadVis.Container>} containers - An array of all containers
+     * @param {Number} resize - The resize parameter [0..1]
+     * @param {Number} top - The top position of the timeline
      * @return A new timeline object
      */
     constructor(document, stack, containers, resize, top) {
@@ -83,18 +78,18 @@ class Timeline {
         // start with second container
         for (let i = 1; i < this.containers.length; i++) {
             // look at two adjacent containers
-            let first = this.containers[i - 1];
-            let second = this.containers[i];
+            const first = this.containers[i - 1];
+            const second = this.containers[i];
 
             // don't calculate time if one of them is a dummy
             if (first.isDummy() || second.isDummy()) {
                 continue;
             }
 
-            let timeDifference = first.timeDifference;
+            const timeDifference = first.timeDifference;
 
             // get the formatted strings
-            let formatted = formatTimeDifference(timeDifference);
+            const formatted = formatTimeDifference(timeDifference);
 
             // draw the labels and tooltips
             this.drawTime(first, first.xPosition, second.xPosition, formatted.string, formatted.toolTip);
@@ -104,21 +99,16 @@ class Timeline {
     /**
      * Draw the label and the tooltip
      * 
-     * @param container
-     *            The container to draw
-     * @param left
-     *            The left position
-     * @param right
-     *            The right position
-     * @param string
-     *            The string to display
-     * @param toolTip
-     *            The tooltip to add
+     * @param {ThreadVis.Container} container - The container to draw
+     * @param {Number} left - The left position
+     * @param {Number} right - The right position
+     * @param {String} string - The string to display
+     * @param {String} toolTip - The tooltip to add
      */
     drawTime(container, left, right, string, toolTip) {
-        let dotSize = Preferences.get(Preferences.VIS_DOTSIZE);
-        let minArcHeight = Preferences.get(Preferences.VIS_ARC_MINHEIGHT);
-        let fontSize = Preferences.get(Preferences.TIMELINE_FONTSIZE);
+        const dotSize = Preferences.get(Preferences.VIS_DOTSIZE);
+        const minArcHeight = Preferences.get(Preferences.VIS_ARC_MINHEIGHT);
+        const fontSize = Preferences.get(Preferences.TIMELINE_FONTSIZE);
         // check to see if we already created the label and the tooltip
         let elem = null;
         let newElem = false;
@@ -131,9 +121,9 @@ class Timeline {
         }
 
         // calculate position
-        let posLeft = (left * this.resize);
-        let posTop = (this.top - dotSize / 2 - fontSize) * this.resize - 1;
-        let posWidth = ((right - left - dotSize) * this.resize);
+        const posLeft = (left * this.resize);
+        const posTop = (this.top - dotSize / 2 - fontSize) * this.resize - 1;
+        const posWidth = ((right - left - dotSize) * this.resize);
 
         // set style
         elem.style.fontSize = fontSize + "px";
@@ -153,9 +143,7 @@ class Timeline {
 
             // prevent mousedown event from bubbling to box object
             // prevent dragging of visualisation by clicking on message
-            elem.addEventListener("mousedown", function(event) {
-                event.stopPropagation();
-            }, true);
+            elem.addEventListener("mousedown", event => event.stopPropagation(), true);
         }
 
         // hide if not enough space (need to show first, otherwise .clientWidth is 0)
@@ -170,10 +158,8 @@ class Timeline {
     /**
      * Re-Draw the timeline
      * 
-     * @param resize
-     *            The resize parameter
-     * @param top
-     *            The top position
+     * @param {Number} resize - The resize parameter
+     * @param {Number} top - The top position
      */
     redraw(resize, top) {
         this.resize = resize;

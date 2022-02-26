@@ -45,43 +45,37 @@ let cache = {};
 
 /**
  * Return a threaded view for the given message header
- * @param {nsIMsgDBHdr} messageHeader The message header for which to create the thread
- * @returns a thread of containers
+ *
+ * @param {nsIMsgDBHdr} messageHeader - The message header for which to create the thread
+ * @return {ThreadVis.Container} - a thread of containers
  */
-const get = (messageHeader) => {
-    return new Promise((resolve, reject) =>  {
-        // check if we know about this message already
-        let container = getCache(messageHeader.messageId);
+const get = async (messageHeader) => {
+    // check if we know about this message already
+    let container = getCache(messageHeader.messageId);
+    if (container) {
+        // container is part of the same thread, return
+        return container;
+    } else {
+        // convert message header to gloda message
+        const message = await getGlodaMessage(messageHeader);
+        // get gloda thread
+        const thread = await getGlodaThread(message);
+        // create the in-memory thread representation
+        createThread(thread);
+        // find the correct container for the initial message
+        container = getCache(messageHeader.messageId);
         if (container) {
-            // container is part of the same thread, return
-            resolve(container);
+            return container;
         } else {
-            // convert message header to gloda message
-            getGlodaMessage(messageHeader)
-                // get gloda thread
-                .then(message => getGlodaThread(message))
-                // create the in-memory thread representation
-                .then(thread => createThread(thread))
-                // find the correct container for the initial message
-                .then(() => {
-                    // message is threaded, return container
-                    container = getCache(messageHeader.messageId);
-                    if (container) {
-                        resolve(container);
-                    } else {
-                        reject();
-                    }
-                })
-                .catch(error => {
-                    reject(error);
-                });
+            throw new Error("Message not found after threading.");
         }
-    });
-}
+    }
+};
 
 /**
  * Create an in-memory view of the thread
- * @param messageCollection the collection of all messages in the thread
+ *
+ * @param messageCollection - the collection of all messages in the thread
  */
 const createThread = (messageCollection) => {
     // start with a fresh thread
@@ -91,22 +85,21 @@ const createThread = (messageCollection) => {
         .map(item => createMessage(item))
         // and put all into thread
         .forEach(message => addMessage(message));
-    return Promise.resolve();
-}
+};
 
 /**
  * Get a Gloda message for message header
  *
- * @param {nsIMsgDBHdr} messageHeader The message header for which to get the Gloda message
- * @returns the Gloda message
+ * @param {nsIMsgDBHdr} messageHeader - The message header for which to get the Gloda message
+ * @return {GlodaMessage} - the Gloda message
  */
 const getGlodaMessage = (messageHeader) => {
     return new Promise((resolve, reject) =>  {
         Gloda.getMessageCollectionForHeader(messageHeader, {
-            onItemsAdded : function(items, collection) { },
-            onItemsModified : function(items, collection) { },
-            onItemsRemoved : function(items, collection) { },
-            onQueryCompleted : function(collection) {
+            onItemsAdded : (items, collection) => {},
+            onItemsModified : (items, collection) => {},
+            onItemsRemoved : (items, collection) => {},
+            onQueryCompleted : (collection) => {
                 if (collection.items.length > 0) {
                     resolve(collection.items[0]);
                 } else {
@@ -119,30 +112,27 @@ const getGlodaMessage = (messageHeader) => {
 
 /**
  * Get all messages for a thread
- * 
- * @param message The Gloda message
- * @returns All Gloda messages in the thread
+ *
+ * @param {GlodaMessage} message - The Gloda message
+ * @return All Gloda messages in the thread
  */
 const getGlodaThread = (message) => {
     return new Promise((resolve, reject) =>  {
         // get all messages in the thread from Gloda
         message.conversation.getMessagesCollection({
-            onItemsAdded : function(items, collection) { },
-            onItemsModified : function(items, collection) { },
-            onItemsRemoved : function(items, collection) { },
-            onQueryCompleted : function(collection) {
-                resolve(collection.items);
-            }
+            onItemsAdded : (items, collection) => {},
+            onItemsModified : (items, collection) => {},
+            onItemsRemoved : (items, collection) => {},
+            onQueryCompleted : (collection) => resolve(collection.items)
         });
     });
 };
 
 /**
  * Create a ThreadVis message
- * 
- * @param {GlodaMessage} glodaMessage The gloda message to add
- * @return {ThreadVis.Message} The wrapped message
- * @type ThreadVis.Message
+ *
+ * @param {GlodaMessage} glodaMessage - The gloda message to add
+ * @return {ThreadVis.Message} - The wrapped message
  */
 const createMessage = (glodaMessage) => {
     if (glodaMessage.folderMessage == null) {
@@ -156,17 +146,19 @@ const createMessage = (glodaMessage) => {
 
 /**
  * Possibly return a cached container for the given message id
- * @param id the message id to search for
- * @returns the cached container for the message
+ *
+ * @param {String} id - the message id to search for
+ * @return {ThreadVis.Container} - the cached container for the message
  */
 const getCache = (id) => {
     return cache[id];
-}
+};
 
 /**
  * Put a created container into the cache
- * @param id the message id
- * @param container the container to cache
+ *
+ * @param {String} id - the message id
+ * @param {ThreadVis.Container} container - the container to cache
  */
 const putCache = (id, container) => {
     cache[id] = container;
@@ -182,12 +174,11 @@ const putCache = (id, container) => {
 /**
  * Put this message in a container
  *
- * @param message
- *            The message to put into a container
+ * @param {ThreadVis.Message} message - The message to put into a container
  */
 const addMessage = (message) => {
     // try to get message container
-    var messageContainer = getCache(message.getId());
+    let messageContainer = getCache(message.getId());
 
     if (messageContainer != null) {
         // if we found a container for this message id, either it's a dummy or we have two mails with the same message-id
@@ -217,11 +208,11 @@ const addMessage = (message) => {
     }
 
     // for each element in references field of message
-    var parentReferenceContainer = null;
-    var references = message.getReferences();
+    let parentReferenceContainer = null;
+    const references = message.getReferences();
 
-    for (var referencekey in references) {
-        var referenceId = references[referencekey];
+    for (let referencekey in references) {
+        const referenceId = references[referencekey];
 
         // somehow, Thunderbird does not correctly filter invalid ids
         if (referenceId.indexOf("@") === -1) {
@@ -230,7 +221,7 @@ const addMessage = (message) => {
         }
 
         // try to find container for referenced message
-        var referenceContainer = getCache(referenceId);
+        let referenceContainer = getCache(referenceId);
         if (referenceContainer == null) {
             // no container found, create new one
             referenceContainer = new Container();

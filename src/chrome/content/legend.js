@@ -29,8 +29,8 @@
 /**
  * Clear the legend box
  */
-function clearLegend() {
-    let legendBox = document.getElementById("LegendContent");
+var clearLegend = () => {
+    const legendBox = document.getElementById("LegendContent");
     while (legendBox.firstChild != null) {
         legendBox.removeChild(legendBox.firstChild);
     }
@@ -39,11 +39,11 @@ function clearLegend() {
 /**
  * Display the legend
  */
-function displayLegend() {
+var displayLegend = () => {
     clearLegend();
 
-    let legendBox = document.getElementById("LegendContent");
-    let legend = opener.ThreadVis.getLegend();
+    const legendBox = document.getElementById("LegendContent");
+    const legend = opener.ThreadVis.getLegend();
     legendBox.appendChild(legend);
     window.sizeToContent();
 }

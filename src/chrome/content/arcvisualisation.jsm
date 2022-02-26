@@ -33,25 +33,25 @@ class ArcVisualisation {
      * Constructor for visualisation class
      * 
      * @constructor
-     * @param {DOMElement} document The document to draw on
-     * @param {DOMElement} stack The stack to draw on
-     * @param {Number} dotSize The size of the dot
-     * @param {Number} resize The resize parameter
-     * @param {Number} arcMinHeight The minimal arc height
-     * @param {Number} arcDifference The height difference between two arcs
-     * @param {Number} arcRadius The corner radius of an arc
-     * @param {Number} arcWidth The width of the arc
-     * @param {String} colour The colour of the arc
-     * @param {String} vPosition The vertical position (top/bottom)
-     * @param {Number} height The height of the arc
-     * @param {Number} left The left position of the arc
-     * @param {Number} right The right position of the arc
-     * @param {Number} top The top position
-     * @param {Number} opacity The opacity
-     * @return {ArcVisualisation} A new arc visualisation object
+     * @param {DOMElement} document - The document to draw on
+     * @param {DOMElement} stack - The stack to draw on
+     * @param {Number} dotSize - The size of the dot
+     * @param {Number} resize - The resize parameter
+     * @param {Number} arcMinHeight - The minimal arc height
+     * @param {Number} arcDifference - The height difference between two arcs
+     * @param {Number} arcRadius - The corner radius of an arc
+     * @param {Number} arcWidth - The width of the arc
+     * @param {String} colour - The colour of the arc
+     * @param {String} vPosition - The vertical position (top/bottom)
+     * @param {Number} height - The height of the arc
+     * @param {Number} left - The left position of the arc
+     * @param {Number} right - The right position of the arc
+     * @param {Number} top - The top position
+     * @param {Number} opacity - The opacity
+     * @return {ArcVisualisation} - A new arc visualisation object
      */
     constructor(document, stack, dotSize, resize, arcMinHeight, arcDifference, arcRadius, arcWidth, colour, vPosition,
-            height,left, right, top, opacity) {
+            height, left, right, top, opacity) {
 
         /**
          * XUL/DOM window to draw in
@@ -104,7 +104,7 @@ class ArcVisualisation {
         this.vPosition = vPosition;
 
         /**
-         * height of arc (counting from 0) multiplied by arc_difference_ to get height in px
+         * height of arc (counting from 0) multiplied by arcDifference to get height in px
          */
         this.height = height;
 
@@ -150,12 +150,12 @@ class ArcVisualisation {
     /**
      * Re-Draw arc
      * 
-     * @param {Number} resize The resize parameter
-     * @param {Number} left The left position
-     * @param {Number} right The right position
-     * @param {Number} top The top position
-     * @param {String} colour The colour
-     * @param {Number} opacity The opacity
+     * @param {Number} resize - The resize parameter
+     * @param {Number} left - The left position
+     * @param {Number} right - The right position
+     * @param {Number} top - The top position
+     * @param {String} colour - The colour
+     * @param {Number} opacity - The opacity
      */
     redraw(resize, left, right, top, colour, opacity) {
         this.resize = resize;

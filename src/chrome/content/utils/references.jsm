@@ -32,15 +32,15 @@ const References = {
     /**
      * Build references array
      * 
-     * @param references The references string
-     * @returns an array of all referenced mssage ids
+     * @param references - The references string
+     * @return {Array} - an array of all referenced mssage ids
      */
     get(references) {
         if (references != null && references != "") {
-            let result = references.match(/[^<>\s]+/g);
+            const result = references.match(/[^<>\s]+/g);
 
-            let dupes = {};
-            let distinct = [];
+            const dupes = {};
+            const distinct = [];
 
             // result can be null if no matches have been found
             if (result) {
@@ -48,7 +48,7 @@ const References = {
                     // TODO
                     // email from user: some mail servers seem to change the message id after the @ sign
                     // add switch to ignore mail host after @ (setting in preferences)
-                    var msgid = result[i];
+                    const msgid = result[i];
                     if (dupes[msgid]) {
                         continue;
                     }

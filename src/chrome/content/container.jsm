@@ -80,7 +80,7 @@ class Container {
     /**
      * Add child to this container. Removes child from old sibling list. Inserts child and all its children.
      * 
-     * @param {Container} child The child to add
+     * @param {Container} child - The child to add
      */
     addChild(child) {
         // check if child is already our child. if so, do nothing
@@ -121,7 +121,7 @@ class Container {
     /**
      * Inserts children into child list. Children have to be removed from old position first!
      * 
-     * @param {Container} child The child to add
+     * @param {Container} child - The child to add
      */
     addChildren(child) {
         // we always want to be passed the first child in list
@@ -140,7 +140,7 @@ class Container {
     /**
      * Insert a container into sibling list
      * 
-     * @param {Container} sibling The container to add as a sibling
+     * @param {Container} sibling - The container to add as a sibling
      */
     addSibling(sibling) {
         if (this.hasNext()) {
@@ -157,12 +157,11 @@ class Container {
     /**
      * See if this container or any of its parents contains a specific container
      * 
-     * @param {Container} target The container to find
-     * @return {Boolean} True if the container is contained in the parent list, false if not
-     * @type Boolean
+     * @param {Container} target - The container to find
+     * @return {Boolean} - True if the container is contained in the parent list, false if not
      */
     findParent(target) {
-        let container = this.getParent();
+        const container = this.getParent();
 
         if (container == null) {
             return false;
@@ -178,8 +177,7 @@ class Container {
     /**
      * Get first child in child list
      * 
-     * @return {Container} Return the first child
-     * @type ThreadVis.Container
+     * @return {Container} - Return the first child
      */
     getChild() {
         return this.child;
@@ -188,8 +186,7 @@ class Container {
     /**
      * Get all children of this container as array
      * 
-     * @return {Array} All children of the current container, recursively
-     * @type Array
+     * @return {Array<Container>} - All children of the current container, recursively
      */
     getChildren() {
         let containers = new Array();
@@ -203,8 +200,7 @@ class Container {
     /**
      * Get recursive container count
      * 
-     * @return {Number} The number of all children, counted recursively
-     * @type Number
+     * @return {Number} - The number of all children, counted recursively
      */
     getCount() {
         let count = 1;
@@ -217,8 +213,7 @@ class Container {
     /**
      * Get date of message
      * 
-     * @return {Date} The date of the message
-     * @type Date
+     * @ {Date} - The date of the message
      */
     getDate() {
         if (!this.isDummy()) {
@@ -236,8 +231,7 @@ class Container {
     /**
      * Get depth of message in tree
      * 
-     * @return {Number} The generational depth of the message
-     * @type Number
+     * @return {Number} - The generational depth of the message
      */
     getDepth() {
         if (this.hasParent()) {
@@ -250,8 +244,7 @@ class Container {
     /**
      * Get last sibling in list
      * 
-     * @return {Container} The last sibling
-     * @type Container
+     * @return {Container} - The last sibling
      */
     getLast() {
         let current = this;
@@ -264,8 +257,7 @@ class Container {
     /**
      * Get next sibling in list
      * 
-     * @return {Container} The next container in the sibling list
-     * @type Container
+     * @return {Container} - The next container in the sibling list
      */
     getNext() {
         return this.next;
@@ -274,8 +266,7 @@ class Container {
     /**
      * Get message of this container
      * 
-     * @return {Message} The message
-     * @type Message
+     * @return {Message} - The message
      */
     getMessage() {
         return this.message;
@@ -284,8 +275,7 @@ class Container {
     /**
      * Get parent of this container
      * 
-     * @return {Container} The parent of the message
-     * @type Container
+     * @return {Container} - The parent of the message
      */
     getParent() {
         return this.parent;
@@ -294,8 +284,7 @@ class Container {
     /**
      * Get previous sibling in list
      * 
-     * @return {Container} The previous sibling in the list
-     * @type Container
+     * @return {Container} - The previous sibling in the list
      */
     getPrevious() {
         return this.previous;
@@ -304,8 +293,7 @@ class Container {
     /**
      * Get topmost container
      * 
-     * @return {Container} The topmost container of the thread
-     * @type Container
+     * @return {Container} - The topmost container of the thread
      */
     getTopContainer() {
         if (this.hasParent()) {
@@ -317,8 +305,7 @@ class Container {
     /**
      * See if this container has at least 1 child
      * 
-     * @return {Boolean} True if the container has a child container
-     * @type Boolean
+     * @return {Boolean} - True if the container has a child container
      */
     hasChild() {
         return (this.getChild() != null);
@@ -327,8 +314,7 @@ class Container {
     /**
      * See if we have a next sibling in list
      * 
-     * @return {Boolean} True if the container has a next sibling in the list
-     * @type Boolean
+     * @return {Boolean} - True if the container has a next sibling in the list
      */
     hasNext() {
         return (this.getNext() != null);
@@ -337,8 +323,7 @@ class Container {
     /**
      * See if this container has a parent
      * 
-     * @return {Boolean} True if the container has a parent container
-     * @type Boolean
+     * @return {Boolean} - True if the container has a parent container
      */
     hasParent() {
         return (this.getParent() != null);
@@ -347,8 +332,7 @@ class Container {
     /**
      * See if we have a previous sibling in list
      * 
-     * @return {Boolean} True if the container has a previous sibling in the list
-     * @type Boolean
+     * @return {Boolean} - True if the container has a previous sibling in the list
      */
     hasPrevious() {
         return (this.getPrevious() != null);
@@ -357,8 +341,7 @@ class Container {
     /**
      * See if this container contains a message
      * 
-     * @return {Boolean} True if the container is a dummy container (i.e. contains no message)
-     * @type Boolean
+     * @return {Boolean} - True if the container is a dummy container (i.e. contains no message)
      */
     isDummy() {
         return (this.getMessage() == null);
@@ -367,8 +350,7 @@ class Container {
     /**
      * Remove a child from the list
      * 
-     * @param {ThreadVis.Container}
-     *            child The child container to remove
+     * @param {ThreadVis.Container} child - The child container to remove
      */
     removeChild(child) {
         // check if child is in fact our child
@@ -426,7 +408,7 @@ class Container {
     /**
      * Set first child in list
      * 
-     * @param {Container} child The child to set
+     * @param {ThreadVis.Container} child - The child to set
      */
     setChild(child) {
         this.child = child;
@@ -435,7 +417,7 @@ class Container {
     /**
      * Set next sibling in list
      * 
-     * @param {Container} next The container to set
+     * @param {ThreadVis.Container} next - The container to set
      */
     setNext(next) {
         this.next = next;
@@ -444,7 +426,7 @@ class Container {
     /**
      * Set message of this container
      * 
-     * @param {Message} message The message to set
+     * @param {ThreadVis.Message} message - The message to set
      */
     setMessage(message) {
         this.message = message;
@@ -453,7 +435,7 @@ class Container {
     /**
      * Set parent of this container
      * 
-     * @param {Container} parent The parent container
+     * @param {ThreadVis.Container} parent - The parent container
      */
     setParent(parent) {
         this.parent = parent;
@@ -462,8 +444,8 @@ class Container {
     /**
      * Set parent for all containers in list
      * 
-     * @param {Container} sibling The first sibling in the list
-     * @param {Container} parent The parent to set
+     * @param {ThreadVis.Container} sibling - The first sibling in the list
+     * @param {ThreadVis.Container} parent - The parent to set
      */
     setParentForContainer(sibling, parent) {
         for (let container = sibling; container != null; container = container.getNext()) {
@@ -474,7 +456,7 @@ class Container {
     /**
      * Set previous sibling in list
      * 
-     * @param {Container} prev The previous container
+     * @param {ThreadVis.Container} prev - The previous container
      */
     setPrevious(prev) {
         this.previous = prev;
@@ -483,8 +465,8 @@ class Container {
     /**
      * Output string representation of this container
      * 
-     * @param prefix The prefix
-     * @return The string representation
+     * @param {String} prefix - The prefix
+     * @return {String} - The string representation
      */
     toString(prefix) {
         if (prefix == null) {
@@ -510,10 +492,9 @@ class Container {
  * Sort function for sorting javascript array
  * Sort by date, but never sort child before parent
  * 
- * @param {Container} one The first container
- * @param {Container} two The second container
- * @return {Number} -1 to sort one before two, +1 to sort two before one
- * @type Number
+ * @param {ThreadVis.Container} one - The first container
+ * @param {ThreadVis.Container} two - The second container
+ * @return {Number} - -1 to sort one before two, +1 to sort two before one
  */
 const sortFunction = (one, two) => {
     // just to be sure, we never want to sort a child
@@ -530,7 +511,7 @@ const sortFunction = (one, two) => {
     // sort all others by date
     // if one of the containers is a dummy, getDate() returns the date of its first child.
     // this should be enough to ensure the timeline
-    let difference = one.getDate().getTime() - two.getDate().getTime();
+    const difference = one.getDate().getTime() - two.getDate().getTime();
 
     if (difference < 0) {
         return -1;

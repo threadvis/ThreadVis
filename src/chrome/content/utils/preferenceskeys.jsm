@@ -35,122 +35,122 @@ const PreferenceBranch = "extensions.threadvis.";
  */
 const PreferenceKeys = {
     // list of disabled accounts
-    DISABLED_ACCOUNTS :
+    DISABLED_ACCOUNTS:
         PreferenceBranch + "disabledaccounts",
 
     // list of disabled folders
-    DISABLED_FOLDERS :
+    DISABLED_FOLDERS:
         PreferenceBranch + "disabledfolders",
 
     // check for "sent" by folder flag
-    SENTMAIL_FOLDERFLAG :
+    SENTMAIL_FOLDERFLAG:
         PreferenceBranch + "sentmail.folderflag",
 
     // check for "sent" by identity
-    SENTMAIL_IDENTITY :
+    SENTMAIL_IDENTITY:
         PreferenceBranch + "sentmail.identity",
 
     // height of SVG export image
-    SVG_HEIGHT :
+    SVG_HEIGHT:
         PreferenceBranch + "svg.height",
 
     // width of SVG export image
-    SVG_WIDTH :
+    SVG_WIDTH:
         PreferenceBranch + "svg.width",
 
     // show timeline
-    TIMELINE :
+    TIMELINE:
         PreferenceBranch + "timeline.enabled",
 
     // font size of timeline
-    TIMELINE_FONTSIZE :
+    TIMELINE_FONTSIZE:
         PreferenceBranch + "timeline.fontsize",
 
     // enable timescaling
-    TIMESCALING :
+    TIMESCALING:
         PreferenceBranch + "timescaling.enabled",
 
     // timescaling method
-    TIMESCALING_METHOD :
+    TIMESCALING_METHOD:
         PreferenceBranch + "timescaling.method",
 
     // minimal timedifference to show
-    TIMESCALING_MINTIMEDIFF :
+    TIMESCALING_MINTIMEDIFF:
         PreferenceBranch + "timescaling.mintimediff",
 
     // size of dot
-    VIS_DOTSIZE :
+    VIS_DOTSIZE:
         PreferenceBranch + "visualisation.dotsize",
 
     // minimum height of arc
-    VIS_ARC_MINHEIGHT :
+    VIS_ARC_MINHEIGHT:
         PreferenceBranch + "visualisation.arcminheight",
 
     // radius of arc
-    VIS_ARC_RADIUS :
+    VIS_ARC_RADIUS:
         PreferenceBranch + "visualisation.arcradius",
 
     // height difference between two arcs
-    VIS_ARC_DIFFERENCE :
+    VIS_ARC_DIFFERENCE:
         PreferenceBranch + "visualisation.arcdifference",
 
     // arc width
-    VIS_ARC_WIDTH :
+    VIS_ARC_WIDTH:
         PreferenceBranch + "visualisation.arcwidth",
 
     // spacing
-    VIS_SPACING :
+    VIS_SPACING:
         PreferenceBranch + "visualisation.spacing",
 
     // message circles
-    VIS_MESSAGE_CIRCLES :
+    VIS_MESSAGE_CIRCLES:
         PreferenceBranch + "visualisation.messagecircles",
 
     // colour
-    VIS_COLOUR :
+    VIS_COLOUR:
         PreferenceBranch + "visualisation.colour",
 
     // background color
-    VIS_COLOURS_BACKGROUND :
+    VIS_COLOURS_BACKGROUND:
         PreferenceBranch + "visualisation.colours.background",
 
     // border color
-    VIS_COLOURS_BORDER :
+    VIS_COLOURS_BORDER:
         PreferenceBranch + "visualisation.colours.border",
 
     // colours for received
-    VIS_COLOURS_RECEIVED :
+    VIS_COLOURS_RECEIVED:
         PreferenceBranch + "visualisation.colours.received",
 
     // colours for sent
-    VIS_COLOURS_SENT :
+    VIS_COLOURS_SENT:
         PreferenceBranch + "visualisation.colours.sent",
 
     // colour for marking current message
-    VIS_COLOURS_CURRENT :
+    VIS_COLOURS_CURRENT:
         PreferenceBranch + "visualisation.colours.current",
 
     // hide if only one message shown
-    VIS_HIDE_ON_SINGLE :
+    VIS_HIDE_ON_SINGLE:
         PreferenceBranch + "visualisation.hideonsingle",
 
     // highlight message
-    VIS_HIGHLIGHT :
+    VIS_HIGHLIGHT:
         PreferenceBranch + "visualisation.highlight",
 
     // minimal width of visualisation
-    VIS_MINIMAL_WIDTH :
+    VIS_MINIMAL_WIDTH:
         PreferenceBranch + "visualisation.minimalwidth",
 
     // opacity
-    VIS_OPACITY :
+    VIS_OPACITY:
         PreferenceBranch + "visualisation.opacity",
 
     // zoom
-    VIS_ZOOM :
+    VIS_ZOOM:
         PreferenceBranch + "visualisation.zoom",
 
     // global message index (Thunderbird internal)
-    GLODA_ENABLED :
+    GLODA_ENABLED:
         "mailnews.database.global.indexer.enabled"
 };

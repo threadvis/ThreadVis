@@ -33,51 +33,64 @@ const { ThreadVis } = ChromeUtils.import("chrome://threadvis/content/threadvis.j
 const { ExtensionParent } = ChromeUtils.import("resource://gre/modules/ExtensionParent.jsm");
 
 const notify = {};
-const extension = ExtensionParent.GlobalManager.getExtension("{A23E4120-431F-4753-AE53-5D028C42CFDC}");
+const extension = ExtensionParent.GlobalManager.getExtension(ThreadVis.ADD_ON_ID);
 Services.scriptloader.loadSubScript(
     extension.rootURI.resolve("chrome/content/helpers/notifyTools.js"),
     notify,
     "UTF-8"
 );
+// Set add-on id in notify tools
+notify.notifyTools.setAddOnId(ThreadVis.ADD_ON_ID);
 
-var ThreadVisInstance;
+const openOptionsPage = () => {
+    WL.messenger.runtime.openOptionsPage();
+}
 
-var onLoad = (isAddonActivation) => {
+let ThreadVisInstance;
+
+/**
+ * Activate add-on, called by WindowListener experiment
+ *
+ * @param {boolean} isAddonActivation
+ */
+var onLoad = async (isAddonActivation) => {
     WL.injectCSS("chrome://threadvis/content/threadvis.css");
     injectVisualisation();
     injectStatusbar();
 
-    notify.notifyTools.notifyBackground({command: "initPref"}).then((data) => {
-        ThreadVisInstance = new ThreadVis(window);
+    await notify.notifyTools.notifyBackground({command: "initPref"});
+    ThreadVisInstance = new ThreadVis(window, openOptionsPage);
 
-        window.ThreadVis = ThreadVisInstance;
-        // attach event listeners
-        document.getElementById("ThreadVisPopUpOpenOptionsDialog").addEventListener("command", function() {
-            WL.messenger.runtime.openOptionsPage();
-        });
-        document.getElementById("ThreadVisOpenOptionsDialog").addEventListener("command", function() {
-            WL.messenger.runtime.openOptionsPage();
-        });
-        document.getElementById("ThreadVisPopUpOpenVisualisation").addEventListener("command", function() {
-            ThreadVisInstance.displayVisualisationWindow();
-        });
-        document.getElementById("ThreadVisOpenLegendWindow").addEventListener("command", function() {
-            ThreadVisInstance.displayLegendWindow();
-        });
-        document.getElementById("ThreadVisExportSVG").addEventListener("command", function() {
-            ThreadVisInstance.visualisation.exportToSVG();
-        });
-    });
-}
+    window.ThreadVis = ThreadVisInstance;
+    // attach event listeners
+    document.getElementById("ThreadVisPopUpOpenOptionsDialog")
+        .addEventListener("command", () => WL.messenger.runtime.openOptionsPage());
+    document.getElementById("ThreadVisOpenOptionsDialog")
+        .addEventListener("command", () => WL.messenger.runtime.openOptionsPage());
+    document.getElementById("ThreadVisPopUpOpenVisualisation")
+        .addEventListener("command", () => ThreadVisInstance.displayVisualisationWindow());
+    document.getElementById("ThreadVisOpenLegendWindow")
+        .addEventListener("command", () => ThreadVisInstance.displayLegendWindow());
+    document.getElementById("ThreadVisExportSVG")
+        .addEventListener("command", () => ThreadVisInstance.visualisation.exportToSVG());
+};
 
+/**
+ * Deactivate add-on, called by WindowListener experiment
+ *
+ * @param {boolean} isAddonDeactivation
+ */
 var onUnload = (isAddonDeactivation) => {
     if (ThreadVisInstance) {
         ThreadVisInstance.shutdown();
         ThreadVisInstance = null;
         delete window.ThreadVis;
     }
-}
+};
 
+/**
+ * Inject the visualization's XUL code into the user interface
+ */
 const injectVisualisation = () => {
     WL.injectElements(`
     <hbox id="expandedHeaderView">
@@ -158,8 +171,11 @@ const injectVisualisation = () => {
         </vbox>
     </hbox>`,
     ["chrome://threadvis/locale/threadvis.dtd"]);
-}
+};
 
+/**
+ * Inject the statusbar XUL code into the user interface
+ */
 const injectStatusbar = () => {
     WL.injectElements(`
     <hbox id="status-bar">
@@ -226,4 +242,4 @@ const injectStatusbar = () => {
         </hbox>
     </hbox>`,
     ["chrome://threadvis/locale/threadvis.dtd"]);
-}
+};

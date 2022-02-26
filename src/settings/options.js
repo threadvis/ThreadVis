@@ -26,23 +26,18 @@
  * JavaScript file for settings dialog
  **********************************************************************************************************************/
 
-async function getPref(pref) {
-    return (await messenger.runtime.getBackgroundPage()).messenger.LegacyPref.get(pref);
-}
+const getPref = async (pref) => 
+    (await messenger.runtime.getBackgroundPage()).messenger.LegacyPref.get(pref);
 
-async function setPref(pref, value) {
-    return (await messenger.runtime.getBackgroundPage()).messenger.LegacyPref.set(pref, value);
-}
+const setPref = async (pref, value) => 
+    (await messenger.runtime.getBackgroundPage()).messenger.LegacyPref.set(pref, value);
 
-async function getAccounts() {
-    return (await messenger.runtime.getBackgroundPage()).messenger.LegacyAccountsFolders.getAccounts();
-}
+const getAccounts = async () =>
+    (await messenger.runtime.getBackgroundPage()).messenger.LegacyAccountsFolders.getAccounts();
 
-function querySelector(name, value) {
-    return `[name="${name}"]` + (value ? `[value="${value}"]` : "");
-}
+const querySelector = (name, value) => `[name="${name}"]` + (value ? `[value="${value}"]` : "");
 
-async function init() {
+const init = async () => {
     [
         { key: PreferenceKeys.TIMESCALING, type: "bool"},
         { key: PreferenceKeys.TIMESCALING_METHOD, type: "string"},
@@ -69,9 +64,9 @@ async function init() {
         { key: PreferenceKeys.DISABLED_FOLDERS, type: "string"}
     ].forEach(pref => {
         getPref(pref.key).then(value => {
-            let elems = document.querySelectorAll(querySelector(pref.key));
+            const elems = document.querySelectorAll(querySelector(pref.key));
             if (elems.length == 1) {
-                let elem = elems[0];
+                const elem = elems[0];
                 if (pref.type === "bool") {
                     elem.checked = value;
                 } else {
@@ -87,12 +82,12 @@ async function init() {
             } else if (elems.length > 1) {
                 // note: special handling for prefs which map to multiple elements, assume each elem is a boolean
                 elems.forEach(elem => {
-                    let equals = elem.value === (pref.type === "bool" ? (value === true ? "true" : "false") : value);
+                    const equals = elem.value === (pref.type === "bool" ? (value === true ? "true" : "false") : value);
                     if (equals) {
                         elem.checked = true;
                     }
                     elem.addEventListener("change", function() {
-                        if (elem.checked) {
+                        if (this.checked) {
                             setPref(pref.key, pref.type === "bool" ? (this.value === "true" ? true : false) : this.value);
                         }
                     });
@@ -106,15 +101,16 @@ async function init() {
 }
 
 /**
- * Build the account list Get all accounts, display checkbox for each
+ * Build the account list.
+ * Get all accounts, display checkbox for each
  */
-async function buildAccountList() {
-    let accountBox = document.getElementById("ThreadVisEnableAccounts");
-    var pref = document.getElementById("ThreadVisHiddenDisabledAccounts").value;
+const buildAccountList = async () => {
+    const accountBox = document.getElementById("ThreadVisEnableAccounts");
+    const pref = document.getElementById("ThreadVisHiddenDisabledAccounts").value;
 
-    let accounts = await getAccounts();
+    const accounts = await getAccounts();
     accounts.forEach(account => {
-        let checkbox = document.createElement("input");
+        const checkbox = document.createElement("input");
         checkbox.setAttribute("id", "ThreadVis-Account-" + account.id);
         checkbox.setAttribute("type", "checkbox");
         checkbox.setAttribute("data-type", "account");
@@ -130,11 +126,11 @@ async function buildAccountList() {
         } else {
             checkbox.checked = true;
         }
-        let label = document.createElement("label");
+        const label = document.createElement("label");
         label.setAttribute("for", "ThreadVis-Account-" + account.id);
         label.textContent = account.name;
 
-        let buttonAll = document.createElement("button");
+        const buttonAll = document.createElement("button");
         buttonAll.textContent = "__MSG_options.visualisation.enabledaccounts.button.all__";
         buttonAll.addEventListener("click", function() {
             document.querySelectorAll("[data-type=folder][data-account=" + account.id + "]").forEach(box => {
@@ -142,7 +138,7 @@ async function buildAccountList() {
                 box.dispatchEvent(new Event("change"));
             });
         });
-        let buttonNone = document.createElement("button");
+        const buttonNone = document.createElement("button");
         buttonNone.textContent = "__MSG_options.visualisation.enabledaccounts.button.none__";
         buttonNone.addEventListener("click", function() {
             document.querySelectorAll("[data-type=folder][data-account=" + account.id + "]").forEach(box => {
@@ -151,7 +147,7 @@ async function buildAccountList() {
             });
         });
 
-        let hbox = document.createElement("div");
+        const hbox = document.createElement("div");
         hbox.setAttribute("class", "account");
         hbox.appendChild(checkbox);
         hbox.appendChild(label);
@@ -166,21 +162,17 @@ async function buildAccountList() {
 /**
  * Create checkbox elements for all folders
  * 
- * @param box
- *            The box to which to add the checkbox elements to
- * @param folders
- *            All folders for which to create checkboxes
- * @param account
- *            The account for which the checkboxes are created
- * @param indent
- *            The amount of indentation
+ * @param {DOMElement} box - The box to which to add the checkbox elements to
+ * @param {Array} folders - All folders for which to create checkboxes
+ * @param {Account} account - The account for which the checkboxes are created
+ * @param {Number} indent - The amount of indentation
  */
-function buildFolderCheckboxes(box, folders, account, indent) {
-    let pref = document.getElementById("ThreadVisHiddenDisabledFolders").value;
+const buildFolderCheckboxes = (box, folders, account, indent) => {
+    const pref = document.getElementById("ThreadVisHiddenDisabledFolders").value;
 
     folders.forEach(folder => {
-        let div = document.createElement("div");
-        let checkbox = document.createElement("input");
+        const div = document.createElement("div");
+        const checkbox = document.createElement("input");
         checkbox.setAttribute("id", "ThreadVis-Account-" + account + "-Folder-" + folder.url);
         checkbox.setAttribute("type", "checkbox");
         checkbox.setAttribute("data-type", "folder");
@@ -195,7 +187,7 @@ function buildFolderCheckboxes(box, folders, account, indent) {
         } else {
             checkbox.checked = true;
         }
-        let label = document.createElement("label");
+        const label = document.createElement("label");
         label.setAttribute("for", "ThreadVis-Account-" + account + "-Folder-" + folder.url);
         label.textContent = folder.name;
         div.appendChild(checkbox);
@@ -212,13 +204,13 @@ function buildFolderCheckboxes(box, folders, account, indent) {
 /**
  * Create a string preference of all deselected accounts
  */
-function buildAccountPreference() {
-    let accountBox = document.getElementById("ThreadVisEnableAccounts");
-    let prefElement = document.getElementById("ThreadVisHiddenDisabledAccounts");
+const buildAccountPreference = () => {
+    const accountBox = document.getElementById("ThreadVisEnableAccounts");
+    const prefElement = document.getElementById("ThreadVisHiddenDisabledAccounts");
 
     let pref = "";
 
-    let checkboxes = accountBox.querySelectorAll("[data-type=account]");
+    const checkboxes = accountBox.querySelectorAll("[data-type=account]");
     checkboxes.forEach(checkbox => {
         if (! checkbox.checked) {
             pref += " " + checkbox.getAttribute("data-account") + " ";
@@ -231,13 +223,13 @@ function buildAccountPreference() {
 /**
  * Create a string preference of all deselected folders
  */
-function buildFolderPreference() {
-    let accountBox = document.getElementById("ThreadVisEnableAccounts");
-    let prefElement = document.getElementById("ThreadVisHiddenDisabledFolders");
+const buildFolderPreference = () => {
+    const accountBox = document.getElementById("ThreadVisEnableAccounts");
+    const prefElement = document.getElementById("ThreadVisHiddenDisabledFolders");
 
     let pref = "";
 
-    let checkboxes = accountBox.querySelectorAll("[data-type=folder]");
+    const checkboxes = accountBox.querySelectorAll("[data-type=folder]");
     checkboxes.forEach(checkbox => {
         if (! checkbox.checked) {
             pref += " " + checkbox.getAttribute("data-folder") + " ";
@@ -247,16 +239,12 @@ function buildFolderPreference() {
     prefElement.dispatchEvent(new Event("change"));
 }
 
-init().then(function() {
-    localize()
-});
+const localize = () => {
+    const keyPrefix = "__MSG_";
 
-function localize() {
-    var keyPrefix = "__MSG_";
-
-    let localization = {
+    const localization = {
         updateString(string) {
-            let re = new RegExp(keyPrefix + "(.+?)__", "g");
+            const re = new RegExp(keyPrefix + "(.+?)__", "g");
             return string.replace(re, matched => {
                 const key = matched.slice(keyPrefix.length, -2);
                 return messenger.i18n.getMessage(key) || matched;
@@ -273,7 +261,9 @@ function localize() {
             );
             for (let i = 0, maxi = texts.snapshotLength; i < maxi; i++) {
                 const text = texts.snapshotItem(i);
-                if (text.nodeValue.includes(keyPrefix)) text.nodeValue = this.updateString(text.nodeValue);
+                if (text.nodeValue.includes(keyPrefix)) {
+                    text.nodeValue = this.updateString(text.nodeValue);
+                }
             }
 
             const attributes = document.evaluate(
@@ -285,7 +275,9 @@ function localize() {
             );
             for (let i = 0, maxi = attributes.snapshotLength; i < maxi; i++) {
                 const attribute = attributes.snapshotItem(i);
-                if (attribute.value.includes(keyPrefix)) attribute.value = this.updateString(attribute.value);
+                if (attribute.value.includes(keyPrefix)) {
+                    attribute.value = this.updateString(attribute.value);
+                }
             }
         },
 
@@ -296,3 +288,8 @@ function localize() {
 
     localization.updateDocument();
 }
+
+(async () => {
+    await init();
+    localize();
+})();

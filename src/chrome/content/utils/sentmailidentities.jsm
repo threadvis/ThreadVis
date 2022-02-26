@@ -31,7 +31,7 @@ const EXPORTED_SYMBOLS = [ "SentMailIdentities" ];
 const SentMailIdentities = {};
 
 // remember all local accounts, for sent-mail comparison
-let accountManager = Components.classes["@mozilla.org/messenger/account-manager;1"]
+const accountManager = Components.classes["@mozilla.org/messenger/account-manager;1"]
         .getService(Components.interfaces.nsIMsgAccountManager);
 for (let identity in accountManager.allIdentities) {
     SentMailIdentities[identity.email] = true;

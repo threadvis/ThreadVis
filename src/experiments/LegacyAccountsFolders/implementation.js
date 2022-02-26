@@ -28,13 +28,21 @@
 
 var { ExtensionCommon } = ChromeUtils.import("resource://gre/modules/ExtensionCommon.jsm");
 
-var accountManager = Components.classes["@mozilla.org/messenger/account-manager;1"]
-    .getService(Components.interfaces.nsIMsgAccountManager);
-
 var LegacyAccountsFolders = class extends ExtensionCommon.ExtensionAPI {
     onStartup() {}
     onShutdown(isAppShutdown) {}
     getAPI(context) {
+        const accountManager = Components.classes["@mozilla.org/messenger/account-manager;1"]
+            .getService(Components.interfaces.nsIMsgAccountManager);
+
+        const getAllFolders = (folder) => {
+            return folder.subFolders.map(subFolder  => ({
+                url: subFolder.folderURL,
+                name: subFolder.name,
+                folders: getAllFolders(subFolder)
+            }));
+        };
+
         return {
             LegacyAccountsFolders: {
                 getAccounts() {
@@ -47,12 +55,4 @@ var LegacyAccountsFolders = class extends ExtensionCommon.ExtensionAPI {
             }
         }
     }
-};
-
-var getAllFolders = (folder) => {
-    return folder.subFolders.map(subFolder  => ({
-        url: subFolder.folderURL,
-        name: subFolder.name,
-        folders: getAllFolders(subFolder)
-    }));
 };

@@ -38,8 +38,8 @@ class Message {
      * Constructor
      * 
      * @constructor
-     * @param {glodaMessage} glodaMessage The gloda message object
-     * @returns {Message} A new message
+     * @param {GlodaMessage} glodaMessage - The gloda message object
+     * @return {ThreadVis.Message} - A new message
      */
     constructor(glodaMessage) {
         /**
@@ -51,7 +51,7 @@ class Message {
     /**
      * Get date of message
      * 
-     * @return {Date} The date of the message
+     * @return {Date} - The date of the message
      */
     getDate() {
         return this.glodaMessage.date;
@@ -60,7 +60,7 @@ class Message {
     /**
      * Get folder message is in
      * 
-     * @return {String} The folder of the message
+     * @return {String} - The folder of the message
      */
     getFolder() {
         return this.glodaMessage.folderURI;
@@ -69,7 +69,7 @@ class Message {
     /**
      * Get sender of message
      * 
-     * @return {String} The sender of the message
+     * @return {String} - The sender of the message
      */
     getFrom() {
         if (this.glodaMessage.folderMessage != null) {
@@ -81,7 +81,7 @@ class Message {
     /**
      * Parse email address from "From" header
      * 
-     * @return {String} The parsed email address
+     * @return {String} - The parsed email address
      */
     getFromEmail() {
         return this.glodaMessage.from.value;
@@ -90,7 +90,7 @@ class Message {
     /**
      * Get message id
      * 
-     * @return {String} The message id
+     * @return {String} - The message id
      */
     getId() {
         return this.glodaMessage.headerMessageID;
@@ -99,7 +99,7 @@ class Message {
     /**
      * Get references
      * 
-     * @return {Array.<String>} The parsed references header
+     * @return {Array<String>} - The parsed references header
      */
     getReferences() {
         if (this.glodaMessage.folderMessage != null) {
@@ -111,7 +111,7 @@ class Message {
     /**
      * Get original subject
      * 
-     * @return {String} The subject
+     * @return {String} - The subject
      */
     getSubject() {
         return this.glodaMessage.subject;
@@ -120,7 +120,7 @@ class Message {
     /**
      * See if message is sent (i.e. in sent-mail folder)
      * 
-     * @return {Boolean} True if the message was sent by the user, false if not
+     * @return {Boolean} - True if the message was sent by the user, false if not
      */
     isSent() {
         let issent = false;
@@ -138,7 +138,7 @@ class Message {
     /**
      * Get body of message
      * 
-     * @return {String} The body of the message
+     * @return {String} - The body of the message
      */
     getBody() {
         return this.glodaMessage.indexedBodyText;
@@ -147,7 +147,7 @@ class Message {
     /**
      * Return message as string
      * 
-     * @return {String} The string representation of the message
+     * @return {String} - The string representation of the message
      */
     toString() {
         return "Message: Subject: '" + this.getSubject() + "'."
@@ -162,7 +162,7 @@ class Message {
     /**
      * Get the underlying nsIMsgDBHdr
      * 
-     * @return {nsIMsgDBHdr} The original nsIMsgDBHdr or null if not found
+     * @return {nsIMsgDBHdr} - The original nsIMsgDBHdr or null if not found
      */
     getMsgDbHdr() {
         if (this.glodaMessage.folderMessage == null) {

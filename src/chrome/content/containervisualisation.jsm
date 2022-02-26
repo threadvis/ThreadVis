@@ -36,23 +36,22 @@ class ContainerVisualisation {
      * Constructor for visualisation class
      * 
      * @constructor
-     * @param {ThreadVis} threadvis Main element
-     * @param {DOMElement} document The document this visualisation is drawn in
-     * @param {DOMElement} stack The stack on which to draw
-     * @param {Container} container The container to visualise
-     * @param {String} colour The colour for the container
-     * @param {String} colourHighlight The colour for the highlighting
-     * @param {Number} left The left position
-     * @param {Number} top The top position
-     * @param {Boolean} selected True if the message is selected
-     * @param {Number} dotSize The size of the dot
-     * @param {Number} resize The resize parameter
-     * @param {Boolean} circle True to draw a circle
-     * @param {Number} spacing The spacing
-     * @param {Number} opacity The opacity
-     * @param {Boolean} messageCircles True to draw circle, false to draw square
-     * @return {ContainerVisualisation} A new container visualisation
-     * @type ContainerVisualisation
+     * @param {ThreadVis} threadvis - Main element
+     * @param {DOMElement} document - The document this visualisation is drawn in
+     * @param {DOMElement} stack - The stack on which to draw
+     * @param {ThreadVis.Container} container - The container to visualise
+     * @param {String} colour - The colour for the container
+     * @param {String} colourHighlight - The colour for the highlighting
+     * @param {Number} left - The left position
+     * @param {Number} top - The top position
+     * @param {Boolean} selected - True if the message is selected
+     * @param {Number} dotSize - The size of the dot
+     * @param {Number} resize - The resize parameter
+     * @param {Boolean} circle - True to draw a circle
+     * @param {Number} spacing - The spacing
+     * @param {Number} opacity - The opacity
+     * @param {Boolean} messageCircles - True to draw circle, false to draw square
+     * @return {ThreadVis.ContainerVisualisation} - A new container visualisation
      */
     constructor(threadvis, document, stack, container, colour, colourHighlight, left, top, selected, dotSize, resize,
             circle, spacing, opacity, messageCircles) {
@@ -172,16 +171,14 @@ class ContainerVisualisation {
      * Just create stub menu
      */
     createToolTip() {
-        let tooltip = this.document.createXULElement("tooltip");
+        const tooltip = this.document.createXULElement("tooltip");
         tooltip.setAttribute("orient", "vertical");
         tooltip.setAttribute("id", "ThreadVis_" + this.left);
 
         this.tooltip = tooltip;
-        tooltip.addEventListener("popupshowing", function() {
-            this.getToolTip();
-        }.bind(this), true);
+        tooltip.addEventListener("popupshowing", () => this.getToolTip(), true);
 
-        let popupset = this.document.getElementById("ThreadVisPopUpTooltips");
+        const popupset = this.document.getElementById("ThreadVisPopUpTooltips");
         popupset.appendChild(tooltip);
     }
 
@@ -195,35 +192,35 @@ class ContainerVisualisation {
 
         if (!this.container.isDummy()) {
             // if container container message, view details
-            let authorLabel = this.document.createXULElement("label");
-            let authorText = this.document.createXULElement("label");
-            let author = this.document.createXULElement("hbox");
+            const authorLabel = this.document.createXULElement("label");
+            const authorText = this.document.createXULElement("label");
+            const author = this.document.createXULElement("hbox");
             author.appendChild(authorLabel);
             author.appendChild(authorText);
             authorLabel.setAttribute("value", Strings.getString("tooltip.from"));
             authorLabel.style.fontWeight = "bold";
             authorText.setAttribute("value", this.container.getMessage().getFrom());
 
-            let dateLabel = this.document.createXULElement("label");
-            let dateText = this.document.createXULElement("label");
-            let date = this.document.createXULElement("hbox");
+            const dateLabel = this.document.createXULElement("label");
+            const dateText = this.document.createXULElement("label");
+            const date = this.document.createXULElement("hbox");
             date.appendChild(dateLabel);
             date.appendChild(dateText);
             dateLabel.setAttribute("value", Strings.getString("tooltip.date"));
             dateLabel.style.fontWeight = "bold";
             dateText.setAttribute("value", formatDate(this.container.getMessage().getDate()));
 
-            let subjectLabel = this.document.createXULElement("label");
-            let subjectText = this.document.createXULElement("label");
-            let subject = this.document.createXULElement("hbox");
+            const subjectLabel = this.document.createXULElement("label");
+            const subjectText = this.document.createXULElement("label");
+            const subject = this.document.createXULElement("hbox");
             subject.appendChild(subjectLabel);
             subject.appendChild(subjectText);
             subjectLabel.setAttribute("value", Strings.getString("tooltip.subject"));
             subjectLabel.style.fontWeight = "bold";
             subjectText.setAttribute("value", this.container.getMessage().getSubject());
 
-            let body = this.document.createXULElement("description");
-            let bodyText = this.document.createTextNode(this.container.getMessage().getBody());
+            const body = this.document.createXULElement("description");
+            const bodyText = this.document.createTextNode(this.container.getMessage().getBody());
             body.appendChild(bodyText);
 
             this.tooltip.appendChild(author);
@@ -233,8 +230,8 @@ class ContainerVisualisation {
             this.tooltip.appendChild(body);
         } else {
             // otherwise we display info about missing message
-            let desc1 = this.document.createXULElement("description");
-            let desc2 = this.document.createXULElement("description");
+            const desc1 = this.document.createXULElement("description");
+            const desc2 = this.document.createXULElement("description");
             desc1.setAttribute("value", Strings.getString("tooltip.missingmessage"));
             desc2.setAttribute("value", Strings.getString("tooltip.missingmessagedetail"));
             this.tooltip.appendChild(desc1);
@@ -272,15 +269,11 @@ class ContainerVisualisation {
         this.click.setAttribute("tooltip", "ThreadVis_" + this.left);
 
         this.stack.appendChild(this.click);
-        this.click.addEventListener("click", function(event) {
-            this.onMouseClick(event);
-        }.bind(this), true);
+        this.click.addEventListener("click", event => this.onMouseClick(event), true);
 
         // prevent mousedown event from bubbling to box object
         // prevent dragging of visualisation by clicking on message
-        this.click.addEventListener("mousedown", function(event) {
-            event.stopPropagation();
-        }, true);
+        this.click.addEventListener("mousedown", event => event.stopPropagation(), true);
     }
 
     /**
@@ -305,7 +298,7 @@ class ContainerVisualisation {
     /**
      * Mouse click event handler Display message user clicked on
      * 
-     * @param {DOMEvent} event The mouse event
+     * @param {DOMEvent} event - The mouse event
      */
     onMouseClick(event) {
         // only react to left mouse click
@@ -332,12 +325,12 @@ class ContainerVisualisation {
     /**
      * Re-Draw all elements
      * 
-     * @param {Number} resize The resize parameter
-     * @param {Number} left The left position
-     * @param {Number} top The top position
-     * @param {Boolean} selected True if container is selected
-     * @param {String} colour The colour
-     * @param {Number} opacity The opacity
+     * @param {Number} resize - The resize parameter
+     * @param {Number} left - The left position
+     * @param {Number} top - The top position
+     * @param {Boolean} selected - True if container is selected
+     * @param {String} colour - The colour
+     * @param {Number} opacity - The opacity
      */
     redraw(resize, left, top, selected, colour, opacity) {
         this.resize = resize;
@@ -390,12 +383,12 @@ class ContainerVisualisation {
      * Visualise circle around container if container is selected
      */
     visualiseCircle() {
-        let posTop = ((this.top - (this.dotSize / 2)) * this.resize);
-        let posLeft = ((this.left - (this.dotSize / 2)) * this.resize);
-        let posHeight = this.dotSize * this.resize;
-        let posWidth = this.dotSize * this.resize;
-        let shadowSpreadSize = this.dotSize * 1/6 * this.resize;
-        let shadowBlurSize = this.dotSize * 1/3 * this.resize;
+        const posTop = ((this.top - (this.dotSize / 2)) * this.resize);
+        const posLeft = ((this.left - (this.dotSize / 2)) * this.resize);
+        const posHeight = this.dotSize * this.resize;
+        const posWidth = this.dotSize * this.resize;
+        const shadowSpreadSize = this.dotSize * 1/6 * this.resize;
+        const shadowBlurSize = this.dotSize * 1/3 * this.resize;
 
         this.circle.style.top = `${posTop}px`;
         this.circle.style.left = `${posLeft}px`;
@@ -413,10 +406,10 @@ class ContainerVisualisation {
      * Visualise container around dot to catch click events and show tooltip
      */
     visualiseClick() {
-        let posTop = ((this.top - (this.spacing / 2)) * this.resize);
-        let posLeft = ((this.left - this.spacing / 2) * this.resize);
-        let posHeight = (this.spacing * this.resize);
-        let posWidth = (this.spacing * this.resize);
+        const posTop = ((this.top - (this.spacing / 2)) * this.resize);
+        const posLeft = ((this.left - this.spacing / 2) * this.resize);
+        const posHeight = (this.spacing * this.resize);
+        const posWidth = (this.spacing * this.resize);
 
         this.click.style.top = posTop + "px";
         this.click.style.left = posLeft + "px";
@@ -435,13 +428,13 @@ class ContainerVisualisation {
      * Draw dot for container
      */
     visualiseDot() {
-        let posTop = ((this.top - (this.dotSize / 2)) * this.resize);
-        let posLeft = ((this.left - (this.dotSize / 2)) * this.resize);
-        let posHeight = (this.dotSize * this.resize);
-        let posWidth = (this.dotSize * this.resize);
+        const posTop = ((this.top - (this.dotSize / 2)) * this.resize);
+        const posLeft = ((this.left - (this.dotSize / 2)) * this.resize);
+        const posHeight = (this.dotSize * this.resize);
+        const posWidth = (this.dotSize * this.resize);
         let styleBackground = "";
         let styleBorder = "";
-        let styleOpacity = this.opacity;
+        const styleOpacity = this.opacity;
         if (this.style != "half") {
             styleBackground = this.colour;
         } else {

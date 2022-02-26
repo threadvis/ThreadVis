@@ -63,23 +63,21 @@ class PreferencesClass {
     /**
      * Do callbacks after preference change
      * 
-     * @param {String} pref The pref that changed
+     * @param {String} pref - The pref that changed
      */
     doCallback(pref) {
-        let value = this.preferences[pref].value;
-        let callbacks = this.preferences[pref].callbacks;
+        const value = this.preferences[pref].value;
+        const callbacks = this.preferences[pref].callbacks;
         for (let key in callbacks) {
-            let func = callbacks[key];
-            func(value);
+            callbacks[key](value);
         }
     }
 
     /**
      * Get preference value for given preference
      * 
-     * @param {String} pref The preference to get
-     * @return {String} The value of the preference
-     * @type String
+     * @param {String} pref - The preference to get
+     * @return {String} - The value of the preference
      */
     get(pref) {
         return this.preferences[pref].value;
@@ -88,10 +86,10 @@ class PreferencesClass {
     /**
      * Load a preference from the store
      * 
-     * @param {String} pref The preference to load
-     * @param {PrefType} type The type of the preference (bool, string, int)
-     * @param {String} def The default value
-     * @param {nsIPrefBranch} prefBranch The branch to use to read the value
+     * @param {String} pref - The preference to load
+     * @param {PrefType} type - The type of the preference (bool, string, int)
+     * @param {String} def - The default value
+     * @param {nsIPrefBranch} prefBranch - The branch to use to read the value
      */
     load(pref, type, def, prefBranch) {
         if (! prefBranch) {
@@ -99,15 +97,15 @@ class PreferencesClass {
         }
         if (this.preferences[pref] == null) {
             this.preferences[pref] = {
-                value : def,
-                callbacks : [],
-                type : type,
-                branch : prefBranch
+                value: def,
+                callbacks: [],
+                type: type,
+                branch: prefBranch
             };
         }
 
         // remove leading branch from pref name
-        let loadPref = pref.substring(this.preferences[pref].branch.root.length);
+        const loadPref = pref.substring(this.preferences[pref].branch.root.length);
 
         // check if we are loading right pref type
         if (this.preferences[pref].branch.getPrefType(loadPref) != type) {
@@ -178,9 +176,9 @@ class PreferencesClass {
 
     /**
      * Observe a pref change
-     * @param {String} subject 
-     * @param {String} topic 
-     * @param {*} data 
+     * @param {String} subject
+     * @param {String} topic
+     * @param {*} data
      */
     observe(subject, topic, data) {
         if (topic != "nsPref:changed") {
@@ -188,7 +186,7 @@ class PreferencesClass {
         }
         // reload preferences
         this.reload();
-        if (data === "mailnews.database.global.indexer.enabled") {
+        if (subject.root === "mailnews.database.global.indexer.enabled") {
             this.doCallback("mailnews.database.global.indexer.enabled");
         } else {
             this.doCallback(PreferenceBranch + data);
@@ -198,8 +196,8 @@ class PreferencesClass {
     /**
      * Register a callback hook
      * 
-     * @param {String} preference The preference
-     * @param {Function} func The function that has to be called if the preference value changes
+     * @param {String} preference - The preference
+     * @param {Function} func - The function that has to be called if the preference value changes
      */
     callback(preference, func) {
         this.preferences[preference].callbacks.push(func);
@@ -208,8 +206,8 @@ class PreferencesClass {
     /**
      * Set preference value for given preference
      * 
-     * @param {String} pref The name of the preference
-     * @param {String} val The value of the preference
+     * @param {String} pref - The name of the preference
+     * @param {String} val - The value of the preference
      */
     set(pref, val) {
         this.preferences[pref].value = val;
@@ -219,14 +217,12 @@ class PreferencesClass {
     /**
      * Store a preference to the store
      * 
-     * @param {String}
-     *            pref The name of the preference
-     * @param {String}
-     *            val The value of the preference
+     * @param {String} pref - The name of the preference
+     * @param {String} val - The value of the preference
      */
     storePreference(pref, val) {
-        let branch = this.preferences[pref].branch;
-        let type = this.preferences[pref].type;
+        const branch = this.preferences[pref].branch;
+        const type = this.preferences[pref].type;
         // remove leading branch from pref name
         pref = pref.substring(branch.root.length);
 

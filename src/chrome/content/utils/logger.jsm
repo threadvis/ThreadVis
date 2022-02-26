@@ -32,15 +32,13 @@ var EXPORTED_SYMBOLS = [ "Logger" ];
 /**
  * Log to error console
  * 
- * @param source
- *            The source file.
- * @param message
- *            The log message
+ * @param {String} source - The source file.
+ * @param {String} message - The log message
  */
 const error = (source, message) => {
-    let consoleService = Components.classes["@mozilla.org/consoleservice;1"]
+    const consoleService = Components.classes["@mozilla.org/consoleservice;1"]
             .getService(Components.interfaces.nsIConsoleService);
-    let scriptError = Components.classes["@mozilla.org/scripterror;1"]
+    const scriptError = Components.classes["@mozilla.org/scripterror;1"]
             .createInstance(Components.interfaces.nsIScriptError);
     scriptError.init(
         message,

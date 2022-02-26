@@ -40,9 +40,7 @@
             src="chrome://threadvis/content/threadvis.jsm" />
     <script type="application/javascript">
         // add visualisation at startup
-        addEventListener("load", function() {
-                window.ThreadVis = new ThreadVis(window);
-        }, false);
+        addEventListener("load", () => window.ThreadVis = new ThreadVis(window), false);
     </script>
 
     <hbox id="ThreadVis"

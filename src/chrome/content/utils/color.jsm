@@ -26,38 +26,39 @@
  * Color utilities
  **********************************************************************************************************************/
 
-var EXPORTED_SYMBOLS = [ "convertRGBtoHSV", "convertHSVtoRGB" ] ;
+var EXPORTED_SYMBOLS = [ "convertRGBtoHSV", "convertHSVtoRGB" ];
 
 /**
  * Convert a RGB colour to a HSV colour
  *
- * @param r The red value
- * @param g The green value
- * @param b The blue value
- * @return The same colour in HSV colour model
- *            object.hue The hue of the colour
- *            object.saturation The saturation of the colour
- *            object.value The value of the colour
+ * @param {Integer} red - The red value [0..255]
+ * @param {Integer} green - The green value [0..255]
+ * @param {Integer} blue - The blue value [0..255]
+ * @return {Object} - The same colour in HSV colour model
+ *            object.hue - The hue of the colour [0..360]
+ *            object.saturation - The saturation of the colour [0..100]
+ *            object.value - The value of the colour [0..100]
  */
-const convertRGBtoHSV = (r, g, b)  => {
-    r = r / 255;
-    g = g / 255;
-    b = b / 255;
+const convertRGBtoHSV = (red, green, blue)  => {
+    const r = red / 255;
+    const g = green / 255;
+    const b = blue / 255;
+
     let h = 0;
     let s = 0;
     let v = 0;
 
-    let minVal = Math.min(r, g, b);
-    let maxVal = Math.max(r, g, b);
-    let delta = maxVal - minVal;
+    const minVal = Math.min(r, g, b);
+    const maxVal = Math.max(r, g, b);
+    const delta = maxVal - minVal;
 
     v = maxVal;
 
     if (delta != 0) {
         s = delta / maxVal;
-        let delR = (((maxVal - r) / 6) + (delta / 2)) / delta;
-        let delG = (((maxVal - g) / 6) + (delta / 2)) / delta;
-        let delB = (((maxVal - b) / 6) + (delta / 2)) / delta;
+        const delR = (((maxVal - r) / 6) + (delta / 2)) / delta;
+        const delG = (((maxVal - g) / 6) + (delta / 2)) / delta;
+        const delB = (((maxVal - b) / 6) + (delta / 2)) / delta;
 
         if (r == maxVal) {
             h = delB - delG;
@@ -84,29 +85,29 @@ const convertRGBtoHSV = (r, g, b)  => {
 /**
  * Convert a HSV colour to a RGB colour
  * 
- * @param hue The "hue" value of the colour
- * @param saturation The "saturation" value of the colour
- * @param value The "value" value of the colour
- * @return The same colour in RGB colour model
- *             object.r Red component [0..255]
- *             object.g Green component [0..255]
- *             object.b Blue component [0..255]
+ * @param {Integer} hue - The "hue" value of the colour [0..360]
+ * @param {Integer} saturation - The "saturation" value of the colour [0..100]
+ * @param {Integer} value - The "value" value of the colour [0..100]
+ * @return {Object} - The same colour in RGB colour model
+ *             object.r - Red component [0..255]
+ *             object.g - Green component [0..255]
+ *             object.b - Blue component [0..255]
  */
 const convertHSVtoRGB = (hue, saturation, value) => {
-    let h = hue / 360;
-    let s = saturation / 100;
-    let v = value / 100;
+    const h = hue / 360;
+    const s = saturation / 100;
+    const v = value / 100;
 
     let r = 0;
     let g = 0;
     let b = 0;
 
     if (s != 0) {
-        let varH = h * 6;
-        let varI = Math.floor(varH);
-        let var1 = v * (1 - s);
-        let var2 = v * (1 - s * (varH - varI));
-        let var3 = v * (1 - s * (1 - (varH - varI)));
+        const varH = h * 6;
+        const varI = Math.floor(varH);
+        const var1 = v * (1 - s);
+        const var2 = v * (1 - s * (varH - varI));
+        const var3 = v * (1 - s * (1 - (varH - varI)));
 
         switch (varI) {
             case 0:
