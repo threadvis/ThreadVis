@@ -93,83 +93,77 @@ var onUnload = (isAddonDeactivation) => {
  */
 const injectVisualisation = () => {
     WL.injectElements(`
-    <hbox id="expandedHeaderView">
-        <vbox id="expandedHeadersBox">
-            <hbox id="expandedHeadersBottomBox">
-                <hbox insertbefore="otherActionsBox"
-                      style="flex: 0.33"
-                      pack="end">
-                    <popupset>
-                        <menupopup id="ThreadVisPopUp">
-                            <menuitem label="&popup.settings;"
-                                      id="ThreadVisPopUpOpenOptionsDialog" />
-                            <menuitem label="&popup.popupwindow;"
-                                      id="ThreadVisPopUpOpenVisualisation" />
-                            <menuitem label="&popup.legend;"
-                                      id="ThreadVisOpenLegendWindow" />
-                            <menuitem label="&popup.exportsvg;"
-                                      id="ThreadVisExportSVG" />
-                        </menupopup>
-                    </popupset>
-                    <popupset id="ThreadVisPopUpTooltips">
-                    </popupset>
-                    <hbox id="ThreadVis"
+    <html:header id="messageHeader">
+        <hbox id="ThreadVisHeaderBox">
+            <popupset>
+                <menupopup id="ThreadVisPopUp">
+                    <menuitem label="&popup.settings;"
+                              id="ThreadVisPopUpOpenOptionsDialog" />
+                    <menuitem label="&popup.popupwindow;"
+                              id="ThreadVisPopUpOpenVisualisation" />
+                    <menuitem label="&popup.legend;"
+                              id="ThreadVisOpenLegendWindow" />
+                    <menuitem label="&popup.exportsvg;"
+                              id="ThreadVisExportSVG" />
+                </menupopup>
+            </popupset>
+            <popupset id="ThreadVisPopUpTooltips">
+            </popupset>
+            <hbox id="ThreadVis"
+                  flex="1"
+                  style="width: 100%; height: 100%;">
+                <vbox flex="1">
+                    <vbox id="ThreadVisBox"
+                          style="overflow: hidden;"
                           flex="1"
-                          style="width: 100%">
-                        <vbox flex="1">
-                            <vbox id="ThreadVisBox"
-                                  style="overflow: hidden;"
-                                  flex="1"
-                                  context="ThreadVisPopUp" />
-                            <hbox id="ThreadVisHorizontalScrollbar"
-                                  style="height: 5px; width: 0px;">
-                                <hbox id="ThreadVisScrollbarLeft"
-                                      style="width: 6px; height: 5px; padding-right: 1px;">
-                                    <image src="chrome://threadvis/content/images/arrowleft.png"
-                                           style="width: 5px; height: 5px;" />
-                                </hbox>
-                                <stack id="ThreadVisScrollbarHorizontalBox"
-                                       style="background: #cccccc; border: 1px solid #333333; height: 5px;"
-                                       flex="1">
-                                    <box id="ThreadVisScrollbarHorizontal"
-                                         height="3"
-                                         style="background: #333333; cursor: e-resize; position: relative;" />
-                                </stack>
-                                <hbox id="ThreadVisScrollbarRight"
-                                      style="width: 6px; height: 5px; padding-left: 1px;">
-                                    <image src="chrome://threadvis/content/images/arrowright.png"
-                                           style="width: 5px; height: 5px;" />
-                                </hbox>
-                            </hbox>
-                        </vbox>
-                        <vbox id="ThreadVisVerticalScrollbar">
-                            <vbox style="width: 5px;"
-                                  flex="1">
-                                <hbox id="ThreadVisScrollbarUp"
-                                      style="width: 5px; height: 6px; padding-bottom: 1px;">
-                                    <image src="chrome://threadvis/content/images/arrowtop.png"
-                                           style="width: 5px; height: 5px;" />
-                                </hbox>
-                                <stack id="ThreadVisScrollbarVerticalBox"
-                                       style="background: #cccccc; border: 1px solid #333333;"
-                                       flex="1">
-                                    <box id="ThreadVisScrollbarVertical"
-                                         width="3"
-                                         style="background: #333333; cursor: s-resize; position: relative;" />
-                                </stack>
-                                <hbox id="ThreadVisScrollbarDown"
-                                      style="width: 5px; height: 6px; padding-top: 1px;">
-                                    <image src="chrome://threadvis/content/images/arrowbottom.png"
-                                           style="width: 5px; height: 5px;" />
-                                </hbox>
-                            </vbox>
-                            <hbox style="height: 5px;" />
-                        </vbox>
+                          context="ThreadVisPopUp" />
+                    <hbox id="ThreadVisHorizontalScrollbar"
+                          style="height: 5px; width: 0px;">
+                        <hbox id="ThreadVisScrollbarLeft"
+                              style="width: 6px; height: 5px; padding-right: 1px;">
+                            <image src="chrome://threadvis/content/images/arrowleft.png"
+                                   style="width: 5px; height: 5px;" />
+                        </hbox>
+                        <stack id="ThreadVisScrollbarHorizontalBox"
+                               style="background: #cccccc; border: 1px solid #333333; height: 5px;"
+                               flex="1">
+                            <box id="ThreadVisScrollbarHorizontal"
+                                 height="3"
+                                 style="background: #333333; cursor: e-resize; position: relative;" />
+                        </stack>
+                        <hbox id="ThreadVisScrollbarRight"
+                              style="width: 6px; height: 5px; padding-left: 1px;">
+                            <image src="chrome://threadvis/content/images/arrowright.png"
+                                   style="width: 5px; height: 5px;" />
+                        </hbox>
                     </hbox>
-                </hbox>
+                </vbox>
+                <vbox id="ThreadVisVerticalScrollbar">
+                    <vbox style="width: 5px;"
+                          flex="1">
+                        <hbox id="ThreadVisScrollbarUp"
+                              style="width: 5px; height: 6px; padding-bottom: 1px;">
+                            <image src="chrome://threadvis/content/images/arrowtop.png"
+                                   style="width: 5px; height: 5px;" />
+                        </hbox>
+                        <stack id="ThreadVisScrollbarVerticalBox"
+                               style="background: #cccccc; border: 1px solid #333333;"
+                               flex="1">
+                            <box id="ThreadVisScrollbarVertical"
+                                 width="3"
+                                 style="background: #333333; cursor: s-resize; position: relative;" />
+                        </stack>
+                        <hbox id="ThreadVisScrollbarDown"
+                              style="width: 5px; height: 6px; padding-top: 1px;">
+                            <image src="chrome://threadvis/content/images/arrowbottom.png"
+                                   style="width: 5px; height: 5px;" />
+                        </hbox>
+                    </vbox>
+                    <hbox style="height: 5px;" />
+                </vbox>
             </hbox>
-        </vbox>
-    </hbox>`,
+        </hbox>
+    </html:header>`,
     ["chrome://threadvis/locale/threadvis.dtd"]);
 };
 

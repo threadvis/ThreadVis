@@ -103,7 +103,7 @@ const getGlodaMessage = (messageHeader) => {
                 if (collection.items.length > 0) {
                     resolve(collection.items[0]);
                 } else {
-                    reject();
+                    reject("Message not found in Gloda.");
                 }
             }
         }, null);

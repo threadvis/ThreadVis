@@ -120,15 +120,13 @@ class ThreadVis {
             this.visualisedMsgId = "";
 
             // remember selected message
-            this.selectedMsgUri = "";
+            this.selectedMsg = null;
 
             // remember container of selected message
             this.selectedContainer = null;
 
             // register for message selection
-            let observerService = Components.classes["@mozilla.org/observer-service;1"]
-                .getService(Components.interfaces.nsIObserverService);
-            observerService.addObserver(this, "MsgMsgDisplayed", false);
+            this.window.gMessageListeners.push(this);
         }
 
         // for a popup, draw initial visualisation
@@ -140,23 +138,21 @@ class ThreadVis {
         this.setStatus(null, {});
     }
 
-    /**
-     * Observe a notification
-     *
-     * @param {String} subject - The subject notifying
-     * @param {String} topic - The topic this is notified
-     * @param {*} data - Notification data
-     */
-    observe(subject, topic, data) {
-        // only observe events in the same window, otherwise opening a second Thunderbird window would
-        // result in both visualisations changing since both observers would react to the event
-        // the subject of the call is the msgHeaderSink of the msgWindow, in
-        // which the notify happened, so we can check that
-        if (subject == this.window.msgWindow.msgHeaderSink) {
-            this.selectedMsgUri = data;
-            this.setSelectedMessage();
-        }
+    onStartHeaders() {
+        // hide visualisation
+        this.window.document.getElementById("messageHeader").classList.remove("threadvis");
     }
+
+    onEndHeaders() {
+        this.selectedMsg = this.window.gMessageDisplay.displayedMessage;
+        this.setSelectedMessage();
+        // make sure we correctly underline recipients (as header is re-drawn)
+        this.visualisation.recolourAuthors();
+        // display again
+        this.window.document.getElementById("messageHeader").classList.add("threadvis");
+    }
+
+    onEndAttachments() {}
 
     /**
      * Callback function from extension. Called after mouse click in extension
@@ -298,6 +294,17 @@ class ThreadVis {
     createBox() {
         const elem = this.window.document.getElementById("ThreadVis");
         elem.hidden = false;
+
+        // if in main window, adapt header display
+        if (! this.isPopupVisualisation()) {
+            // get number of visible grid rows
+            const rowCount = this.window.document.getElementById("messageHeader")
+                .querySelectorAll(".message-header-row:not([hidden])")
+                .length;
+            // ThreadVis goes from line 3 till the end
+            this.window.document.getElementById("ThreadVisHeaderBox")
+                .style.gridRowEnd = rowCount + 1;
+        }
     }
 
     /**
@@ -364,7 +371,6 @@ class ThreadVis {
         , false);
 
         this.deleteBox();
-        //this.window.clearInterval(this.visualisation.checkResizeInterval);
     };
 
     /**
@@ -444,13 +450,7 @@ class ThreadVis {
 
         this.visualisation.disabled = false;
 
-        // get currently loaded message
-        const messenger = Components.classes["@mozilla.org/messenger;1"]
-                       .createInstance(Components.interfaces.nsIMessenger);
-        const msg = messenger.messageServiceFromURI(this.selectedMsgUri)
-                .messageURIToMsgHdr(this.selectedMsgUri);
-
-        const loadedMsgFolder = msg.folder;
+        const loadedMsgFolder = this.selectedMsg.folder;
         if (!this.checkEnabledAccountOrFolder(loadedMsgFolder)) {
             this.visualisation.disabled = true;
             this.visualisation.displayDisabled(true);
@@ -467,10 +467,7 @@ class ThreadVis {
             .getService(Components.interfaces.nsIMsgAccountManager))
             .FindAccountForServer(server);
 
-        // delay display to give UI time to layout
-        this.window.setTimeout(() => {
-            this.visualiseMessage(msg, force);
-        }, 250);
+        this.visualiseMessage(this.selectedMsg, force);
     }
 
     /**
@@ -532,7 +529,7 @@ class ThreadVis {
             }
             this.visualisedMsgId = message.messageId;
             this.visualise(container);
-        }  catch(error) {
+        } catch(error) {
             Logger.error("visualise", error);
             // - message id not found, or
             // - container with id was dummy
@@ -767,8 +764,6 @@ class ThreadVis {
      * Shutdown, unregister all observers
      */
     shutdown() {
-        const observerService = Components.classes["@mozilla.org/observer-service;1"]
-            .getService(Components.interfaces.nsIObserverService);
-        observerService.removeObserver(this, "MsgMsgDisplayed");
+        this.window.gMessageListeners = this.window.gMessageListeners.filter(item => item != this);
     }
 }

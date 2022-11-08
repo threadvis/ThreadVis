@@ -23,44 +23,26 @@
  *
  * Version: $Id$
  * *********************************************************************************************************************
- * CSS file to layout visualisation
+ * Wrappers for email (header) parsers
  **********************************************************************************************************************/
 
-splitter.mousehidden {
-    visibility: hidden;
-}
+const { MailServices } = ChromeUtils.import("resource:///modules/MailServices.jsm");
 
-splitter.mousehidden:hover {
-    visibility: visible;
-}
+var EXPORTED_SYMBOLS = [ "extractEmailAddress" ];
 
-#ThreadVisStatusBarPanel.disabled #ThreadVisStatusText {
-    color: #cccccc;
-}
+/**
+ * Extract email address from a TO/FROM/CC/BCC line
+ *
+ * @param {String} anyEmailAddressFormat - The email header line as displayed in the UI
+ * @return {String} - The extracted email address
+ */
+const extractEmailAddress = (anyEmailAddressFormat) => {
+    const parsedItems = MailServices.headerParser.parseEncodedHeader(anyEmailAddressFormat);
+    // due to missing quotes in the header display, the parser trips on things like
+    // Lastname, Firstname <firstname.lastname@domain.ending>
+    // as those would originally be quoted:
+    // "Lastname, Firstname" <firstname.lastname@domain.ending>
+    // for sake of simplicity, assume input is a single address and take _any_ extracted address
 
-#ThreadVisStatusText .toolbarbutton-text {
-    margin-left: 5px;
-}
-
-#ThreadVisHeaderBox {
-    visibility: hidden;
-    grid-row-start: 2;
-    grid-column: 2/3;
-}
-
-#messageHeader.threadvis #ThreadVisHeaderBox {
-    visibility: inherit;
-}
-
-#messageHeader.threadvis {
-    grid-template-columns: auto minmax(250px, 1fr);
-    column-gap: 2em;
-}
-
-#messageHeader.threadvis > .message-header-row:not([hidden]) {
-    grid-column: 1/2;
-}
-
-#messageHeader.threadvis #headerSenderToolbarContainer {
-    grid-column: 1/3 !important;
-}
+    return parsedItems.map(item => item.email).find(email => email != "");
+};

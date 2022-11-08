@@ -44,6 +44,7 @@ chrome/content/visualisation.jsm
 
 chrome/content/utils/color.jsm
 chrome/content/utils/date.jsm
+chrome/content/utils/emailparser.jsm
 chrome/content/utils/logger.jsm
 chrome/content/utils/number.jsm
 chrome/content/utils/preferences.jsm

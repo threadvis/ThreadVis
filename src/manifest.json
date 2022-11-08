@@ -31,8 +31,8 @@
     "applications": {
         "gecko": {
             "id": "{A23E4120-431F-4753-AE53-5D028C42CFDC}",
-            "strict_min_version": "91.0",
-            "strict_max_version": "91.*"
+            "strict_min_version": "102.0",
+            "strict_max_version": "102.*"
         }
     },
     "name": "__MSG_extensionName__",

@@ -28,6 +28,10 @@
 
 const EXPORTED_SYMBOLS = [ "Visualisation" ];
 
+var { MailServices } = ChromeUtils.import(
+    "resource:///modules/MailServices.jsm"
+  );
+
 const { ArcVisualisation } = ChromeUtils.import("chrome://threadvis/content/arcvisualisation.jsm");
 const { sortFunction } = ChromeUtils.import("chrome://threadvis/content/container.jsm");
 const { ContainerVisualisation } = ChromeUtils.import("chrome://threadvis/content/containervisualisation.jsm");
@@ -36,6 +40,7 @@ const { Scrollbar } = ChromeUtils.import("chrome://threadvis/content/scrollbar.j
 const { Strings } = ChromeUtils.import("chrome://threadvis/content/utils/strings.jsm");
 const { Timeline } = ChromeUtils.import("chrome://threadvis/content/timeline.jsm");
 const { convertHSVtoRGB, convertRGBtoHSV} = ChromeUtils.import("chrome://threadvis/content/utils/color.jsm");
+const { extractEmailAddress } = ChromeUtils.import("chrome://threadvis/content/utils/emailparser.jsm");
 const { DECtoHEX, HEXtoDEC } = ChromeUtils.import("chrome://threadvis/content/utils/number.jsm");
 
 class Visualisation {
@@ -205,23 +210,6 @@ class Visualisation {
     }
 
     /**
-     * Check size of stack. If resized, resize visualisation
-     */
-    checkSize() {
-        if (this.disabled) {
-            return;
-        }
-
-        if (this.box.getBoundingClientRect().height != this.boxHeight || this.box.getBoundingClientRect().width != this.boxWidth) {
-            this.resetStack();
-            this.visualise();
-        }
-
-        this.boxHeight = this.box.getBoundingClientRect().height;
-        this.boxWidth = this.box.getBoundingClientRect().width;
-    }
-
-    /**
      * Clear stack. Delete all children
      */
     clearStack() {
@@ -255,49 +243,40 @@ class Visualisation {
     colourAuthors(authors) {
         const prefHighlight = Preferences.get(Preferences.VIS_HIGHLIGHT);
 
-        // colour links
-        const emailFields = [];
-
-        // check to see if we have the element expandedHeaderView
-        if (this.document.getElementById("expandedHeaderView") == null) {
+        // check to see if we have the element messageHeader
+        if (this.document.getElementById("messageHeader") == null) {
             return;
         }
 
-        // in Thunderbird 78, evertyhing seems to be a mail-multi-headerfield
-        // (from, to, cc, bcc, ... )
-        const multiFields = this.document.getElementById("expandedHeaderView").getElementsByTagName("mail-multi-emailheaderfield");
-        for (let i = 0; i < multiFields.length; i++) {
-            // get "normal" header fields (i.e. non expanded cc and to)
-            let multiField = multiFields[i].emailAddresses.childNodes;
-            for (let j = 0; j < multiField.length; j++) {
-                if (multiField[j].attributes["emailAddress"])
-                    emailFields.push(multiField[j]);
+        // in Thunderbird 102, every header containing an address seems to be a recipient-single-line
+        const emailFields = this.document.getElementById("messageHeader").querySelectorAll(".recipient-single-line");
+
+        for (let field of emailFields) {
+            const emailAddress = extractEmailAddress(field.textContent);
+            if (! emailAddress) {
+                continue;
             }
 
-            // get "expanded" header fields
-            multiField = multiFields[i].longEmailAddresses.childNodes;
-            for (let j = 0; j < multiField.length; j++) {
-                if (multiField[j].attributes["emailAddress"]) {
-                    emailFields.push(multiField[j]);
-                }
-            }
-        }
-
-        let emailField = null;
-        while (emailField = emailFields.pop()) {
-            const author = authors[emailField.attributes["emailAddress"].value];
+            const author = authors[emailAddress];
             let hsv = null;
             if (author) {
                 hsv = author.hsv;
             }
 
             if (hsv && prefHighlight) {
-                emailField.style.borderBottom = "2px solid " + this.getColour(hsv.hue, 100, hsv.value);
+                field.style.borderBottom = "2px solid " + this.getColour(hsv.hue, 100, hsv.value);
             } else {
-                emailField.style.borderBottom = null;
+                field.style.borderBottom = null;
             }
         }
     }
+
+    /**
+     * Underline authors in header view
+     */
+     recolourAuthors() {
+        this.colourAuthors(this.authors);
+     }
 
     /**
      * Build legend popup containing all authors of current thread
@@ -687,7 +666,7 @@ class Visualisation {
         const oldMargin = parseFloat(this.stack.style.marginLeft);
         let newMargin = oldMargin;
 
-        const originalWidth = this.box.getBoundingClientRect().width;
+        const originalWidth = this.getBoxSize().width;
 
         if (container.xPosition * this.resize + oldMargin > originalWidth) {
             // calculate necessary margin
@@ -964,7 +943,7 @@ class Visualisation {
                 }
                 totalTimeScale += thisContainer.xScaled;
             }
-            // if the total_time_scale == containers.length, we reduced every horizontal spacing to its minimum and
+            // if the totalTimeScale == containers.length, we reduced every horizontal spacing to its minimum and
             // we can't do anything more
             // this means we have to lay out more messages than we can
             // this is dealt with later in resizing
@@ -1069,7 +1048,7 @@ class Visualisation {
         const availableSize = this.getBoxSize();
 
         // do time scaling
-        const width = availableSize.width * this.zoom - (prefSpacing / this.resize);
+        const width = availableSize.width * this.zoom - ((prefDotSize + prefSpacing) * this.resize);
         const height = availableSize.height * this.zoom;
         this.containers = this.timeScaling(this.containers, minimalTimeDifference, width);
 
@@ -1080,7 +1059,7 @@ class Visualisation {
             this.resize = 1 * this.zoom;
         }
 
-        let x = (prefSpacing / 2) * (1 / this.resize);
+        let x = (prefSpacing / 2) * this.resize;
 
         // pre-calculate colours for different authors
         this.authors = new Object();
@@ -1203,16 +1182,6 @@ class Visualisation {
         this.scrollbar.draw();
         this.changed = false;
 
-        // check for resize of box
-        this.boxHeight = this.box.getBoundingClientRect().height;
-        this.boxWidth = this.box.getBoundingClientRect().width;
-        // TODO check how to resize
-        // let ref = this;
-        // this.window.clearInterval(this.checkResizeInterval);
-        // this.checkResizeInterval = this.window.setInterval(function() {
-        //     ref.checkSize();
-        // }, 100);
-
         // set cursor if visualisation is draggable
         this.setCursor();
 
@@ -1225,8 +1194,8 @@ class Visualisation {
         });
 
         // right align the visualisation
-        if (x < this.boxWidth) {
-            const deltaX = this.boxWidth - x - prefDotSize - prefSpacing;
+        const deltaX = availableSize.width - x - (prefDotSize + prefSpacing / 2) * this.resize;
+        if (deltaX > 0) {
             this.moveVisualisationTo({
                 x: deltaX
             });
@@ -1267,7 +1236,7 @@ class Visualisation {
         const availableSize = this.getBoxSize();
 
         // do timescaling
-        const width = availableSize.width * this.zoom - (prefSpacing / this.resize);
+        const width = availableSize.width * this.zoom - ((prefDotSize + prefSpacing) * this.resize);
         const height = availableSize.height * this.zoom;
         this.containers = this.timeScaling(this.containers, minimalTimeDifference, width);
 
@@ -1278,7 +1247,7 @@ class Visualisation {
             this.resize = 1 * this.zoom;
         }
 
-        let x = (prefSpacing / 2) * (1 / this.resize);
+        let x = (prefSpacing / 2) * this.resize;
 
         for (let counter = 0; counter < this.containers.length; counter++) {
             const thisContainer = this.containers[counter];
@@ -1356,7 +1325,9 @@ class Visualisation {
                 this.arcVisualisations[thisContainer].redraw(this.resize, parent.xPosition, x, topHeight, colour, opacity);
             }
 
-            x = x + (thisContainer.xScaled * prefSpacing);
+            if (counter < this.containers.length - 1) {
+                x = x + (thisContainer.xScaled * prefSpacing);
+            }
         }
 
         // calculate if we have to move the visualisation so that the
@@ -1387,6 +1358,14 @@ class Visualisation {
         this.moveVisualisationTo({
             y: deltaY
         });
+
+        // right align the visualisation
+        const deltaX = availableSize.width - x - (prefDotSize + prefSpacing / 2) * this.resize;
+        if (deltaX > 0) {
+            this.moveVisualisationTo({
+                x: deltaX
+            });
+        }
     };
 
     /**
