@@ -140,7 +140,7 @@ class ThreadVis {
 
     onStartHeaders() {
         // hide visualisation
-        this.window.document.getElementById("messageHeader").classList.remove("threadvis");
+        this.deleteBox();
     }
 
     onEndHeaders() {
@@ -149,7 +149,9 @@ class ThreadVis {
         // make sure we correctly underline recipients (as header is re-drawn)
         this.visualisation.recolourAuthors();
         // display again
-        this.window.document.getElementById("messageHeader").classList.add("threadvis");
+        if (! this.hasPopupVisualisation()) {
+            this.createBox();
+        }
     }
 
     onEndAttachments() {}
@@ -292,9 +294,7 @@ class ThreadVis {
      * Create threadvis XUL box
      */
     createBox() {
-        const elem = this.window.document.getElementById("ThreadVis");
-        elem.hidden = false;
-
+        this.window.document.getElementById("messageHeader")?.classList.add("threadvis");
         // if in main window, adapt header display
         if (! this.isPopupVisualisation()) {
             // get number of visible grid rows
@@ -311,8 +311,7 @@ class ThreadVis {
      * Delete threadvis XUL box
      */
     deleteBox() {
-        const elem = this.window.document.getElementById("ThreadVis");
-        elem.hidden = true;
+        this.window.document.getElementById("messageHeader")?.classList.remove("threadvis");
     }
 
     /**

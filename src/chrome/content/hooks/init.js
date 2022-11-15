@@ -93,22 +93,27 @@ var onUnload = (isAddonDeactivation) => {
  */
 const injectVisualisation = () => {
     WL.injectElements(`
+    <html:body>
+        <popupset>
+            <menupopup id="ThreadVisPopUp">
+                <menuitem label="&popup.settings;"
+                          id="ThreadVisPopUpOpenOptionsDialog" />
+                <menuitem label="&popup.popupwindow;"
+                          id="ThreadVisPopUpOpenVisualisation" />
+                <menuitem label="&popup.legend;"
+                          id="ThreadVisOpenLegendWindow" />
+                <menuitem label="&popup.exportsvg;"
+                          id="ThreadVisExportSVG" />
+            </menupopup>
+        </popupset>
+        <popupset id="ThreadVisPopUpTooltips">
+        </popupset>
+    </html:body>`,
+    ["chrome://threadvis/locale/threadvis.dtd"]);
+
+    WL.injectElements(`
     <html:header id="messageHeader">
         <hbox id="ThreadVisHeaderBox">
-            <popupset>
-                <menupopup id="ThreadVisPopUp">
-                    <menuitem label="&popup.settings;"
-                              id="ThreadVisPopUpOpenOptionsDialog" />
-                    <menuitem label="&popup.popupwindow;"
-                              id="ThreadVisPopUpOpenVisualisation" />
-                    <menuitem label="&popup.legend;"
-                              id="ThreadVisOpenLegendWindow" />
-                    <menuitem label="&popup.exportsvg;"
-                              id="ThreadVisExportSVG" />
-                </menupopup>
-            </popupset>
-            <popupset id="ThreadVisPopUpTooltips">
-            </popupset>
             <hbox id="ThreadVis"
                   flex="1"
                   style="width: 100%; height: 100%;">

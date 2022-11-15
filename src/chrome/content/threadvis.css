@@ -43,13 +43,13 @@ splitter.mousehidden:hover {
 }
 
 #ThreadVisHeaderBox {
-    visibility: hidden;
+    display: none;
     grid-row-start: 2;
     grid-column: 2/3;
 }
 
 #messageHeader.threadvis #ThreadVisHeaderBox {
-    visibility: inherit;
+    display: inherit;
 }
 
 #messageHeader.threadvis {
