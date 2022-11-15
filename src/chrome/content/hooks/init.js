@@ -44,7 +44,7 @@ notify.notifyTools.setAddOnId(ThreadVis.ADD_ON_ID);
 
 const openOptionsPage = () => {
     WL.messenger.runtime.openOptionsPage();
-}
+};
 
 let ThreadVisInstance;
 

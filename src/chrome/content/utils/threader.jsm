@@ -82,9 +82,9 @@ const createThread = (messageCollection) => {
     resetCache();
     messageCollection
         // convert to "our" messages
-        .map(item => createMessage(item))
+        .map((item) => createMessage(item))
         // and put all into thread
-        .forEach(message => addMessage(message));
+        .forEach((message) => addMessage(message));
 };
 
 /**
@@ -137,7 +137,7 @@ const getGlodaThread = (message) => {
 const createMessage = (glodaMessage) => {
     if (glodaMessage.folderMessage == null) {
         Logger.error("Cache",
-                "Could not find 'real' message for gloda message with msg-id '"
+            "Could not find 'real' message for gloda message with msg-id '"
                 + glodaMessage.headerMessageID + "' in folder '" + glodaMessage.folderURI + "'");
     }
 
@@ -162,12 +162,12 @@ const getCache = (id) => {
  */
 const putCache = (id, container) => {
     cache[id] = container;
-}
+};
 
 /**
  * Reset in-memory data
  */
- const resetCache = () => {
+const resetCache = () => {
     cache = {};
 };
 

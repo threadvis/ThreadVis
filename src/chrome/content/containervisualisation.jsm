@@ -83,7 +83,7 @@ class ContainerVisualisation {
         /**
          * colour of highlight
          */
-         this.colourHighlight = colourHighlight;
+        this.colourHighlight = colourHighlight;
 
         /**
          * left position of container in px
@@ -164,7 +164,7 @@ class ContainerVisualisation {
         this.drawClick();
 
         this.createToolTip();
-    };
+    }
 
     /**
      * Create tooltip for container containing information about container.
@@ -269,11 +269,11 @@ class ContainerVisualisation {
         this.click.setAttribute("tooltip", "ThreadVis_" + this.left);
 
         this.stack.appendChild(this.click);
-        this.click.addEventListener("click", event => this.onMouseClick(event), true);
+        this.click.addEventListener("click", (event) => this.onMouseClick(event), true);
 
         // prevent mousedown event from bubbling to box object
         // prevent dragging of visualisation by clicking on message
-        this.click.addEventListener("mousedown", event => event.stopPropagation(), true);
+        this.click.addEventListener("mousedown", (event) => event.stopPropagation(), true);
     }
 
     /**

@@ -37,9 +37,9 @@ var EXPORTED_SYMBOLS = [ "Logger" ];
  */
 const error = (source, message) => {
     const consoleService = Components.classes["@mozilla.org/consoleservice;1"]
-            .getService(Components.interfaces.nsIConsoleService);
+        .getService(Components.interfaces.nsIConsoleService);
     const scriptError = Components.classes["@mozilla.org/scripterror;1"]
-            .createInstance(Components.interfaces.nsIScriptError);
+        .createInstance(Components.interfaces.nsIScriptError);
     scriptError.init(
         message,
         "ThreadVis/" + source,

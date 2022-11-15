@@ -27,6 +27,7 @@
  **********************************************************************************************************************/
 
 var EXPORTED_SYMBOLS = [ "Container", "sortFunction"];
+
 class Container {
     /**
      * Constructor
@@ -75,7 +76,7 @@ class Container {
          */
         // TODO move to containervis
         this.xPosition = 0;
-    };
+    }
 
     /**
      * Add child to this container. Removes child from old sibling list. Inserts child and all its children.

@@ -34,7 +34,7 @@ var clearLegend = () => {
     while (legendBox.firstChild != null) {
         legendBox.removeChild(legendBox.firstChild);
     }
-}
+};
 
 /**
  * Display the legend
@@ -46,4 +46,4 @@ var displayLegend = () => {
     const legend = opener.ThreadVis.getLegend();
     legendBox.appendChild(legend);
     window.sizeToContent();
-}
+};

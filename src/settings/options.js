@@ -62,8 +62,8 @@ const init = async () => {
         { key: PreferenceKeys.SENTMAIL_IDENTITY, type: "bool"},
         { key: PreferenceKeys.DISABLED_ACCOUNTS, type: "string"},
         { key: PreferenceKeys.DISABLED_FOLDERS, type: "string"}
-    ].forEach(pref => {
-        getPref(pref.key).then(value => {
+    ].forEach((pref) => {
+        getPref(pref.key).then((value) => {
             const elems = document.querySelectorAll(querySelector(pref.key));
             if (elems.length == 1) {
                 const elem = elems[0];
@@ -76,12 +76,12 @@ const init = async () => {
                     if (pref.type === "bool") {
                         setPref(pref.key, this.checked);
                     } else {
-                        setPref(pref.key, this.value)
+                        setPref(pref.key, this.value);
                     }
                 });
             } else if (elems.length > 1) {
                 // note: special handling for prefs which map to multiple elements, assume each elem is a boolean
-                elems.forEach(elem => {
+                elems.forEach((elem) => {
                     const equals = elem.value === (pref.type === "bool" ? (value === true ? "true" : "false") : value);
                     if (equals) {
                         elem.checked = true;
@@ -93,12 +93,12 @@ const init = async () => {
                     });
                 });
             }
-        })
+        });
     });
 
     // build account list
     await buildAccountList();
-}
+};
 
 /**
  * Build the account list.
@@ -109,7 +109,7 @@ const buildAccountList = async () => {
     const pref = document.getElementById("ThreadVisHiddenDisabledAccounts").value;
 
     const accounts = await getAccounts();
-    accounts.forEach(account => {
+    accounts.forEach((account) => {
         const checkbox = document.createElement("input");
         checkbox.setAttribute("id", "ThreadVis-Account-" + account.id);
         checkbox.setAttribute("type", "checkbox");
@@ -117,10 +117,10 @@ const buildAccountList = async () => {
         checkbox.setAttribute("data-account", account.id);
         checkbox.addEventListener("change", function() {
             buildAccountPreference();
-            document.querySelectorAll("[data-type=folder][data-account=" + account.id + "]").forEach(box => {
+            document.querySelectorAll("[data-type=folder][data-account=" + account.id + "]").forEach((box) => {
                 box.disabled = ! this.checked;
             });
-        })
+        });
         if (pref != "" && pref.indexOf(" " + account.key + " ") > -1) {
             checkbox.checked = false;
         } else {
@@ -133,7 +133,7 @@ const buildAccountList = async () => {
         const buttonAll = document.createElement("button");
         buttonAll.textContent = "__MSG_options.visualisation.enabledaccounts.button.all__";
         buttonAll.addEventListener("click", function() {
-            document.querySelectorAll("[data-type=folder][data-account=" + account.id + "]").forEach(box => {
+            document.querySelectorAll("[data-type=folder][data-account=" + account.id + "]").forEach((box) => {
                 box.checked = true;
                 box.dispatchEvent(new Event("change"));
             });
@@ -141,7 +141,7 @@ const buildAccountList = async () => {
         const buttonNone = document.createElement("button");
         buttonNone.textContent = "__MSG_options.visualisation.enabledaccounts.button.none__";
         buttonNone.addEventListener("click", function() {
-            document.querySelectorAll("[data-type=folder][data-account=" + account.id + "]").forEach(box => {
+            document.querySelectorAll("[data-type=folder][data-account=" + account.id + "]").forEach((box) => {
                 box.checked = false;
                 box.dispatchEvent(new Event("change"));
             });
@@ -157,7 +157,7 @@ const buildAccountList = async () => {
 
         buildFolderCheckboxes(accountBox, account.folders, account.id, 1);
     });
-}
+};
 
 /**
  * Create checkbox elements for all folders
@@ -170,7 +170,7 @@ const buildAccountList = async () => {
 const buildFolderCheckboxes = (box, folders, account, indent) => {
     const pref = document.getElementById("ThreadVisHiddenDisabledFolders").value;
 
-    folders.forEach(folder => {
+    folders.forEach((folder) => {
         const div = document.createElement("div");
         const checkbox = document.createElement("input");
         checkbox.setAttribute("id", "ThreadVis-Account-" + account + "-Folder-" + folder.url);
@@ -199,7 +199,7 @@ const buildFolderCheckboxes = (box, folders, account, indent) => {
             buildFolderCheckboxes(box, folder.folders, account, indent + 1);
         }
     });
-}
+};
 
 /**
  * Create a string preference of all deselected accounts
@@ -211,14 +211,14 @@ const buildAccountPreference = () => {
     let pref = "";
 
     const checkboxes = accountBox.querySelectorAll("[data-type=account]");
-    checkboxes.forEach(checkbox => {
+    checkboxes.forEach((checkbox) => {
         if (! checkbox.checked) {
             pref += " " + checkbox.getAttribute("data-account") + " ";
         }
     });
     prefElement.value = pref;
     prefElement.dispatchEvent(new Event("change"));
-}
+};
 
 /**
  * Create a string preference of all deselected folders
@@ -230,14 +230,14 @@ const buildFolderPreference = () => {
     let pref = "";
 
     const checkboxes = accountBox.querySelectorAll("[data-type=folder]");
-    checkboxes.forEach(checkbox => {
+    checkboxes.forEach((checkbox) => {
         if (! checkbox.checked) {
             pref += " " + checkbox.getAttribute("data-folder") + " ";
         }
     });
     prefElement.value = pref;
     prefElement.dispatchEvent(new Event("change"));
-}
+};
 
 const localize = () => {
     const keyPrefix = "__MSG_";
@@ -245,7 +245,7 @@ const localize = () => {
     const localization = {
         updateString(string) {
             const re = new RegExp(keyPrefix + "(.+?)__", "g");
-            return string.replace(re, matched => {
+            return string.replace(re, (matched) => {
                 const key = matched.slice(keyPrefix.length, -2);
                 return messenger.i18n.getMessage(key) || matched;
             });
@@ -253,7 +253,7 @@ const localize = () => {
 
         updateSubtree(node) {
             const texts = document.evaluate(
-                'descendant::text()[contains(self::text(), "' + keyPrefix + '")]',
+                "descendant::text()[contains(self::text(), \"" + keyPrefix + "\")]",
                 node,
                 null,
                 XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
@@ -267,7 +267,7 @@ const localize = () => {
             }
 
             const attributes = document.evaluate(
-                'descendant::*/attribute::*[contains(., "' + keyPrefix + '")]',
+                "descendant::*/attribute::*[contains(., \"" + keyPrefix + "\")]",
                 node,
                 null,
                 XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
@@ -287,7 +287,7 @@ const localize = () => {
     };
 
     localization.updateDocument();
-}
+};
 
 (async () => {
     await init();

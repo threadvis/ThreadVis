@@ -36,7 +36,7 @@ var LegacyAccountsFolders = class extends ExtensionCommon.ExtensionAPI {
             .getService(Components.interfaces.nsIMsgAccountManager);
 
         const getAllFolders = (folder) => {
-            return folder.subFolders.map(subFolder  => ({
+            return folder.subFolders.map((subFolder)  => ({
                 url: subFolder.folderURL,
                 name: subFolder.name,
                 folders: getAllFolders(subFolder)
@@ -46,13 +46,13 @@ var LegacyAccountsFolders = class extends ExtensionCommon.ExtensionAPI {
         return {
             LegacyAccountsFolders: {
                 getAccounts() {
-                    return accountManager.accounts.map(account => ({
+                    return accountManager.accounts.map((account) => ({
                         id: account.key,
                         name: account.incomingServer.prettyName,
                         folders: getAllFolders(account.incomingServer.rootFolder)
                     }));
                 }
             }
-        }
+        };
     }
 };

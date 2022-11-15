@@ -54,6 +54,6 @@ var LegacyPref = class extends ExtensionCommon.ExtensionAPI {
                     Preferences.set(name, value);
                 }
             }
-        }
+        };
     }
 };

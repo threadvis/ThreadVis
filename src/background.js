@@ -26,13 +26,12 @@
  * Main background script for the WebExtension
  **********************************************************************************************************************/
 
-(async => {
+(async () => {
 
     messenger.NotifyTools.onNotifyBackground.addListener(async (info) => {
         switch (info.command) {
-          case "initPref":
-            return messenger.LegacyPref.init();
-            break;
+            case "initPref":
+                return messenger.LegacyPref.init();
         }
     });
 

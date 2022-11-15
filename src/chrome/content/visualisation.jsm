@@ -28,10 +28,6 @@
 
 const EXPORTED_SYMBOLS = [ "Visualisation" ];
 
-var { MailServices } = ChromeUtils.import(
-    "resource:///modules/MailServices.jsm"
-  );
-
 const { ArcVisualisation } = ChromeUtils.import("chrome://threadvis/content/arcvisualisation.jsm");
 const { sortFunction } = ChromeUtils.import("chrome://threadvis/content/container.jsm");
 const { ContainerVisualisation } = ChromeUtils.import("chrome://threadvis/content/containervisualisation.jsm");
@@ -274,9 +270,9 @@ class Visualisation {
     /**
      * Underline authors in header view
      */
-     recolourAuthors() {
+    recolourAuthors() {
         this.colourAuthors(this.authors);
-     }
+    }
 
     /**
      * Build legend popup containing all authors of current thread
@@ -315,7 +311,7 @@ class Visualisation {
         box.appendChild(nameBox);
 
         return box;
-    };
+    }
 
     /**
      * Create stack
@@ -329,10 +325,10 @@ class Visualisation {
                 this.stack.style.position = "relative";
                 this.box.appendChild(this.stack);
             }
-            this.document.addEventListener("mousemove", event => this.onMouseMove(event), false);
-            this.box.addEventListener("mousedown", event => this.onMouseDown(event), false);
-            this.document.addEventListener("mouseup", event => this.onMouseUp(event), false);
-            this.box.addEventListener("DOMMouseScroll", event => this.onScroll(event), false);
+            this.document.addEventListener("mousemove", (event) => this.onMouseMove(event), false);
+            this.box.addEventListener("mousedown", (event) => this.onMouseDown(event), false);
+            this.document.addEventListener("mouseup", (event) => this.onMouseUp(event), false);
+            this.box.addEventListener("DOMMouseScroll", (event) => this.onScroll(event), false);
         } else {
             this.clearStack();
         }
@@ -519,7 +515,7 @@ class Visualisation {
             prefMessageCircles);
 
         return msg;
-    };
+    }
 
     /**
      * Export a dot to SVG
@@ -560,7 +556,7 @@ class Visualisation {
         svg += " />";
 
         return svg;
-    };
+    }
 
     /**
      * Get the size of the available viewbox
@@ -574,7 +570,7 @@ class Visualisation {
             height: this.box.getBoundingClientRect().height,
             width: this.box.getBoundingClientRect().width
         };
-    };
+    }
 
     /**
      * Get a colour for the arc
@@ -590,7 +586,7 @@ class Visualisation {
         return "#" + DECtoHEX(Math.floor(rgb.r))
                 + DECtoHEX(Math.floor(rgb.g))
                 + DECtoHEX(Math.floor(rgb.b));
-    };
+    }
 
     /**
      * Get a new colour for the arc. Choose the next available colour
@@ -744,7 +740,7 @@ class Visualisation {
 
         // set mouse cursor
         this.setCursor();
-    };
+    }
 
     /**
      * OnMouseMove event handler.
@@ -808,7 +804,7 @@ class Visualisation {
 
             this.scrollbar.draw();
         }
-    };
+    }
 
     /**
      * OnMouseUp event handler.
@@ -821,7 +817,7 @@ class Visualisation {
 
         // reset mouse cursor
         this.setCursor();
-    };
+    }
 
     /**
      * OnScroll event handler.
@@ -837,7 +833,7 @@ class Visualisation {
         } else {
             this.zoomOut();
         }
-    };
+    }
 
     /**
      * Reset stack Set all margins to zero
@@ -845,7 +841,7 @@ class Visualisation {
     resetStack() {
         this.stack.style.marginLeft = "0px";
         this.stack.style.marginTop = "0px";
-    };
+    }
 
     /**
      * Set the cursor
@@ -861,7 +857,7 @@ class Visualisation {
         } else {
             this.box.style.cursor = null;
         }
-    };
+    }
 
     /**
      * If time scaling is enabled, we want to layout the messages so that their
@@ -953,7 +949,7 @@ class Visualisation {
         }
 
         return containers;
-    };
+    }
 
     /**
      * Visualise a new thread
@@ -1200,7 +1196,7 @@ class Visualisation {
                 x: deltaX
             });
         }
-    };
+    }
 
     /**
      * Visualise an existing thread
@@ -1366,7 +1362,7 @@ class Visualisation {
                 x: deltaX
             });
         }
-    };
+    }
 
     /**
      * Zoom in and draw new visualisation
@@ -1382,7 +1378,7 @@ class Visualisation {
 
         this.window.clearTimeout(this.zoomTimeout);
         this.zoomTimeout = this.window.setTimeout(() => this.visualise(), 200);
-    };
+    }
 
     /**
      * Zoom out and draw new visualisation
@@ -1408,14 +1404,14 @@ class Visualisation {
         this.zoomTimeout = this.window.setTimeout(function() {
             ref.visualise();
         }, 200);
-    };
+    }
 
     /**
      * Reset Zoom level
      */
     zoomReset() {
         this.zoom = 1.0;
-    };
+    }
 
     /**
      * Export to SVG
@@ -1575,7 +1571,7 @@ class Visualisation {
             if (res == nsIFilePicker.returnOK || res == nsIFilePicker.returnReplace) {
                 const file = fp.file;
                 const foStream = Components.classes["@mozilla.org/network/file-output-stream;1"]
-                        .createInstance(Components.interfaces.nsIFileOutputStream);
+                    .createInstance(Components.interfaces.nsIFileOutputStream);
 
                 // use 0x02 | 0x10 to open file for appending.
                 foStream.init(file, 0x02 | 0x08 | 0x20, 0o666, 0); // write,

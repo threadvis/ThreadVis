@@ -64,53 +64,53 @@ class ThreadVis {
         // init only for new window, not for popup
         if (!this.isPopupVisualisation()) {
             Preferences.callback(Preferences.DISABLED_ACCOUNTS,
-                    value => this.preferenceChanged());
+                (value) => this.preferenceChanged());
             Preferences.callback(Preferences.DISABLED_FOLDERS,
-                    value => this.preferenceChanged());
+                (value) => this.preferenceChanged());
             Preferences.callback(Preferences.TIMELINE,
-                    value => this.preferenceChanged());
+                (value) => this.preferenceChanged());
             Preferences.callback(Preferences.TIMELINE_FONTSIZE,
-                    value => this.preferenceChanged());
+                (value) => this.preferenceChanged());
             Preferences.callback(Preferences.TIMESCALING,
-                    value => this.preferenceChanged());
+                (value) => this.preferenceChanged());
             Preferences.callback(Preferences.TIMESCALING_METHOD,
-                    value => this.preferenceChanged());
+                (value) => this.preferenceChanged());
             Preferences.callback(Preferences.TIMESCALING_MINTIMEDIFF,
-                    value => this.preferenceChanged());
+                (value) => this.preferenceChanged());
             Preferences.callback(Preferences.VIS_DOTSIZE,
-                    value => this.preferenceChanged());
+                (value) => this.preferenceChanged());
             Preferences.callback(Preferences.VIS_ARC_MINHEIGHT,
-                    value => this.preferenceChanged());
+                (value) => this.preferenceChanged());
             Preferences.callback(Preferences.VIS_ARC_RADIUS,
-                    value => this.preferenceChanged());
+                (value) => this.preferenceChanged());
             Preferences.callback(Preferences.VIS_ARC_DIFFERENCE,
-                    value => this.preferenceChanged());
+                (value) => this.preferenceChanged());
             Preferences.callback(Preferences.VIS_ARC_WIDTH,
-                    value => this.preferenceChanged());
+                (value) => this.preferenceChanged());
             Preferences.callback(Preferences.VIS_SPACING,
-                    value => this.preferenceChanged());
+                (value) => this.preferenceChanged());
             Preferences.callback(Preferences.VIS_MESSAGE_CIRCLES,
-                    value => this.preferenceChanged());
+                (value) => this.preferenceChanged());
             Preferences.callback(Preferences.VIS_COLOUR,
-                    value => this.preferenceChanged());
+                (value) => this.preferenceChanged());
             Preferences.callback(Preferences.VIS_COLOURS_BACKGROUND,
-                    value => this.preferenceChanged());
+                (value) => this.preferenceChanged());
             Preferences.callback(Preferences.VIS_COLOURS_BORDER,
-                    value => this.preferenceChanged());
+                (value) => this.preferenceChanged());
             Preferences.callback(Preferences.VIS_COLOURS_RECEIVED,
-                    value => this.preferenceChanged());
+                (value) => this.preferenceChanged());
             Preferences.callback(Preferences.VIS_COLOURS_SENT,
-                    value => this.preferenceChanged());
+                (value) => this.preferenceChanged());
             Preferences.callback(Preferences.VIS_COLOURS_CURRENT,
-                    value => this.preferenceChanged());
+                (value) => this.preferenceChanged());
             Preferences.callback(Preferences.VIS_HIGHLIGHT,
-                    value => this.preferenceChanged());
+                (value) => this.preferenceChanged());
             Preferences.callback(Preferences.VIS_OPACITY,
-                    value => this.preferenceChanged());
+                (value) => this.preferenceChanged());
             Preferences.callback(Preferences.VIS_ZOOM,
-                    value => this.preferenceChanged());
+                (value) => this.preferenceChanged());
             Preferences.callback(Preferences.GLODA_ENABLED,
-                    value => this.preferenceChanged());
+                (value) => this.preferenceChanged());
 
             if (!this.checkEnabledGloda()) {
                 this.deleteBox();
@@ -367,11 +367,11 @@ class ThreadVis {
             "chrome=yes,resizable=yes,alwaysRaised=yes,dependent=yes");
 
         this.popupWindow.addEventListener("close",
-            () => this.visualise(this.popupWindow.ThreadVis.selectedContainer, true)
-        , false);
+            () => this.visualise(this.popupWindow.ThreadVis.selectedContainer, true),
+            false);
 
         this.deleteBox();
-    };
+    }
 
     /**
      * Get legend object
@@ -552,14 +552,14 @@ class ThreadVis {
      */
     zoomIn() {
         this.visualisation.zoomIn();
-    };
+    }
 
     /**
      * Zoom function to call from user click
      */
     zoomOut() {
         this.visualisation.zoomOut();
-    };
+    }
 
     /**
      * Set the status text in the statusbar
@@ -605,7 +605,7 @@ class ThreadVis {
             if (error && errorText != null) {
                 while (parent.getElementById("ThreadVisStatusTooltipError").firstChild != null) {
                     parent.getElementById("ThreadVisStatusTooltipError")
-                            .removeChild(parent.getElementById("ThreadVisStatusTooltipError").firstChild);
+                        .removeChild(parent.getElementById("ThreadVisStatusTooltipError").firstChild);
                 }
                 parent.getElementById("ThreadVisStatusTooltipError").hidden = false;
                 parent.getElementById("ThreadVisStatusTooltipError").appendChild(parent.createTextNode(errorText));
@@ -757,13 +757,13 @@ class ThreadVis {
      * @param {} msg - The message to open
      */
     openNewMessage(msg) {
-        MailUtils.displayMessage(msg, gFolderDisplay.view, null);
+        MailUtils.displayMessage(msg, this.window.gFolderDisplay.view, null);
     }
 
     /**
      * Shutdown, unregister all observers
      */
     shutdown() {
-        this.window.gMessageListeners = this.window.gMessageListeners.filter(item => item != this);
+        this.window.gMessageListeners = this.window.gMessageListeners.filter((item) => item != this);
     }
 }

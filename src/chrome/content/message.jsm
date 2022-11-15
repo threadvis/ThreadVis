@@ -167,8 +167,8 @@ class Message {
     getMsgDbHdr() {
         if (this.glodaMessage.folderMessage == null) {
             Logger.error(
-                    "Cache",
-                    "Unable to find nsIMsgDBHdr for message " + this.getId() + ", probably in folder " + this.getFolder()
+                "Cache",
+                "Unable to find nsIMsgDBHdr for message " + this.getId() + ", probably in folder " + this.getFolder()
                     + ". Either the message database (msf) for this folder is corrupt, or the global index is out-of-date.");
         }
         return this.glodaMessage.folderMessage;

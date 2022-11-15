@@ -32,7 +32,7 @@ const SentMailIdentities = {};
 
 // remember all local accounts, for sent-mail comparison
 const accountManager = Components.classes["@mozilla.org/messenger/account-manager;1"]
-        .getService(Components.interfaces.nsIMsgAccountManager);
+    .getService(Components.interfaces.nsIMsgAccountManager);
 for (let identity in accountManager.allIdentities) {
     SentMailIdentities[identity.email] = true;
 }

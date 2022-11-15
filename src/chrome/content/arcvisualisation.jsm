@@ -134,7 +134,7 @@ class ArcVisualisation {
         this.arc = null;
 
         this.draw();
-    };
+    }
 
     /**
      * Draw arc

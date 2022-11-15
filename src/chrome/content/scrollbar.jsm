@@ -27,6 +27,7 @@
  **********************************************************************************************************************/
 
 var EXPORTED_SYMBOLS = [ "Scrollbar" ];
+
 class Scrollbar {
     /**
      * Constructor for scrollbar class
@@ -84,13 +85,13 @@ class Scrollbar {
         this.arrowUp = this.document.getElementById("ThreadVisScrollbarUp");
 
         // add event listeners
-        this.document.addEventListener("mousemove", event => this.onMouseMoveHorizontal(event), false);
-        this.horizontal.addEventListener("mousedown", event => this.onMouseDownHorizontal(event), false);
-        this.document.addEventListener("mouseup", event => this.onMouseUpHorizontal(event), false);
+        this.document.addEventListener("mousemove", (event) => this.onMouseMoveHorizontal(event), false);
+        this.horizontal.addEventListener("mousedown", (event) => this.onMouseDownHorizontal(event), false);
+        this.document.addEventListener("mouseup", (event) => this.onMouseUpHorizontal(event), false);
 
-        this.document.addEventListener("mousemove", event => this.onMouseMoveVertical(event), false);
-        this.vertical.addEventListener("mousedown", event => this.onMouseDownVertical(event), false);
-        this.document.addEventListener("mouseup", event => this.onMouseUpVertical(event), false);
+        this.document.addEventListener("mousemove", (event) => this.onMouseMoveVertical(event), false);
+        this.vertical.addEventListener("mousedown", (event) => this.onMouseDownVertical(event), false);
+        this.document.addEventListener("mouseup", (event) => this.onMouseUpVertical(event), false);
 
         // add event listeners for up/down/left/right buttons
         /**
@@ -101,48 +102,48 @@ class Scrollbar {
         this.downPanInterval = null;
         this.rightPanInterval = null;
 
-        this.arrowUp.addEventListener("click", event => {
+        this.arrowUp.addEventListener("click", (event) => {
             this.window.clearInterval(this.upPanInterval);
             this.panUp();
         }, false);
-        this.arrowUp.addEventListener("mousedown", event => {
+        this.arrowUp.addEventListener("mousedown", (event) => {
             this.window.clearInterval(this.upPanInterval);
             this.upPanInterval = this.window.setInterval(() => {
                 this.panUp();
             }, 100);
         }, false);
-        this.arrowDown.addEventListener("click", event => {
+        this.arrowDown.addEventListener("click", (event) => {
             this.window.clearInterval(this.upPanInterval);
             this.panDown();
         }, false);
-        this.arrowDown.addEventListener("mousedown", event => {
+        this.arrowDown.addEventListener("mousedown", (event) => {
             this.window.clearInterval(this.downPanInterval);
             this.downPanInterval = this.window.setInterval(() => {
                 this.panDown();
             }, 100);
         }, false);
-        this.arrowLeft.addEventListener("click", event => {
+        this.arrowLeft.addEventListener("click", (event) => {
             this.window.clearInterval(this.upPanInterval);
             this.panLeft();
         }, false);
-        this.arrowLeft.addEventListener("mousedown", event => {
+        this.arrowLeft.addEventListener("mousedown", (event) => {
             this.window.clearInterval(this.leftPanInterval);
             this.leftPanInterval = this.window.setInterval(() => {
                 this.panLeft();
             }, 100);
         }, false);
-        this.arrowRight.addEventListener("click", event => {
+        this.arrowRight.addEventListener("click", (event) => {
             this.window.clearInterval(this.upPanInterval);
             this.panRight();
         }, false);
-        this.arrowRight.addEventListener("mousedown", event => {
+        this.arrowRight.addEventListener("mousedown", (event) => {
             this.window.clearInterval(this.rightPanInterval);
             this.rightPanInterval = this.window.setInterval(() => {
                 this.panRight();
             }, 100);
         }, false);
 
-        this.document.addEventListener("mouseup", event => {
+        this.document.addEventListener("mouseup", (event) => {
             this.window.clearInterval(this.upPanInterval);
             this.window.clearInterval(this.downPanInterval);
             this.window.clearInterval(this.leftPanInterval);
@@ -150,7 +151,7 @@ class Scrollbar {
         }, false);
 
         // on resize, reset size of scrollbars
-        this.window.addEventListener("resize", event => this.resize(), false);
+        this.window.addEventListener("resize", (event) => this.resize(), false);
 
         /**
          * Initial state: no scrollbars shown

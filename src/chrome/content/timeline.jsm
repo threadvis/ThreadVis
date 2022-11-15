@@ -143,7 +143,7 @@ class Timeline {
 
             // prevent mousedown event from bubbling to box object
             // prevent dragging of visualisation by clicking on message
-            elem.addEventListener("mousedown", event => event.stopPropagation(), true);
+            elem.addEventListener("mousedown", (event) => event.stopPropagation(), true);
         }
 
         // hide if not enough space (need to show first, otherwise .clientWidth is 0)
