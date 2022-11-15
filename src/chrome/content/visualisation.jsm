@@ -64,7 +64,7 @@ class Visualisation {
         this.resize = 1;
         this.zoom = 1;
 
-        this.authors = null;
+        this.authors = {};
         this.containers = null;
         this.containerVisualisations = null;
         this.arcVisualisations = null;
@@ -385,7 +385,7 @@ class Visualisation {
 
         this.disabled = true;
         this.changed = true;
-        this.colourAuthors([]);
+        this.colourAuthors({});
     }
 
     /**
@@ -1062,7 +1062,7 @@ class Visualisation {
         let x = (prefSpacing / 2) * this.resize;
 
         // pre-calculate colours for different authors
-        this.authors = new Object();
+        this.authors = {};
         this.lastColour = -1;
 
         this.containerVisualisations = {};
