@@ -366,7 +366,10 @@ class ThreadVis {
             "chrome=yes,resizable=yes,alwaysRaised=yes,dependent=yes");
 
         this.popupWindow.addEventListener("close",
-            () => this.visualise(this.popupWindow.ThreadVis.selectedContainer, true),
+            () => {
+                this.visualise(this.popupWindow.ThreadVis.selectedContainer, true);
+                this.popupWindow = null;
+            },
             false);
 
         this.deleteBox();
