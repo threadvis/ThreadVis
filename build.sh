@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # * ********************************************************************************************************************
 # * This file is part of ThreadVis.
@@ -23,7 +23,6 @@
 # * You should have received a copy of the GNU Affero General Public License along with ThreadVis.
 # * If not, see <http://www.gnu.org/licenses/>.
 # *
-# * Version: $Id$
 # * ********************************************************************************************************************
 # * Makefile for ThreadVis
 # *********************************************************************************************************************/
@@ -63,7 +62,7 @@ cp -r src/* build/src
 
 # first, check if our build is clean
 versionstring="${version}"
-if [[ -n $(git status -s) ]]; then
+if [[ -n $(git status -s ./src) ]]; then
     versionstring="${versionstring}.${hash}.${timestamp}"
 fi
 
@@ -74,7 +73,7 @@ do
 done
 
 # update in all files
-for f in $(find build/ -name '*.js' -or -name '*.xhtml' -or -name '*.css' -or -name '*.json')
+for f in $(find build/ -name '*.js' -or -name '*.jsm' -or -name '*.xhtml' -or -name '*.css' -or -name '*.json')
 do
     sed -i '' -e "s/[$]Id[$]/${versionstring}/g" $f
 done
