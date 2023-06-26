@@ -26,7 +26,9 @@
  * JS file to load XUL to display ThreadVis extension and include all scripts.
  **********************************************************************************************************************/
 
-const { Services } = ChromeUtils.import("resource://gre/modules/Services.jsm");
+const Services = globalThis.Services || ChromeUtils.import(
+  "resource://gre/modules/Services.jsm"
+).Services;
 
 const { ThreadVis } = ChromeUtils.import("chrome://threadvis/content/threadvis.jsm");
 
