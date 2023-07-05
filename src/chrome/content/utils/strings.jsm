@@ -28,7 +28,9 @@
 
 var EXPORTED_SYMBOLS = [ "Strings" ];
 
-const { Services } = ChromeUtils.import("resource://gre/modules/Services.jsm");
+const Services = globalThis.Services || ChromeUtils.import(
+  "resource://gre/modules/Services.jsm"
+).Services;
 const strings = Services.strings.createBundle("chrome://threadvis/locale/threadvis.properties");
 
 /**
