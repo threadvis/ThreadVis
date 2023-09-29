@@ -32,7 +32,7 @@ var EXPORTED_SYMBOLS = [ "Preferences" ];
 const { PreferenceKeys, PreferenceBranch } = ChromeUtils.import("chrome://threadvis/content/utils/preferenceskeys.jsm");
 
 // Services
-const { Services } = ChromeUtils.import("resource://gre/modules/Services.jsm");
+const Services = globalThis.Services;
 
 const PREF_BOOL = Services.prefs.PREF_BOOL;
 const PREF_INT = Services.prefs.PREF_INT;

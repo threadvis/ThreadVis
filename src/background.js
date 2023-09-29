@@ -44,6 +44,10 @@
     ]);
 
     messenger.WindowListener.registerWindow(
+        "about:message",
+        "chrome://threadvis/content/hooks/init.js");
+
+    messenger.WindowListener.registerWindow(
         "chrome://messenger/content/messenger.xhtml",
         "chrome://threadvis/content/hooks/init.js");
 

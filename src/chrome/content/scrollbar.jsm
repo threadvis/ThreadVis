@@ -36,9 +36,10 @@ class Scrollbar {
      * @param {DOMWindow} window - The current window
      * @param {XULStack} stack - The stack on which the visualisation is drawn.
      * @param {XULBox} box - The main box.
+     * @param {XULBox} outerBox - The main outer box.
      * @return A new scrollbar object.
      */
-    constructor(visualisation, window, stack, box) {
+    constructor(visualisation, window, stack, box, outerBox) {
         /**
          * DOM/XUL window to render in
          */
@@ -64,7 +65,10 @@ class Scrollbar {
          */
         this.box = box;
 
-        this.init(box);
+        /**
+         * XUL box containing add-on in header
+         */
+        this.outerBox = outerBox;
 
         /**
          * XUL boxes for horizontal scrollbar
@@ -72,8 +76,6 @@ class Scrollbar {
         this.horizontalScrollbar = this.document.getElementById("ThreadVisHorizontalScrollbar");
         this.boxHorizontal = this.document.getElementById("ThreadVisScrollbarHorizontalBox");
         this.horizontal = this.document.getElementById("ThreadVisScrollbarHorizontal");
-        this.arrowLeft = this.document.getElementById("ThreadVisScrollbarLeft");
-        this.arrowRight = this.document.getElementById("ThreadVisScrollbarRight");
 
         /**
          * XUL boxes for vertical scrollbar
@@ -81,8 +83,6 @@ class Scrollbar {
         this.verticalScrollbar = this.document.getElementById("ThreadVisVerticalScrollbar");
         this.boxVertical = this.document.getElementById("ThreadVisScrollbarVerticalBox");
         this.vertical = this.document.getElementById("ThreadVisScrollbarVertical");
-        this.arrowDown = this.document.getElementById("ThreadVisScrollbarDown");
-        this.arrowUp = this.document.getElementById("ThreadVisScrollbarUp");
 
         // add event listeners
         this.document.addEventListener("mousemove", (event) => this.onMouseMoveHorizontal(event), false);
@@ -102,47 +102,6 @@ class Scrollbar {
         this.downPanInterval = null;
         this.rightPanInterval = null;
 
-        this.arrowUp.addEventListener("click", (event) => {
-            this.window.clearInterval(this.upPanInterval);
-            this.panUp();
-        }, false);
-        this.arrowUp.addEventListener("mousedown", (event) => {
-            this.window.clearInterval(this.upPanInterval);
-            this.upPanInterval = this.window.setInterval(() => {
-                this.panUp();
-            }, 100);
-        }, false);
-        this.arrowDown.addEventListener("click", (event) => {
-            this.window.clearInterval(this.upPanInterval);
-            this.panDown();
-        }, false);
-        this.arrowDown.addEventListener("mousedown", (event) => {
-            this.window.clearInterval(this.downPanInterval);
-            this.downPanInterval = this.window.setInterval(() => {
-                this.panDown();
-            }, 100);
-        }, false);
-        this.arrowLeft.addEventListener("click", (event) => {
-            this.window.clearInterval(this.upPanInterval);
-            this.panLeft();
-        }, false);
-        this.arrowLeft.addEventListener("mousedown", (event) => {
-            this.window.clearInterval(this.leftPanInterval);
-            this.leftPanInterval = this.window.setInterval(() => {
-                this.panLeft();
-            }, 100);
-        }, false);
-        this.arrowRight.addEventListener("click", (event) => {
-            this.window.clearInterval(this.upPanInterval);
-            this.panRight();
-        }, false);
-        this.arrowRight.addEventListener("mousedown", (event) => {
-            this.window.clearInterval(this.rightPanInterval);
-            this.rightPanInterval = this.window.setInterval(() => {
-                this.panRight();
-            }, 100);
-        }, false);
-
         this.document.addEventListener("mouseup", (event) => {
             this.window.clearInterval(this.upPanInterval);
             this.window.clearInterval(this.downPanInterval);
@@ -151,7 +110,7 @@ class Scrollbar {
         }, false);
 
         // on resize, reset size of scrollbars
-        this.window.addEventListener("resize", (event) => this.resize(), false);
+        //this.window.addEventListener("resize", (event) => { console.log(event); /*this.resize()*/}, false);
 
         /**
          * Initial state: no scrollbars shown
@@ -168,8 +127,8 @@ class Scrollbar {
      *         object.y - the y-position of the vertical scrollbar
      */
     calculatePosition() {
-        const movedX = Math.abs(parseFloat(this.stack.style.marginLeft));
-        const movedY = Math.abs(parseFloat(this.stack.style.marginTop));
+        const movedX = Math.abs(parseFloat(this.stack.style.left));
+        const movedY = Math.abs(parseFloat(this.stack.style.top));
 
         const x = (movedX / this.getStackWidth()) * this.getScrollBarHorizontalWidth();
         const y = (movedY / this.getStackHeight()) * this.getScrollBarVerticalHeight();
@@ -193,13 +152,18 @@ class Scrollbar {
         let width = (this.getTotalWidth() / this.getStackWidth()) * this.getScrollBarHorizontalWidth();
         let height = (this.getTotalHeight() / this.getStackHeight()) * this.getScrollBarVerticalHeight();
 
-        if (width > this.getScrollBarHorizontalWidth()) {
-            width = this.getScrollBarHorizontalWidth();
+        // check for meaningful values
+        if (isNaN(width) || isNaN(height)) {
+            return {
+                width: 0,
+                hideHorizontal: true,
+                height: 0,
+                hideVertical: true
+            };
         }
 
-        if (height > this.getScrollBarVerticalHeight()) {
-            height = this.getScrollBarVerticalHeight();
-        }
+        width = Math.min(width, this.getScrollBarHorizontalWidth());
+        height = Math.min(height, this.getScrollBarVerticalHeight());
 
         let hideHorizontal = false;
         if (Math.abs(width - this.getScrollBarHorizontalWidth()) < 2) {
@@ -231,7 +195,7 @@ class Scrollbar {
             this.horizontalScrollbar.style.visibility = "hidden";
         } else {
             this.horizontalShown = true;
-            this.horizontalScrollbar.style.visibility = "visible";
+            this.horizontalScrollbar.style.visibility = null;
             this.horizontal.style.width = size.width + "px";
             this.horizontal.style.left = position.x + "px";
         }
@@ -240,7 +204,7 @@ class Scrollbar {
             this.verticalScrollbar.style.visibility = "hidden";
         } else {
             this.verticalShown = true;
-            this.verticalScrollbar.style.visibility = "visible";
+            this.verticalScrollbar.style.visibility = null;
             this.vertical.style.height = size.height + "px";
             this.vertical.style.top = position.y + "px";
         }
@@ -252,7 +216,7 @@ class Scrollbar {
      * @return {Number} - The width of the horizontal scrollbar in pixel
      */
     getScrollBarHorizontalWidth() {
-        return this.boxHorizontal.clientWidth - 2;
+        return Math.max(this.boxHorizontal.clientWidth, 0);
     }
 
     /**
@@ -261,7 +225,7 @@ class Scrollbar {
      * @return {Number} - The height of the vertical scrollbar in pixel
      */
     getScrollBarVerticalHeight() {
-        return this.boxVertical.clientHeight - 2;
+        return Math.max(this.boxVertical.clientHeight, 0);
     }
 
     /**
@@ -301,15 +265,6 @@ class Scrollbar {
     }
 
     /**
-     * Init height of scrollbars
-     * 
-     * @param {XULBox} box - The box object (viewport)
-     */
-    init(box) {
-        this.box = box;
-    }
-
-    /**
      * Return true if scrollbar is shown
      * 
      * @return {Boolean} - True if any scrollbar (either horizontal or vertical) is shown
@@ -343,7 +298,7 @@ class Scrollbar {
      */
     onMouseMoveHorizontal(event) {
         if (this.panningHorizontal) {
-            const x = event.clientX;
+            const x = event.screenX;
             const dx = x - this.startX;
             this.startX = x;
             this.panHorizontal(dx);
@@ -361,8 +316,9 @@ class Scrollbar {
             return;
         }
 
-        this.startX = event.clientX;
+        this.startX = event.screenX;
         this.panningHorizontal = true;
+        this.outerBox.classList.add("hover");
     }
 
     /**
@@ -381,7 +337,7 @@ class Scrollbar {
      */
     onMouseMoveVertical(event) {
         if (this.panningVertical) {
-            const y = event.clientY;
+            const y = event.screenY;
             const dy = y - this.startY;
 
             this.startY = y;
@@ -399,8 +355,9 @@ class Scrollbar {
             return;
         }
 
-        this.startY = event.clientY;
+        this.startY = event.screenY;
         this.panningVertical = true;
+        this.outerBox.classList.add("hover");
     }
 
     /**

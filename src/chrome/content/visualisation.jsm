@@ -54,8 +54,6 @@ class Visualisation {
         this.COLOUR_DUMMY = "#75756D";
         this.COLOUR_SINGLE = "#0000FF";
 
-        this.box = null;
-        this.stack = null;
         // set default resize parameter
         this.resize = 1;
         this.zoom = 1;
@@ -73,13 +71,18 @@ class Visualisation {
         // force display of too many messages
         this.force = false;
 
+        // get all needed DOM elements
         this.outerBox = this.document.getElementById("ThreadVis");
         this.box = this.document.getElementById("ThreadVisBox");
-        this.verticalScrollbarBox = this.document.getElementById("ThreadVisVerticalScrollbar");
-        this.horizontalScrollbarBox = this.document.getElementById("ThreadVisHorizontalScrollbar");
         this.buttonsBox = this.document.getElementById("ThreadVisButtons");
         this.stack = this.document.getElementById("ThreadVisStack");
         this.popups = this.document.getElementById("ThreadVisPopUpTooltips");
+
+        // attach event listeners
+        this.document.addEventListener("mousemove", (event) => this.onMouseMove(event), false);
+        this.box.addEventListener("mousedown", (event) => this.onMouseDown(event), false);
+        this.document.addEventListener("mouseup", (event) => this.onMouseUp(event), false);
+        this.box.addEventListener("DOMMouseScroll", (event) => this.onScroll(event), false);
     }
 
     /**
@@ -209,25 +212,20 @@ class Visualisation {
      * Clear stack. Delete all children
      */
     clearStack() {
-        if (this.outerBox != null) {
-            this.outerBox.hidden = false;
+        this.outerBox.hidden = false;
+        while (this.stack.firstChild != null) {
+            this.stack.removeChild(this.stack.firstChild);
         }
-        if (this.stack != null) {
-            while (this.stack.firstChild != null) {
-                this.stack.removeChild(this.stack.firstChild);
-            }
-            // reset move
-            this.stack.style.marginLeft = "0px";
-            this.stack.style.marginTop = "0px";
-            this.stack.style.padding = "5px";
+        // reset move
+        //this.stack.style.marginLeft = "0px";
+        //this.stack.style.marginTop = "0px";
+        this.stack.style.left = "0px";
+        this.stack.style.top = "0px";
+        //this.stack.style.padding = "5px";
 
-        }
-
-        if (this.popups != null) {
-            // also delete all popupset menus
-            while (this.popups.firstChild != null) {
-                this.popups.removeChild(this.popups.firstChild);
-            }
+        // also delete all popupset menus
+        while (this.popups.firstChild != null) {
+            this.popups.removeChild(this.popups.firstChild);
         }
     }
 
@@ -314,35 +312,6 @@ class Visualisation {
     }
 
     /**
-     * Create stack
-     */
-    createStack() {
-        if (!this.stack) {
-            this.stack = null;
-            if (this.stack == null) {
-                this.stack = this.document.createXULElement("stack");
-                this.stack.setAttribute("id", "ThreadVisStack");
-                this.stack.style.position = "relative";
-                this.box.appendChild(this.stack);
-            }
-            this.document.addEventListener("mousemove", (event) => this.onMouseMove(event), false);
-            this.box.addEventListener("mousedown", (event) => this.onMouseDown(event), false);
-            this.document.addEventListener("mouseup", (event) => this.onMouseUp(event), false);
-            this.box.addEventListener("DOMMouseScroll", (event) => this.onScroll(event), false);
-        } else {
-            this.clearStack();
-        }
-
-        const loading = this.document.createXULElement("description");
-        loading.setAttribute("value", Strings.getString("visualisation.loading"));
-        loading.style.position = "relative";
-        loading.style.top = "20px";
-        loading.style.left = "20px";
-        loading.style.color = "#999999";
-        this.stack.appendChild(loading);
-    }
-
-    /**
      * Display disabled message
      * 
      * @param {Boolean} forceHide - Force hiding of visualisation, even if preference is not set
@@ -391,25 +360,25 @@ class Visualisation {
      */
     displayWarningCount(container) {
         this.clearStack();
+        this.scrollbar?.draw();
 
         const warning = this.document.createXULElement("label");
-        warning.setAttribute("value", Strings.getString("visualisation.warningCount") + " [" + container.getTopContainer().getCount() + "].");
-        warning.style.position = "relative";
+        warning.setAttribute("value", Strings.getString("visualisation.warningCount") + " (" + container.getTopContainer().getCount() + ").");
+        warning.classList.add("warning");
         warning.style.top = "10px";
-        warning.style.left = "20px";
-        warning.style.color = "#999999";
         this.stack.appendChild(warning);
 
         const link = this.document.createXULElement("label");
         link.setAttribute("value", Strings.getString("visualisation.warningCountLink"));
-        link.style.position = "relative";
+        link.classList.add("warning", "link");
         link.style.top = "30px";
-        link.style.left = "20px";
-        link.style.color = "#0000ff";
-        link.style.textDecoration = "underline";
         link.addEventListener("click", () => this.visualise(container, true), true);
-        link.style.cursor = "pointer";
         this.stack.appendChild(link);
+
+        // check to move warning all the way to the right
+        this.moveVisualisationTo({
+            x: this.getBoxSize().width - this.getStackSize().width
+        });
 
         // set cursor
         this.box.style.cursor = null;
@@ -573,6 +542,20 @@ class Visualisation {
     }
 
     /**
+     * Get the size of the stack
+     * 
+     * @return {Object}
+     *          .height - The height of the stack
+     *          .width - The width of the stack
+     */
+    getStackSize() {
+        return {
+            height: this.stack.getBoundingClientRect().height,
+            width: this.stack.getBoundingClientRect().width
+        };
+    }
+
+    /**
      * Get a colour for the arc
      * 
      * @param {Number} hue - The colour hue
@@ -659,7 +642,7 @@ class Visualisation {
         const prefSpacing = Preferences.get(Preferences.VIS_SPACING);
 
         // get current left margin
-        const oldMargin = parseFloat(this.stack.style.marginLeft);
+        const oldMargin = parseFloat(this.stack.style.left);
         let newMargin = oldMargin;
 
         const originalWidth = this.getBoxSize().width;
@@ -692,10 +675,10 @@ class Visualisation {
      */
     moveVisualisationTo(position) {
         if (typeof (position.x) != "undefined") {
-            this.stack.style.marginLeft = position.x + "px";
+            this.stack.style.left = position.x + "px";
         }
         if (typeof (position.y) != "undefined") {
-            this.stack.style.marginTop = position.y + "px";
+            this.stack.style.top = position.y + "px";
         }
     }
 
@@ -724,7 +707,7 @@ class Visualisation {
         }
 
         // only pan if visualisation is larger than viewport
-        if (this.scrollbar != null && !this.scrollbar.isShown()) {
+        if (this.scrollbar && !this.scrollbar.isShown()) {
             return;
         }
 
@@ -734,9 +717,10 @@ class Visualisation {
         this.stackWidth = this.stack.scrollWidth;
         this.stackHeight = this.stack.scrollHeight;
 
-        this.startX = event.clientX;
-        this.startY = event.clientY;
+        this.startX = event.screenX;
+        this.startY = event.screenY;
         this.panning = true;
+        this.outerBox.classList.add("hover");
 
         // set mouse cursor
         this.setCursor();
@@ -750,12 +734,13 @@ class Visualisation {
      */
     onMouseMove(event) {
         if (this.panning) {
-            const x = event.clientX;
-            const y = event.clientY;
+            const x = event.screenX;
+            const y = event.screenY;
+
             let dx = x - this.startX;
             let dy = y - this.startY;
-            let currentX = parseFloat(this.stack.style.marginLeft);
-            let currentY = parseFloat(this.stack.style.marginTop);
+            let currentX = parseFloat(this.stack.style.left);
+            let currentY = parseFloat(this.stack.style.top);
 
             if (currentX == "") {
                 currentX = 0;
@@ -769,7 +754,7 @@ class Visualisation {
             this.startY = y;
 
             // set mininum dx to a little less than available to prevent overpanning
-            const minDx = Math.min(this.boxWidth - this.stackWidth + 4, 0);
+            const minDx = Math.min(this.boxWidth - this.stackWidth, 0);
             const minDy = Math.min(this.boxHeight - this.stackHeight, 0);
 
             // don't move more to the right than necessary
@@ -793,16 +778,16 @@ class Visualisation {
             }
 
             const position = {};
-            if (this.scrollbar.isShownHorizontal()) {
+            if (this.scrollbar?.isShownHorizontal()) {
                 position.x = dx;
             }
-            if (this.scrollbar.isShownVertical()) {
+            if (this.scrollbar?.isShownVertical()) {
                 position.y = dy;
             }
 
             this.moveVisualisationTo(position);
 
-            this.scrollbar.draw();
+            this.scrollbar?.draw();
         }
     }
 
@@ -814,6 +799,7 @@ class Visualisation {
      */
     onMouseUp(event) {
         this.panning = false;
+        this.outerBox.classList.remove("hover");
 
         // reset mouse cursor
         this.setCursor();
@@ -836,11 +822,17 @@ class Visualisation {
     }
 
     /**
-     * Reset stack Set all margins to zero
+     * Reset stack
+     * Set all offsets to zero
      */
     resetStack() {
-        this.stack.style.marginLeft = "0px";
-        this.stack.style.marginTop = "0px";
+        this.stack.style.left = "0px";
+        this.stack.style.top = "0px";
+
+        //this.box.hidden = true;
+        //this.outerBox.style.height = "auto";
+        //this.outerBox.style.height = this.outerBox.clientHeight + "px";
+        //this.box.hidden = false;
     }
 
     /**
@@ -852,7 +844,7 @@ class Visualisation {
             this.box.style.cursor = "-moz-grabbing";
         }
         // set cursor if visualisation is draggable
-        else if (this.scrollbar != null && this.scrollbar.isShown()) {
+        else if (this.scrollbar?.isShown()) {
             this.box.style.cursor = "-moz-grab";
         } else {
             this.box.style.cursor = null;
@@ -1005,7 +997,6 @@ class Visualisation {
         }
 
         // clear stack before drawing
-        this.createStack();
         this.zoomReset();
         this.resetStack();
         this.clearStack();
@@ -1172,14 +1163,8 @@ class Visualisation {
         }
 
         if (!this.scrollbar) {
-            this.scrollbar = new Scrollbar(this, this.window, this.stack, this.box);
+            this.scrollbar = new Scrollbar(this, this.window, this.stack, this.box, this.outerBox);
         }
-        this.scrollbar.init(this.box);
-        this.scrollbar.draw();
-        this.changed = false;
-
-        // set cursor if visualisation is draggable
-        this.setCursor();
 
         // vertically center the visualisation
         const centerY = (availableSize.height - prefDotSize * this.resize) / 2;
@@ -1196,6 +1181,11 @@ class Visualisation {
                 x: deltaX
             });
         }
+
+        this.scrollbar.draw();
+        // set cursor if visualisation is draggable
+        this.setCursor();
+        this.changed = false;
     }
 
     /**
@@ -1342,10 +1332,6 @@ class Visualisation {
         this.moveVisualisationTo({
             y: 0
         });
-        this.scrollbar.draw();
-
-        // set cursor if visualisation is draggable
-        this.setCursor();
 
         // vertically center the visualisation
         const centerY = (availableSize.height - prefDotSize * this.resize) / 2;
@@ -1362,6 +1348,10 @@ class Visualisation {
                 x: deltaX
             });
         }
+
+        this.scrollbar.draw();
+        // set cursor if visualisation is draggable
+        this.setCursor();
     }
 
     /**

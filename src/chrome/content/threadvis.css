@@ -48,6 +48,69 @@ splitter.mousehidden:hover {
     grid-column: 2/3;
 }
 
+#ThreadVis {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 3px;
+    grid-template-rows: minmax(0, 1fr) 3px;
+    height: 100%;
+}
+
+#ThreadVisBox {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+#ThreadVis:hover #ThreadVisHorizontalScrollbar,
+#ThreadVis:hover #ThreadVisVerticalScrollbar,
+#ThreadVis.hover #ThreadVisHorizontalScrollbar,
+#ThreadVis.hover #ThreadVisVerticalScrollbar {
+    visibility: visible;
+}
+
+#ThreadVisHorizontalScrollbar {
+    visibility: hidden;
+    grid-row: 2;
+    grid-column: 1;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 2px;
+}
+
+#ThreadVisScrollbarHorizontalBox {
+    border-radius: 2px;
+    height: 100%;
+}
+
+#ThreadVisScrollbarHorizontal {
+    height: 2px;
+    background: #333333;
+    border-radius: 2px;
+    cursor: col-resize;
+    position: relative;
+}
+
+#ThreadVisVerticalScrollbar {
+    visibility: hidden;
+    grid-row: 1;
+    grid-column: 2;
+    display: grid;
+    grid-template-columns: 2px;
+    grid-template-rows: 1fr;
+}
+
+#ThreadVisScrollbarVerticalBox {
+    border-radius: 2px;
+    width: 100%;
+}
+
+#ThreadVisScrollbarVertical {
+    width: 2px;
+    background: #333333;
+    border-radius: 2px;
+    cursor: row-resize;
+    position: relative;
+}
+
 #messageHeader.threadvis #ThreadVisHeaderBox {
     display: inherit;
 }
@@ -63,4 +126,23 @@ splitter.mousehidden:hover {
 
 #messageHeader.threadvis #headerSenderToolbarContainer {
     grid-column: 1/3 !important;
+}
+
+#ThreadVis .warning {
+    position: relative;
+    color: #999999;
+}
+
+#ThreadVis .warning.link {
+    color: #0000ff;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#ThreadVis .timeline.wrapper {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    height: 0;
 }

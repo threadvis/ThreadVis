@@ -111,47 +111,47 @@ class Timeline {
         const fontSize = Preferences.get(Preferences.TIMELINE_FONTSIZE);
         // check to see if we already created the label and the tooltip
         let elem = null;
-        let newElem = false;
+        let wrapperElem = null;
         if (this.times[container]) {
-            elem = this.times[container];
+            ({ elem, wrapperElem } = this.times[container]);
         } else {
             elem = this.document.createXULElement("description");
-            newElem = true;
-            this.times[container] = elem;
-        }
+            elem.style.display = "inline-block";
+            wrapperElem = this.document.createElement("div");
+            wrapperElem.classList.add("timeline", "wrapper");
+            this.times[container] = { elem, wrapperElem };
 
-        // calculate position
-        const posLeft = (left * this.resize);
-        const posTop = (this.top - dotSize / 2 - fontSize) * this.resize - 1;
-        const posWidth = ((right - left - dotSize) * this.resize);
-
-        // set style
-        elem.style.fontSize = fontSize + "px";
-        elem.style.left = posLeft + "px";
-        elem.style.position = "relative";
-        elem.style.textAlign = "center";
-        elem.style.top = posTop + "px";
-        elem.style.width = posWidth + "px";
-        elem.style.zIndex = "1";
-
-        elem.setAttribute("value", string);
-        elem.setAttribute("tooltiptext", toolTip);
-
-        // and add to stack only if we just created the element
-        if (newElem) {
-            this.stack.appendChild(elem);
+            // and add to stack only if we just created the element
+            this.stack.appendChild(wrapperElem);
+            wrapperElem.appendChild(elem);
 
             // prevent mousedown event from bubbling to box object
             // prevent dragging of visualisation by clicking on message
             elem.addEventListener("mousedown", (event) => event.stopPropagation(), true);
         }
 
-        // hide if not enough space (need to show first, otherwise .clientWidth is 0)
-        elem.hidden = false;
-        if ((elem.clientWidth > Math.floor((right - left) * this.resize)) || (fontSize > minArcHeight * this.resize)) {
-            elem.hidden = true;
+        // calculate position
+        const posLeft = (left + dotSize / 2) * this.resize;
+        const posTop = (this.top - dotSize / 2 - fontSize) * this.resize - 1;
+        const posWidth = ((right - left - dotSize) * this.resize);
+
+        // set style
+        elem.style.fontSize = fontSize + "px";
+        wrapperElem.style.left = posLeft + "px";
+        wrapperElem.style.top = posTop + "px";
+        wrapperElem.style.width = posWidth + "px";
+
+        elem.setAttribute("value", string);
+        elem.setAttribute("tooltiptext", toolTip);
+
+        // force-show wrapper elem to calculate size
+        wrapperElem.style.display = "flex";
+
+        if ((elem.clientWidth > wrapperElem.clientWidth) || (fontSize > minArcHeight * this.resize)) {
+            wrapperElem.style.display = "none";
         } else {
-            elem.hidden = false;
+            // not hidden, enough space. assign correct width to center text
+            wrapperElem.style.display = "flex";
         }
     }
 

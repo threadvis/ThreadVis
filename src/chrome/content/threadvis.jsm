@@ -126,7 +126,12 @@ class ThreadVis {
             this.selectedContainer = null;
 
             // register for message selection
-            this.window.gMessageListeners.push(this);
+            this.window.gMessageListeners?.push?.(this);
+
+            // if message is already selected on startup, visualise it
+            if (this.window.gMessage) {
+                this.onEndHeaders();
+            }
         }
 
         // for a popup, draw initial visualisation
@@ -139,22 +144,16 @@ class ThreadVis {
     }
 
     onStartHeaders() {
-        // hide visualisation
         this.deleteBox();
     }
 
     onEndHeaders() {
-        this.selectedMsg = this.window.gMessageDisplay.displayedMessage;
+        this.selectedMsg = this.window.gMessage;
         this.setSelectedMessage();
         // make sure we correctly underline recipients (as header is re-drawn)
         this.visualisation.recolourAuthors();
-        // display again
-        if (! this.hasPopupVisualisation()) {
-            this.createBox();
-        }
     }
 
-    onEndAttachments() {}
 
     /**
      * Callback function from extension. Called after mouse click in extension
@@ -178,27 +177,16 @@ class ThreadVis {
             return;
         }
 
-        // for sake of simplicity, assume we are in a folder view, unless told otherwise
-        let currentTabMode = "folder";
-        const tabmail = this.window.document.getElementById("tabmail");
-        if (tabmail) {
-            currentTabMode = tabmail.selectedTab.mode.name;
+        if (this.selectedMsg === msg) {
+            // no need to do anything if message is already selected and visualised
+            return;
         }
 
-        // if in standard 3-pane (folder) view, select new folder, switch to folder and display message
-        if (currentTabMode == "folder") {
-            if (this.window.gFolderTreeView) {
-                this.window.gFolderTreeView.selectFolder(msg.folder);
-            }
-            if (this.window.gFolderDisplay) {
-                this.window.gFolderDisplay.show(msg.folder);
-                this.window.gFolderDisplay.selectMessage(msg);
-            }
-        } else if (currentTabMode == "message") {
-            Logger.error(
-                "message switching",
-                "Currently, switching messages is not possible when viewing a message in a tab.");
-        }
+        // we're only being attached to mailMessageTabs, so this should be easy ...
+        this.window.parent.selectMessage?.(msg);
+
+        // and, just in case we're not part of a 3-pane (e.g. open message in its own tab)
+        this.window.displayMessage?.(message.getMessageURI());
     }
 
     /**
@@ -269,7 +257,7 @@ class ThreadVis {
             return;
         }
 
-        this.visualisation.createStack();
+        this.visualisation.clearStack();
 
         // also clear popup
         if (this.hasPopupVisualisation()) {
@@ -282,10 +270,8 @@ class ThreadVis {
         }
 
         // also clear legend in opener
-        if (this.window.opener
-                && this.window.opener.ThreadVis
-                && this.window.opener.ThreadVis.legendWindow
-                && !this.window.opener.ThreadVis.legendWindow.closed) {
+        if (this.window.opener?.Threadvis?.legendWindow
+            && !this.window.opener.ThreadVis.legendWindow.closed) {
             this.window.opener.ThreadVis.legendWindow.clearLegend();
         }
     }
@@ -318,11 +304,10 @@ class ThreadVis {
      * Display legend popup
      */
     displayLegend() {
-        if (this.window.opener && this.window.opener.ThreadVis) {
-            this.window.opener.ThreadVis.displayLegend();
-        }
+        this.window.opener?.ThreadVis.displayLegend?.();
 
-        if (this.legendWindow != null && !this.legendWindow.closed) {
+
+        if (this.legendWindow && !this.legendWindow.closed) {
             this.legendWindow.displayLegend();
         }
     }
@@ -331,12 +316,12 @@ class ThreadVis {
      * Display legend popup
      */
     displayLegendWindow() {
-        if (this.window.opener && this.window.opener.ThreadVis) {
+        if (this.window.opener?.ThreadVis) {
             this.window.opener.ThreadVis.displayLegendWindow();
             return;
         }
 
-        if (this.legendWindow != null && !this.legendWindow.closed) {
+        if (this.legendWindow && !this.legendWindow?.closed) {
             this.legendWindow.close();
             return;
         }
@@ -355,7 +340,7 @@ class ThreadVis {
             return;
         }
 
-        if (this.popupWindow != null && !this.popupWindow.closed) {
+        if (this.popupWindow && !this.popupWindow.closed) {
             this.popupWindow.focus();
             return;
         }
@@ -381,7 +366,7 @@ class ThreadVis {
      * @return {ThreadVis.Legend} - The legend object, null if it doesn't exist
      */
     getLegend() {
-        if (this.popupWindow && this.popupWindow.ThreadVis) {
+        if (this.popupWindow?.ThreadVis) {
             return this.popupWindow.ThreadVis.visualisation.legend;
         } else {
             return this.visualisation.legend;
@@ -394,7 +379,7 @@ class ThreadVis {
      * @return {DOMWindow} - The popup window, null if no popup exists
      */
     getPopupVisualisation() {
-        if (this.popupWindow != null && !this.popupWindow.closed) {
+        if (this.popupWindow && !this.popupWindow.closed) {
             return this.popupWindow;
         }
         return null;
@@ -406,7 +391,7 @@ class ThreadVis {
      * @return {Boolean} - True if a popup exists, false if not
      */
     hasPopupVisualisation() {
-        if (this.popupWindow != null && !this.popupWindow.closed) {
+        if (this.popupWindow && !this.popupWindow.closed) {
             return true;
         }
         return false;
@@ -427,7 +412,7 @@ class ThreadVis {
     preferenceChanged() {
         this.visualisation.changed = true;
 
-        if (this.popupWindow && this.popupWindow.ThreadVis) {
+        if (this.popupWindow?.ThreadVis) {
             this.popupWindow.ThreadVis.visualisation.changed = true;
         }
 
@@ -435,8 +420,8 @@ class ThreadVis {
     }
 
     /**
-     * Called when a message is selected Call visualisation with messageid to
-     * visualise
+     * Called when a message is selected
+     * Call visualisation with messageid to visualise
      * 
      * @param {Boolean} force - True to force display of message
      */
@@ -505,8 +490,8 @@ class ThreadVis {
 
         this.createBox();
         this.visualisation.disabled = false;
-        this.visualisation.visualise(container);
         this.selectedContainer = container;
+        this.visualisation.visualise(container);
     }
 
     /**
@@ -536,7 +521,7 @@ class ThreadVis {
             // - message id not found, or
             // - container with id was dummy
             // this means the message was not indexed
-            if (this.popupWindow && this.popupWindow.ThreadVis) {
+            if (this.popupWindow?.ThreadVis) {
                 this.popupWindow.ThreadVis.clearVisualisation();
             } else {
                 this.clearVisualisation();
@@ -564,6 +549,22 @@ class ThreadVis {
     }
 
     /**
+     * Return the main messenger window by walking the parent chain
+     *
+     * @param window 
+     * @returns a window which is the main messenger window, undefined if not found
+     */
+    getMessenger(window) {
+        if (window.location.href === "chrome://messenger/content/messenger.xhtml") {
+            return window;
+        }
+        if (window.parent && window.parent !== window) {
+            return this.getMessenger(window.parent);
+        }
+        return undefined;
+    }
+
+    /**
      * Set the status text in the statusbar
      * 
      * @param text
@@ -572,11 +573,17 @@ class ThreadVis {
      *            Data to display
      */
     setStatus(text, info) {
-        let parent = this.window.document;
+        let window = this.window;
         if (this.isPopupVisualisation()) {
-            parent = this.window.opener.document;
+            window = this.window.opener;
         }
-        const elem = parent.getElementById("ThreadVisStatusText");
+        window = this.getMessenger(window);
+        if (! window) {
+            return;
+        }
+        window.ThreadVis = this;
+        let document = window.document;
+        const elem = document.getElementById("ThreadVisStatusText");
         if (text != null) {
             elem.label = text;
         } else {
@@ -603,68 +610,68 @@ class ThreadVis {
             if (typeof (info.accountEnabled) != "undefined") {
                 disabledAccount = !info.accountEnabled;
             }
-            parent.getElementById("ThreadVisStatusTooltipDisabled").hidden = true;
+            document.getElementById("ThreadVisStatusTooltipDisabled").hidden = true;
             if (error && errorText != null) {
-                while (parent.getElementById("ThreadVisStatusTooltipError").firstChild != null) {
-                    parent.getElementById("ThreadVisStatusTooltipError")
-                        .removeChild(parent.getElementById("ThreadVisStatusTooltipError").firstChild);
+                while (document.getElementById("ThreadVisStatusTooltipError").firstChild != null) {
+                    document.getElementById("ThreadVisStatusTooltipError")
+                        .removeChild(document.getElementById("ThreadVisStatusTooltipError").firstChild);
                 }
-                parent.getElementById("ThreadVisStatusTooltipError").hidden = false;
-                parent.getElementById("ThreadVisStatusTooltipError").appendChild(parent.createTextNode(errorText));
+                document.getElementById("ThreadVisStatusTooltipError").hidden = false;
+                document.getElementById("ThreadVisStatusTooltipError").appendChild(parent.createTextNode(errorText));
             } else {
-                parent.getElementById("ThreadVisStatusTooltipError").hidden = true;
+                document.getElementById("ThreadVisStatusTooltipError").hidden = true;
             }
             if (disabledGloda) {
-                parent.getElementById("ThreadVisStatusTooltipGlodaDisabled").hidden = false;
+                document.getElementById("ThreadVisStatusTooltipGlodaDisabled").hidden = false;
             } else {
-                parent.getElementById("ThreadVisStatusTooltipGlodaDisabled").hidden = true;
+                document.getElementById("ThreadVisStatusTooltipGlodaDisabled").hidden = true;
             }
             if (!disabledGloda && disabledAccount) {
-                parent.getElementById("ThreadVisStatusTooltipAccountDisabled").hidden = false;
-                parent.getElementById("ThreadVisStatusMenuEnableAccount").setAttribute("checked", false);
-                parent.getElementById("ThreadVisStatusMenuDisableAccount").setAttribute("checked", true);
+                document.getElementById("ThreadVisStatusTooltipAccountDisabled").hidden = false;
+                document.getElementById("ThreadVisStatusMenuEnableAccount").setAttribute("checked", false);
+                document.getElementById("ThreadVisStatusMenuDisableAccount").setAttribute("checked", true);
             } else {
-                parent.getElementById("ThreadVisStatusTooltipAccountDisabled").hidden = true;
-                parent.getElementById("ThreadVisStatusMenuEnableAccount").setAttribute("checked", true);
-                parent.getElementById("ThreadVisStatusMenuDisableAccount").setAttribute("checked", false);
+                document.getElementById("ThreadVisStatusTooltipAccountDisabled").hidden = true;
+                document.getElementById("ThreadVisStatusMenuEnableAccount").setAttribute("checked", true);
+                document.getElementById("ThreadVisStatusMenuDisableAccount").setAttribute("checked", false);
             }
             if (!disabledGloda && !disabledAccount && disabledFolder) {
-                parent.getElementById("ThreadVisStatusTooltipFolderDisabled").hidden = false;
-                parent.getElementById("ThreadVisStatusMenuEnableFolder").setAttribute("checked", false);
-                parent.getElementById("ThreadVisStatusMenuDisableFolder").setAttribute("checked", true);
+                document.getElementById("ThreadVisStatusTooltipFolderDisabled").hidden = false;
+                document.getElementById("ThreadVisStatusMenuEnableFolder").setAttribute("checked", false);
+                document.getElementById("ThreadVisStatusMenuDisableFolder").setAttribute("checked", true);
             } else {
-                parent.getElementById("ThreadVisStatusTooltipFolderDisabled").hidden = true;
-                parent.getElementById("ThreadVisStatusMenuEnableFolder").setAttribute("checked", true);
-                parent.getElementById("ThreadVisStatusMenuDisableFolder").setAttribute("checked", false);
+                document.getElementById("ThreadVisStatusTooltipFolderDisabled").hidden = true;
+                document.getElementById("ThreadVisStatusMenuEnableFolder").setAttribute("checked", true);
+                document.getElementById("ThreadVisStatusMenuDisableFolder").setAttribute("checked", false);
             }
 
             // account disable
             if (!disabledGloda) {
-                parent.getElementById("ThreadVisStatusMenuEnableAccount").disabled = false;
-                parent.getElementById("ThreadVisStatusMenuDisableAccount").disabled = false;
+                document.getElementById("ThreadVisStatusMenuEnableAccount").disabled = false;
+                document.getElementById("ThreadVisStatusMenuDisableAccount").disabled = false;
             } else {
-                parent.getElementById("ThreadVisStatusMenuEnableAccount").disabled = true;
-                parent.getElementById("ThreadVisStatusMenuDisableAccount").disabled = true;
+                document.getElementById("ThreadVisStatusMenuEnableAccount").disabled = true;
+                document.getElementById("ThreadVisStatusMenuDisableAccount").disabled = true;
             }
 
             // folder disable
             if (!disabledGloda && !disabledAccount) {
-                parent.getElementById("ThreadVisStatusMenuEnableFolder").disabled = false;
-                parent.getElementById("ThreadVisStatusMenuDisableFolder").disabled = false;
+                document.getElementById("ThreadVisStatusMenuEnableFolder").disabled = false;
+                document.getElementById("ThreadVisStatusMenuDisableFolder").disabled = false;
             } else {
-                parent.getElementById("ThreadVisStatusMenuEnableFolder").disabled = true;
-                parent.getElementById("ThreadVisStatusMenuDisableFolder").disabled = true;
+                document.getElementById("ThreadVisStatusMenuEnableFolder").disabled = true;
+                document.getElementById("ThreadVisStatusMenuDisableFolder").disabled = true;
             }
 
             if (error) {
-                parent.getElementById("ThreadVisStatusText").setAttribute("image", "chrome://threadvis/content/images/statusbar-error.png");
-                parent.getElementById("ThreadVisStatusBarPanel").setAttribute("class", "statusbarpanel");
+                document.getElementById("ThreadVisStatusText").setAttribute("image", "chrome://threadvis/content/images/statusbar-error.png");
+                document.getElementById("ThreadVisStatusBarPanel").setAttribute("class", "statusbarpanel");
             } else if (disabledGloda || disabledAccount || disabledFolder) {
-                parent.getElementById("ThreadVisStatusBarPanel").setAttribute("class", "statusbarpanel disabled");
-                parent.getElementById("ThreadVisStatusText").setAttribute("image", "chrome://threadvis/content/images/statusbar-disabled.png");
+                document.getElementById("ThreadVisStatusBarPanel").setAttribute("class", "statusbarpanel disabled");
+                document.getElementById("ThreadVisStatusText").setAttribute("image", "chrome://threadvis/content/images/statusbar-disabled.png");
             } else {
-                parent.getElementById("ThreadVisStatusText").setAttribute("image", "chrome://threadvis/content/images/statusbar.png");
-                parent.getElementById("ThreadVisStatusBarPanel").setAttribute("class", "statusbarpanel");
+                document.getElementById("ThreadVisStatusText").setAttribute("image", "chrome://threadvis/content/images/statusbar.png");
+                document.getElementById("ThreadVisStatusBarPanel").setAttribute("class", "statusbarpanel");
             }
         }
     }
@@ -673,8 +680,8 @@ class ThreadVis {
      * Disable for current folder
      */
     disableCurrentFolder() {
-        // get currently displayed folder
-        const folder = this.window.gFolderDisplay.displayedFolder;
+        // get folder of currently displayed message
+        const folder = this.selectedMsg.folder;
         if (folder) {
             let folderSetting = Preferences.get(Preferences.DISABLED_FOLDERS);
 
@@ -691,8 +698,8 @@ class ThreadVis {
      * Enable for current folder
      */
     enableCurrentFolder() {
-        // get currently displayed folder
-        const folder = this.window.gFolderDisplay.displayedFolder;
+        // get folder of currently displayed message
+        const folder = this.selectedMsg.folder;
         if (folder) {
             let folderSetting = Preferences.get(Preferences.DISABLED_FOLDERS);
 
@@ -710,8 +717,8 @@ class ThreadVis {
      * Enable for current account
      */
     enableCurrentAccount() {
-        // get currently displayed folder
-        const folder = this.window.gFolderDisplay.displayedFolder;
+        // get folder of currently displayed message
+        const folder = this.selectedMsg.folder;
         if (folder) {
             const server = folder.server;
             const account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
@@ -734,8 +741,8 @@ class ThreadVis {
      * Disable for current account
      */
     disableCurrentAccount() {
-        // get currently displayed folder
-        let folder = this.window.gFolderDisplay.displayedFolder;
+        // get folder of currently displayed message
+        const folder = this.selectedMsg.folder;
         if (folder) {
             let server = folder.server;
             let account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
@@ -759,6 +766,7 @@ class ThreadVis {
      * @param {} msg - The message to open
      */
     openNewMessage(msg) {
+        // TODO when is this called? gFolderDisplay does not exist anymore...
         MailUtils.displayMessage(msg, this.window.gFolderDisplay.view, null);
     }
 

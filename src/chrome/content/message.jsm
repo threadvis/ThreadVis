@@ -173,4 +173,12 @@ class Message {
         }
         return this.glodaMessage.folderMessage;
     }
+
+    getMessageURI() {
+        return this.glodaMessage.folderMessageURI;
+    }
+
+    getFolderURI() {
+        return this.glodaMessage.folderURI;
+    }
 }
