@@ -449,16 +449,12 @@ class Visualisation {
             sweep = 0;
         }
 
-        const path = "M" + startX + "," + startY
-                + " a" + radiusX + "," + radiusY + " 0 0," + sweep + " " + radiusX + "," + cornerStart
-                + " h " + width
-                + " a" + radiusX + "," + radiusY + " 0 0," + sweep + " " + radiusX + "," + cornerEnd;
+        const path = `M${startX},${startY}`
+            + ` a${radiusX},${radiusY} 0 0,${sweep} ${radiusX},${cornerStart}`
+            + ` h ${width}`
+            + ` a${radiusX},${radiusY} 0 0,${sweep} ${radiusX},${cornerEnd}`;
 
-        return "<path id=\"p_" + counter + "\""
-                + " d=\"" + path + "\""
-                + " fill=\"none\""
-                + " stroke=\"" + colour + "\""
-                + " stroke-width=\"" + (prefArcWidth * resize) + "\" />";
+        return `<path id="p_${counter}" d="${path}" fill="none" stroke="${colour}" stroke-width="${prefArcWidth * resize}" />`;
     }
 
     /**
@@ -512,15 +508,12 @@ class Visualisation {
             style = "dummy";
         }
 
-        let svg = "<circle id=\"c_" + counter + "\""
-                + " onmouseover=\"toggle(evt,this);\" onmouseout=\"toggle(evt,this);\""
-                + " cx=\"" + (left * resize) + "\"" + " cy=\"" + (top * resize) + "\""
-                + " r=\"" + (prefDotSize * resize * 0.5) + "\"";
+        let svg = `<circle id="c_${counter}" cx="${left * resize}" cy="${top * resize}" r="${prefDotSize * resize * 0.5}"`;
 
         if (style !== "half") {
-            svg += " fill=\"" + colour + "\"";
+            svg += ` fill="${colour}"`;
         } else {
-            svg += " stroke=\"" + colour + "\" stroke-width=\"" + (prefDotSize / 4 * resize) + "\" fill=\"none\"";
+            svg += ` stroke="${colour}" stroke-width="${prefDotSize / 4 * resize}" fill="none"`;
         }
         svg += " />";
 
@@ -1464,9 +1457,9 @@ class Visualisation {
         let lastColour = this.lastColour;
         this.lastColour = -1;
 
-        let svg = "<?xml version=\"1.0\" standalone=\"no\"?>"
-                + "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">"
-                + "<svg width=\"100%\" height=\"100%\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">";
+        let svg = `<?xml version="1.0" standalone="no"?>`
+            + `<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">`
+            + `<svg width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg">`;
 
         for (let counter = 0; counter < containers.length; counter++) {
             const thisContainer = containers[counter];
@@ -1511,7 +1504,7 @@ class Visualisation {
             // if we are using more than one colour
             const circle = prefColour == "single" ? false : true;
 
-            svg += this.drawDotSVG(thisContainer, colour, x, topHeight, selected, circle, false, opacity, resize, counter);
+            svg += this.drawDotSVG(thisContainer, colour, x, topHeight, selected, circle, opacity, resize, counter);
 
             thisContainer.xPosition = x;
             thisContainer.svgId = counter;
@@ -1556,6 +1549,8 @@ class Visualisation {
         const fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
         fp.init(this.window, "Select a File", nsIFilePicker.modeSave);
         fp.appendFilter("SVG Files", "*.svg");
+        fp.defaultString = "threadvis";
+        fp.defaultExtension = "svg";
 
         fp.open((res) => {
             if (res == nsIFilePicker.returnOK || res == nsIFilePicker.returnReplace) {
