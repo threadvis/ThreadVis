@@ -26,7 +26,7 @@
  * Color utilities
  **********************************************************************************************************************/
 
-var EXPORTED_SYMBOLS = [ "convertRGBtoHSV", "convertHSVtoRGB" ];
+const EXPORTED_SYMBOLS = [ "convertRGBtoHSV", "convertHSVtoRGB" ];
 
 /**
  * Convert a RGB colour to a HSV colour
@@ -54,17 +54,17 @@ const convertRGBtoHSV = (red, green, blue)  => {
 
     v = maxVal;
 
-    if (delta != 0) {
+    if (delta !== 0) {
         s = delta / maxVal;
         const delR = (((maxVal - r) / 6) + (delta / 2)) / delta;
         const delG = (((maxVal - g) / 6) + (delta / 2)) / delta;
         const delB = (((maxVal - b) / 6) + (delta / 2)) / delta;
 
-        if (r == maxVal) {
+        if (r === maxVal) {
             h = delB - delG;
-        } else if (g == maxVal) {
+        } else if (g === maxVal) {
             h = (1 / 3) + delR - delB;
-        } else if (b == maxVal) {
+        } else if (b === maxVal) {
             h = (2 / 3) + delG - delR;
         }
 
@@ -102,7 +102,7 @@ const convertHSVtoRGB = (hue, saturation, value) => {
     let g = 0;
     let b = 0;
 
-    if (s != 0) {
+    if (s !== 0) {
         const varH = h * 6;
         const varI = Math.floor(varH);
         const var1 = v * (1 - s);

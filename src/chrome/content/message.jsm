@@ -26,7 +26,7 @@
  * Wrap email message
  **********************************************************************************************************************/
 
-var EXPORTED_SYMBOLS = [ "Message" ];
+const EXPORTED_SYMBOLS = [ "Message" ];
 
 const { Logger } = ChromeUtils.import("chrome://threadvis/content/utils/logger.jsm");
 const { Preferences } = ChromeUtils.import("chrome://threadvis/content/utils/preferences.jsm");
@@ -35,6 +35,11 @@ const { SentMailIdentities } = ChromeUtils.import("chrome://threadvis/content/ut
 
 class Message {
     /**
+     * {GlodaMessage} object
+     */
+    #glodaMessage;
+
+    /**
      * Constructor
      * 
      * @constructor
@@ -42,10 +47,11 @@ class Message {
      * @return {ThreadVis.Message} - A new message
      */
     constructor(glodaMessage) {
+        Object.seal(this);
         /**
          * Gloda message
          */
-        this.glodaMessage = glodaMessage;
+        this.#glodaMessage = glodaMessage;
     }
 
     /**
@@ -53,8 +59,8 @@ class Message {
      * 
      * @return {Date} - The date of the message
      */
-    getDate() {
-        return this.glodaMessage.date;
+    get date() {
+        return this.#glodaMessage.date;
     }
 
     /**
@@ -62,8 +68,8 @@ class Message {
      * 
      * @return {String} - The folder of the message
      */
-    getFolder() {
-        return this.glodaMessage.folderURI;
+    get folder() {
+        return this.#glodaMessage.folderURI;
     }
 
     /**
@@ -71,11 +77,11 @@ class Message {
      * 
      * @return {String} - The sender of the message
      */
-    getFrom() {
-        if (this.glodaMessage.folderMessage != null) {
-            return this.glodaMessage.folderMessage.mime2DecodedAuthor;
+    get from() {
+        if (this.#glodaMessage.folderMessage) {
+            return this.#glodaMessage.folderMessage.mime2DecodedAuthor;
         }
-        return this.glodaMessage.from;
+        return this.#glodaMessage.from;
     }
 
     /**
@@ -83,8 +89,8 @@ class Message {
      * 
      * @return {String} - The parsed email address
      */
-    getFromEmail() {
-        return this.glodaMessage.from.value;
+    get fromEmail() {
+        return this.#glodaMessage.from.value;
     }
 
     /**
@@ -92,8 +98,8 @@ class Message {
      * 
      * @return {String} - The message id
      */
-    getId() {
-        return this.glodaMessage.headerMessageID;
+    get id() {
+        return this.#glodaMessage.headerMessageID;
     }
 
     /**
@@ -101,9 +107,9 @@ class Message {
      * 
      * @return {Array<String>} - The parsed references header
      */
-    getReferences() {
-        if (this.glodaMessage.folderMessage != null) {
-            return References.get(this.glodaMessage.folderMessage.getStringProperty("references"));
+    get references() {
+        if (this.#glodaMessage.folderMessage) {
+            return References.get(this.#glodaMessage.folderMessage.getStringProperty("references"));
         }
         return [];
     }
@@ -113,8 +119,8 @@ class Message {
      * 
      * @return {String} - The subject
      */
-    getSubject() {
-        return this.glodaMessage.subject;
+    get subject() {
+        return this.#glodaMessage.subject;
     }
 
     /**
@@ -122,15 +128,15 @@ class Message {
      * 
      * @return {Boolean} - True if the message was sent by the user, false if not
      */
-    isSent() {
+    get isSent() {
         let issent = false;
         // it is sent if it is stored in a folder that is marked as sent (if enabled)
-        if (this.glodaMessage.folderMessage != null) {
-            issent |= this.glodaMessage.folderMessage.folder.isSpecialFolder(Components.interfaces.nsMsgFolderFlags.SentMail, true)
+        if (this.#glodaMessage.folderMessage) {
+            issent ||= this.#glodaMessage.folderMessage.folder.isSpecialFolder(Components.interfaces.nsMsgFolderFlags.SentMail, true)
                     && Preferences.get(Preferences.SENTMAIL_FOLDERFLAG);
         }
         // or it is sent if the sender address is a local identity (if enabled)
-        issent |= SentMailIdentities[this.glodaMessage.from.value] == true
+        issent ||= SentMailIdentities[this.#glodaMessage.from.value]
                 && Preferences.get(Preferences.SENTMAIL_IDENTITY);
         return issent;
     }
@@ -140,8 +146,8 @@ class Message {
      * 
      * @return {String} - The body of the message
      */
-    getBody() {
-        return this.glodaMessage.indexedBodyText;
+    get body() {
+        return this.#glodaMessage.indexedBodyText;
     }
 
     /**
@@ -150,13 +156,13 @@ class Message {
      * @return {String} - The string representation of the message
      */
     toString() {
-        return "Message: Subject: '" + this.getSubject() + "'."
-                + " From: '" + this.getFrom() + "'."
-                + " MsgId: '" + this.getId() + "'."
-                + " Date: '" + this.getDate() + "'. "
-                + " Folder: '" + this.getFolder() + "'. "
-                + " Refs: '" + this.getReferences() + "'. "
-                + " Sent: '" + this.isSent() + "'";
+        return "Message: Subject: '" + this.subject + "'."
+                + " From: '" + this.from + "'."
+                + " MsgId: '" + this.id + "'."
+                + " Date: '" + this.date + "'. "
+                + " Folder: '" + this.folder + "'. "
+                + " Refs: '" + this.references + "'. "
+                + " Sent: '" + this.isSent + "'";
     }
 
     /**
@@ -164,21 +170,17 @@ class Message {
      * 
      * @return {nsIMsgDBHdr} - The original nsIMsgDBHdr or null if not found
      */
-    getMsgDbHdr() {
-        if (this.glodaMessage.folderMessage == null) {
+    get msgDbHdr() {
+        if (!this.#glodaMessage.folderMessage) {
             Logger.error(
                 "Cache",
-                "Unable to find nsIMsgDBHdr for message " + this.getId() + ", probably in folder " + this.getFolder()
+                "Unable to find nsIMsgDBHdr for message " + this.id + ", probably in folder " + this.folder
                     + ". Either the message database (msf) for this folder is corrupt, or the global index is out-of-date.");
         }
-        return this.glodaMessage.folderMessage;
+        return this.#glodaMessage.folderMessage;
     }
 
-    getMessageURI() {
-        return this.glodaMessage.folderMessageURI;
-    }
-
-    getFolderURI() {
-        return this.glodaMessage.folderURI;
+    get messageURI() {
+        return this.#glodaMessage.folderMessageURI;
     }
 }

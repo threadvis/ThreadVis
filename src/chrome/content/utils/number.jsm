@@ -26,7 +26,7 @@
  * Number utilities
  **********************************************************************************************************************/
 
-var EXPORTED_SYMBOLS = [ "DECtoHEX", "HEXtoDEC" ];
+const EXPORTED_SYMBOLS = [ "DECtoHEX", "HEXtoDEC" ];
 
 /**
  * Get hexadecimal representation of a decimal number

@@ -26,7 +26,7 @@
  * Names of preferences
  **********************************************************************************************************************/
 
-var EXPORTED_SYMBOLS = [ "PreferenceBranch", "PreferenceKeys" ];
+const EXPORTED_SYMBOLS = [ "PreferenceBranch", "PreferenceKeys" ];
 
 const PreferenceBranch = "extensions.threadvis.";
 

@@ -31,7 +31,7 @@
  */
 var clearLegend = () => {
     const legendBox = document.getElementById("LegendContent");
-    while (legendBox.firstChild != null) {
+    while (legendBox.firstChild) {
         legendBox.removeChild(legendBox.firstChild);
     }
 };
@@ -43,7 +43,7 @@ var displayLegend = () => {
     clearLegend();
 
     const legendBox = document.getElementById("LegendContent");
-    const legend = opener.ThreadVis.getLegend();
+    const legend = opener.ThreadVis.legend;
     legendBox.appendChild(legend);
     window.sizeToContent();
 };

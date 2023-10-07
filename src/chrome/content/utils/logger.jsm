@@ -26,8 +26,7 @@
  * Wrapper for logger
  **********************************************************************************************************************/
 
-var EXPORTED_SYMBOLS = [ "Logger" ];
-
+const EXPORTED_SYMBOLS = [ "Logger" ];
 
 /**
  * Log to error console
@@ -42,7 +41,7 @@ const error = (source, message) => {
         .createInstance(Components.interfaces.nsIScriptError);
     scriptError.init(
         message,
-        "ThreadVis/" + source,
+        `ThreadVis/${source}`,
         null,
         null,
         null,

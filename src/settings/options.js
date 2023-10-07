@@ -65,7 +65,7 @@ const init = async () => {
     ].forEach((pref) => {
         getPref(pref.key).then((value) => {
             const elems = document.querySelectorAll(querySelector(pref.key));
-            if (elems.length == 1) {
+            if (elems.length === 1) {
                 const elem = elems[0];
                 if (pref.type === "bool") {
                     elem.checked = value;
@@ -121,7 +121,7 @@ const buildAccountList = async () => {
                 box.disabled = ! this.checked;
             });
         });
-        if (pref != "" && pref.indexOf(" " + account.key + " ") > -1) {
+        if (pref !== "" && pref.indexOf(" " + account.key + " ") > -1) {
             checkbox.checked = false;
         } else {
             checkbox.checked = true;
@@ -182,7 +182,7 @@ const buildFolderCheckboxes = (box, folders, account, indent) => {
             buildFolderPreference();
         });
         div.style.paddingLeft = indent + "em";
-        if (pref != "" && pref.indexOf(folder.url + " ") > -1) {
+        if (pref !== "" && pref.indexOf(folder.url + " ") > -1) {
             checkbox.checked = false;
         } else {
             checkbox.checked = true;

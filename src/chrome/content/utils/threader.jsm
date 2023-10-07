@@ -30,18 +30,14 @@
  * www.jwz.org/doc/threading.html
  **********************************************************************************************************************/
 
-var EXPORTED_SYMBOLS = [ "Threader" ];
+const EXPORTED_SYMBOLS = [ "Threader" ];
 
 const { Container } = ChromeUtils.import("chrome://threadvis/content/container.jsm");
 const { Logger } = ChromeUtils.import("chrome://threadvis/content/utils/logger.jsm");
 const { Message } = ChromeUtils.import("chrome://threadvis/content/message.jsm");
+const { Thread } = ChromeUtils.import("chrome://threadvis/content/thread.jsm");
 
 const { Gloda } = ChromeUtils.import("resource:///modules/gloda/Gloda.jsm");
-
-/**
- * Local cache of message containers
- */
-let cache = {};
 
 /**
  * Return a threaded view for the given message header
@@ -50,26 +46,15 @@ let cache = {};
  * @return {ThreadVis.Container} - a thread of containers
  */
 const get = async (messageHeader) => {
-    // check if we know about this message already
-    let container = getCache(messageHeader.messageId);
-    if (container) {
-        // container is part of the same thread, return
-        return container;
-    } else {
-        // convert message header to gloda message
-        const message = await getGlodaMessage(messageHeader);
-        // get gloda thread
-        const thread = await getGlodaThread(message);
-        // create the in-memory thread representation
-        createThread(thread);
-        // find the correct container for the initial message
-        container = getCache(messageHeader.messageId);
-        if (container) {
-            return container;
-        } else {
-            throw new Error("Message not found after threading.");
-        }
-    }
+    // convert message header to gloda messag{}
+    const message = await getGlodaMessage(messageHeader);
+    // get gloda thread
+    const glodaThread = await getGlodaThread(message);
+    // create the in-memory thread representation
+    const containers = createContainers(glodaThread);
+    const thread = new Thread(containers);
+    thread.select(messageHeader.messageId);
+    return thread;
 };
 
 /**
@@ -77,14 +62,12 @@ const get = async (messageHeader) => {
  *
  * @param messageCollection - the collection of all messages in the thread
  */
-const createThread = (messageCollection) => {
-    // start with a fresh thread
-    resetCache();
-    messageCollection
+const createContainers = (messageCollection) => {
+    return messageCollection
         // convert to "our" messages
         .map((item) => createMessage(item))
         // and put all into thread
-        .forEach((message) => addMessage(message));
+        .reduce(reduceMessages, []);
 };
 
 /**
@@ -135,40 +118,12 @@ const getGlodaThread = (message) => {
  * @return {ThreadVis.Message} - The wrapped message
  */
 const createMessage = (glodaMessage) => {
-    if (glodaMessage.folderMessage == null) {
+    if (!glodaMessage.folderMessage) {
         Logger.error("Cache",
-            "Could not find 'real' message for gloda message with msg-id '"
-                + glodaMessage.headerMessageID + "' in folder '" + glodaMessage.folderURI + "'");
+            `Could not find "real" message for gloda message with msg-id "${glodaMessage.headerMessageID}" in folder "${glodaMessage.folderURI}"`);
     }
 
     return new Message(glodaMessage);
-};
-
-/**
- * Possibly return a cached container for the given message id
- *
- * @param {String} id - the message id to search for
- * @return {ThreadVis.Container} - the cached container for the message
- */
-const getCache = (id) => {
-    return cache[id];
-};
-
-/**
- * Put a created container into the cache
- *
- * @param {String} id - the message id
- * @param {ThreadVis.Container} container - the container to cache
- */
-const putCache = (id, container) => {
-    cache[id] = container;
-};
-
-/**
- * Reset in-memory data
- */
-const resetCache = () => {
-    cache = {};
 };
 
 /**
@@ -176,91 +131,87 @@ const resetCache = () => {
  *
  * @param {ThreadVis.Message} message - The message to put into a container
  */
-const addMessage = (message) => {
+const reduceMessages = (containers, message) => {
     // try to get message container
-    let messageContainer = getCache(message.getId());
+    let messageContainer = containers.find((container) => container.id === message.id);
 
-    if (messageContainer != null) {
+    if (messageContainer) {
         // if we found a container for this message id, either it's a dummy or we have two mails with the same message-id
         // this should only happen if we sent a mail to a list and got back our sent-mail in the inbox
         // in that case we want that our sent-mail takes precedence over the other,
         // since we want to display it as sent, and we only want to display it once
-        if (messageContainer.isDummy() || (!messageContainer.isDummy() && !messageContainer.getMessage().isSent())) {
+        if (!messageContainer.message || (messageContainer.message && !messageContainer.message.isSent)) {
             // store message in this container
             messageContainer.message = message;
-            // index container in hashtable
-            putCache(message.getId(), messageContainer);
-        } else if (!messageContainer.isDummy() && messageContainer.getMessage().isSent()) {
+        } else if (messageContainer.message?.isSent) {
             // the message in messageContainer is a sent message, the new message is not the sent one
             // in this case we simply ignore the new message, since the sent message takes precedence
-            return;
+            return containers;
         } else {
-            messageContainer = null;
+            messageContainer = undefined;
         }
     }
 
-    if (messageContainer == null) {
+    if (!messageContainer) {
         // no suitable container found, create new one
-        messageContainer = new Container();
-        messageContainer.message = message;
-        // index container in hashtable
-        putCache(message.getId(), messageContainer);
+        messageContainer = new Container(message.id, message);
+        // remember container
+        containers.push(messageContainer);
     }
 
     // for each element in references field of message
-    let parentReferenceContainer = null;
-    const references = message.getReferences();
+    let parentReferenceContainer = undefined;
 
-    for (let referencekey in references) {
-        const referenceId = references[referencekey];
-
+    message.references.forEach((reference) => {
         // somehow, Thunderbird does not correctly filter invalid ids
-        if (referenceId.indexOf("@") === -1) {
+        if (reference.indexOf("@") === -1) {
             // invalid message id, ignore
-            continue;
+            return;
         }
 
         // try to find container for referenced message
-        let referenceContainer = getCache(referenceId);
-        if (referenceContainer == null) {
+        let referenceContainer = containers.find((container) => container.id === reference);
+        if (!referenceContainer) {
             // no container found, create new one
-            referenceContainer = new Container();
+            referenceContainer = new Container(reference);
             // index container
-            putCache(referenceId, referenceContainer);
+            containers.push(referenceContainer);
         }
 
         // link reference container together
 
         // if we have a parent container and current container does not have a parent
         // and we are not looking at the same container see if we are already a child of parent
-        if (parentReferenceContainer != null && !referenceContainer.hasParent()
-                && parentReferenceContainer != referenceContainer
+        if (parentReferenceContainer && !referenceContainer.parent
+                && parentReferenceContainer !== referenceContainer
                 && !referenceContainer.findParent(parentReferenceContainer)) {
             parentReferenceContainer.addChild(referenceContainer);
         }
         parentReferenceContainer = referenceContainer;
-    }
+    });
 
     // set parent of current message to last element in references
 
     // if we have a suitable parent container, and the parent container is the current container
     // or the parent container is a child of the current container, discard it as parent
-    if (parentReferenceContainer != null
-            && (parentReferenceContainer == messageContainer || parentReferenceContainer.findParent(messageContainer))) {
-        parentReferenceContainer = null;
+    if (parentReferenceContainer
+            && (parentReferenceContainer === messageContainer || parentReferenceContainer.findParent(messageContainer))) {
+        parentReferenceContainer = undefined;
     }
 
     // if current message already has a parent
-    if (messageContainer.hasParent() && parentReferenceContainer != null) {
+    if (messageContainer.parent && parentReferenceContainer) {
         // remove us from this parent
-        messageContainer.getParent().removeChild(messageContainer);
+        messageContainer.parent.removeChild(messageContainer);
     }
 
     // if we have a suitable parent
-    if (parentReferenceContainer != null) {
+    if (parentReferenceContainer) {
         // add us as child
         parentReferenceContainer.addChild(messageContainer);
     }
+
+    return containers;
 };
 
 

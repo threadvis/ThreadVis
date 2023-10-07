@@ -35,7 +35,10 @@ chrome/content/containervisualisation.jsm
 chrome/content/legend.js
 chrome/content/legend.xhtml
 chrome/content/message.jsm
+chrome/content/positionedcontainer.jsm
+chrome/content/positionedthread.jsm
 chrome/content/scrollbar.jsm
+chrome/content/thread.jsm
 chrome/content/threadvis.css
 chrome/content/threadvis.jsm
 chrome/content/threadvispopup.xhtml

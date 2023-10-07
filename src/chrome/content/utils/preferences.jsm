@@ -26,7 +26,7 @@
  * JavaScript file to react to preference changing events
  **********************************************************************************************************************/
 
-var EXPORTED_SYMBOLS = [ "Preferences" ];
+const EXPORTED_SYMBOLS = [ "Preferences" ];
 
 // shared key strings for our preferences
 const { PreferenceKeys, PreferenceBranch } = ChromeUtils.import("chrome://threadvis/content/utils/preferenceskeys.jsm");
@@ -41,23 +41,24 @@ const PREF_STRING = Services.prefs.PREF_STRING;
 class PreferencesClass {
 
     /**
+     * Internal preferences object
+     */
+    #preferences = {};
+
+    /**
+     * Branch of threadvis preferences
+     */
+    #threadVisPrefBranch = Services.prefs.getBranch(PreferenceBranch);
+    
+    /**
+     * Branch for gloda preference
+     */
+    #glodaPrefBranch = Services.prefs.getBranch("mailnews.database.global.indexer.enabled");
+    
+    /**
      * Constructor
      */
     constructor() {
-        /**
-         * Internal preferences object
-         */
-        this.preferences = {};
-
-        /**
-         * Branch of threadvis preferences
-         */
-        this.threadVisPrefBranch = Services.prefs.getBranch(PreferenceBranch);
-
-        /**
-         * Branch for gloda preference
-         */
-        this.glodaPrefBranch = Services.prefs.getBranch("mailnews.database.global.indexer.enabled");
     }
 
     /**
@@ -65,9 +66,9 @@ class PreferencesClass {
      * 
      * @param {String} pref - The pref that changed
      */
-    doCallback(pref) {
-        const value = this.preferences[pref].value;
-        const callbacks = this.preferences[pref].callbacks;
+    #doCallback(pref) {
+        const value = this.#preferences[pref].value;
+        const callbacks = this.#preferences[pref].callbacks;
         for (let key in callbacks) {
             callbacks[key](value);
         }
@@ -80,7 +81,7 @@ class PreferencesClass {
      * @return {String} - The value of the preference
      */
     get(pref) {
-        return this.preferences[pref].value;
+        return this.#preferences[pref].value;
     }
 
     /**
@@ -91,12 +92,12 @@ class PreferencesClass {
      * @param {String} def - The default value
      * @param {nsIPrefBranch} prefBranch - The branch to use to read the value
      */
-    load(pref, type, def, prefBranch) {
+    #load(pref, type, def, prefBranch) {
         if (! prefBranch) {
-            prefBranch = this.threadVisPrefBranch;
+            prefBranch = this.#threadVisPrefBranch;
         }
-        if (this.preferences[pref] == null) {
-            this.preferences[pref] = {
+        if (!this.#preferences[pref]) {
+            this.#preferences[pref] = {
                 value: def,
                 callbacks: [],
                 type: type,
@@ -105,22 +106,22 @@ class PreferencesClass {
         }
 
         // remove leading branch from pref name
-        const loadPref = pref.substring(this.preferences[pref].branch.root.length);
+        const loadPref = pref.substring(this.#preferences[pref].branch.root.length);
 
         // check if we are loading right pref type
-        if (this.preferences[pref].branch.getPrefType(loadPref) != type) {
+        if (this.#preferences[pref].branch.getPrefType(loadPref) !== type) {
             return;
         }
 
         switch (type) {
             case PREF_BOOL:
-                this.preferences[pref].value = this.preferences[pref].branch.getBoolPref(loadPref);
+                this.#preferences[pref].value = this.#preferences[pref].branch.getBoolPref(loadPref);
                 break;
             case PREF_STRING:
-                this.preferences[pref].value = this.preferences[pref].branch.getCharPref(loadPref);
+                this.#preferences[pref].value = this.#preferences[pref].branch.getCharPref(loadPref);
                 break;
             case PREF_INT:
-                this.preferences[pref].value = this.preferences[pref].branch.getIntPref(loadPref);
+                this.#preferences[pref].value = this.#preferences[pref].branch.getIntPref(loadPref);
                 break;
         }
     }
@@ -129,38 +130,38 @@ class PreferencesClass {
      * Reload preferences
      */
     reload() {
-        this.load(PreferenceKeys.DISABLED_ACCOUNTS, PREF_STRING, "");
-        this.load(PreferenceKeys.DISABLED_FOLDERS, PREF_STRING, "");
-        this.load(PreferenceKeys.SENTMAIL_FOLDERFLAG, PREF_BOOL, true);
-        this.load(PreferenceKeys.SENTMAIL_IDENTITY, PREF_BOOL, true);
-        this.load(PreferenceKeys.SVG_HEIGHT, PREF_INT, 1000);
-        this.load(PreferenceKeys.SVG_WIDTH, PREF_INT, 1000);
-        this.load(PreferenceKeys.TIMELINE, PREF_BOOL, true);
-        this.load(PreferenceKeys.TIMELINE_FONTSIZE, PREF_INT, 9);
-        this.load(PreferenceKeys.TIMESCALING, PREF_BOOL, true,);
-        this.load(PreferenceKeys.TIMESCALING_METHOD, PREF_STRING, "linear");
-        this.load(PreferenceKeys.TIMESCALING_MINTIMEDIFF, PREF_INT, 0);
-        this.load(PreferenceKeys.VIS_DOTSIZE, PREF_INT, 12);
-        this.load(PreferenceKeys.VIS_ARC_MINHEIGHT, PREF_INT, 12);
-        this.load(PreferenceKeys.VIS_ARC_RADIUS, PREF_INT, 32);
-        this.load(PreferenceKeys.VIS_ARC_DIFFERENCE, PREF_INT, 6);
-        this.load(PreferenceKeys.VIS_ARC_WIDTH, PREF_INT, 2);
-        this.load(PreferenceKeys.VIS_SPACING, PREF_INT, 24);
-        this.load(PreferenceKeys.VIS_MESSAGE_CIRCLES, PREF_BOOL, true);
-        this.load(PreferenceKeys.VIS_COLOUR, PREF_STRING, "author");
-        this.load(PreferenceKeys.VIS_COLOURS_BACKGROUND, PREF_STRING, "");
-        this.load(PreferenceKeys.VIS_COLOURS_BORDER, PREF_STRING, "");
-        this.load(PreferenceKeys.VIS_COLOURS_RECEIVED, PREF_STRING,
+        this.#load(PreferenceKeys.DISABLED_ACCOUNTS, PREF_STRING, "");
+        this.#load(PreferenceKeys.DISABLED_FOLDERS, PREF_STRING, "");
+        this.#load(PreferenceKeys.SENTMAIL_FOLDERFLAG, PREF_BOOL, true);
+        this.#load(PreferenceKeys.SENTMAIL_IDENTITY, PREF_BOOL, true);
+        this.#load(PreferenceKeys.SVG_HEIGHT, PREF_INT, 1000);
+        this.#load(PreferenceKeys.SVG_WIDTH, PREF_INT, 1000);
+        this.#load(PreferenceKeys.TIMELINE, PREF_BOOL, true);
+        this.#load(PreferenceKeys.TIMELINE_FONTSIZE, PREF_INT, 9);
+        this.#load(PreferenceKeys.TIMESCALING, PREF_BOOL, true,);
+        this.#load(PreferenceKeys.TIMESCALING_METHOD, PREF_STRING, "linear");
+        this.#load(PreferenceKeys.TIMESCALING_MINTIMEDIFF, PREF_INT, 0);
+        this.#load(PreferenceKeys.VIS_DOTSIZE, PREF_INT, 12);
+        this.#load(PreferenceKeys.VIS_ARC_MINHEIGHT, PREF_INT, 12);
+        this.#load(PreferenceKeys.VIS_ARC_RADIUS, PREF_INT, 32);
+        this.#load(PreferenceKeys.VIS_ARC_DIFFERENCE, PREF_INT, 6);
+        this.#load(PreferenceKeys.VIS_ARC_WIDTH, PREF_INT, 2);
+        this.#load(PreferenceKeys.VIS_SPACING, PREF_INT, 24);
+        this.#load(PreferenceKeys.VIS_MESSAGE_CIRCLES, PREF_BOOL, true);
+        this.#load(PreferenceKeys.VIS_COLOUR, PREF_STRING, "author");
+        this.#load(PreferenceKeys.VIS_COLOURS_BACKGROUND, PREF_STRING, "");
+        this.#load(PreferenceKeys.VIS_COLOURS_BORDER, PREF_STRING, "");
+        this.#load(PreferenceKeys.VIS_COLOURS_RECEIVED, PREF_STRING,
             "#7FFF00,#00FFFF,#7F00FF,#997200,#009926,#002699,#990072,#990000,#4C9900,#009999,#4C0099,#FFBF00,#00FF3F,#003FFF,#FF00BF");
-        this.load(PreferenceKeys.VIS_COLOURS_SENT, PREF_STRING, "#ff0000");
-        this.load(PreferenceKeys.VIS_COLOURS_CURRENT, PREF_STRING, "#000000");
-        this.load(PreferenceKeys.VIS_HIDE_ON_SINGLE, PREF_BOOL, false);
-        this.load(PreferenceKeys.VIS_HIGHLIGHT, PREF_BOOL, true);
-        this.load(PreferenceKeys.VIS_MINIMAL_WIDTH, PREF_INT, 0);
-        this.load(PreferenceKeys.VIS_OPACITY, PREF_INT, 30);
-        this.load(PreferenceKeys.VIS_ZOOM, PREF_STRING, "full");
+        this.#load(PreferenceKeys.VIS_COLOURS_SENT, PREF_STRING, "#ff0000");
+        this.#load(PreferenceKeys.VIS_COLOURS_CURRENT, PREF_STRING, "#000000");
+        this.#load(PreferenceKeys.VIS_HIDE_ON_SINGLE, PREF_BOOL, false);
+        this.#load(PreferenceKeys.VIS_HIGHLIGHT, PREF_BOOL, true);
+        this.#load(PreferenceKeys.VIS_MINIMAL_WIDTH, PREF_INT, 0);
+        this.#load(PreferenceKeys.VIS_OPACITY, PREF_INT, 30);
+        this.#load(PreferenceKeys.VIS_ZOOM, PREF_STRING, "full");
 
-        this.load(PreferenceKeys.GLODA_ENABLED, PREF_BOOL, true, this.glodaPrefBranch);
+        this.#load(PreferenceKeys.GLODA_ENABLED, PREF_BOOL, true, this.#glodaPrefBranch);
     }
 
     /**
@@ -168,10 +169,10 @@ class PreferencesClass {
      */
     register() {
         // add observer for our own branch
-        this.threadVisPrefBranch.addObserver("", this, false);
+        this.#threadVisPrefBranch.addObserver("", this, false);
 
         // add observer for gloda
-        this.glodaPrefBranch.addObserver("", this, false);
+        this.#glodaPrefBranch.addObserver("", this, false);
     }
 
     /**
@@ -181,15 +182,15 @@ class PreferencesClass {
      * @param {*} data
      */
     observe(subject, topic, data) {
-        if (topic != "nsPref:changed") {
+        if (topic !== "nsPref:changed") {
             return;
         }
         // reload preferences
         this.reload();
         if (subject.root === "mailnews.database.global.indexer.enabled") {
-            this.doCallback("mailnews.database.global.indexer.enabled");
+            this.#doCallback("mailnews.database.global.indexer.enabled");
         } else {
-            this.doCallback(PreferenceBranch + data);
+            this.#doCallback(PreferenceBranch + data);
         }
     }
 
@@ -200,7 +201,7 @@ class PreferencesClass {
      * @param {Function} func - The function that has to be called if the preference value changes
      */
     callback(preference, func) {
-        this.preferences[preference].callbacks.push(func);
+        this.#preferences[preference].callbacks.push(func);
     }
 
     /**
@@ -210,8 +211,8 @@ class PreferencesClass {
      * @param {String} val - The value of the preference
      */
     set(pref, val) {
-        this.preferences[pref].value = val;
-        this.storePreference(pref, val);
+        this.#preferences[pref].value = val;
+        this.#storePreference(pref, val);
     }
 
     /**
@@ -220,9 +221,9 @@ class PreferencesClass {
      * @param {String} pref - The name of the preference
      * @param {String} val - The value of the preference
      */
-    storePreference(pref, val) {
-        const branch = this.preferences[pref].branch;
-        const type = this.preferences[pref].type;
+    #storePreference(pref, val) {
+        const branch = this.#preferences[pref].branch;
+        const type = this.#preferences[pref].type;
         // remove leading branch from pref name
         pref = pref.substring(branch.root.length);
 
@@ -243,9 +244,10 @@ class PreferencesClass {
      * Unregister observer
      */
     unregister() {
-        this.threadVisPrefBranch.removeObserver("", this);
-        this.glodaPrefBranch.removeObserver("", this);
+        this.#threadVisPrefBranch.removeObserver("", this);
+        this.#glodaPrefBranch.removeObserver("", this);
     }
 }
 
 const Preferences = Object.assign(new PreferencesClass(), PreferenceKeys);
+Object.seal(Preferences);

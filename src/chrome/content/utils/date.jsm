@@ -26,7 +26,7 @@
  * Various utility classes
  **********************************************************************************************************************/
 
-var EXPORTED_SYMBOLS = [ "formatTimeDifference", "formatDate" ];
+const EXPORTED_SYMBOLS = [ "formatTimeDifference", "formatDate" ];
 
 const { Strings } = ChromeUtils.import("chrome://threadvis/content/utils/strings.jsm");
 

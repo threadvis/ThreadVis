@@ -28,6 +28,8 @@
 
 const EXPORTED_SYMBOLS = [ "ThreadVis" ];
 
+const { MailUtils } = ChromeUtils.import("resource:///modules/MailUtils.jsm");
+
 const { Logger } = ChromeUtils.import("chrome://threadvis/content/utils/logger.jsm");
 const { Preferences } = ChromeUtils.import("chrome://threadvis/content/utils/preferences.jsm");
 const { Strings } = ChromeUtils.import("chrome://threadvis/content/utils/strings.jsm");
@@ -38,122 +40,154 @@ class ThreadVis {
 
     static ADD_ON_ID = "{A23E4120-431F-4753-AE53-5D028C42CFDC}";
 
+    /**
+     * window reference, as this is a module and cannot directly reference "window"
+     */
+    #window;
+
+    /**
+     * Visualisation object
+     */
+    #visualisation;
+
+    /**
+     * method to open the add-ons's option page
+     */
+    #openOptionsPage;
+
+    /**
+     * Popup window reference
+     */
+    #popupWindow;
+
+    /**
+     * Legend window reference
+     */
+    #legendWindow;
+
+    /**
+     * current thread
+     */
+    #currentThread;
+    
+    /**
+     * Create a new ThreadVis instance
+     *
+     * @param window window to draw in
+     * @param openOptionsPage function to open options page
+     */
     constructor(window, openOptionsPage) {
-        // window reference, as this is a module and cannot directly reference "window"
-        this.window = window;
-        // method to open the add-ons's option page
-        this.openOptionsPage = openOptionsPage;
+        Object.seal(this);
+        this.#window = window;
+        this.#openOptionsPage = openOptionsPage;
 
         window.addEventListener("close", () => {
-            if (this.hasPopupVisualisation()) {
-                this.popupWindow.close();
+            if (this.#hasPopupVisualisation) {
+                this.#popupWindow.close();
             }
-            if (this.legendWindow && !this.legendWindow.closed) {
-                this.legendWindow.close();
+            if (this.#legendWindow && !this.#legendWindow.closed) {
+                this.#legendWindow.close();
             }
         }, false);
 
         // visualisation object
-        this.visualisation = new Visualisation(this, window);
+        this.#visualisation = new Visualisation(this, window);
 
         // create box object
-        this.createBox();
+        this.#createBox();
 
-        this.clearVisualisation();
+        this.#clearVisualisation();
 
         // init only for new window, not for popup
-        if (!this.isPopupVisualisation()) {
+        if (!this.isPopupVisualisation) {
             Preferences.callback(Preferences.DISABLED_ACCOUNTS,
-                (value) => this.preferenceChanged());
+                (value) => this.#preferenceChanged());
             Preferences.callback(Preferences.DISABLED_FOLDERS,
-                (value) => this.preferenceChanged());
+                (value) => this.#preferenceChanged());
             Preferences.callback(Preferences.TIMELINE,
-                (value) => this.preferenceChanged());
+                (value) => this.#preferenceChanged());
             Preferences.callback(Preferences.TIMELINE_FONTSIZE,
-                (value) => this.preferenceChanged());
+                (value) => this.#preferenceChanged());
             Preferences.callback(Preferences.TIMESCALING,
-                (value) => this.preferenceChanged());
+                (value) => this.#preferenceChanged());
             Preferences.callback(Preferences.TIMESCALING_METHOD,
-                (value) => this.preferenceChanged());
+                (value) => this.#preferenceChanged());
             Preferences.callback(Preferences.TIMESCALING_MINTIMEDIFF,
-                (value) => this.preferenceChanged());
+                (value) => this.#preferenceChanged());
             Preferences.callback(Preferences.VIS_DOTSIZE,
-                (value) => this.preferenceChanged());
+                (value) => this.#preferenceChanged());
             Preferences.callback(Preferences.VIS_ARC_MINHEIGHT,
-                (value) => this.preferenceChanged());
+                (value) => this.#preferenceChanged());
             Preferences.callback(Preferences.VIS_ARC_RADIUS,
-                (value) => this.preferenceChanged());
+                (value) => this.#preferenceChanged());
             Preferences.callback(Preferences.VIS_ARC_DIFFERENCE,
-                (value) => this.preferenceChanged());
+                (value) => this.#preferenceChanged());
             Preferences.callback(Preferences.VIS_ARC_WIDTH,
-                (value) => this.preferenceChanged());
+                (value) => this.#preferenceChanged());
             Preferences.callback(Preferences.VIS_SPACING,
-                (value) => this.preferenceChanged());
+                (value) => this.#preferenceChanged());
             Preferences.callback(Preferences.VIS_MESSAGE_CIRCLES,
-                (value) => this.preferenceChanged());
+                (value) => this.#preferenceChanged());
             Preferences.callback(Preferences.VIS_COLOUR,
-                (value) => this.preferenceChanged());
+                (value) => this.#preferenceChanged());
             Preferences.callback(Preferences.VIS_COLOURS_BACKGROUND,
-                (value) => this.preferenceChanged());
+                (value) => this.#preferenceChanged());
             Preferences.callback(Preferences.VIS_COLOURS_BORDER,
-                (value) => this.preferenceChanged());
+                (value) => this.#preferenceChanged());
             Preferences.callback(Preferences.VIS_COLOURS_RECEIVED,
-                (value) => this.preferenceChanged());
+                (value) => this.#preferenceChanged());
             Preferences.callback(Preferences.VIS_COLOURS_SENT,
-                (value) => this.preferenceChanged());
+                (value) => this.#preferenceChanged());
             Preferences.callback(Preferences.VIS_COLOURS_CURRENT,
-                (value) => this.preferenceChanged());
+                (value) => this.#preferenceChanged());
             Preferences.callback(Preferences.VIS_HIGHLIGHT,
-                (value) => this.preferenceChanged());
+                (value) => this.#preferenceChanged());
             Preferences.callback(Preferences.VIS_OPACITY,
-                (value) => this.preferenceChanged());
+                (value) => this.#preferenceChanged());
             Preferences.callback(Preferences.VIS_ZOOM,
-                (value) => this.preferenceChanged());
+                (value) => this.#preferenceChanged());
             Preferences.callback(Preferences.GLODA_ENABLED,
-                (value) => this.preferenceChanged());
+                (value) => this.#preferenceChanged());
 
-            if (!this.checkEnabledGloda()) {
-                this.deleteBox();
+            if (!this.#isEnabledGloda) {
+                this.#deleteBox();
             }
 
-            // remember msgid of visualised message
-            this.visualisedMsgId = "";
-
-            // remember selected message
-            this.selectedMsg = null;
-
-            // remember container of selected message
-            this.selectedContainer = null;
-
             // register for message selection
-            this.window.gMessageListeners?.push?.(this);
+            this.#window.gMessageListeners?.push?.(this);
 
             // if message is already selected on startup, visualise it
-            if (this.window.gMessage) {
+            if (this.#window.gMessage) {
                 this.onEndHeaders();
             }
         }
 
         // for a popup, draw initial visualisation
-        if (this.isPopupVisualisation()) {
-            this.visualise(this.window.opener.ThreadVis.selectedContainer);
+        if (this.isPopupVisualisation) {
+            this.visualise(this.#window.opener.ThreadVis.currentThread, false, true);
         }
 
         // set initial status
-        this.setStatus(null, {});
+        this.#setStatus(null, {});
     }
 
     onStartHeaders() {
-        this.deleteBox();
+        this.#deleteBox();
     }
 
-    onEndHeaders() {
-        this.selectedMsg = this.window.gMessage;
-        this.setSelectedMessage();
+    onEndHeaders(force) {
+        this.#setSelectedMessage(this.#window.gMessage, force);
         // make sure we correctly underline recipients (as header is re-drawn)
-        this.visualisation.recolourAuthors();
+        this.#visualisation.recolourAuthors();
     }
 
+    get window() {
+        return this.#window;
+    }
+
+    get visualisation() {
+        return this.#visualisation;
+    }
 
     /**
      * Callback function from extension. Called after mouse click in extension
@@ -162,31 +196,35 @@ class ThreadVis {
      * @param {ThreadVis.Message} message - The message to display
      */
     callback(message) {
-        if (!this.checkEnabledGloda()) {
+        if (!this.#isEnabledGloda) {
             return;
         }
 
         // get the original nsIMsgDBHdr from the message. this may be null if it is not found
         // (i.e. index out-of-date or folder index (msf) corrupt).
-        const msg = message.getMsgDbHdr();
-        if (msg == null) {
-            this.setStatus(null, {
+        const msg = message.msgDbHdr;
+        if (!msg) {
+            this.#setStatus(null, {
                 error : true,
                 errorText : Strings.getString("error.messagenotfound")
             });
             return;
         }
 
-        if (this.selectedMsg === msg) {
+        if (this.#currentThread.selected.message === message) {
             // no need to do anything if message is already selected and visualised
             return;
         }
 
         // we're only being attached to mailMessageTabs, so this should be easy ...
-        this.window.parent.selectMessage?.(msg);
+        this.#window.parent?.selectMessage?.(msg);
 
         // and, just in case we're not part of a 3-pane (e.g. open message in its own tab)
-        this.window.displayMessage?.(message.getMessageURI());
+        this.#window.displayMessage?.(message.messageURI);
+    }
+
+    get currentThread() {
+        return this.#currentThread;
     }
 
     /**
@@ -194,7 +232,7 @@ class ThreadVis {
      * 
      * @return {Boolean} - True if the gloda is enabled, false if not.
      */
-    checkEnabledGloda() {
+    get #isEnabledGloda() {
         return Preferences.get(Preferences.GLODA_ENABLED);
     }
 
@@ -204,7 +242,7 @@ class ThreadVis {
      * @param {MsgFolder} folder - The folder to check
      * @return {Boolean} - True if the account is enabled, false if not.
      */
-    checkEnabledAccount(folder) {
+    #checkEnabledAccount(folder) {
         if (!folder) {
             return false;
         }
@@ -214,7 +252,7 @@ class ThreadVis {
             .getService(Components.interfaces.nsIMsgAccountManager))
             .FindAccountForServer(server);
 
-        if (Preferences.get(Preferences.DISABLED_ACCOUNTS) != ""
+        if (Preferences.get(Preferences.DISABLED_ACCOUNTS) !== ""
                 && Preferences.get(Preferences.DISABLED_ACCOUNTS).indexOf(" " + account.key + " ") > -1) {
             return false;
         }
@@ -227,12 +265,12 @@ class ThreadVis {
      * @param {MsgFolder} folder - The folder to check
      * @return {Boolean} - True if the folder is enabled, false if not.
      */
-    checkEnabledFolder(folder) {
+    #checkEnabledFolder(folder) {
         if (!folder) {
             return false;
         }
 
-        if (Preferences.get(Preferences.DISABLED_FOLDERS) != ""
+        if (Preferences.get(Preferences.DISABLED_FOLDERS) !== ""
                 && Preferences.get(Preferences.DISABLED_FOLDERS).indexOf(" " + folder.URI + " ") > -1) {
             return false;
         }
@@ -245,50 +283,50 @@ class ThreadVis {
      * @param {MsgFolder} folder - The folder to check
      * @return {Boolean} - True if the folder/account is enabled, false if not.
      */
-    checkEnabledAccountOrFolder(folder) {
-        return this.checkEnabledAccount(folder) && this.checkEnabledFolder(folder);
+    #checkEnabledAccountOrFolder(folder) {
+        return this.#checkEnabledAccount(folder) && this.#checkEnabledFolder(folder);
     }
 
     /**
      * Clear visualisation
      */
-    clearVisualisation() {
-        if (!this.checkEnabledGloda()) {
+    #clearVisualisation() {
+        if (!this.#isEnabledGloda) {
             return;
         }
 
-        this.visualisation.clearStack();
+        this.#visualisation.clearStack();
 
         // also clear popup
-        if (this.hasPopupVisualisation()) {
-            this.popupWindow.ThreadVis.clearVisualisation();
+        if (this.#hasPopupVisualisation) {
+            this.#popupWindow.ThreadVis.clearVisualisation();
         }
 
         // also clear legend
-        if (this.legendWindow && !this.legendWindow.closed) {
-            this.legendWindow.clearLegend();
+        if (this.#legendWindow && !this.#legendWindow.closed) {
+            this.#legendWindow.clearLegend();
         }
 
         // also clear legend in opener
-        if (this.window.opener?.Threadvis?.legendWindow
-            && !this.window.opener.ThreadVis.legendWindow.closed) {
-            this.window.opener.ThreadVis.legendWindow.clearLegend();
+        if (this.#window.opener?.Threadvis?.legendWindow
+            && !this.#window.opener.ThreadVis.legendWindow.closed) {
+            this.#window.opener.ThreadVis.legendWindow.clearLegend();
         }
     }
 
     /**
      * Create threadvis XUL box
      */
-    createBox() {
-        this.window.document.getElementById("messageHeader")?.classList.add("threadvis");
+    #createBox() {
+        this.#window.document.getElementById("messageHeader")?.classList.add("threadvis");
         // if in main window, adapt header display
-        if (! this.isPopupVisualisation()) {
+        if (!this.isPopupVisualisation) {
             // get number of visible grid rows
-            const rowCount = this.window.document.getElementById("messageHeader")
+            const rowCount = this.#window.document.getElementById("messageHeader")
                 .querySelectorAll(".message-header-row:not([hidden])")
                 .length;
             // ThreadVis goes from line 3 till the end
-            this.window.document.getElementById("ThreadVisHeaderBox")
+            this.#window.document.getElementById("ThreadVisHeaderBox")
                 .style.gridRowEnd = rowCount + 1;
         }
     }
@@ -296,19 +334,18 @@ class ThreadVis {
     /**
      * Delete threadvis XUL box
      */
-    deleteBox() {
-        this.window.document.getElementById("messageHeader")?.classList.remove("threadvis");
+    #deleteBox() {
+        this.#window.document.getElementById("messageHeader")?.classList.remove("threadvis");
     }
 
     /**
      * Display legend popup
      */
     displayLegend() {
-        this.window.opener?.ThreadVis.displayLegend?.();
+        this.#window.opener?.ThreadVis.displayLegend?.();
 
-
-        if (this.legendWindow && !this.legendWindow.closed) {
-            this.legendWindow.displayLegend();
+        if (this.#legendWindow && !this.#legendWindow.closed) {
+            this.#legendWindow.displayLegend();
         }
     }
 
@@ -316,17 +353,17 @@ class ThreadVis {
      * Display legend popup
      */
     displayLegendWindow() {
-        if (this.window.opener?.ThreadVis) {
-            this.window.opener.ThreadVis.displayLegendWindow();
+        if (this.#window.opener?.ThreadVis) {
+            this.#window.opener.ThreadVis.displayLegendWindow();
             return;
         }
 
-        if (this.legendWindow && !this.legendWindow?.closed) {
-            this.legendWindow.close();
+        if (this.#legendWindow && !this.#legendWindow?.closed) {
+            this.#legendWindow.close();
             return;
         }
 
-        this.legendWindow = this.window.openDialog(
+        this.#legendWindow = this.#window.openDialog(
             "chrome://threadvis/content/legend.xhtml",
             "ThreadVisLegend",
             "chrome=yes,resizable=no,alwaysRaised=yes,dependent=yes,dialog=yes");
@@ -336,28 +373,28 @@ class ThreadVis {
      * Display a popup window for the visualisation
      */
     displayVisualisationWindow() {
-        if (this.visualisation.disabled) {
+        if (this.#visualisation.disabled) {
             return;
         }
 
-        if (this.popupWindow && !this.popupWindow.closed) {
-            this.popupWindow.focus();
+        if (this.#popupWindow && !this.#popupWindow.closed) {
+            this.#popupWindow.focus();
             return;
         }
 
-        this.popupWindow = this.window.openDialog(
+        this.#popupWindow = this.#window.openDialog(
             "chrome://threadvis/content/threadvispopup.xhtml",
             null,
             "chrome=yes,resizable=yes,alwaysRaised=yes,dependent=yes");
 
-        this.popupWindow.addEventListener("close",
+        this.#popupWindow.addEventListener("close",
             () => {
-                this.visualise(this.popupWindow.ThreadVis.selectedContainer, true);
-                this.popupWindow = null;
+                this.visualise(this.#popupWindow.ThreadVis.currentThread, true);
+                this.#popupWindow = null;
             },
             false);
 
-        this.deleteBox();
+        this.#deleteBox();
     }
 
     /**
@@ -365,11 +402,11 @@ class ThreadVis {
      * 
      * @return {ThreadVis.Legend} - The legend object, null if it doesn't exist
      */
-    getLegend() {
-        if (this.popupWindow?.ThreadVis) {
-            return this.popupWindow.ThreadVis.visualisation.legend;
+    get legend() {
+        if (this.#popupWindow?.ThreadVis) {
+            return this.#popupWindow.ThreadVis.visualisation.legend;
         } else {
-            return this.visualisation.legend;
+            return this.#visualisation.legend;
         }
     }
 
@@ -378,9 +415,9 @@ class ThreadVis {
      * 
      * @return {DOMWindow} - The popup window, null if no popup exists
      */
-    getPopupVisualisation() {
-        if (this.popupWindow && !this.popupWindow.closed) {
-            return this.popupWindow;
+    get #popupVisualisation() {
+        if (this.#popupWindow && !this.#popupWindow.closed) {
+            return this.#popupWindow;
         }
         return null;
     }
@@ -390,8 +427,8 @@ class ThreadVis {
      * 
      * @return {Boolean} - True if a popup exists, false if not
      */
-    hasPopupVisualisation() {
-        if (this.popupWindow && !this.popupWindow.closed) {
+    get #hasPopupVisualisation() {
+        if (this.#popupWindow && !this.#popupWindow.closed) {
             return true;
         }
         return false;
@@ -402,132 +439,130 @@ class ThreadVis {
      * 
      * @return {Boolean} - True if this window is a popup, false if not
      */
-    isPopupVisualisation() {
-        return this.window.document.documentElement.id == "ThreadVisPopup";
+    get isPopupVisualisation() {
+        return this.#window.document.documentElement.id === "ThreadVisPopup";
     }
 
     /**
      * Preference changed
      */
-    preferenceChanged() {
-        this.visualisation.changed = true;
+    #preferenceChanged() {
+        this.#visualisation.changed = true;
 
-        if (this.popupWindow?.ThreadVis) {
-            this.popupWindow.ThreadVis.visualisation.changed = true;
+        if (this.#popupWindow?.ThreadVis) {
+            this.#popupWindow.ThreadVis.visualisation.changed = true;
         }
 
-        this.setSelectedMessage(true);
+        // re-trigger startup
+        this.onEndHeaders(true);
     }
 
     /**
      * Called when a message is selected
      * Call visualisation with messageid to visualise
      * 
+     * @param {nsIMsgDBHdr} message - message to display
      * @param {Boolean} force - True to force display of message
      */
-    setSelectedMessage(force) {
-        if (!this.checkEnabledGloda()) {
-            this.visualisation.disabled = true;
-            this.visualisation.displayDisabled();
-            this.visualisedMsgId = null;
-            this.setStatus(null, {});
+    #setSelectedMessage(message, force) {
+        if (!this.#isEnabledGloda) {
+            this.#visualisation.disabled = true;
+            this.#visualisation.displayDisabled();
+            this.#currentThread = undefined;
+            this.#setStatus(null, {});
             return;
         }
-        this.setStatus(null, {});
+        this.#setStatus(null, {});
 
-        this.visualisation.disabled = false;
+        this.#visualisation.disabled = false;
 
-        const loadedMsgFolder = this.selectedMsg.folder;
-        if (!this.checkEnabledAccountOrFolder(loadedMsgFolder)) {
-            this.visualisation.disabled = true;
-            this.visualisation.displayDisabled(true);
-            this.visualisedMsgId = null;
-            this.setStatus(null, {
-                accountEnabled: this.checkEnabledAccount(loadedMsgFolder),
-                folderEnabled: this.checkEnabledFolder(loadedMsgFolder)
+        if (!this.#checkEnabledAccountOrFolder(message.folder)) {
+            this.#visualisation.disabled = true;
+            this.#visualisation.displayDisabled(true);
+            this.#setStatus(null, {
+                accountEnabled: this.#checkEnabledAccount(message.folder),
+                folderEnabled: this.#checkEnabledFolder(message.folder)
             });
             return;
         }
 
-        const server = loadedMsgFolder.server;
-        this.account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
-            .getService(Components.interfaces.nsIMsgAccountManager))
-            .FindAccountForServer(server);
-
-        this.visualiseMessage(this.selectedMsg, force);
+        this.#visualiseMessage(message, force);
     }
 
     /**
-     * Visualise a container
+     * Visualise a thread
      * 
-     * @param {ThreadVis.Container} container - The container to visualise
+     * @param {ThreadVis.Thread} thread - The thread to visualise
      * @param {Boolean} forceNoPopup - True to force visualisation in this window, even if popup still exists
+     * @param {Boolean} forceTooManyMessages - True to force visualisation even if too many messages
      */
-    visualise(container, forceNoPopup) {
-        let msg = container.getMessage().getMsgDbHdr();
-        if (!this.checkEnabledGloda() || !this.checkEnabledAccountOrFolder(msg.folder)) {
+    visualise(thread, forceNoPopup, forceTooManyMessages) {
+        const msg = thread.selected.message.msgDbHdr;
+        if (!this.#isEnabledGloda || !this.#checkEnabledAccountOrFolder(msg.folder)) {
             return;
         }
 
-        if (this.hasPopupVisualisation() && !this.isPopupVisualisation() && !forceNoPopup) {
-            this.getPopupVisualisation().ThreadVis.visualise(container);
+        if (this.#hasPopupVisualisation && !this.isPopupVisualisation && !forceNoPopup) {
+            this.#popupVisualisation.ThreadVis.visualise(thread, false, true);
             return;
         }
 
-        const msgCount = container.getTopContainer().getCount();
+        const msgCount = thread.size;
 
         // if user wants to hide visualisation if it only consists of a single
         // message, do so, but not in popup visualisation
-        if (msgCount == 1
+        if (msgCount === 1
                 && Preferences.get(Preferences.VIS_HIDE_ON_SINGLE)
-                && !this.isPopupVisualisation()) {
-            this.visualisation.disabled = true;
-            this.visualisation.displayDisabled(true);
-            this.visualisedMsgId = null;
-            this.selectedContainer = null;
+                && !this.isPopupVisualisation) {
+            this.#visualisation.disabled = true;
+            this.#visualisation.displayDisabled(true);
+            this.#currentThread = undefined;
             return;
         }
 
-        this.createBox();
-        this.visualisation.disabled = false;
-        this.selectedContainer = container;
-        this.visualisation.visualise(container);
+        this.#createBox();
+        this.#visualisation.disabled = false;
+        this.#currentThread = thread;
+        this.#visualisation.visualise(thread, forceTooManyMessages);
     }
 
     /**
      * Visualise a message. Find the container. Call visualise()
      * 
-     * @param {ThreadVis.Message} message - The message to visualise
+     * @param {nsIMsgDBHdr} message - The message to visualise
      * @param {Boolean} force - True to force the display of the visualisation
      */
-    async visualiseMessage(message, force) {
-        if (this.visualisedMsgId == message.messageId && !force) {
+    async #visualiseMessage(message, force) {
+        if (this.#currentThread?.selected.id === message.messageId && !force) {
             return;
         }
-        if (!this.checkEnabledGloda() || !this.checkEnabledAccountOrFolder(message.folder)) {
+        if (!this.#isEnabledGloda || !this.#checkEnabledAccountOrFolder(message.folder)) {
+            return;
+        }
+
+        // check if message is in current thread
+        if (this.#currentThread?.contains(message.messageId)) {
+            this.#currentThread.select(message.messageId);
+            this.visualise(this.#currentThread);
             return;
         }
 
         // get threaded view for the message
         try {
-            const container = await Threader.get(message);
-            if (container.isDummy()) {
-                throw new Error("Dummy message found.");
-            }
-            this.visualisedMsgId = message.messageId;
-            this.visualise(container);
+            const thread = await Threader.get(message);
+            this.visualise(thread);
         } catch(error) {
             Logger.error("visualise", error);
             // - message id not found, or
             // - container with id was dummy
             // this means the message was not indexed
-            if (this.popupWindow?.ThreadVis) {
-                this.popupWindow.ThreadVis.clearVisualisation();
+            if (this.#popupWindow?.ThreadVis) {
+                this.#popupWindow.ThreadVis.clearVisualisation();
             } else {
-                this.clearVisualisation();
-                this.deleteBox();
+                this.#clearVisualisation();
+                this.#deleteBox();
             }
-            this.setStatus(null, {
+            this.#setStatus(null, {
                 error : true,
                 errorText : Strings.getString("error.messagenotfound")
             });
@@ -537,15 +572,15 @@ class ThreadVis {
     /**
      * Zoom function to call from user click
      */
-    zoomIn() {
-        this.visualisation.zoomIn();
+    #zoomIn() {
+        this.#visualisation.zoomIn();
     }
 
     /**
      * Zoom function to call from user click
      */
-    zoomOut() {
-        this.visualisation.zoomOut();
+    #zoomOut() {
+        this.#visualisation.zoomOut();
     }
 
     /**
@@ -554,12 +589,12 @@ class ThreadVis {
      * @param window 
      * @returns a window which is the main messenger window, undefined if not found
      */
-    getMessenger(window) {
+    #getMessenger(window) {
         if (window.location.href === "chrome://messenger/content/messenger.xhtml") {
             return window;
         }
         if (window.parent && window.parent !== window) {
-            return this.getMessenger(window.parent);
+            return this.#getMessenger(window.parent);
         }
         return undefined;
     }
@@ -572,52 +607,52 @@ class ThreadVis {
      * @param info
      *            Data to display
      */
-    setStatus(text, info) {
-        let window = this.window;
-        if (this.isPopupVisualisation()) {
-            window = this.window.opener;
+    #setStatus(text, info) {
+        let window = this.#window;
+        if (this.isPopupVisualisation) {
+            window = this.#window.opener;
         }
-        window = this.getMessenger(window);
-        if (! window) {
+        window = this.#getMessenger(window);
+        if (!window) {
             return;
         }
         window.ThreadVis = this;
         let document = window.document;
         const elem = document.getElementById("ThreadVisStatusText");
-        if (text != null) {
+        if (text) {
             elem.label = text;
         } else {
             elem.label = elem.getAttribute("defaultlabel");
         }
         let error = false;
         let errorText = null;
-        let disabledGloda = !this.checkEnabledGloda();
+        let disabledGloda = !this.#isEnabledGloda;
         let disabledAccount = false;
         let disabledFolder = false;
-        if (typeof (info) != "undefined") {
-            if (typeof (info.error) != "undefined") {
+        if (typeof (info) !== "undefined") {
+            if (typeof (info.error) !== "undefined") {
                 error = info.error;
             }
-            if (typeof (info.errorText) != "undefined") {
+            if (typeof (info.errorText) !== "undefined") {
                 errorText = info.errorText;
             }
-            if (typeof (info.glodaEnabled) != "undefined") {
+            if (typeof (info.glodaEnabled) !== "undefined") {
                 disabledGloda = !info.glodaEnabled;
             }
-            if (typeof (info.folderEnabled) != "undefined") {
+            if (typeof (info.folderEnabled) !== "undefined") {
                 disabledFolder = !info.folderEnabled;
             }
-            if (typeof (info.accountEnabled) != "undefined") {
+            if (typeof (info.accountEnabled) !== "undefined") {
                 disabledAccount = !info.accountEnabled;
             }
             document.getElementById("ThreadVisStatusTooltipDisabled").hidden = true;
-            if (error && errorText != null) {
-                while (document.getElementById("ThreadVisStatusTooltipError").firstChild != null) {
+            if (error && errorText) {
+                while (document.getElementById("ThreadVisStatusTooltipError").firstChild) {
                     document.getElementById("ThreadVisStatusTooltipError")
                         .removeChild(document.getElementById("ThreadVisStatusTooltipError").firstChild);
                 }
                 document.getElementById("ThreadVisStatusTooltipError").hidden = false;
-                document.getElementById("ThreadVisStatusTooltipError").appendChild(parent.createTextNode(errorText));
+                document.getElementById("ThreadVisStatusTooltipError").appendChild(document.createTextNode(errorText));
             } else {
                 document.getElementById("ThreadVisStatusTooltipError").hidden = true;
             }
@@ -681,7 +716,7 @@ class ThreadVis {
      */
     disableCurrentFolder() {
         // get folder of currently displayed message
-        const folder = this.selectedMsg.folder;
+        const folder = this.#currentThread.selected.message.msgDbHdr.folder;
         if (folder) {
             let folderSetting = Preferences.get(Preferences.DISABLED_FOLDERS);
 
@@ -699,7 +734,7 @@ class ThreadVis {
      */
     enableCurrentFolder() {
         // get folder of currently displayed message
-        const folder = this.selectedMsg.folder;
+        const folder = this.#currentThread.selected.message.msgDbHdr.folder;
         if (folder) {
             let folderSetting = Preferences.get(Preferences.DISABLED_FOLDERS);
 
@@ -718,7 +753,7 @@ class ThreadVis {
      */
     enableCurrentAccount() {
         // get folder of currently displayed message
-        const folder = this.selectedMsg.folder;
+        const folder = this.#currentThread.selected.message.msgDbHdr.folder;
         if (folder) {
             const server = folder.server;
             const account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
@@ -742,7 +777,7 @@ class ThreadVis {
      */
     disableCurrentAccount() {
         // get folder of currently displayed message
-        const folder = this.selectedMsg.folder;
+        const folder = this.#currentThread.selected.message.msgDbHdr.folder;
         if (folder) {
             let server = folder.server;
             let account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
@@ -766,14 +801,13 @@ class ThreadVis {
      * @param {} msg - The message to open
      */
     openNewMessage(msg) {
-        // TODO when is this called? gFolderDisplay does not exist anymore...
-        MailUtils.displayMessage(msg, this.window.gFolderDisplay.view, null);
+        MailUtils.displayMessage(msg);
     }
 
     /**
      * Shutdown, unregister all observers
      */
     shutdown() {
-        this.window.gMessageListeners = this.window.gMessageListeners.filter((item) => item != this);
+        this.#window.gMessageListeners = this.#window.gMessageListeners.filter((item) => item !== this);
     }
 }

@@ -26,7 +26,7 @@
  * Split message ids in header field "references" and return all referenced message ids in an array.
  **********************************************************************************************************************/
 
-var EXPORTED_SYMBOLS = [ "References" ];
+const EXPORTED_SYMBOLS = [ "References" ];
 
 const References = {
     /**
@@ -36,7 +36,7 @@ const References = {
      * @return {Array} - an array of all referenced mssage ids
      */
     get(references) {
-        if (references != null && references != "") {
+        if (references) {
             const result = references.match(/[^<>\s]+/g);
 
             const dupes = {};

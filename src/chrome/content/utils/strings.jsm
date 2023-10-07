@@ -26,9 +26,9 @@
  * Implements strings proxy
  **********************************************************************************************************************/
 
-var EXPORTED_SYMBOLS = [ "Strings" ];
+const EXPORTED_SYMBOLS = [ "Strings" ];
 
-const { Services } = ChromeUtils.import("resource://gre/modules/Services.jsm");
+const Services = globalThis.Services;
 const strings = Services.strings.createBundle("chrome://threadvis/locale/threadvis.properties");
 
 /**

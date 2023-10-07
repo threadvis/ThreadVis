@@ -26,49 +26,60 @@
  * Draw the timeline.
  **********************************************************************************************************************/
 
-var EXPORTED_SYMBOLS = [ "Timeline" ];
+const EXPORTED_SYMBOLS = [ "Timeline" ];
 
 const { Preferences } = ChromeUtils.import("chrome://threadvis/content/utils/preferences.jsm");
 const { formatTimeDifference } = ChromeUtils.import("chrome://threadvis/content/utils/date.jsm");
 
 class Timeline {
+
+    /**
+     * XUL/DOM document to draw in
+     */
+    #document;
+
+    /**
+     * XUL stack to draw timeline on
+     */
+    #stack;
+    
+    /**
+     * current thread
+     */
+    #thread;
+
+    /**
+     * resize multiplicator
+     */
+    #resize;
+    
+    /**
+     * top position of center of visualisation in px
+     */
+    #top;
+
+    /**
+     * cache timing info for containers
+     */
+    #times = {};
+    
     /**
      * Constructor for timeline class
      * 
      * @param {DOMDocument} document - The document to draw in
      * @param {XULStack} stack - The stack to draw the timeline on
-     * @param {Array<ThreadVis.Container>} containers - An array of all containers
+     * @param {ThreadVis.Thread} thread - The current thread
      * @param {Number} resize - The resize parameter [0..1]
      * @param {Number} top - The top position of the timeline
      * @return A new timeline object
      */
-    constructor(document, stack, containers, resize, top) {
-        /**
-         * XUL/DOM document to draw in
-         */
-        this.document = document;
-
-        /**
-         * XUL stack to draw timeline on
-         */
-        this.stack = stack;
-
-        /**
-         * containers of current thread
-         */
-        this.containers = containers;
-
-        /**
-         * resize multiplicator
-         */
-        this.resize = resize;
-
-        /**
-         * top position of center of visualisation in px
-        */
-        this.top = top;
-
-        this.times = {};
+    constructor(document, stack, thread, resize, top) {
+        Object.seal(this);
+        this.#document = document;
+        this.#stack = stack;
+        this.#thread = thread;
+        this.#resize = resize;
+        this.#top = top;
     }
 
     /**
@@ -76,13 +87,14 @@ class Timeline {
      */
     draw() {
         // start with second container
-        for (let i = 1; i < this.containers.length; i++) {
+        const containers = this.#thread.containers;
+        for (let i = 1; i < containers.length; i++) {
             // look at two adjacent containers
-            const first = this.containers[i - 1];
-            const second = this.containers[i];
+            const first = containers[i - 1];
+            const second = containers[i];
 
-            // don't calculate time if one of them is a dummy
-            if (first.isDummy() || second.isDummy()) {
+            // don't calculate time if one of them does not have a message
+            if (!first.message || !second.message) {
                 continue;
             }
 
@@ -92,37 +104,38 @@ class Timeline {
             const formatted = formatTimeDifference(timeDifference);
 
             // draw the labels and tooltips
-            this.drawTime(first, first.xPosition, second.xPosition, formatted.string, formatted.toolTip);
+            this.#drawTime(first.id, first.x, second.x, formatted.string, formatted.toolTip);    
         }
     }
 
     /**
      * Draw the label and the tooltip
      * 
-     * @param {ThreadVis.Container} container - The container to draw
+     * @param {ThreadVis.Container.Id} containerId - The container to draw
      * @param {Number} left - The left position
      * @param {Number} right - The right position
      * @param {String} string - The string to display
      * @param {String} toolTip - The tooltip to add
      */
-    drawTime(container, left, right, string, toolTip) {
+    #drawTime(containerId, left, right, string, toolTip) {
         const dotSize = Preferences.get(Preferences.VIS_DOTSIZE);
         const minArcHeight = Preferences.get(Preferences.VIS_ARC_MINHEIGHT);
         const fontSize = Preferences.get(Preferences.TIMELINE_FONTSIZE);
+
         // check to see if we already created the label and the tooltip
         let elem = null;
         let wrapperElem = null;
-        if (this.times[container]) {
-            ({ elem, wrapperElem } = this.times[container]);
+        if (this.#times[containerId]) {
+            ({ elem, wrapperElem } = this.#times[containerId]);
         } else {
-            elem = this.document.createXULElement("description");
+            elem = this.#document.createXULElement("description");
             elem.style.display = "inline-block";
-            wrapperElem = this.document.createElement("div");
+            wrapperElem = this.#document.createElement("div");
             wrapperElem.classList.add("timeline", "wrapper");
-            this.times[container] = { elem, wrapperElem };
+            this.#times[containerId] = { elem, wrapperElem };
 
             // and add to stack only if we just created the element
-            this.stack.appendChild(wrapperElem);
+            this.#stack.appendChild(wrapperElem);
             wrapperElem.appendChild(elem);
 
             // prevent mousedown event from bubbling to box object
@@ -131,15 +144,15 @@ class Timeline {
         }
 
         // calculate position
-        const posLeft = (left + dotSize / 2) * this.resize;
-        const posTop = (this.top - dotSize / 2 - fontSize) * this.resize - 1;
-        const posWidth = ((right - left - dotSize) * this.resize);
+        const posLeft = (left + dotSize / 2) * this.#resize;
+        const posTop = (this.#top - dotSize / 2 - fontSize) * this.#resize - 1;
+        const posWidth = ((right - left - dotSize) * this.#resize);
 
         // set style
-        elem.style.fontSize = fontSize + "px";
-        wrapperElem.style.left = posLeft + "px";
-        wrapperElem.style.top = posTop + "px";
-        wrapperElem.style.width = posWidth + "px";
+        elem.style.fontSize = `${fontSize}px`;
+        wrapperElem.style.left = `${posLeft}px`;
+        wrapperElem.style.top = `${posTop}px`;
+        wrapperElem.style.width = `${posWidth}px`;
 
         elem.setAttribute("value", string);
         elem.setAttribute("tooltiptext", toolTip);
@@ -147,7 +160,7 @@ class Timeline {
         // force-show wrapper elem to calculate size
         wrapperElem.style.display = "flex";
 
-        if ((elem.clientWidth > wrapperElem.clientWidth) || (fontSize > minArcHeight * this.resize)) {
+        if ((elem.clientWidth > wrapperElem.clientWidth) || (fontSize > minArcHeight * this.#resize)) {
             wrapperElem.style.display = "none";
         } else {
             // not hidden, enough space. assign correct width to center text
@@ -162,8 +175,8 @@ class Timeline {
      * @param {Number} top - The top position
      */
     redraw(resize, top) {
-        this.resize = resize;
-        this.top = top;
+        this.#resize = resize;
+        this.#top = top;
         this.draw();
     }
 }

@@ -28,7 +28,7 @@
 
 const { MailServices } = ChromeUtils.import("resource:///modules/MailServices.jsm");
 
-var EXPORTED_SYMBOLS = [ "extractEmailAddress" ];
+const EXPORTED_SYMBOLS = [ "extractEmailAddress" ];
 
 /**
  * Extract email address from a TO/FROM/CC/BCC line
@@ -44,5 +44,5 @@ const extractEmailAddress = (anyEmailAddressFormat) => {
     // "Lastname, Firstname" <firstname.lastname@domain.ending>
     // for sake of simplicity, assume input is a single address and take _any_ extracted address
 
-    return parsedItems.map((item) => item.email).find((email) => email != "");
+    return parsedItems.map((item) => item.email).find((email) => email !== "");
 };
