@@ -44,6 +44,15 @@
     "options.sentmail.identity": {
         "message": "Treat all emails with a local identity as sender as a sent email."
     },
+    "options.statusbar.caption": {
+        "message": "Statusbar icon"
+    },
+    "options.statusbar.enabled": {
+        "message": "Show ThreadVis icon in statusbar"
+    },
+    "options.statusbar.description": {
+        "message": "For this setting to take effect, please disable and re-enable the add-on."
+    },
     "options.visualisation.zoom.caption": {
         "message": "Default Size"
     },

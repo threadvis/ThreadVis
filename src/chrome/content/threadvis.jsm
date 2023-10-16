@@ -104,6 +104,8 @@ class ThreadVis {
                 (value) => this.#preferenceChanged());
             Preferences.callback(Preferences.DISABLED_FOLDERS,
                 (value) => this.#preferenceChanged());
+            Preferences.callback(Preferences.STATUSBAR,
+                (value) => this.#preferenceChanged());
             Preferences.callback(Preferences.TIMELINE,
                 (value) => this.#preferenceChanged());
             Preferences.callback(Preferences.TIMELINE_FONTSIZE,
@@ -619,6 +621,10 @@ class ThreadVis {
         window.ThreadVis = this;
         let document = window.document;
         const elem = document.getElementById("ThreadVisStatusText");
+        if (!elem) {
+            // status bar not available (user disabled?)
+            return;
+        }
         if (text) {
             elem.label = text;
         } else {

@@ -28,6 +28,7 @@
 
 const Services = globalThis.Services;
 
+const { Preferences } = ChromeUtils.import("chrome://threadvis/content/utils/preferences.jsm");
 const { ThreadVis } = ChromeUtils.import("chrome://threadvis/content/threadvis.jsm");
 
 const { ExtensionParent } = ChromeUtils.import("resource://gre/modules/ExtensionParent.jsm");
@@ -56,17 +57,20 @@ let ThreadVisInstance;
 var onLoad = async (isAddonActivation) => {
     WL.injectCSS("chrome://threadvis/content/threadvis.css");
 
-    if (window.location.href === "about:message") {
-        injectVisualisation();
-    }
-    if (window.location.href === "chrome://messenger/content/messenger.xhtml") {
+    // wait for preferences to be available
+    await notify.notifyTools.notifyBackground({command: "initPref"});
+
+    // inject status bar icon into main window (if configured)
+    if (window.location.href === "chrome://messenger/content/messenger.xhtml" && Preferences.get(Preferences.STATUSBAR)) {
         injectStatusbar();
         document.getElementById("ThreadVisOpenOptionsDialog")
             .addEventListener("command", () => WL.messenger.runtime.openOptionsPage());
         return;
     }
 
-    await notify.notifyTools.notifyBackground({command: "initPref"});
+    // inject visualisation into message
+    injectVisualisation();
+
     ThreadVisInstance = new ThreadVis(window, openOptionsPage);
 
     window.ThreadVis = ThreadVisInstance;

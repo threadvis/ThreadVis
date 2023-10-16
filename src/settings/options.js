@@ -60,6 +60,7 @@ const init = async () => {
         { key: PreferenceKeys.VIS_COLOURS_CURRENT, type: "string"},
         { key: PreferenceKeys.SENTMAIL_FOLDERFLAG, type: "bool"},
         { key: PreferenceKeys.SENTMAIL_IDENTITY, type: "bool"},
+        { key: PreferenceKeys.STATUSBAR, type: "bool"},
         { key: PreferenceKeys.DISABLED_ACCOUNTS, type: "string"},
         { key: PreferenceKeys.DISABLED_FOLDERS, type: "string"}
     ].forEach((pref) => {

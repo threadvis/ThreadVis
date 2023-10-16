@@ -136,6 +136,7 @@ class PreferencesClass {
         this.#load(PreferenceKeys.SENTMAIL_IDENTITY, PREF_BOOL, true);
         this.#load(PreferenceKeys.SVG_HEIGHT, PREF_INT, 1000);
         this.#load(PreferenceKeys.SVG_WIDTH, PREF_INT, 1000);
+        this.#load(PreferenceKeys.STATUSBAR, PREF_BOOL, true);
         this.#load(PreferenceKeys.TIMELINE, PREF_BOOL, true);
         this.#load(PreferenceKeys.TIMELINE_FONTSIZE, PREF_INT, 9);
         this.#load(PreferenceKeys.TIMESCALING, PREF_BOOL, true,);

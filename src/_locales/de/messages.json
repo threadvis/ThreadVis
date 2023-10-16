@@ -44,6 +44,15 @@
     "options.sentmail.identity": {
         "message": "Alle E-Mails mit einer lokalen Identität als Absender als gesendet behandeln."
     },
+    "options.statusbar.caption": {
+        "message": "Icon in Statusleiste"
+    },
+    "options.statusbar.enabled": {
+        "message": "Zeige ThreadVis-Icon in Statusleiste"
+    },
+    "options.statusbar.description": {
+        "message": "Um diese Einstellung anzuwenden, bitte das Add-on deaktivieren und wieder aktivieren."
+    },
     "options.visualisation.zoom.caption": {
         "message": "Standard-Größe"
     },

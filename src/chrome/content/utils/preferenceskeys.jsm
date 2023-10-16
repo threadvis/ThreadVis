@@ -58,6 +58,10 @@ const PreferenceKeys = {
     SVG_WIDTH:
         PreferenceBranch + "svg.width",
 
+    // show/hide statusbar icon
+    STATUSBAR:
+        PreferenceBranch + "statusbar.enabled",
+
     // show timeline
     TIMELINE:
         PreferenceBranch + "timeline.enabled",
