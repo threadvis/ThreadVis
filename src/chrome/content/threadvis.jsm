@@ -69,7 +69,12 @@ class ThreadVis {
      * current thread
      */
     #currentThread;
-    
+
+    /**
+     * A MutationObserver connected to our box
+     */
+    #domMutationObserver;
+
     /**
      * Create a new ThreadVis instance
      *
@@ -80,6 +85,7 @@ class ThreadVis {
         Object.seal(this);
         this.#window = window;
         this.#openOptionsPage = openOptionsPage;
+        this.#domMutationObserver = new this.#window.MutationObserver(() => this.#positionBox());
 
         window.addEventListener("close", () => {
             if (this.#hasPopupVisualisation) {
@@ -177,8 +183,8 @@ class ThreadVis {
         this.#deleteBox();
     }
 
-    onEndHeaders(force) {
-        this.#setSelectedMessage(this.#window.gMessage, force);
+    onEndHeaders() {
+        this.#setSelectedMessage(this.#window.gMessage, true);
         // make sure we correctly underline recipients (as header is re-drawn)
         this.#visualisation.recolourAuthors();
     }
@@ -323,14 +329,27 @@ class ThreadVis {
         this.#window.document.getElementById("messageHeader")?.classList.add("threadvis");
         // if in main window, adapt header display
         if (!this.isPopupVisualisation) {
-            // get number of visible grid rows
-            const rowCount = this.#window.document.getElementById("messageHeader")
-                .querySelectorAll(".message-header-row:not([hidden])")
-                .length;
-            // ThreadVis goes from line 3 till the end
-            this.#window.document.getElementById("ThreadVisHeaderBox")
-                .style.gridRowEnd = rowCount + 1;
+            this.#positionBox();
         }
+    }
+
+    /**
+     * Position box in header, right column, from line 2 till the end
+     */
+    #positionBox() {
+        // disconnect observer to avoid creating a feedback loop
+        this.#domMutationObserver?.disconnect();
+        // get number of visible grid rows
+        const rowCount = this.#window.document.getElementById("messageHeader")
+            .querySelectorAll(".message-header-row:not([hidden])").length;
+        // ThreadVis goes from line 3 till the end
+        this.#window.document.getElementById("ThreadVisHeaderBox").style.gridRowEnd = rowCount + 1;
+        this.#window.document.getElementById("messageHeader")?.classList.add("threadvis");
+        // add a mutation observer in case another add-on changes the headers as well (eg Compact Headers)
+        // and re-position ourself in case of an attribute change to our dom element
+        this.#domMutationObserver?.observe(
+            this.#window.document.getElementById("messageHeader"),
+            { attributes: true });
     }
 
     /**
@@ -338,6 +357,7 @@ class ThreadVis {
      */
     #deleteBox() {
         this.#window.document.getElementById("messageHeader")?.classList.remove("threadvis");
+        this.#domMutationObserver?.disconnect();
     }
 
     /**
@@ -456,7 +476,7 @@ class ThreadVis {
         }
 
         // re-trigger startup
-        this.onEndHeaders(true);
+        this.onEndHeaders();
     }
 
     /**
@@ -815,5 +835,6 @@ class ThreadVis {
      */
     shutdown() {
         this.#window.gMessageListeners = this.#window.gMessageListeners.filter((item) => item !== this);
+        this.#domMutationObserver.disconnect();
     }
 }

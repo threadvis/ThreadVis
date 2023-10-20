@@ -111,20 +111,25 @@ splitter.mousehidden:hover {
     position: relative;
 }
 
-#messageHeader.threadvis #ThreadVisHeaderBox {
+/**
+ * compact attribute is set by "Compact Headers" add-on, don't
+ * display ThreadVis if headers are compacted, as there's no
+ * space available anyways and we'd mess around with the grid display
+ */
+#messageHeader:not([compact]).threadvis #ThreadVisHeaderBox {
     display: inherit;
 }
 
-#messageHeader.threadvis {
+#messageHeader:not([compact]).threadvis {
     grid-template-columns: auto minmax(250px, 1fr);
     column-gap: 2em;
 }
 
-#messageHeader.threadvis > .message-header-row:not([hidden]) {
+#messageHeader:not([compact]).threadvis > .message-header-row:not([hidden]) {
     grid-column: 1/2;
 }
 
-#messageHeader.threadvis #headerSenderToolbarContainer {
+#messageHeader:not([compact]).threadvis #headerSenderToolbarContainer {
     grid-column: 1/3 !important;
 }
 
