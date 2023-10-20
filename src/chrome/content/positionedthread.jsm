@@ -38,23 +38,35 @@ class PositionedThread {
      */
     #containers = [];
 
-    #height = 0;
-
+    /**
+     * Available width to the visualisation
+     */
     #width = 0;
 
+    /**
+     * Stacked arcs height (top)
+     */
     #topHeight = 0;
+
+    /**
+     * Stacked arcs height (bottom)
+     */
     #bottomHeight = 0;
+
+    /**
+     * Calculated minimal time difference between two messages
+     */
     #minimalTimeDifference = Number.MAX_VALUE;
 
-    constructor(containers, selectedContainer, authors, width, height) {
+    constructor(containers, selectedContainer, authors, width) {
         Object.seal(this);
         this.#containers = containers
             .toSorted(PositionedThread.#sortFunction)
-            .map((container, index) => {
+            .map((container) => {
                 const author = authors[container.message?.fromEmail];
                 const isSelected = container === selectedContainer;
                 const inThread = container.findParent(selectedContainer) || selectedContainer.findParent(container);
-                return new PositionedContainer(container, index, author, isSelected, inThread);
+                return new PositionedContainer(container, author, isSelected, inThread);
             });
 
         // now that we have all positioned containers, link parents
@@ -65,7 +77,6 @@ class PositionedThread {
             return item;
         });
 
-        this.#height = height;
         this.#width = width;
 
         this.#calculateSize();
@@ -221,7 +232,7 @@ class PositionedThread {
         // this means, we have to scale the timing factor down
         let scaling = 0.9;
         let iteration = 0;
-        while (totalTimeScale > maxCountX && iteration < 100) {
+        while (totalTimeScale > maxCountX && iteration < 10000) {
             iteration++;
             totalTimeScale = 0;
             this.#containers.forEach((container) => {

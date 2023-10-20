@@ -366,13 +366,6 @@ class Scrollbar {
     }
 
     /**
-     * React on click on "down" button Pan vertically by one pixel
-     */
-    #panDown() {
-        this.#panVertical(1);
-    }
-
-    /**
      * Do horizontal panning by dx pixel
      * 
      * @param {Number} dx - Amount of panning in pixel
@@ -401,27 +394,6 @@ class Scrollbar {
             "x": dx * multiplicator
         };
         this.#visualisation.moveVisualisationTo(position);
-    }
-
-    /**
-     * React on click on "left" button Pan left by one pixel
-     */
-    #panLeft() {
-        this.#panHorizontal(-1);
-    }
-
-    /**
-     * React on click on "right" button Pan right by one pixel
-     */
-    #panRight() {
-        this.#panHorizontal(1);
-    }
-
-    /**
-     * React on click on "up" button Pan up by one pixel
-     */
-    #panUp() {
-        this.#panVertical(-1);
     }
 
     /**

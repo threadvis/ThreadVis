@@ -42,7 +42,7 @@ class Timeline {
      * XUL stack to draw timeline on
      */
     #stack;
-    
+
     /**
      * current thread
      */
@@ -52,7 +52,7 @@ class Timeline {
      * resize multiplicator
      */
     #resize;
-    
+
     /**
      * top position of center of visualisation in px
      */
@@ -62,7 +62,7 @@ class Timeline {
      * cache timing info for containers
      */
     #times = {};
-    
+
     /**
      * Constructor for timeline class
      * 
@@ -104,7 +104,7 @@ class Timeline {
             const formatted = formatTimeDifference(timeDifference);
 
             // draw the labels and tooltips
-            this.#drawTime(first.id, first.x, second.x, formatted.string, formatted.toolTip);    
+            this.#drawTime(first.id, first.x, second.x, formatted.string, formatted.toolTip);
         }
     }
 
@@ -170,11 +170,13 @@ class Timeline {
 
     /**
      * Re-Draw the timeline
-     * 
+     *
+     * @param {ThreadVis.Thread} thread - The current thread
      * @param {Number} resize - The resize parameter
      * @param {Number} top - The top position
      */
-    redraw(resize, top) {
+    redraw(thread, resize, top) {
+        this.#thread = thread;
         this.#resize = resize;
         this.#top = top;
         this.draw();

@@ -164,7 +164,7 @@ class ArcVisualisation {
 
     /**
      * Re-Draw arc
-     * 
+     *
      * @param {Number} resize - The resize parameter
      * @param {Number} left - The left position
      * @param {Number} right - The right position

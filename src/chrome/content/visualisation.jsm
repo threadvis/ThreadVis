@@ -352,7 +352,7 @@ class Visualisation {
         this.#stack.appendChild(link);
 
         // check to move warning all the way to the right
-        this.#moveVisualisationTo({
+        this.moveVisualisationTo({
             x: this.#boxSize.width - this.#stackSize.width
         });
 
@@ -612,7 +612,7 @@ class Visualisation {
             newMargin = (-container.x + (prefSpacing / 2)) * this.#resize;
         }
 
-        this.#moveVisualisationTo({
+        this.moveVisualisationTo({
             x: newMargin
         });
     }
@@ -624,7 +624,7 @@ class Visualisation {
      *          .x: the x-position
      *          .y: the y-position
      */
-    #moveVisualisationTo(position) {
+    moveVisualisationTo(position) {
         if (typeof (position.x) !== "undefined") {
             this.#stack.style.left = `${position.x}px`;
         }
@@ -734,7 +734,7 @@ class Visualisation {
                 position.y = dy;
             }
 
-            this.#moveVisualisationTo(position);
+            this.moveVisualisationTo(position);
 
             this.#scrollbar?.draw();
         }
@@ -873,7 +873,7 @@ class Visualisation {
         const availableSize = this.#boxSize;
         const width = availableSize.width * this.#zoom;
         const height = availableSize.height * this.#zoom;
-        const positionedThread = thread.getPositioned(width, height);
+        const positionedThread = thread.getPositioned(width);
 
         const thisTopHeight = prefDotSize / 2 + prefArcMinHeight + positionedThread.topHeight * prefArcDifference;
 
@@ -954,7 +954,7 @@ class Visualisation {
                 if (!keepExisting) {
                     this.#arcVisualisations[container.id] = this.#drawArc(colour, position, arcHeight, container.parent.x, container.x, thisTopHeight, opacity);
                 } else {
-                    this.#arcVisualisations[container.id].redraw(this.#resize, container.parent.xPosition, container.x, thisTopHeight, colour, opacity);
+                    this.#arcVisualisations[container.id].redraw(this.#resize, container.parent.x, container.x, thisTopHeight, colour, opacity);
                 }
             }
         });
@@ -973,7 +973,7 @@ class Visualisation {
                 this.#timeline = new Timeline(this.#document, this.#stack, positionedThread, this.#resize, thisTopHeight);
                 this.#timeline.draw();
             } else if (this.#timeline) {
-                this.#timeline.redraw(this.#resize, thisTopHeight);
+                this.#timeline.redraw(positionedThread, this.#resize, thisTopHeight);
             }
         } else {
             this.#timeline = undefined;
@@ -991,14 +991,14 @@ class Visualisation {
         if (this.#stack.clientHeight <= availableSize.height) {
             deltaY = Math.max(deltaY, 0);
         }
-        this.#moveVisualisationTo({
+        this.moveVisualisationTo({
             y: deltaY
         });
 
         // right align the visualisation
         const deltaX = availableSize.width - positionedThread.maxX - (prefDotSize + prefSpacing / 2) * this.#resize;
         if (deltaX > 0) {
-            this.#moveVisualisationTo({
+            this.moveVisualisationTo({
                 x: deltaX
             });
         }
@@ -1087,7 +1087,7 @@ class Visualisation {
         const width = prefWidth;
         const height = prefHeight;
 
-        const positionedThread = thread.getPositioned(width, height);
+        const positionedThread = thread.getPositioned(width);
 
         const thisTopHeight = prefDotSize / 2 + prefArcMinHeight + positionedThread.topHeight * prefArcDifference;
 

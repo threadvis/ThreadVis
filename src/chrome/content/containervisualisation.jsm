@@ -110,11 +110,6 @@ class ContainerVisualisation {
     #messageCircles;
 
     /**
-     * DOM element to handle the context popup
-     */
-    #popup;
-
-    /**
      * Style of container (default === full)
      */
     #style = "full";
@@ -497,14 +492,5 @@ class ContainerVisualisation {
             this.#dot.style.MozBorderRadius = "";
         }
         this.#dot.style.cursor = "default";
-    }
-
-    /**
-     * x position of this container
-     *
-     * @returns {Number} pixel offset
-     */
-    get xPosition() {
-        return this.#left;
     }
 }

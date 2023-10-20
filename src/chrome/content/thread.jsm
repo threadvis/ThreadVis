@@ -75,8 +75,8 @@ class Thread {
         return this.#authors;
     }
 
-    getPositioned(width, height) {
-        return new PositionedThread(this.#containers, this.#selectedContainer, this.#authors, width, height);
+    getPositioned(width) {
+        return new PositionedThread(this.#containers, this.#selectedContainer, this.#authors, width);
     }
 
     #populateAuthors() {

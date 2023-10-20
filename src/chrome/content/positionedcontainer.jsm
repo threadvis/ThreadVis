@@ -41,11 +41,6 @@ class PositionedContainer {
     #parent;
 
     /**
-     * Position of the container
-     */
-    #index = 0;
-
-    /**
      * True if this container is currently selected (focused)
      */
     #selected = false;
@@ -91,10 +86,9 @@ class PositionedContainer {
      * @param {Boolean} inThread - true if this container is in the parent/child chain of the selected container
      * @return A new positioned container
      */
-    constructor(container, index, author, selected, inThread) {
+    constructor(container, author, selected, inThread) {
         Object.seal(this);
         this.#container = container;
-        this.#index = index;
         this.#author = author;
         this.#selected = selected;
         this.#inThread = inThread;
