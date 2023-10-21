@@ -502,10 +502,23 @@ class Visualisation {
      *          .width - The width of the stack
      */
     get #stackSize() {
-        return {
-            height: this.#stack.getBoundingClientRect().height,
-            width: this.#stack.getBoundingClientRect().width
-        };
+        // loop over all elements, calculate max in each direction
+        const {
+            left: stackLeft,
+            top: stackTop
+        } = this.#stack.getBoundingClientRect();
+        return Array.from(this.#stack.querySelectorAll("*")).reduce(({width, height}, element) => {
+            const {
+                left: elementLeft,
+                top: elementTop,
+                width: elementWidth,
+                height: elementHeight
+            } = element.getBoundingClientRect();
+            return {
+                width: Math.max(width, elementLeft + elementWidth - stackLeft),
+                height: Math.max(height, elementTop + elementHeight - stackTop)
+            };
+        }, { width: 0, height: 0});
     }
 
     /**
@@ -698,10 +711,6 @@ class Visualisation {
             this.#panning.start.y = y;
 
             // set mininum dx to a little less than available to prevent overpanning
-            //const minDx = Math.min(this.boxWidth - this.stackWidth, 0);
-            //const minDy = Math.min(this.boxHeight - this.stackHeight, 0);
-            //const minDx = Math.min(this.#box.clientWidth - this.#stack.scrollWidth, 0);
-            //const minDy = Math.min(this.#box.clientHeight - this.#stack.scrollHeight, 0);
             const minDx = Math.min(this.#panning.box.width - this.#panning.stack.width, 0);
             const minDy = Math.min(this.#panning.box.height - this.#panning.stack.height, 0);
 
@@ -984,11 +993,14 @@ class Visualisation {
         }
 
         // vertically center the visualisation
+        // - if visualisation height < available height, try to center as much as possible,
+        //   but don't move any arcs outside of viewport, even if centerline is not centered
+        // - if visualisation height > available height, center
         const centerY = availableSize.height / 2;
         const nowY = thisTopHeight * this.#resize;
         let deltaY = centerY - nowY;
         // check if visualisation fits into height, if so, don't move into negative
-        if (this.#stack.clientHeight <= availableSize.height) {
+        if (this.#stackSize.height <= availableSize.height) {
             deltaY = Math.max(deltaY, 0);
         }
         this.moveVisualisationTo({
