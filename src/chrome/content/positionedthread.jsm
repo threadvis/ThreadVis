@@ -134,8 +134,9 @@ class PositionedThread {
                 container.timeDifference = timeDifference;
 
                 // since we could have dummy containers that have the same time as
-                // the next message, skip any time difference of 0
-                if (timeDifference < this.#minimalTimeDifference && timeDifference !== 0) {
+                // the next message, or malformed threads where the answer is _before_ the parent,
+                // skip any time difference <= 0
+                if (timeDifference < this.#minimalTimeDifference && timeDifference > 0) {
                     this.#minimalTimeDifference = timeDifference;
                 }
             }
@@ -209,7 +210,7 @@ class PositionedThread {
         let totalTimeScale = 0;
         this.#containers.forEach((container) => {
             let xScaling = 1;
-            if (container.timeDifference !== 0) {
+            if (container.timeDifference > 0) {
                 xScaling = container.timeDifference / minimalTimeDifference;
                 // instead of linear scaling, we might use other scaling factor
                 if (prefTimescalingMethod === "log") {
