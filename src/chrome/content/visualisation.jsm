@@ -34,7 +34,6 @@ const { Preferences } = ChromeUtils.import("chrome://threadvis/content/utils/pre
 const { Scrollbar } = ChromeUtils.import("chrome://threadvis/content/scrollbar.jsm");
 const { Strings } = ChromeUtils.import("chrome://threadvis/content/utils/strings.jsm");
 const { Timeline } = ChromeUtils.import("chrome://threadvis/content/timeline.jsm");
-const { convertHSVtoRGB, convertRGBtoHSV} = ChromeUtils.import("chrome://threadvis/content/utils/color.jsm");
 const { extractEmailAddress } = ChromeUtils.import("chrome://threadvis/content/utils/emailparser.jsm");
 const { DECtoHEX, HEXtoDEC } = ChromeUtils.import("chrome://threadvis/content/utils/number.jsm");
 
@@ -56,7 +55,7 @@ class Visualisation {
     #document;
 
     /**
-     * Default colors
+     * Default colours
      */
     #COLOUR_DUMMY = "#75756D";
     #COLOUR_SINGLE = "#0000FF";
@@ -138,7 +137,7 @@ class Visualisation {
     #currentThread;
 
     /**
-     * Lastly chosen color offset
+     * Lastly chosen colour offset
      */
     #lastColour;
 
@@ -216,13 +215,13 @@ class Visualisation {
             }
 
             const author = authors[emailAddress];
-            let hsv = null;
+            let colour = null;
             if (author) {
-                hsv = author.hsv;
+                colour = author.colour;
             }
 
-            if (hsv && prefHighlight) {
-                field.style.borderBottom = `2px solid ${this.#getColour(hsv.hue, 100, hsv.value)}`;
+            if (colour && prefHighlight) {
+                field.style.borderBottom = `2px solid ${colour}`;
             } else {
                 field.style.borderBottom = null;
             }
@@ -245,8 +244,8 @@ class Visualisation {
         this.#legend = this.#document.createXULElement("vbox");
 
         for (let email in authors) {
-            const { hsv, name, count} = authors[email];
-            this.#legend.appendChild(this.#createLegendBox(hsv, name, count));
+            const { colour, name, count} = authors[email];
+            this.#legend.appendChild(this.#createLegendBox(colour, name, count));
         }
     }
 
@@ -257,16 +256,16 @@ class Visualisation {
     /**
      * Build one row for legend
      * 
-     * @param {Object} hsv - The colour in HSV colour model
+     * @param {Object} colour - The colour
      * @param {String} name - The name of the author
      * @param {Number} count - The message count for the author
      * @return {DOMElement} A legend box for a single author
      */
-    #createLegendBox(hsv, name, count) {
+    #createLegendBox(colour, name, count) {
         const box = this.#document.createXULElement("hbox");
 
         const colourBox = this.#document.createXULElement("hbox");
-        colourBox.style.background = this.#getColour(hsv.hue, 100, hsv.value);
+        colourBox.style.background = colour;
         colourBox.style.width = "20px";
         box.appendChild(colourBox);
 
@@ -522,26 +521,10 @@ class Visualisation {
     }
 
     /**
-     * Get a colour for the arc
-     * 
-     * @param {Number} hue - The colour hue
-     * @param {Number} saturation - The colour saturation
-     * @param {Number} value - The colour value
-     * @return {String} - A colour string in the form "#11AACC"
-     */
-    #getColour(hue, saturation, value) {
-        const rgb = convertHSVtoRGB(hue, saturation, value);
-
-        return "#" + DECtoHEX(Math.floor(rgb.r))
-                + DECtoHEX(Math.floor(rgb.g))
-                + DECtoHEX(Math.floor(rgb.b));
-    }
-
-    /**
      * Get a new colour for the dot/arc. Choose the next available colour
      * 
      * @param {Boolean} sent - True if the message was sent
-     * @return {Object} - The next available colour in HSV colour model
+     * @return {Object} - The next available colour
      */
     #getNewColour(sent) {
         // display sent emails always in the same colour
@@ -553,10 +536,7 @@ class Visualisation {
             this.#lastColour = (this.#lastColour + 1) % receivedColours.length;
             hex = receivedColours[this.#lastColour];
         }
-        return convertRGBtoHSV(
-            HEXtoDEC(hex.slice(1, 3)),
-            HEXtoDEC(hex.slice(3, 5)),
-            HEXtoDEC(hex.slice(5, 7)));
+        return hex;
     }
 
     /**
@@ -896,11 +876,6 @@ class Visualisation {
         positionedThread.containers.forEach((container) => {
             let colour = this.#COLOUR_DUMMY;
             let opacity = 1;
-            let hsv = {
-                "hue" : 60,
-                "saturation" : 6.8,
-                "value" : 45.9
-            };
             if (container.message) {
                 if (prefColour === "single") {
                     if (container.selected) {
@@ -909,13 +884,12 @@ class Visualisation {
                         colour = this.#COLOUR_DUMMY;
                     }
                 } else {
-                    if (container.author.hsv) {
-                        hsv = container.author.hsv;
+                    if (container.author.colour) {
+                        colour = container.author.colour;
                     } else {
-                        hsv = this.#getNewColour(container.isSent);
-                        container.author.hsv = hsv;
+                        colour = this.#getNewColour(container.isSent);
+                        container.author.colour = colour;
                     }
-                    colour = this.#getColour(hsv.hue, 100, hsv.value);
                     if (container.selected || container.inThread) {
                         opacity = 1;
                     } else {
@@ -949,14 +923,6 @@ class Visualisation {
                         colour = this.#COLOUR_SINGLE;
                     } else {
                         colour = this.#COLOUR_DUMMY;
-                    }
-                } else {
-                    // get colour for arc
-                    colour = this.#getColour(hsv.hue, 100, hsv.value);
-                    if (container.selected || container.inThread) {
-                        opacity = 1;
-                    } else {
-                        opacity = prefOpacity;
                     }
                 }
 
@@ -1113,11 +1079,6 @@ class Visualisation {
         positionedThread.containers.forEach((container) => {
             let colour = this.#COLOUR_DUMMY;
             let opacity = 1;
-            let hsv = {
-                "hue" : 60,
-                "saturation" : 6.8,
-                "value" : 45.9
-            };
             if (container.message) {
                 if (prefColour === "single") {
                     if (container.selected) {
@@ -1126,13 +1087,12 @@ class Visualisation {
                         colour = this.#COLOUR_DUMMY;
                     }
                 } else {
-                    if (container.author.hsv) {
-                        hsv = container.author.hsv;
+                    if (container.author.colour) {
+                        colour = container.author.colour;
                     } else {
-                        hsv = this.#getNewColour(container.isSent);
-                        container.author.hsv = hsv;
+                        colour = this.#getNewColour(container.isSent);
+                        container.author.colour = colour;
                     }
-                    colour = this.#getColour(hsv.hue, 100, hsv.value);
                     if (container.selected || container.inThread) {
                         opacity = 1;
                     } else {
@@ -1164,14 +1124,6 @@ class Visualisation {
                         colour = this.#COLOUR_SINGLE;
                     } else {
                         colour = this.#COLOUR_DUMMY;
-                    }
-                } else {
-                    // get colour for arc
-                    colour = this.#getColour(hsv.hue, 100, hsv.value);
-                    if (container.selected || container.inThread) {
-                        opacity = 1;
-                    } else {
-                        opacity = prefOpacity;
                     }
                 }
 

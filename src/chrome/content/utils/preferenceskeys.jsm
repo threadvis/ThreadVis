@@ -114,11 +114,11 @@ const PreferenceKeys = {
     VIS_COLOUR:
         PreferenceBranch + "visualisation.colour",
 
-    // background color
+    // background colour
     VIS_COLOURS_BACKGROUND:
         PreferenceBranch + "visualisation.colours.background",
 
-    // border color
+    // border colour
     VIS_COLOURS_BORDER:
         PreferenceBranch + "visualisation.colours.border",
 

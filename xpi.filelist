@@ -45,7 +45,6 @@ chrome/content/threadvispopup.xhtml
 chrome/content/timeline.jsm
 chrome/content/visualisation.jsm
 
-chrome/content/utils/color.jsm
 chrome/content/utils/date.jsm
 chrome/content/utils/emailparser.jsm
 chrome/content/utils/number.jsm
