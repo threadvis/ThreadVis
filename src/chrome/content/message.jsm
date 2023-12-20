@@ -28,7 +28,6 @@
 
 const EXPORTED_SYMBOLS = [ "Message" ];
 
-const { Logger } = ChromeUtils.import("chrome://threadvis/content/utils/logger.jsm");
 const { Preferences } = ChromeUtils.import("chrome://threadvis/content/utils/preferences.jsm");
 const { References } = ChromeUtils.import("chrome://threadvis/content/utils/references.jsm");
 const { SentMailIdentities } = ChromeUtils.import("chrome://threadvis/content/utils/sentmailidentities.jsm");
@@ -172,10 +171,7 @@ class Message {
      */
     get msgDbHdr() {
         if (!this.#glodaMessage.folderMessage) {
-            Logger.error(
-                "Cache",
-                "Unable to find nsIMsgDBHdr for message " + this.id + ", probably in folder " + this.folder
-                    + ". Either the message database (msf) for this folder is corrupt, or the global index is out-of-date.");
+            console.error(`ThreadVis: Unable to find nsIMsgDBHdr for message ${this.id}, probably in folder ${this.folder}. Either the message database (msf) for this folder is corrupt, or the global index is out-of-date.`);
         }
         return this.#glodaMessage.folderMessage;
     }

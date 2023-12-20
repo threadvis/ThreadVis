@@ -30,7 +30,6 @@ const EXPORTED_SYMBOLS = [ "ThreadVis" ];
 
 const { MailUtils } = ChromeUtils.import("resource:///modules/MailUtils.jsm");
 
-const { Logger } = ChromeUtils.import("chrome://threadvis/content/utils/logger.jsm");
 const { Preferences } = ChromeUtils.import("chrome://threadvis/content/utils/preferences.jsm");
 const { Strings } = ChromeUtils.import("chrome://threadvis/content/utils/strings.jsm");
 const { Threader } = ChromeUtils.import("chrome://threadvis/content/utils/threader.jsm");
@@ -574,7 +573,7 @@ class ThreadVis {
             const thread = await Threader.get(message);
             this.visualise(thread);
         } catch(error) {
-            Logger.error("visualise", error);
+            console.error("ThreadVis.visualise", error);
             // - message id not found, or
             // - container with id was dummy
             // this means the message was not indexed

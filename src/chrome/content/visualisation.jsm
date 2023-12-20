@@ -1074,7 +1074,6 @@ class Visualisation {
      * @param {Boolean} force - True to force the display even if the thread contains too many messages
      */
     exportToSVG(thread, force) {
-        console.log("xport to svg", thread, force);
         if (typeof force === "undefined") {
             force = false;
         }

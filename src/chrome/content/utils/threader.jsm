@@ -33,7 +33,6 @@
 const EXPORTED_SYMBOLS = [ "Threader" ];
 
 const { Container } = ChromeUtils.import("chrome://threadvis/content/container.jsm");
-const { Logger } = ChromeUtils.import("chrome://threadvis/content/utils/logger.jsm");
 const { Message } = ChromeUtils.import("chrome://threadvis/content/message.jsm");
 const { Thread } = ChromeUtils.import("chrome://threadvis/content/thread.jsm");
 
@@ -46,7 +45,7 @@ const { Gloda } = ChromeUtils.import("resource:///modules/gloda/Gloda.jsm");
  * @return {ThreadVis.Container} - a thread of containers
  */
 const get = async (messageHeader) => {
-    // convert message header to gloda messag{}
+    // convert message header to gloda message
     const message = await getGlodaMessage(messageHeader);
     // get gloda thread
     const glodaThread = await getGlodaThread(message);
@@ -119,8 +118,7 @@ const getGlodaThread = (message) => {
  */
 const createMessage = (glodaMessage) => {
     if (!glodaMessage.folderMessage) {
-        Logger.error("Cache",
-            `Could not find "real" message for gloda message with msg-id "${glodaMessage.headerMessageID}" in folder "${glodaMessage.folderURI}"`);
+        console.error(`ThreadVis: Could not find "real" message for gloda message with msg-id "${glodaMessage.headerMessageID}" in folder "${glodaMessage.folderURI}"`);
     }
 
     return new Message(glodaMessage);
