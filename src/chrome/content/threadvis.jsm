@@ -257,7 +257,7 @@ class ThreadVis {
         const server = folder.server;
         const account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
             .getService(Components.interfaces.nsIMsgAccountManager))
-            .FindAccountForServer(server);
+            .findAccountForServer(server);
 
         if (Preferences.get(Preferences.DISABLED_ACCOUNTS) !== ""
                 && Preferences.get(Preferences.DISABLED_ACCOUNTS).indexOf(" " + account.key + " ") > -1) {
@@ -783,7 +783,7 @@ class ThreadVis {
             const server = folder.server;
             const account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
                 .getService(Components.interfaces.nsIMsgAccountManager))
-                .FindAccountForServer(server);
+                .findAccountForServer(server);
 
             let accountSetting = Preferences.get(Preferences.DISABLED_ACCOUNTS);
 
@@ -804,10 +804,10 @@ class ThreadVis {
         // get folder of currently displayed message
         const folder = this.#currentThread.selected.message.msgDbHdr.folder;
         if (folder) {
-            let server = folder.server;
-            let account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
+            const server = folder.server;
+            const account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
                 .getService(Components.interfaces.nsIMsgAccountManager))
-                .FindAccountForServer(server);
+                .findAccountForServer(server);
 
             let accountSetting = Preferences.get(Preferences.DISABLED_ACCOUNTS);
 
