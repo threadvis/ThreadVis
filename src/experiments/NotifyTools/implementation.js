@@ -1,9 +1,11 @@
-/*
- * This file is provided by the addon-developer-support repository at
- * https://github.com/thundernest/addon-developer-support
+/* This file is provided by the addon-developer-support repository at
+ * https://github.com/thunderbird/addon-developer-support
  *
+ * Version 1.6
+ * - adjusted to TB128 (no longer loading Services and ExtensionCommon)
+ * 
  * Version 1.5
- * - adjusted to Thunderbird Supernova (Services is now in globalThis)
+ * - adjusted to TB115 (Services is now in globalThis)
  *
  * Version 1.4
  *  - updated implementation to not assign this anymore
@@ -14,7 +16,7 @@
  * Version 1.1
  *  - added startup event, to make sure API is ready as soon as the add-on is starting
  *    NOTE: This requires to add the startup event to the manifest, see:
- *    https://github.com/thundernest/addon-developer-support/tree/master/auxiliary-apis/NotifyTools#usage
+ *    https://github.com/thunderbird/addon-developer-support/tree/master/auxiliary-apis/NotifyTools#usage
  *
  * Author: John Bieling (john@thunderbird.net)
  *
@@ -23,15 +25,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+/* global Services, ExtensionCommon */
+
 "use strict";
 
 (function (exports) {
-
-  // Get various parts of the WebExtension framework that we need.
-  var { ExtensionCommon } = ChromeUtils.import("resource://gre/modules/ExtensionCommon.jsm");
-  var Services = globalThis.Services || 
-    ChromeUtils.import("resource://gre/modules/Services.jsm").Services;
-
   var observerTracker = new Set();
 
   class NotifyTools extends ExtensionCommon.ExtensionAPI {

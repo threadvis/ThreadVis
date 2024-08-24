@@ -3,13 +3,16 @@ var ADDON_ID = "";
 
 /*
  * This file is provided by the addon-developer-support repository at
- * https://github.com/thundernest/addon-developer-support
+ * https://github.com/thunderbird/addon-developer-support
  *
  * For usage descriptions, please check:
- * https://github.com/thundernest/addon-developer-support/tree/master/scripts/notifyTools
+ * https://github.com/thunderbird/addon-developer-support/tree/master/scripts/notifyTools
  *
+ * Version 1.7
+ * - adjusted to TB128 (no longer loading Services)
+ * 
  * Version 1.6
- * - adjusted to Thunderbird Supernova (Services is now in globalThis)
+ * - adjusted to Thunderbird 115 (Services is now in globalThis)
  *
  * Version 1.5
  * - deprecate enable(), disable() and registerListener()
@@ -28,9 +31,6 @@ var ADDON_ID = "";
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-
-var Services = globalThis.Services || 
-  ChromeUtils.import("resource://gre/modules/Services.jsm").Services;
 
 var notifyTools = {
   registeredCallbacks: {},
