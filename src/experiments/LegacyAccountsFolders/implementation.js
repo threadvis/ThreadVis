@@ -26,7 +26,7 @@
  * Give access to accounts/folders (folder.folderURL is not available via WebExtension)
  **********************************************************************************************************************/
 
-var { ExtensionCommon } = ChromeUtils.import("resource://gre/modules/ExtensionCommon.jsm");
+var { ExtensionCommon } = ChromeUtils.importESModule("resource://gre/modules/ExtensionCommon.sys.mjs");
 
 var LegacyAccountsFolders = class extends ExtensionCommon.ExtensionAPI {
     onStartup() {}

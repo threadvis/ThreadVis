@@ -26,7 +26,7 @@
  * Wrappers for email (header) parsers
  **********************************************************************************************************************/
 
-const { MailServices } = ChromeUtils.import("resource:///modules/MailServices.jsm");
+const { MailServices } = ChromeUtils.importESModule("resource:///modules/MailServices.sys.mjs");
 
 const EXPORTED_SYMBOLS = [ "extractEmailAddress" ];
 

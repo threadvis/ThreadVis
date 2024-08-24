@@ -26,7 +26,7 @@
  * Register experiment to access preferences in options.js
  **********************************************************************************************************************/
 
-var { ExtensionCommon } = ChromeUtils.import("resource://gre/modules/ExtensionCommon.jsm");
+var { ExtensionCommon } = ChromeUtils.importESModule("resource://gre/modules/ExtensionCommon.sys.mjs");
 
 var { Preferences } = ChromeUtils.import("chrome://threadvis/content/utils/preferences.jsm");
 

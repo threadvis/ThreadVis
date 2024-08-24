@@ -31,7 +31,7 @@ const Services = globalThis.Services;
 const { Preferences } = ChromeUtils.import("chrome://threadvis/content/utils/preferences.jsm");
 const { ThreadVis } = ChromeUtils.import("chrome://threadvis/content/threadvis.jsm");
 
-const { ExtensionParent } = ChromeUtils.import("resource://gre/modules/ExtensionParent.jsm");
+const { ExtensionParent } = ChromeUtils.importESModule("resource://gre/modules/ExtensionParent.sys.mjs");
 
 const notify = {};
 const extension = ExtensionParent.GlobalManager.getExtension(ThreadVis.ADD_ON_ID);

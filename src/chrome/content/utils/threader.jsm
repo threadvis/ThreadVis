@@ -36,7 +36,7 @@ const { Container } = ChromeUtils.import("chrome://threadvis/content/container.j
 const { Message } = ChromeUtils.import("chrome://threadvis/content/message.jsm");
 const { Thread } = ChromeUtils.import("chrome://threadvis/content/thread.jsm");
 
-const { Gloda } = ChromeUtils.import("resource:///modules/gloda/Gloda.jsm");
+const { Gloda } = ChromeUtils.importESModule("resource:///modules/gloda/Gloda.sys.mjs");
 
 /**
  * Return a threaded view for the given message header

@@ -28,7 +28,7 @@
 
 const EXPORTED_SYMBOLS = [ "ThreadVis" ];
 
-const { MailUtils } = ChromeUtils.import("resource:///modules/MailUtils.jsm");
+const { MailUtils } = ChromeUtils.importESModule("resource:///modules/MailUtils.sys.mjs");
 
 const { Preferences } = ChromeUtils.import("chrome://threadvis/content/utils/preferences.jsm");
 const { Strings } = ChromeUtils.import("chrome://threadvis/content/utils/strings.jsm");
