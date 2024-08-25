@@ -7,7 +7,7 @@ For details see the add-on's homepage at <https://threadvis.github.io>.
 
 ---
 Copyright &copy; 2005-2007 Alexander C. Hubmann
-Copyright &copy; 2007-2023 Alexander C. Hubmann-Haidvogel
+Copyright &copy; 2007-2024 Alexander C. Hubmann-Haidvogel
 
 ThreadVis started as part of Alexander C. Hubmann-Haidvogel's Master's Thesis titled [*ThreadVis for Thunderbird: A Thread Visualisation Extension for the Mozilla Thunderbird Email Client*](https://ftp.isds.tugraz.at/pub/theses/ahubmann.pdf) at Graz University of Technology, Austria.
 
