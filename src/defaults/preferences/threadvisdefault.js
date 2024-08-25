@@ -28,6 +28,7 @@
 
 pref("extensions.threadvis.disabledaccounts", "");
 pref("extensions.threadvis.disabledfolders", "");
+pref("extensions.threadvis.statusbar.enabled", true);
 pref("extensions.threadvis.timeline.enabled", true);
 pref("extensions.threadvis.timeline.fontsize", 9);
 pref("extensions.threadvis.timescaling.enabled", true);
