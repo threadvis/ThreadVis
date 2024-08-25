@@ -26,18 +26,15 @@
  * JavaScript file to visualise message relationships (threads).
  **********************************************************************************************************************/
 
-const EXPORTED_SYMBOLS = [ "Visualisation" ];
+import { ArcVisualisation } from "./arcvisualisation.mjs";
+import { ContainerVisualisation } from "./containervisualisation.mjs";
+import { Preferences } from "./utils/preferences.mjs";
+import { Scrollbar } from "./scrollbar.mjs";
+import { Strings } from "./utils/strings.mjs";
+import { Timeline } from "./timeline.mjs";
+import { extractEmailAddress } from "./utils/emailparser.mjs";
 
-const { ArcVisualisation } = ChromeUtils.import("chrome://threadvis/content/arcvisualisation.jsm");
-const { ContainerVisualisation } = ChromeUtils.import("chrome://threadvis/content/containervisualisation.jsm");
-const { Preferences } = ChromeUtils.import("chrome://threadvis/content/utils/preferences.jsm");
-const { Scrollbar } = ChromeUtils.import("chrome://threadvis/content/scrollbar.jsm");
-const { Strings } = ChromeUtils.import("chrome://threadvis/content/utils/strings.jsm");
-const { Timeline } = ChromeUtils.import("chrome://threadvis/content/timeline.jsm");
-const { extractEmailAddress } = ChromeUtils.import("chrome://threadvis/content/utils/emailparser.jsm");
-const { DECtoHEX, HEXtoDEC } = ChromeUtils.import("chrome://threadvis/content/utils/number.jsm");
-
-class Visualisation {
+export class Visualisation {
 
     /**
      * main ThreadVis object

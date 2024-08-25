@@ -23,43 +23,26 @@
  *
  * Version: $Id$
  * *********************************************************************************************************************
- * Split message ids in header field "references" and return all referenced message ids in an array.
+ * Number utilities
  **********************************************************************************************************************/
 
-const EXPORTED_SYMBOLS = [ "References" ];
-
-const References = {
-    /**
-     * Build references array
-     * 
-     * @param references - The references string
-     * @return {Array} - an array of all referenced mssage ids
-     */
-    get(references) {
-        if (references) {
-            const result = references.match(/[^<>\s]+/g);
-
-            const dupes = {};
-            const distinct = [];
-
-            // result can be null if no matches have been found
-            if (result) {
-                for (let i = result.length - 1; i >= 0; i--) {
-                    // TODO
-                    // email from user: some mail servers seem to change the message id after the @ sign
-                    // add switch to ignore mail host after @ (setting in preferences)
-                    const msgid = result[i];
-                    if (dupes[msgid]) {
-                        continue;
-                    }
-                    dupes[msgid] = msgid;
-                    distinct.push(msgid);
-                }
-            }
-            distinct.reverse();
-            return distinct;
-        } else {
-            return [];
-        }
-    }
+/**
+ * Get hexadecimal representation of a decimal number
+ * 
+ * @param {Integer} dec - The decimal value of the number
+ * @return {String} - The hexadecimal string representing the colour
+ */
+export const DECtoHEX = (dec) => {
+    const alpha = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F" ];
+    const n_ = Math.floor(dec / 16);
+    const _n = dec - n_ * 16;
+    return alpha[n_] + alpha[_n];
 };
+
+/**
+ * Get decimal representation of a hexadecimal number
+ * 
+ * @param {String} hex - The hexadecimal value of the number
+ * @return {Integer} - The decimal value of the number
+ */
+export const HEXtoDEC = (hex) => parseInt(hex, 16);

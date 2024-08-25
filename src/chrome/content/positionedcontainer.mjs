@@ -26,9 +26,7 @@
  * Wraps a {Container} to make it positioned
  **********************************************************************************************************************/
 
-const EXPORTED_SYMBOLS = [ "PositionedContainer" ];
-
-class PositionedContainer {
+export class PositionedContainer {
 
     /**
      * The wrapped {Container}

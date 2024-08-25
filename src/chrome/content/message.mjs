@@ -26,13 +26,11 @@
  * Wrap email message
  **********************************************************************************************************************/
 
-const EXPORTED_SYMBOLS = [ "Message" ];
+import { Preferences } from "./utils/preferences.mjs";
+import { References } from "./utils/references.mjs";
+import { SentMailIdentities }  from "./utils/sentmailidentities.mjs";
 
-const { Preferences } = ChromeUtils.import("chrome://threadvis/content/utils/preferences.jsm");
-const { References } = ChromeUtils.import("chrome://threadvis/content/utils/references.jsm");
-const { SentMailIdentities } = ChromeUtils.import("chrome://threadvis/content/utils/sentmailidentities.jsm");
-
-class Message {
+export class Message {
     /**
      * {GlodaMessage} object
      */

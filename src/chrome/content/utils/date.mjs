@@ -26,9 +26,7 @@
  * Various utility classes
  **********************************************************************************************************************/
 
-const EXPORTED_SYMBOLS = [ "formatTimeDifference", "formatDate" ];
-
-const { Strings } = ChromeUtils.import("chrome://threadvis/content/utils/strings.jsm");
+import { Strings }from "./strings.mjs";
 
 /**
  * Built-in date formatter service
@@ -47,7 +45,7 @@ const dateFormatter = new Intl.DateTimeFormat(undefined, {
  * @param {integer} timeDifference - The time difference to display
  * @return {Object} - The formatted time difference for label and tooltip
  */
-const formatTimeDifference = (timeDifference) => {
+export const formatTimeDifference = (timeDifference) => {
     // timedifference is in miliseconds
     timeDifference = timeDifference - (timeDifference % 1000);
     timeDifference = timeDifference / 1000;
@@ -123,4 +121,4 @@ const formatTimeDifference = (timeDifference) => {
  * @param {Date} date - The date
  * @return {String} - The formatted date
  */
-const formatDate = (date) => dateFormatter.format(date);
+export const formatDate = (date) => dateFormatter.format(date);

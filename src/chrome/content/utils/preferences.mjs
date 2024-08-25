@@ -26,13 +26,8 @@
  * JavaScript file to react to preference changing events
  **********************************************************************************************************************/
 
-const EXPORTED_SYMBOLS = [ "Preferences" ];
-
 // shared key strings for our preferences
-const { PreferenceKeys, PreferenceBranch } = ChromeUtils.import("chrome://threadvis/content/utils/preferenceskeys.jsm");
-
-// Services
-const Services = globalThis.Services;
+import { PreferenceKeys, PreferenceBranch } from "./preferenceskeys.mjs";
 
 const PREF_BOOL = Services.prefs.PREF_BOOL;
 const PREF_INT = Services.prefs.PREF_INT;
@@ -250,5 +245,5 @@ class PreferencesClass {
     }
 }
 
-const Preferences = Object.assign(new PreferencesClass(), PreferenceKeys);
+export const Preferences = Object.assign(new PreferencesClass(), PreferenceKeys);
 Object.seal(Preferences);

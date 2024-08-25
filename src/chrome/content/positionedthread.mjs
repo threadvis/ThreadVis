@@ -26,12 +26,10 @@
  * Wrap {Thread} to add chronological order and positions
  **********************************************************************************************************************/
 
-const EXPORTED_SYMBOLS = [ "PositionedThread" ];
+import { PositionedContainer } from "./positionedcontainer.mjs";
+import { Preferences } from "./utils/preferences.mjs";
 
-const { PositionedContainer } = ChromeUtils.import("chrome://threadvis/content/positionedcontainer.jsm");
-const { Preferences } = ChromeUtils.import("chrome://threadvis/content/utils/preferences.jsm");
-
-class PositionedThread {
+export class PositionedThread {
 
     /**
      * List of positioned containers

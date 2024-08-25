@@ -26,12 +26,10 @@
  * Draw the timeline.
  **********************************************************************************************************************/
 
-const EXPORTED_SYMBOLS = [ "Timeline" ];
+import { Preferences } from "./utils/preferences.mjs";
+import { formatTimeDifference } from "./utils/date.mjs";
 
-const { Preferences } = ChromeUtils.import("chrome://threadvis/content/utils/preferences.jsm");
-const { formatTimeDifference } = ChromeUtils.import("chrome://threadvis/content/utils/date.jsm");
-
-class Timeline {
+export class Timeline {
 
     /**
      * XUL/DOM document to draw in

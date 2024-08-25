@@ -26,14 +26,12 @@
  * Names of preferences
  **********************************************************************************************************************/
 
-const EXPORTED_SYMBOLS = [ "PreferenceBranch", "PreferenceKeys" ];
-
-const PreferenceBranch = "extensions.threadvis.";
+export const PreferenceBranch = "extensions.threadvis.";
 
 /**
  * Preference names
  */
-const PreferenceKeys = {
+export const PreferenceKeys = {
     // list of disabled accounts
     DISABLED_ACCOUNTS:
         PreferenceBranch + "disabledaccounts",

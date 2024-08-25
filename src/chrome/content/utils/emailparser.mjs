@@ -23,16 +23,24 @@
  *
  * Version: $Id$
  * *********************************************************************************************************************
- * Sent mail identities
+ * Wrappers for email (header) parsers
  **********************************************************************************************************************/
 
-const EXPORTED_SYMBOLS = [ "SentMailIdentities" ];
+const { MailServices } = ChromeUtils.importESModule("resource:///modules/MailServices.sys.mjs");
 
-const SentMailIdentities = {};
+/**
+ * Extract email address from a TO/FROM/CC/BCC line
+ *
+ * @param {String} anyEmailAddressFormat - The email header line as displayed in the UI
+ * @return {String} - The extracted email address
+ */
+export const extractEmailAddress = (anyEmailAddressFormat) => {
+    const parsedItems = MailServices.headerParser.parseEncodedHeader(anyEmailAddressFormat);
+    // due to missing quotes in the header display, the parser trips on things like
+    // Lastname, Firstname <firstname.lastname@domain.ending>
+    // as those would originally be quoted:
+    // "Lastname, Firstname" <firstname.lastname@domain.ending>
+    // for sake of simplicity, assume input is a single address and take _any_ extracted address
 
-// remember all local accounts, for sent-mail comparison
-const accountManager = Components.classes["@mozilla.org/messenger/account-manager;1"]
-    .getService(Components.interfaces.nsIMsgAccountManager);
-for (let identity in accountManager.allIdentities) {
-    SentMailIdentities[identity.email] = true;
-}
+    return parsedItems.map((item) => item.email).find((email) => email !== "");
+};

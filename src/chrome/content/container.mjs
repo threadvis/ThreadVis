@@ -26,9 +26,7 @@
  * Implements container for messages
  **********************************************************************************************************************/
 
-const EXPORTED_SYMBOLS = [ "Container" ];
-
-class Container {
+export class Container {
 
     /**
      * Unique id of the container

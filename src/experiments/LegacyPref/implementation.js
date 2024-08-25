@@ -28,7 +28,7 @@
 
 var { ExtensionCommon } = ChromeUtils.importESModule("resource://gre/modules/ExtensionCommon.sys.mjs");
 
-var { Preferences } = ChromeUtils.import("chrome://threadvis/content/utils/preferences.jsm");
+var { Preferences } = ChromeUtils.importESModule("chrome://threadvis/content/utils/preferences.mjs");
 
 var LegacyPref = class extends ExtensionCommon.ExtensionAPI {
     onStartup() {

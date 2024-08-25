@@ -23,28 +23,14 @@
  *
  * Version: $Id$
  * *********************************************************************************************************************
- * Number utilities
+ * Sent mail identities
  **********************************************************************************************************************/
 
-const EXPORTED_SYMBOLS = [ "DECtoHEX", "HEXtoDEC" ];
+export const SentMailIdentities = {};
 
-/**
- * Get hexadecimal representation of a decimal number
- * 
- * @param {Integer} dec - The decimal value of the number
- * @return {String} - The hexadecimal string representing the colour
- */
-const DECtoHEX = (dec) => {
-    const alpha = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F" ];
-    const n_ = Math.floor(dec / 16);
-    const _n = dec - n_ * 16;
-    return alpha[n_] + alpha[_n];
-};
-
-/**
- * Get decimal representation of a hexadecimal number
- * 
- * @param {String} hex - The hexadecimal value of the number
- * @return {Integer} - The decimal value of the number
- */
-const HEXtoDEC = (hex) => parseInt(hex, 16);
+// remember all local accounts, for sent-mail comparison
+const accountManager = Components.classes["@mozilla.org/messenger/account-manager;1"]
+    .getService(Components.interfaces.nsIMsgAccountManager);
+for (let identity in accountManager.allIdentities) {
+    SentMailIdentities[identity.email] = true;
+}

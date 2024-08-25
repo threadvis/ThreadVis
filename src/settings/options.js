@@ -26,6 +26,8 @@
  * JavaScript file for settings dialog
  **********************************************************************************************************************/
 
+import { PreferenceKeys } from "../chrome/content/utils/preferenceskeys.mjs";
+
 const getPref = async (pref) => 
     (await messenger.runtime.getBackgroundPage()).messenger.LegacyPref.get(pref);
 

@@ -26,9 +26,7 @@
  * Display a simple scrollbar. Don't use normal built-in scrollbars as they are way too large for the visualisation.
  **********************************************************************************************************************/
 
-const EXPORTED_SYMBOLS = [ "Scrollbar" ];
-
-class Scrollbar {
+export class Scrollbar {
 
     /**
      * visualisation object

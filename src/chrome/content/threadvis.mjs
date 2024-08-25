@@ -26,16 +26,14 @@
  * Main JavaScript file.
  **********************************************************************************************************************/
 
-const EXPORTED_SYMBOLS = [ "ThreadVis" ];
-
 const { MailUtils } = ChromeUtils.importESModule("resource:///modules/MailUtils.sys.mjs");
 
-const { Preferences } = ChromeUtils.import("chrome://threadvis/content/utils/preferences.jsm");
-const { Strings } = ChromeUtils.import("chrome://threadvis/content/utils/strings.jsm");
-const { Threader } = ChromeUtils.import("chrome://threadvis/content/utils/threader.jsm");
-const { Visualisation } = ChromeUtils.import("chrome://threadvis/content/visualisation.jsm");
+import { Preferences } from "./utils/preferences.mjs";
+import { Strings } from "./utils/strings.mjs";
+import { Threader } from "./utils/threader.mjs";
+import { Visualisation } from "./visualisation.mjs";
 
-class ThreadVis {
+export class ThreadVis {
 
     static ADD_ON_ID = "{A23E4120-431F-4753-AE53-5D028C42CFDC}";
 

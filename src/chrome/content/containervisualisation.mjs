@@ -26,13 +26,11 @@
  * JavaScript file to visualise message in threadvis
  **********************************************************************************************************************/
 
-const EXPORTED_SYMBOLS = [ "ContainerVisualisation" ];
+import { Preferences } from "./utils/preferences.mjs";
+import { Strings } from "./utils/strings.mjs";
+import { formatDate } from "./utils/date.mjs";
 
-const { Preferences } = ChromeUtils.import("chrome://threadvis/content/utils/preferences.jsm");
-const { Strings } = ChromeUtils.import("chrome://threadvis/content/utils/strings.jsm");
-const { formatDate } = ChromeUtils.import("chrome://threadvis/content/utils/date.jsm");
-
-class ContainerVisualisation {
+export class ContainerVisualisation {
 
     /**
      * Main object

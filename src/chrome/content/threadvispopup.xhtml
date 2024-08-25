@@ -37,9 +37,8 @@
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         xmlns:html="http://www.w3.org/1999/xhtml">
 
-    <script type="application/javascript"
-            src="chrome://threadvis/content/threadvis.jsm" />
-    <script type="application/javascript">
+    <script>
+        const { ThreadVis } = ChromeUtils.importESModule("chrome://threadvis/content/threadvis.mjs");
         // add visualisation at startup
         addEventListener("load", () => window.ThreadVis = new ThreadVis(window), false);
         addEventListener("resize", () => window.ThreadVis?.visualisation?.visualise?.());

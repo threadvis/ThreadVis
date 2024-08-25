@@ -26,11 +26,9 @@
  * JavaScript file to visualise message arc in threadvis
  **********************************************************************************************************************/
 
-const EXPORTED_SYMBOLS = [ "ArcVisualisation"];
+import { Preferences } from "./utils/preferences.mjs";
 
-const { Preferences } = ChromeUtils.import("chrome://threadvis/content/utils/preferences.jsm");
-
-class ArcVisualisation {
+export class ArcVisualisation {
     /**
      * XUL/DOM window to draw in
      */

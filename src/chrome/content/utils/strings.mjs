@@ -26,15 +26,12 @@
  * Implements strings proxy
  **********************************************************************************************************************/
 
-const EXPORTED_SYMBOLS = [ "Strings" ];
-
-const Services = globalThis.Services;
 const strings = Services.strings.createBundle("chrome://threadvis/locale/threadvis.properties");
 
 /**
  * Static strings object
  */
-const Strings = {
+export const Strings = {
     /**
      * Get localized string
      * 

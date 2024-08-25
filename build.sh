@@ -73,7 +73,7 @@ do
 done
 
 # update in all files
-for f in $(find build/ -name '*.js' -or -name '*.jsm' -or -name '*.xhtml' -or -name '*.css' -or -name '*.json')
+for f in $(find build/ -name '*.js' -or -name '*.mjs' -or -name '*.xhtml' -or -name '*.css' -or -name '*.json')
 do
     sed -i '' -e "s/[$]Id[$]/${versionstring}/g" $f
 done

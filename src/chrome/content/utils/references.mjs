@@ -23,26 +23,41 @@
  *
  * Version: $Id$
  * *********************************************************************************************************************
- * Wrappers for email (header) parsers
+ * Split message ids in header field "references" and return all referenced message ids in an array.
  **********************************************************************************************************************/
 
-const { MailServices } = ChromeUtils.importESModule("resource:///modules/MailServices.sys.mjs");
+export const References = {
+    /**
+     * Build references array
+     * 
+     * @param references - The references string
+     * @return {Array} - an array of all referenced mssage ids
+     */
+    get(references) {
+        if (references) {
+            const result = references.match(/[^<>\s]+/g);
 
-const EXPORTED_SYMBOLS = [ "extractEmailAddress" ];
+            const dupes = {};
+            const distinct = [];
 
-/**
- * Extract email address from a TO/FROM/CC/BCC line
- *
- * @param {String} anyEmailAddressFormat - The email header line as displayed in the UI
- * @return {String} - The extracted email address
- */
-const extractEmailAddress = (anyEmailAddressFormat) => {
-    const parsedItems = MailServices.headerParser.parseEncodedHeader(anyEmailAddressFormat);
-    // due to missing quotes in the header display, the parser trips on things like
-    // Lastname, Firstname <firstname.lastname@domain.ending>
-    // as those would originally be quoted:
-    // "Lastname, Firstname" <firstname.lastname@domain.ending>
-    // for sake of simplicity, assume input is a single address and take _any_ extracted address
-
-    return parsedItems.map((item) => item.email).find((email) => email !== "");
+            // result can be null if no matches have been found
+            if (result) {
+                for (let i = result.length - 1; i >= 0; i--) {
+                    // TODO
+                    // email from user: some mail servers seem to change the message id after the @ sign
+                    // add switch to ignore mail host after @ (setting in preferences)
+                    const msgid = result[i];
+                    if (dupes[msgid]) {
+                        continue;
+                    }
+                    dupes[msgid] = msgid;
+                    distinct.push(msgid);
+                }
+            }
+            distinct.reverse();
+            return distinct;
+        } else {
+            return [];
+        }
+    }
 };

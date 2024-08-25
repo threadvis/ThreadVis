@@ -26,10 +26,8 @@
  * JS file to load XUL to display ThreadVis extension and include all scripts.
  **********************************************************************************************************************/
 
-const Services = globalThis.Services;
-
-const { Preferences } = ChromeUtils.import("chrome://threadvis/content/utils/preferences.jsm");
-const { ThreadVis } = ChromeUtils.import("chrome://threadvis/content/threadvis.jsm");
+const { Preferences } = ChromeUtils.importESModule("chrome://threadvis/content/utils/preferences.mjs");
+const { ThreadVis } = ChromeUtils.importESModule("chrome://threadvis/content/threadvis.mjs");
 
 const { ExtensionParent } = ChromeUtils.importESModule("resource://gre/modules/ExtensionParent.sys.mjs");
 

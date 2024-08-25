@@ -30,11 +30,9 @@
  * www.jwz.org/doc/threading.html
  **********************************************************************************************************************/
 
-const EXPORTED_SYMBOLS = [ "Threader" ];
-
-const { Container } = ChromeUtils.import("chrome://threadvis/content/container.jsm");
-const { Message } = ChromeUtils.import("chrome://threadvis/content/message.jsm");
-const { Thread } = ChromeUtils.import("chrome://threadvis/content/thread.jsm");
+import { Container } from "../container.mjs";
+import { Message } from "../message.mjs";
+import { Thread } from "../thread.mjs";
 
 const { Gloda } = ChromeUtils.importESModule("resource:///modules/gloda/Gloda.sys.mjs");
 
@@ -213,6 +211,6 @@ const reduceMessages = (containers, message) => {
 };
 
 
-const Threader = {
+export const Threader = {
     get
 };

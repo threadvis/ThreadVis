@@ -26,11 +26,9 @@
  * Thread utilities
  **********************************************************************************************************************/
 
-const EXPORTED_SYMBOLS = [ "Thread" ];
+import { PositionedThread } from "./positionedthread.mjs";
 
-const { PositionedThread } = ChromeUtils.import("chrome://threadvis/content/positionedthread.jsm");
-
-class Thread {
+export class Thread {
 
     /**
      * List of containers
