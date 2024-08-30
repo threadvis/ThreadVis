@@ -1133,7 +1133,7 @@ export class Visualisation {
 
         const nsIFilePicker = Components.interfaces.nsIFilePicker;
         const fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
-        fp.init(this.#window, "Select a File", nsIFilePicker.modeSave);
+        fp.init(this.#window.browsingContext, "Select a File", nsIFilePicker.modeSave);
         fp.appendFilter("SVG Files", "*.svg");
         fp.defaultString = "threadvis";
         fp.defaultExtension = "svg";
