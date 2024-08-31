@@ -181,9 +181,11 @@ export class ThreadVis {
     }
 
     onEndHeaders() {
-        this.#setSelectedMessage(this.#window.gMessage, true);
-        // make sure we correctly underline recipients (as header is re-drawn)
-        this.#visualisation.recolourAuthors();
+        if (this.#window.gMessage) {
+            this.#setSelectedMessage(this.#window.gMessage, true);
+            // make sure we correctly underline recipients (as header is re-drawn)
+            this.#visualisation.recolourAuthors();
+        }
     }
 
     get window() {
