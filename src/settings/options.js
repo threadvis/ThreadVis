@@ -39,8 +39,10 @@ const getAccounts = async () =>
 
 const querySelector = (name, value) => `[name="${name}"]` + (value ? `[value="${value}"]` : "");
 
+const prefDisabled = (pref, value) => pref !== "" && pref.indexOf(" " + value + " ") > -1;
+
 const init = async () => {
-    [
+    await Promise.all([
         { key: PreferenceKeys.TIMESCALING, type: "bool"},
         { key: PreferenceKeys.TIMESCALING_METHOD, type: "string"},
         { key: PreferenceKeys.VIS_MESSAGE_CIRCLES, type: "bool"},
@@ -65,7 +67,7 @@ const init = async () => {
         { key: PreferenceKeys.STATUSBAR, type: "bool"},
         { key: PreferenceKeys.DISABLED_ACCOUNTS, type: "string"},
         { key: PreferenceKeys.DISABLED_FOLDERS, type: "string"}
-    ].forEach((pref) => {
+    ].map((pref) =>
         getPref(pref.key).then((value) => {
             const elems = document.querySelectorAll(querySelector(pref.key));
             if (elems.length === 1) {
@@ -96,8 +98,8 @@ const init = async () => {
                     });
                 });
             }
-        });
-    });
+        })
+    ));
 
     // build account list
     await buildAccountList();
@@ -124,7 +126,8 @@ const buildAccountList = async () => {
                 box.disabled = ! this.checked;
             });
         });
-        if (pref !== "" && pref.indexOf(" " + account.key + " ") > -1) {
+        const accountDisabled = prefDisabled(pref, account.id);
+        if (accountDisabled) {
             checkbox.checked = false;
         } else {
             checkbox.checked = true;
@@ -158,7 +161,7 @@ const buildAccountList = async () => {
         hbox.appendChild(buttonNone);
         accountBox.appendChild(hbox);
 
-        buildFolderCheckboxes(accountBox, account.folders, account.id, 1);
+        buildFolderCheckboxes(accountBox, account.folders, account.id, accountDisabled, 1);
     });
 };
 
@@ -168,9 +171,10 @@ const buildAccountList = async () => {
  * @param {DOMElement} box - The box to which to add the checkbox elements to
  * @param {Array} folders - All folders for which to create checkboxes
  * @param {Account} account - The account for which the checkboxes are created
+ * @param {Boolean} disabled - The account is disabled, so disable all checkboxes
  * @param {Number} indent - The amount of indentation
  */
-const buildFolderCheckboxes = (box, folders, account, indent) => {
+const buildFolderCheckboxes = (box, folders, account, disabled, indent) => {
     const pref = document.getElementById("ThreadVisHiddenDisabledFolders").value;
 
     folders.forEach((folder) => {
@@ -185,10 +189,13 @@ const buildFolderCheckboxes = (box, folders, account, indent) => {
             buildFolderPreference();
         });
         div.style.paddingLeft = indent + "em";
-        if (pref !== "" && pref.indexOf(folder.url + " ") > -1) {
+        if (prefDisabled(pref, folder.url)) {
             checkbox.checked = false;
         } else {
             checkbox.checked = true;
+        }
+        if (disabled) {
+            checkbox.disabled = true;
         }
         const label = document.createElement("label");
         label.setAttribute("for", "ThreadVis-Account-" + account + "-Folder-" + folder.url);
@@ -199,7 +206,7 @@ const buildFolderCheckboxes = (box, folders, account, indent) => {
 
         // descend into subfolders
         if (folder.folders) {
-            buildFolderCheckboxes(box, folder.folders, account, indent + 1);
+            buildFolderCheckboxes(box, folder.folders, account, disabled, indent + 1);
         }
     });
 };

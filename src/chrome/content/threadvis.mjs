@@ -278,7 +278,7 @@ export class ThreadVis {
         }
 
         if (Preferences.get(Preferences.DISABLED_FOLDERS) !== ""
-                && Preferences.get(Preferences.DISABLED_FOLDERS).indexOf(" " + folder.URI + " ") > -1) {
+                && Preferences.get(Preferences.DISABLED_FOLDERS).indexOf(" " + folder.folderURL + " ") > -1) {
             return false;
         }
         return true;
@@ -745,7 +745,7 @@ export class ThreadVis {
         if (folder) {
             let folderSetting = Preferences.get(Preferences.DISABLED_FOLDERS);
 
-            folderSetting = folderSetting + " " + folder.URI + " ";
+            folderSetting = folderSetting + " " + folder.folderURL + " ";
 
             Preferences.set(
                 Preferences.DISABLED_FOLDERS,
@@ -763,8 +763,8 @@ export class ThreadVis {
         if (folder) {
             let folderSetting = Preferences.get(Preferences.DISABLED_FOLDERS);
 
-            const index = folderSetting.indexOf(" " + folder.URI + " ");
-            folderSetting = folderSetting.substring(0, index) + folderSetting.substring(index + folder.URI.length + 2);
+            const index = folderSetting.indexOf(" " + folder.folderURL + " ");
+            folderSetting = folderSetting.substring(0, index) + folderSetting.substring(index + folder.folderURL.length + 2);
 
             Preferences.set(
                 Preferences.DISABLED_FOLDERS,
