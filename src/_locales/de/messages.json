@@ -84,7 +84,7 @@
         "message": "Wenn Time Scaling aktiviert ist, ist der horizontale Abstand zwischen benachbarten Nachrichten proportional zum zeitlichen Abstand dieser Nachrichten."
     },
     "options.visualisation.timescaling.method": {
-        "message": "Time Scaling-Methode"
+        "message": "Time Scaling-Methode:"
     },
     "options.visualisation.timescaling.method.linear": {
         "message": "linear"
@@ -93,7 +93,7 @@
         "message": "logarithmisch"
     },
     "options.visualisation.timescaling.mintimediff": {
-        "message": "Minimal dargestellte Zeitdifferenz"
+        "message": "Minimal dargestellte Zeitdifferenz:"
     },
     "options.visualisation.timescaling.mintimediff.automatic": {
         "message": "automatisch"
@@ -171,16 +171,16 @@
         "message": "Die E-Mail-Adressen der Autoren farbig unterstreichen."
     },
     "options.visualisation.opacity": {
-        "message": "Unwichtige Sub-Threads ausblenden:"
+        "message": "Intensität für nicht relevante Sub-Threads:"
     },
     "options.visualisation.colour.sent": {
-        "message": "Farbe für gesendete E-Mails"
+        "message": "Farbe für gesendete E-Mails:"
     },
     "options.visualisation.colour.received": {
-        "message": "Farben (durch Beistrich getrennt) für empfangene E-Mails"
+        "message": "Farben für empfangene E-Mails (durch Komma getrennt):"
     },
     "options.visualisation.colour.current": {
-        "message": "Farbe um aktuell angezeigte E-Mail hervorzuheben"
+        "message": "Farbe um aktuell angezeigte E-Mail hervorzuheben:"
     },
     "options.about.version": {
         "message": "Version"
