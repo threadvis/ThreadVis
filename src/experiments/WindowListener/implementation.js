@@ -6,6 +6,10 @@
  *
  * Author: John Bieling (john@thunderbird.net)
  *
+ * Patch note 2025-04-07 (Alexander C. Hubmann-Haidvogel <ahubmann@gmail.com>):
+ * Minimal fix to restore functionality in Thunderbird 137, which dropped
+ * XPCOMUtils.defineLazyGetter in favor of ChromeUtils.defineLazyGetter.
+ *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -278,11 +282,11 @@ var WindowListener_102 = class extends ExtensionCommon.ExtensionAPI {
     for (let api of apis) {
       switch (api) {
         case "storage":
-          XPCOMUtils.defineLazyGetter(messenger, "storage", () => getStorage());
+          ChromeUtils.defineLazyGetter(messenger, "storage", () => getStorage());
           break;
 
         default:
-          XPCOMUtils.defineLazyGetter(messenger, api, () =>
+          ChromeUtils.defineLazyGetter(messenger, api, () =>
             context.apiCan.findAPIPath(api)
           );
       }
@@ -1319,11 +1323,11 @@ var WindowListener_115 = class extends ExtensionCommon.ExtensionAPI {
     for (let api of apis) {
       switch (api) {
         case "storage":
-          XPCOMUtils.defineLazyGetter(messenger, "storage", () => getStorage());
+          ChromeUtils.defineLazyGetter(messenger, "storage", () => getStorage());
           break;
 
         default:
-          XPCOMUtils.defineLazyGetter(messenger, api, () =>
+          ChromeUtils.defineLazyGetter(messenger, api, () =>
             context.apiCan.findAPIPath(api)
           );
       }
