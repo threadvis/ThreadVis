@@ -34,7 +34,7 @@
         "gecko": {
             "id": "{A23E4120-431F-4753-AE53-5D028C42CFDC}",
             "strict_min_version": "128.0",
-            "strict_max_version": "140.*"
+            "strict_max_version": "141.*"
         }
     },
     "name": "__MSG_extensionName__",
