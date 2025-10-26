@@ -683,47 +683,40 @@ export class ThreadVis {
             } else {
                 document.getElementById("ThreadVisStatusTooltipError").hidden = true;
             }
+            // display message for disabled Gloda
             if (disabledGloda) {
                 document.getElementById("ThreadVisStatusTooltipGlodaDisabled").hidden = false;
             } else {
                 document.getElementById("ThreadVisStatusTooltipGlodaDisabled").hidden = true;
             }
+            // display message for disabled account
             if (!disabledGloda && disabledAccount) {
                 document.getElementById("ThreadVisStatusTooltipAccountDisabled").hidden = false;
-                document.getElementById("ThreadVisStatusMenuEnableAccount").setAttribute("checked", false);
-                document.getElementById("ThreadVisStatusMenuDisableAccount").setAttribute("checked", true);
             } else {
                 document.getElementById("ThreadVisStatusTooltipAccountDisabled").hidden = true;
-                document.getElementById("ThreadVisStatusMenuEnableAccount").setAttribute("checked", true);
-                document.getElementById("ThreadVisStatusMenuDisableAccount").setAttribute("checked", false);
             }
+            // display message for disabled folder
             if (!disabledGloda && !disabledAccount && disabledFolder) {
                 document.getElementById("ThreadVisStatusTooltipFolderDisabled").hidden = false;
-                document.getElementById("ThreadVisStatusMenuEnableFolder").setAttribute("checked", false);
-                document.getElementById("ThreadVisStatusMenuDisableFolder").setAttribute("checked", true);
             } else {
                 document.getElementById("ThreadVisStatusTooltipFolderDisabled").hidden = true;
-                document.getElementById("ThreadVisStatusMenuEnableFolder").setAttribute("checked", true);
-                document.getElementById("ThreadVisStatusMenuDisableFolder").setAttribute("checked", false);
             }
 
-            // account disable
-            if (!disabledGloda) {
-                document.getElementById("ThreadVisStatusMenuEnableAccount").disabled = false;
-                document.getElementById("ThreadVisStatusMenuDisableAccount").disabled = false;
-            } else {
-                document.getElementById("ThreadVisStatusMenuEnableAccount").disabled = true;
-                document.getElementById("ThreadVisStatusMenuDisableAccount").disabled = true;
-            }
+            // set checked attributes for account
+            document.getElementById("ThreadVisStatusMenuEnableAccount").setAttribute("checked", !disabledAccount);
+            document.getElementById("ThreadVisStatusMenuDisableAccount").setAttribute("checked", disabledAccount);
 
-            // folder disable
-            if (!disabledGloda && !disabledAccount) {
-                document.getElementById("ThreadVisStatusMenuEnableFolder").disabled = false;
-                document.getElementById("ThreadVisStatusMenuDisableFolder").disabled = false;
-            } else {
-                document.getElementById("ThreadVisStatusMenuEnableFolder").disabled = true;
-                document.getElementById("ThreadVisStatusMenuDisableFolder").disabled = true;
-            }
+            // set checked attributes for folder
+            document.getElementById("ThreadVisStatusMenuEnableFolder").setAttribute("checked", !disabledFolder);
+            document.getElementById("ThreadVisStatusMenuDisableFolder").setAttribute("checked", disabledFolder);
+
+            // enable/disable account settings
+            document.getElementById("ThreadVisStatusMenuEnableAccount").disabled = disabledGloda;
+            document.getElementById("ThreadVisStatusMenuDisableAccount").disabled = disabledGloda;
+
+            // enable/disable folder settings
+            document.getElementById("ThreadVisStatusMenuEnableFolder").disabled = disabledGloda || disabledAccount;
+            document.getElementById("ThreadVisStatusMenuDisableFolder").disabled = disabledGloda || disabledAccount;
 
             if (error) {
                 document.getElementById("ThreadVisStatusText").setAttribute("image", "chrome://threadvis/content/images/statusbar-error.png");
@@ -780,7 +773,7 @@ export class ThreadVis {
      */
     enableCurrentAccount() {
         // get folder of currently displayed message
-        const folder = this.#currentThread.selected.message.msgDbHdr.folder;
+        const folder = this.#currentThread?.selected.message.msgDbHdr.folder;
         if (folder) {
             const server = folder.server;
             const account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
@@ -804,7 +797,7 @@ export class ThreadVis {
      */
     disableCurrentAccount() {
         // get folder of currently displayed message
-        const folder = this.#currentThread.selected.message.msgDbHdr.folder;
+        const folder = this.#currentThread?.selected.message.msgDbHdr.folder;
         if (folder) {
             const server = folder.server;
             const account = (Components.classes["@mozilla.org/messenger/account-manager;1"]
