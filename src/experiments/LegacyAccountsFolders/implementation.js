@@ -25,7 +25,7 @@
  *
  * Version: $Id$
  * *********************************************************************************************************************
- * Give access to accounts/folders (folder.folderURL is not available via WebExtension)
+ * Give access to accounts/folders (folder.URI is not available via WebExtension)
  **********************************************************************************************************************/
 
 var { ExtensionCommon } = ChromeUtils.importESModule("resource://gre/modules/ExtensionCommon.sys.mjs");
@@ -39,7 +39,7 @@ var LegacyAccountsFolders = class extends ExtensionCommon.ExtensionAPI {
 
         const getAllFolders = (folder) => {
             return folder.subFolders.map((subFolder)  => ({
-                url: subFolder.folderURL,
+                url: subFolder.URI,
                 name: subFolder.name,
                 folders: getAllFolders(subFolder)
             }));
