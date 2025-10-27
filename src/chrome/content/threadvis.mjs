@@ -279,6 +279,11 @@ export class ThreadVis {
             return false;
         }
 
+        // check if the folder's URI is valid
+        if (!folder.URI) {
+            return false;
+        }
+
         if (Preferences.get(Preferences.DISABLED_FOLDERS) !== ""
                 && Preferences.get(Preferences.DISABLED_FOLDERS).indexOf(" " + folder.URI + " ") > -1) {
             return false;
@@ -737,7 +742,7 @@ export class ThreadVis {
     disableCurrentFolder() {
         // get folder of currently displayed message
         const folder = this.#currentThread.selected.message.msgDbHdr.folder;
-        if (folder) {
+        if (folder && folder.URI) {
             let folderSetting = Preferences.get(Preferences.DISABLED_FOLDERS);
 
             folderSetting = folderSetting + " " + folder.URI + " ";
@@ -755,7 +760,7 @@ export class ThreadVis {
     enableCurrentFolder() {
         // get folder of currently displayed message
         const folder = this.#currentThread.selected.message.msgDbHdr.folder;
-        if (folder) {
+        if (folder && folder.URI) {
             let folderSetting = Preferences.get(Preferences.DISABLED_FOLDERS);
 
             const index = folderSetting.indexOf(" " + folder.URI + " ");
