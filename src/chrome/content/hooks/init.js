@@ -35,10 +35,12 @@ const { ExtensionParent } = ChromeUtils.importESModule("resource://gre/modules/E
 
 const notify = {};
 const extension = ExtensionParent.GlobalManager.getExtension(ThreadVis.ADD_ON_ID);
-Services.scriptloader.loadSubScript(
+Services.scriptloader.loadSubScriptWithOptions(
     extension.rootURI.resolve("chrome/content/helpers/notifyTools.js"),
-    notify,
-    "UTF-8"
+    {
+        target: notify,
+        allowUnsafeURL: true
+    }
 );
 // Set add-on id in notify tools
 notify.notifyTools.setAddOnId(ThreadVis.ADD_ON_ID);
